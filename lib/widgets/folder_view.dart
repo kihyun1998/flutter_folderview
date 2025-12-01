@@ -7,12 +7,14 @@ class FolderView<T> extends StatelessWidget {
   final List<Node<T>> data;
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
+  final Set<String>? selectedNodeIds;
 
   const FolderView({
     super.key,
     required this.data,
     required this.mode,
     this.onNodeTap,
+    this.selectedNodeIds,
   });
 
   @override
@@ -29,6 +31,7 @@ class FolderView<T> extends StatelessWidget {
           onTap: onNodeTap,
           isLast: index == displayNodes.length - 1,
           isRoot: true,
+          selectedNodeIds: selectedNodeIds,
         );
       },
     );

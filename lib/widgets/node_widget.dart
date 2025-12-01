@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../models/node.dart';
 
-class NodeWidget<T> extends StatelessWidget {
+class NodeWidget<T> extends StatefulWidget {
   final Node<T> node;
   final ViewMode mode;
   final Function(Node<T>)? onTap;
   final bool isLast;
   final bool isRoot;
+  final Set<String>? selectedNodeIds;
 
   const NodeWidget({
     super.key,
@@ -16,11 +17,58 @@ class NodeWidget<T> extends StatelessWidget {
     this.onTap,
     this.isLast = false,
     this.isRoot = false,
+    this.selectedNodeIds,
   });
+
+  @override
+  State<NodeWidget<T>> createState() => _NodeWidgetState<T>();
+}
+
+class _NodeWidgetState<T> extends State<NodeWidget<T>>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _iconTurns;
+  late Animation<double> _heightFactor;
 
   static const double _indentWidth = 24.0;
   static const double _iconSize = 20.0;
   static const double _rowHeight = 40.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _iconTurns = Tween<double>(begin: 0.0, end: 0.25).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    _heightFactor = _controller.view;
+
+    // Initialize state
+    if (widget.node.isExpanded) {
+      _controller.value = 1.0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(NodeWidget<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.node.isExpanded != oldWidget.node.isExpanded) {
+      if (widget.node.isExpanded) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +78,11 @@ class NodeWidget<T> extends StatelessWidget {
         Positioned(
           left: 0,
           top: 0,
-          bottom: isLast ? null : 0,
-          height: isLast ? _rowHeight / 2 : null,
+          bottom: widget.isLast ? null : 0,
+          height: widget.isLast ? _rowHeight / 2 : null,
           width: _indentWidth,
           child: CustomPaint(
-            painter: _LinePainter(isLast: isLast, isRoot: isRoot),
+            painter: _LinePainter(isLast: widget.isLast, isRoot: widget.isRoot),
           ),
         ),
 
@@ -54,27 +102,35 @@ class NodeWidget<T> extends StatelessWidget {
                   // Clickable Content
                   Expanded(
                     child: InkWell(
-                      onTap: () => onTap?.call(node),
-                      child: Row(
-                        children: [
-                          // Expand/Collapse Icon
-                          if (node.canExpand)
-                            Icon(
-                              node.isExpanded
-                                  ? Icons.expand_more
-                                  : Icons.chevron_right,
-                              size: _iconSize,
-                            )
-                          else
-                            const SizedBox(width: _iconSize),
+                      onTap: () => widget.onTap?.call(widget.node),
+                      child: Container(
+                        color: (widget.selectedNodeIds
+                                    ?.contains(widget.node.id) ??
+                                false)
+                            ? Theme.of(context).colorScheme.primaryContainer
+                            : null,
+                        child: Row(
+                          children: [
+                            // Expand/Collapse Icon
+                            if (widget.node.canExpand)
+                              RotationTransition(
+                                turns: _iconTurns,
+                                child: Icon(
+                                  Icons.chevron_right,
+                                  size: _iconSize,
+                                ),
+                              )
+                            else
+                              const SizedBox(width: _iconSize),
 
-                          // Node Icon
-                          Icon(_getNodeIcon(), size: _iconSize),
-                          const SizedBox(width: 8),
+                            // Node Icon
+                            Icon(_getNodeIcon(), size: _iconSize),
+                            const SizedBox(width: 8),
 
-                          // Label
-                          Expanded(child: Text(node.label)),
-                        ],
+                            // Label
+                            Expanded(child: Text(widget.node.label)),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -83,21 +139,27 @@ class NodeWidget<T> extends StatelessWidget {
             ),
 
             // Children
-            if (node.isExpanded)
-              Padding(
-                padding: const EdgeInsets.only(left: _indentWidth),
-                child: Column(
-                  children: node.children.asMap().entries.map((entry) {
-                    return NodeWidget<T>(
-                      node: entry.value,
-                      mode: mode,
-                      onTap: onTap,
-                      isLast: entry.key == node.children.length - 1,
-                      isRoot: false,
-                    );
-                  }).toList(),
+            ClipRect(
+              child: SizeTransition(
+                sizeFactor: _heightFactor,
+                axisAlignment: -1.0, // Expand from top
+                child: Padding(
+                  padding: const EdgeInsets.only(left: _indentWidth),
+                  child: Column(
+                    children: widget.node.children.asMap().entries.map((entry) {
+                      return NodeWidget<T>(
+                        node: entry.value,
+                        mode: widget.mode,
+                        onTap: widget.onTap,
+                        isLast: entry.key == widget.node.children.length - 1,
+                        isRoot: false,
+                        selectedNodeIds: widget.selectedNodeIds,
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
+            ),
           ],
         ),
       ],
@@ -105,10 +167,12 @@ class NodeWidget<T> extends StatelessWidget {
   }
 
   IconData _getNodeIcon() {
-    if (node.type == NodeType.folder) {
-      return node.isExpanded ? Icons.folder_open : Icons.folder;
-    } else if (node.type == NodeType.parent) {
-      return mode == ViewMode.tree ? Icons.account_tree : Icons.description;
+    if (widget.node.type == NodeType.folder) {
+      return widget.node.isExpanded ? Icons.folder_open : Icons.folder;
+    } else if (widget.node.type == NodeType.parent) {
+      return widget.mode == ViewMode.tree
+          ? Icons.account_tree
+          : Icons.description;
     } else {
       return Icons.insert_drive_file;
     }
