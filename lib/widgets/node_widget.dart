@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/node.dart';
 
-class NodeWidget<T> extends StatefulWidget {
+class NodeWidget<T> extends StatelessWidget {
   final Node<T> node;
   final ViewMode mode;
   final Function(Node<T>)? onTap;
@@ -18,11 +18,6 @@ class NodeWidget<T> extends StatefulWidget {
     this.isRoot = false,
   });
 
-  @override
-  _NodeWidgetState<T> createState() => _NodeWidgetState<T>();
-}
-
-class _NodeWidgetState<T> extends State<NodeWidget<T>> {
   static const double _indentWidth = 24.0;
   static const double _iconSize = 20.0;
   static const double _rowHeight = 40.0;
@@ -32,16 +27,14 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>> {
     return Stack(
       children: [
         // 1. Vertical Line (Pipeline)
-        // Drawn for the full height of this widget if not last.
-        // If last, drawn only to the center of the header.
         Positioned(
           left: 0,
           top: 0,
-          bottom: widget.isLast ? null : 0, // Full height if not last
-          height: widget.isLast ? _rowHeight / 2 : null, // Half height if last
+          bottom: isLast ? null : 0,
+          height: isLast ? _rowHeight / 2 : null,
           width: _indentWidth,
           child: CustomPaint(
-            painter: _LinePainter(isLast: widget.isLast, isRoot: widget.isRoot),
+            painter: _LinePainter(isLast: isLast, isRoot: isRoot),
           ),
         ),
 
@@ -61,20 +54,13 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>> {
                   // Clickable Content
                   Expanded(
                     child: InkWell(
-                      onTap: () {
-                        if (widget.node.canExpand) {
-                          setState(() {
-                            widget.node.isExpanded = !widget.node.isExpanded;
-                          });
-                        }
-                        widget.onTap?.call(widget.node);
-                      },
+                      onTap: () => onTap?.call(node),
                       child: Row(
                         children: [
                           // Expand/Collapse Icon
-                          if (widget.node.canExpand)
+                          if (node.canExpand)
                             Icon(
-                              widget.node.isExpanded
+                              node.isExpanded
                                   ? Icons.expand_more
                                   : Icons.chevron_right,
                               size: _iconSize,
@@ -87,7 +73,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>> {
                           const SizedBox(width: 8),
 
                           // Label
-                          Expanded(child: Text(widget.node.label)),
+                          Expanded(child: Text(node.label)),
                         ],
                       ),
                     ),
@@ -97,16 +83,16 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>> {
             ),
 
             // Children
-            if (widget.node.isExpanded)
+            if (node.isExpanded)
               Padding(
                 padding: const EdgeInsets.only(left: _indentWidth),
                 child: Column(
-                  children: widget.node.children.asMap().entries.map((entry) {
+                  children: node.children.asMap().entries.map((entry) {
                     return NodeWidget<T>(
                       node: entry.value,
-                      mode: widget.mode,
-                      onTap: widget.onTap,
-                      isLast: entry.key == widget.node.children.length - 1,
+                      mode: mode,
+                      onTap: onTap,
+                      isLast: entry.key == node.children.length - 1,
                       isRoot: false,
                     );
                   }).toList(),
@@ -119,12 +105,10 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>> {
   }
 
   IconData _getNodeIcon() {
-    if (widget.node.type == NodeType.folder) {
-      return widget.node.isExpanded ? Icons.folder_open : Icons.folder;
-    } else if (widget.node.type == NodeType.parent) {
-      return widget.mode == ViewMode.tree
-          ? Icons.account_tree
-          : Icons.description;
+    if (node.type == NodeType.folder) {
+      return node.isExpanded ? Icons.folder_open : Icons.folder;
+    } else if (node.type == NodeType.parent) {
+      return mode == ViewMode.tree ? Icons.account_tree : Icons.description;
     } else {
       return Icons.insert_drive_file;
     }
