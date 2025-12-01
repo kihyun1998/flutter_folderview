@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/node.dart';
 import 'node_widget.dart';
 
@@ -8,11 +9,11 @@ class FolderView<T> extends StatefulWidget {
   final Function(Node<T>)? onNodeTap;
 
   const FolderView({
-    Key? key,
+    super.key,
     required this.data,
     required this.mode,
     this.onNodeTap,
-  }) : super(key: key);
+  });
 
   @override
   _FolderViewState<T> createState() => _FolderViewState<T>();
@@ -31,6 +32,8 @@ class _FolderViewState<T> extends State<FolderView<T>> {
           node: displayNodes[index],
           mode: widget.mode,
           onTap: widget.onNodeTap,
+          isLast: index == displayNodes.length - 1,
+          isRoot: true,
         );
       },
     );
@@ -47,7 +50,9 @@ class _FolderViewState<T> extends State<FolderView<T>> {
     } else {
       // In Folder Mode, we show Folders and Parents at the root level.
       // "Folder mode: Folder > Parent > Child. Parent of Parent is Folder."
-      return widget.data.where((n) => n.type == NodeType.folder || n.type == NodeType.parent).toList();
+      return widget.data
+          .where((n) => n.type == NodeType.folder || n.type == NodeType.parent)
+          .toList();
     }
   }
 }
