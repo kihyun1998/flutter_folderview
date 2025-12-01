@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_folderview/flutter_folderview.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,116 +8,166 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter FolderView Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  ViewMode _currentMode = ViewMode.folder;
+  late List<Node<String>> _data;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _data = _generateMockData();
+  }
+
+  List<Node<String>> _generateMockData() {
+    // Structure:
+    // Folder A
+    //   - Parent 1
+    //     - Child 1.1
+    //     - Child 1.2
+    //   - Folder B
+    //     - Parent 2
+    //       - Child 2.1
+    // Parent 3 (Root level parent, visible in Tree Mode as root, and Folder Mode as root)
+    //   - Child 3.1
+
+    final child1_1 = Node<String>(id: 'c1.1', label: 'Child 1.1', type: NodeType.child);
+    final child1_2 = Node<String>(id: 'c1.2', label: 'Child 1.2', type: NodeType.child);
+    
+    final parent1 = Node<String>(
+      id: 'p1', 
+      label: 'Parent 1', 
+      type: NodeType.parent, 
+      children: [child1_1, child1_2]
+    );
+
+    final child2_1 = Node<String>(id: 'c2.1', label: 'Child 2.1', type: NodeType.child);
+    final parent2 = Node<String>(
+      id: 'p2', 
+      label: 'Parent 2', 
+      type: NodeType.parent, 
+      children: [child2_1]
+    );
+
+    final folderB = Node<String>(
+      id: 'fB', 
+      label: 'Folder B', 
+      type: NodeType.folder, 
+      children: [parent2]
+    );
+
+    final folderA = Node<String>(
+      id: 'fA', 
+      label: 'Folder A', 
+      type: NodeType.folder, 
+      children: [parent1, folderB]
+    );
+
+    final child3_1 = Node<String>(id: 'c3.1', label: 'Child 3.1', type: NodeType.child);
+    final parent3 = Node<String>(
+      id: 'p3', 
+      label: 'Parent 3', 
+      type: NodeType.parent, 
+      children: [child3_1]
+    );
+
+    // In a real scenario, you might have a flat list or a tree. 
+    // Here we return the top-level nodes for Folder Mode.
+    // For Tree Mode, we might need to flatten or traverse to find all Parents if they are nested in folders.
+    // However, the requirement says:
+    // Tree Mode: Parent > Child. Parent of Parent is none.
+    // Folder Mode: Folder > ... > Parent > Child.
+    
+    // If we pass this list to FolderView, the FolderView logic needs to handle the display.
+    // But wait, if 'Parent 1' is inside 'Folder A', it shouldn't be a root in Tree Mode if we just pass [Folder A, Parent 3].
+    // We need a way to get ALL parents for Tree Mode.
+    
+    return [folderA, parent3];
+  }
+
+  // Helper to extract all parents for Tree Mode from the hierarchical data
+  List<Node<String>> _getAllParents(List<Node<String>> nodes) {
+    List<Node<String>> parents = [];
+    for (var node in nodes) {
+      if (node.type == NodeType.parent) {
+        parents.add(node);
+      }
+      if (node.children.isNotEmpty) {
+        parents.addAll(_getAllParents(node.children));
+      }
+    }
+    return parents;
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    // Prepare data for the view
+    List<Node<String>> viewData;
+    if (_currentMode == ViewMode.tree) {
+      // In Tree Mode, we want all Parents to be at the root level.
+      // So we flatten the hierarchy to find all parents.
+      viewData = _getAllParents(_data);
+    } else {
+      // In Folder Mode, we use the hierarchy as is.
+      viewData = _data;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Flutter FolderView'),
+        actions: [
+          IconButton(
+            icon: Icon(_currentMode == ViewMode.folder ? Icons.folder : Icons.account_tree),
+            onPressed: () {
+              setState(() {
+                _currentMode = _currentMode == ViewMode.folder 
+                    ? ViewMode.tree 
+                    : ViewMode.folder;
+              });
+            },
+            tooltip: 'Switch to ${_currentMode == ViewMode.folder ? 'Tree' : 'Folder'} Mode',
+          ),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Current Mode: ${_currentMode.toString().split('.').last.toUpperCase()}',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: FolderView<String>(
+              data: viewData,
+              mode: _currentMode,
+              onNodeTap: (node) {
+                print('Tapped: ${node.label} (${node.type})');
+              },
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
