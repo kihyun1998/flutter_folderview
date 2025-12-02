@@ -50,24 +50,30 @@ class FolderView<T> extends StatelessWidget {
         final needsVerticalScroll = contentHeight > availableHeight;
 
         return SyncedScrollControllers(
-          builder: (context, verticalController, verticalScrollbarController,
-              horizontalController, horizontalScrollbarController) {
-            return FolderViewContent<T>(
-              data: displayNodes,
-              mode: mode,
-              onNodeTap: onNodeTap,
-              selectedNodeIds: selectedNodeIds,
-              contentWidth: contentWidth,
-              contentHeight: contentHeight,
-              needsHorizontalScroll: needsHorizontalScroll,
-              needsVerticalScroll: needsVerticalScroll,
-              horizontalController: horizontalController!,
-              verticalController: verticalController!,
-              horizontalBarController: horizontalScrollbarController!,
-              verticalBarController: verticalScrollbarController!,
-              lineStyle: lineStyle,
-            );
-          },
+          builder:
+              (
+                context,
+                verticalController,
+                verticalScrollbarController,
+                horizontalController,
+                horizontalScrollbarController,
+              ) {
+                return FolderViewContent<T>(
+                  data: displayNodes,
+                  mode: mode,
+                  onNodeTap: onNodeTap,
+                  selectedNodeIds: selectedNodeIds,
+                  contentWidth: contentWidth,
+                  contentHeight: contentHeight,
+                  needsHorizontalScroll: needsHorizontalScroll,
+                  needsVerticalScroll: needsVerticalScroll,
+                  horizontalController: horizontalController!,
+                  verticalController: verticalController!,
+                  horizontalBarController: horizontalScrollbarController!,
+                  verticalBarController: verticalScrollbarController!,
+                  lineStyle: lineStyle,
+                );
+              },
         );
       },
     );

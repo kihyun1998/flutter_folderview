@@ -1,4 +1,4 @@
-library flutter_folderview;
+library;
 
 export 'models/node.dart';
 export 'widgets/folder_view.dart';

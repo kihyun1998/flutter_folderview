@@ -32,7 +32,6 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   late Animation<double> _iconTurns;
   late Animation<double> _heightFactor;
 
-  static const double _indentWidth = 24.0;
   static const double _iconSize = 20.0;
   static const double _rowHeight = 40.0;
 
@@ -43,9 +42,10 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _iconTurns = Tween<double>(begin: 0.0, end: 0.25).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _iconTurns = Tween<double>(
+      begin: 0.0,
+      end: 0.25,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _heightFactor = _controller.view;
 
     // Initialize state
@@ -82,7 +82,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           top: 0,
           bottom: widget.isLast ? null : 0,
           height: widget.isLast ? _rowHeight / 2 : null,
-          width: _indentWidth,
+          width: _iconSize,
           child: CustomPaint(
             painter: _LinePainter(
               isLast: widget.isLast,
@@ -102,16 +102,16 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Spacer for the connector line (Non-clickable)
-                  const SizedBox(width: _indentWidth),
+                  // // Spacer for the connector line (Non-clickable)
+                  const SizedBox(width: _iconSize),
 
                   // Clickable Content
                   Expanded(
                     child: InkWell(
                       onTap: () => widget.onTap?.call(widget.node),
                       child: Container(
-                        color: (widget.selectedNodeIds
-                                    ?.contains(widget.node.id) ??
+                        color:
+                            (widget.selectedNodeIds?.contains(widget.node.id) ??
                                 false)
                             ? Theme.of(context).colorScheme.primaryContainer
                             : null,
@@ -150,7 +150,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                 sizeFactor: _heightFactor,
                 axisAlignment: -1.0, // Expand from top
                 child: Padding(
-                  padding: const EdgeInsets.only(left: _indentWidth),
+                  padding: const EdgeInsets.only(left: _iconSize),
                   child: Column(
                     children: widget.node.children.asMap().entries.map((entry) {
                       return NodeWidget<T>(

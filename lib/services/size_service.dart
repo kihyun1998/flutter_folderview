@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/node.dart';
 
 class SizeService {
@@ -6,7 +7,7 @@ class SizeService {
   static double calculateContentWidth<T>({
     required List<Node<T>> nodes,
     required TextStyle textStyle,
-    double indentWidth = 24.0,
+    double linePaintWidth = 20.0,
     double iconSize = 20.0,
     double spacing = 8.0,
     double rightPadding = 16.0,
@@ -19,7 +20,7 @@ class SizeService {
         node: node,
         textStyle: textStyle,
         depth: 0,
-        indentWidth: indentWidth,
+        linePaintWidth: linePaintWidth,
         iconSize: iconSize,
         spacing: spacing,
         rightPadding: rightPadding,
@@ -33,14 +34,14 @@ class SizeService {
         final childrenWidth = calculateContentWidth(
           nodes: node.children,
           textStyle: textStyle,
-          indentWidth: indentWidth,
+          linePaintWidth: linePaintWidth,
           iconSize: iconSize,
           spacing: spacing,
           rightPadding: rightPadding,
           maxWidth: maxWidth,
         );
         // Add one level of indentation for children
-        final adjustedChildWidth = childrenWidth + indentWidth;
+        final adjustedChildWidth = childrenWidth + linePaintWidth;
         if (adjustedChildWidth > maxNodeWidth) {
           maxNodeWidth = adjustedChildWidth;
         }
@@ -55,13 +56,13 @@ class SizeService {
     required Node<T> node,
     required TextStyle textStyle,
     required int depth,
-    required double indentWidth,
+    required double linePaintWidth,
     required double iconSize,
     required double spacing,
     required double rightPadding,
   }) {
     // Base indent (pipeline spacing)
-    double width = indentWidth;
+    double width = linePaintWidth;
 
     // Expand/collapse icon (or space)
     width += iconSize;
