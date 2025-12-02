@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/node.dart';
+import '../themes/flutter_folder_view_theme.dart';
 import 'folder_view_horizontal_scrollbar.dart';
 import 'folder_view_vertical_scrollbar.dart';
 import 'node_widget.dart';
@@ -24,7 +25,7 @@ class FolderViewContent<T> extends StatefulWidget {
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
   final Set<String>? selectedNodeIds;
-  final LineStyle lineStyle;
+  final FlutterFolderViewTheme theme;
 
   const FolderViewContent({
     super.key,
@@ -40,7 +41,7 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.mode,
     required this.onNodeTap,
     required this.selectedNodeIds,
-    this.lineStyle = LineStyle.connector,
+    required this.theme,
   });
 
   @override
@@ -60,7 +61,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     required ScrollController verticalController,
     required double contentWidth,
     required bool needsHorizontalScroll,
-    required LineStyle lineStyle,
+    required FlutterFolderViewTheme theme,
   }) {
     final Widget listView = Column(
       children: [
@@ -76,7 +77,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                 isLast: index == data.length - 1,
                 isRoot: true,
                 selectedNodeIds: selectedNodeIds,
-                lineStyle: lineStyle,
+                lineTheme: theme.lineTheme,
               );
             },
           ),
@@ -120,7 +121,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
               verticalController: widget.verticalController,
               contentWidth: widget.contentWidth,
               needsHorizontalScroll: widget.needsHorizontalScroll,
-              lineStyle: widget.lineStyle,
+              theme: widget.theme,
             ),
 
             /// Vertical scrollbar

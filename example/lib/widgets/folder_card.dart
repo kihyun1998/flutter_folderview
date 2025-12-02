@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
+
 import '../models/card_config.dart';
 
 class FolderCard extends StatefulWidget {
   final CardConfig initialConfig;
 
-  const FolderCard({
-    super.key,
-    required this.initialConfig,
-  });
+  const FolderCard({super.key, required this.initialConfig});
 
   @override
   State<FolderCard> createState() => _FolderCardState();
@@ -38,7 +36,9 @@ class _FolderCardState extends State<FolderCard> {
   }
 
   List<Node<String>> _toggleNodeRecursive(
-      List<Node<String>> nodes, String targetId) {
+    List<Node<String>> nodes,
+    String targetId,
+  ) {
     return nodes.map((node) {
       if (node.id == targetId) {
         return Node<String>(
@@ -125,7 +125,11 @@ class _FolderCardState extends State<FolderCard> {
                 ),
                 // Line Style Menu
                 PopupMenuButton<LineStyle>(
-                  icon: Icon(Icons.more_vert, size: 18, color: Colors.grey[600]),
+                  icon: Icon(
+                    Icons.more_vert,
+                    size: 18,
+                    color: Colors.grey[600],
+                  ),
                   tooltip: 'Line Style',
                   onSelected: (lineStyle) {
                     setState(() {
@@ -164,7 +168,6 @@ class _FolderCardState extends State<FolderCard> {
                 mode: config.mode,
                 onNodeTap: _handleNodeTap,
                 selectedNodeIds: selectedNodeIds,
-                lineStyle: config.lineStyle,
               ),
             ),
           ),

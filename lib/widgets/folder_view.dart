@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/node.dart';
 import '../services/size_service.dart';
+import '../themes/flutter_folder_view_theme.dart';
+import '../themes/folder_view_theme.dart';
 import 'folder_view_content.dart';
 import 'synced_scroll_controllers.dart';
 
@@ -10,7 +12,7 @@ class FolderView<T> extends StatelessWidget {
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
   final Set<String>? selectedNodeIds;
-  final LineStyle lineStyle;
+  final FlutterFolderViewTheme? theme;
 
   const FolderView({
     super.key,
@@ -18,11 +20,14 @@ class FolderView<T> extends StatelessWidget {
     required this.mode,
     this.onNodeTap,
     this.selectedNodeIds,
-    this.lineStyle = LineStyle.connector,
+    this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Resolve theme: use provided theme, or get from context, or use default
+    final effectiveTheme = theme ?? FolderViewTheme.of(context);
+
     // Filter data based on mode
     List<Node<T>> displayNodes = _getDisplayNodes();
 
@@ -71,7 +76,7 @@ class FolderView<T> extends StatelessWidget {
                   verticalController: verticalController!,
                   horizontalBarController: horizontalScrollbarController!,
                   verticalBarController: verticalScrollbarController!,
-                  lineStyle: lineStyle,
+                  theme: effectiveTheme,
                 );
               },
         );

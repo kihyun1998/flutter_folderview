@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 
 import 'data/corporate_data.dart';
-import 'data/government_data.dart';
 import 'data/filesystem_data.dart';
+import 'data/government_data.dart';
 import 'data/software_data.dart';
 import 'models/card_config.dart';
+import 'pages/theme_demo_page.dart';
 import 'widgets/folder_card.dart';
 
 void main() {
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter FolderView Showcase',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -44,6 +46,18 @@ class MyHomePage extends StatelessWidget {
         title: const Text('Flutter FolderView Showcase'),
         centerTitle: true,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.palette),
+            tooltip: 'Theme Demo',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ThemeDemoPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

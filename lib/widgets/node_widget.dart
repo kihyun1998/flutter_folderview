@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/node.dart';
+import '../themes/folder_view_line_theme.dart';
 
 class NodeWidget<T> extends StatefulWidget {
   final Node<T> node;
@@ -9,7 +10,7 @@ class NodeWidget<T> extends StatefulWidget {
   final bool isLast;
   final bool isRoot;
   final Set<String>? selectedNodeIds;
-  final LineStyle lineStyle;
+  final FolderViewLineTheme lineTheme;
 
   const NodeWidget({
     super.key,
@@ -19,7 +20,7 @@ class NodeWidget<T> extends StatefulWidget {
     this.isLast = false,
     this.isRoot = false,
     this.selectedNodeIds,
-    this.lineStyle = LineStyle.connector,
+    required this.lineTheme,
   });
 
   @override
@@ -87,7 +88,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
             painter: _LinePainter(
               isLast: widget.isLast,
               isRoot: widget.isRoot,
-              lineStyle: widget.lineStyle,
+              lineTheme: widget.lineTheme,
             ),
           ),
         ),
@@ -160,7 +161,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                         isLast: entry.key == widget.node.children.length - 1,
                         isRoot: false,
                         selectedNodeIds: widget.selectedNodeIds,
-                        lineStyle: widget.lineStyle,
+                        lineTheme: widget.lineTheme,
                       );
                     }).toList(),
                   ),
@@ -189,29 +190,30 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
 class _LinePainter extends CustomPainter {
   final bool isLast;
   final bool isRoot;
-  final LineStyle lineStyle;
+  final FolderViewLineTheme lineTheme;
 
   _LinePainter({
     required this.isLast,
     required this.isRoot,
-    required this.lineStyle,
+    required this.lineTheme,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     // Don't draw any lines for root nodes or when lineStyle is none
-    if (isRoot || lineStyle == LineStyle.none) {
+    if (isRoot || lineTheme.lineStyle == LineStyle.none) {
       return;
     }
 
     final paint = Paint()
-      ..color = Colors.grey
-      ..strokeWidth = 1.0
+      ..color = lineTheme.lineColor
+      ..strokeWidth = lineTheme.lineWidth
+      ..strokeCap = lineTheme.strokeCap
       ..style = PaintingStyle.stroke;
 
     final double centerX = size.width / 2;
 
-    switch (lineStyle) {
+    switch (lineTheme.lineStyle) {
       case LineStyle.connector:
         // Traditional tree lines with ├─ and └─
         // Vertical Line
@@ -250,6 +252,6 @@ class _LinePainter extends CustomPainter {
   bool shouldRepaint(covariant _LinePainter oldDelegate) {
     return oldDelegate.isLast != isLast ||
         oldDelegate.isRoot != isRoot ||
-        oldDelegate.lineStyle != lineStyle;
+        oldDelegate.lineTheme != lineTheme;
   }
 }
