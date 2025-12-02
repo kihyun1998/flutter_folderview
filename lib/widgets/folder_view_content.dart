@@ -1,0 +1,142 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/material.dart';
+
+import '../models/node.dart';
+import 'folder_view_horizontal_scrollbar.dart';
+import 'folder_view_vertical_scrollbar.dart';
+import 'node_widget.dart';
+
+class FolderViewContent<T> extends StatefulWidget {
+  /// Scroll controllers
+  final ScrollController horizontalController;
+  final ScrollController horizontalBarController;
+  final ScrollController verticalController;
+  final ScrollController verticalBarController;
+
+  /// Scroll flags
+  final bool needsVerticalScroll;
+  final bool needsHorizontalScroll;
+
+  final double contentWidth;
+  final double contentHeight;
+
+  final List<Node<T>> data;
+  final ViewMode mode;
+  final Function(Node<T>)? onNodeTap;
+  final Set<String>? selectedNodeIds;
+
+  const FolderViewContent({
+    super.key,
+    required this.horizontalController,
+    required this.horizontalBarController,
+    required this.verticalController,
+    required this.verticalBarController,
+    required this.needsVerticalScroll,
+    required this.needsHorizontalScroll,
+    required this.contentWidth,
+    required this.contentHeight,
+    required this.data,
+    required this.mode,
+    required this.onNodeTap,
+    required this.selectedNodeIds,
+  });
+
+  @override
+  State<FolderViewContent<T>> createState() => _FolderViewContentState<T>();
+}
+
+class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
+  bool _isHover = false;
+
+  /// Build the ListView
+  Widget _buildListView({
+    required List<Node<T>> data,
+    required ViewMode mode,
+    required Function(Node<T>)? onNodeTap,
+    required Set<String>? selectedNodeIds,
+    required ScrollController horizontalController,
+    required ScrollController verticalController,
+    required double contentWidth,
+    required bool needsHorizontalScroll,
+  }) {
+    final Widget listView = Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            controller: verticalController,
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              return NodeWidget<T>(
+                node: data[index],
+                mode: mode,
+                onTap: onNodeTap,
+                isLast: index == data.length - 1,
+                isRoot: true,
+                selectedNodeIds: selectedNodeIds,
+              );
+            },
+          ),
+        ),
+        // Only add spacing when horizontal scrollbar is actually needed
+        if (needsHorizontalScroll)
+          SizedBox(height: FolderViewHorizontalScrollbar.scrollbarTrackWidth),
+      ],
+    );
+
+    if (needsHorizontalScroll) {
+      return SingleChildScrollView(
+        controller: horizontalController,
+        scrollDirection: Axis.horizontal,
+        physics: const ClampingScrollPhysics(),
+        child: SizedBox(
+          width: contentWidth,
+          child: listView,
+        ),
+      );
+    } else {
+      return listView;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHover = true),
+      onExit: (_) => setState(() => _isHover = false),
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+        child: Stack(
+          children: [
+            _buildListView(
+              data: widget.data,
+              mode: widget.mode,
+              onNodeTap: widget.onNodeTap,
+              selectedNodeIds: widget.selectedNodeIds,
+              horizontalController: widget.horizontalController,
+              verticalController: widget.verticalController,
+              contentWidth: widget.contentWidth,
+              needsHorizontalScroll: widget.needsHorizontalScroll,
+            ),
+
+            /// Vertical scrollbar
+            if (widget.needsVerticalScroll)
+              FolderViewVerticalScrollbar(
+                isHover: _isHover,
+                verticalScrollbarController: widget.verticalBarController,
+                contentHeight: widget.contentHeight,
+                needsHorizontalScroll: widget.needsHorizontalScroll,
+              ),
+
+            /// Horizontal scrollbar
+            if (widget.needsHorizontalScroll)
+              FolderViewHorizontalScrollbar(
+                isHover: _isHover,
+                horizontalScrollbarController: widget.horizontalBarController,
+                contentWidth: widget.contentWidth,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

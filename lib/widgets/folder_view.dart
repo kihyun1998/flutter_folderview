@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../models/node.dart';
-import 'node_widget.dart';
+import '../services/size_service.dart';
+import 'folder_view_content.dart';
+import 'synced_scroll_controllers.dart';
 
 class FolderView<T> extends StatelessWidget {
   final List<Node<T>> data;
@@ -22,16 +24,47 @@ class FolderView<T> extends StatelessWidget {
     // Filter data based on mode
     List<Node<T>> displayNodes = _getDisplayNodes();
 
-    return ListView.builder(
-      itemCount: displayNodes.length,
-      itemBuilder: (context, index) {
-        return NodeWidget<T>(
-          node: displayNodes[index],
-          mode: mode,
-          onTap: onNodeTap,
-          isLast: index == displayNodes.length - 1,
-          isRoot: true,
-          selectedNodeIds: selectedNodeIds,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double availableHeight = constraints.maxHeight;
+        final double availableWidth = constraints.maxWidth;
+
+        // Default text style for measurement
+        final textStyle = const TextStyle(fontSize: 14);
+
+        // Calculate content dimensions
+        final contentWidth = SizeService.calculateContentWidth(
+          nodes: displayNodes,
+          textStyle: textStyle,
+          maxWidth: availableWidth * 3, // Allow up to 3x viewport width
+        );
+
+        final contentHeight = SizeService.calculateContentHeight(
+          nodes: displayNodes,
+          rowHeight: 40.0,
+        );
+
+        final needsHorizontalScroll = contentWidth > availableWidth;
+        final needsVerticalScroll = contentHeight > availableHeight;
+
+        return SyncedScrollControllers(
+          builder: (context, verticalController, verticalScrollbarController,
+              horizontalController, horizontalScrollbarController) {
+            return FolderViewContent<T>(
+              data: displayNodes,
+              mode: mode,
+              onNodeTap: onNodeTap,
+              selectedNodeIds: selectedNodeIds,
+              contentWidth: contentWidth,
+              contentHeight: contentHeight,
+              needsHorizontalScroll: needsHorizontalScroll,
+              needsVerticalScroll: needsVerticalScroll,
+              horizontalController: horizontalController!,
+              verticalController: verticalController!,
+              horizontalBarController: horizontalScrollbarController!,
+              verticalBarController: verticalScrollbarController!,
+            );
+          },
         );
       },
     );

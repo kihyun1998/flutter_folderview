@@ -68,47 +68,147 @@ class FolderState extends _$FolderState {
   }
 
   List<Node<String>> _generateMockData() {
-    final child1_1 = Node<String>(id: 'c1.1', label: 'Child 1.1', type: NodeType.child);
-    final child1_2 = Node<String>(id: 'c1.2', label: 'Child 1.2', type: NodeType.child);
+    // Deep nesting example - Company > Department > Team > Projects > Tasks
     
-    final parent1 = Node<String>(
-      id: 'p1', 
-      label: 'Parent 1', 
-      type: NodeType.parent, 
-      children: [child1_1, child1_2]
+    // Engineering Department
+    final engineeringTask1 = Node<String>(
+      id: 'eng_task_1', 
+      label: 'Implement New Authentication System with OAuth 2.0 and JWT Tokens', 
+      type: NodeType.child
     );
-
-    final child2_1 = Node<String>(id: 'c2.1', label: 'Child 2.1', type: NodeType.child);
-    final parent2 = Node<String>(
-      id: 'p2', 
-      label: 'Parent 2', 
-      type: NodeType.parent, 
-      children: [child2_1]
+    final engineeringTask2 = Node<String>(
+      id: 'eng_task_2', 
+      label: 'Refactor Legacy Database Schema for Better Performance', 
+      type: NodeType.child
     );
-
-    final folderB = Node<String>(
-      id: 'fB', 
-      label: 'Folder B', 
-      type: NodeType.folder, 
-      children: [parent2]
-    );
-
-    final folderA = Node<String>(
-      id: 'fA', 
-      label: 'Folder A', 
-      type: NodeType.folder, 
-      children: [parent1, folderB]
-    );
-
-    final child3_1 = Node<String>(id: 'c3.1', label: 'Child 3.1', type: NodeType.child);
-    final parent3 = Node<String>(
-      id: 'p3', 
-      label: 'Parent 3', 
-      type: NodeType.parent, 
-      children: [child3_1]
+    final engineeringTask3 = Node<String>(
+      id: 'eng_task_3', 
+      label: 'Code Review and Optimization Analysis', 
+      type: NodeType.child
     );
     
-    return [folderA, parent3];
+    final backendProject = Node<String>(
+      id: 'backend_proj',
+      label: 'Backend API Development - Q4 2024 Milestone',
+      type: NodeType.parent,
+      children: [engineeringTask1, engineeringTask2, engineeringTask3],
+    );
+    
+    final frontendTask1 = Node<String>(
+      id: 'frontend_task_1',
+      label: 'Responsive Dashboard with Real-time Analytics and Data Visualization',
+      type: NodeType.child
+    );
+    final frontendTask2 = Node<String>(
+      id: 'frontend_task_2',
+      label: 'Mobile-First Design Implementation',
+      type: NodeType.child
+    );
+    
+    final frontendProject = Node<String>(
+      id: 'frontend_proj',
+      label: 'Frontend User Interface Modernization Project',
+      type: NodeType.parent,
+      children: [frontendTask1, frontendTask2],
+    );
+    
+    final engineeringFolder = Node<String>(
+      id: 'engineering_folder',
+      label: 'Engineering Department - Software Development Division',
+      type: NodeType.folder,
+      children: [backendProject, frontendProject],
+    );
+    
+    // Marketing Department
+    final marketingTask1 = Node<String>(
+      id: 'marketing_task_1',
+      label: 'Q4 Social Media Campaign Strategy and Content Calendar Planning',
+      type: NodeType.child
+    );
+    final marketingTask2 = Node<String>(
+      id: 'marketing_task_2',
+      label: 'Customer Engagement Analytics Report',
+      type: NodeType.child
+    );
+    final marketingTask3 = Node<String>(
+      id: 'marketing_task_3',
+      label: 'Brand Identity Redesign Proposal',
+      type: NodeType.child
+    );
+    final marketingTask4 = Node<String>(
+      id: 'marketing_task_4',
+      label: 'Email Marketing Automation Setup',
+      type: NodeType.child
+    );
+    
+    final digitalMarketingParent = Node<String>(
+      id: 'digital_marketing',
+      label: 'Digital Marketing Initiatives and Online Presence Enhancement',
+      type: NodeType.parent,
+      children: [marketingTask1, marketingTask2, marketingTask3, marketingTask4],
+    );
+    
+    final marketingFolder = Node<String>(
+      id: 'marketing_folder',
+      label: 'Marketing & Communications Department - Strategic Planning',
+      type: NodeType.folder,
+      children: [digitalMarketingParent],
+    );
+    
+    // HR Department
+    final hrTask1 = Node<String>(
+      id: 'hr_task_1',
+      label: 'Employee Onboarding Process Documentation and Training Materials',
+      type: NodeType.child
+    );
+    final hrTask2 = Node<String>(
+      id: 'hr_task_2',
+      label: 'Annual Performance Review Schedule',
+      type: NodeType.child
+    );
+    final hrTask3 = Node<String>(
+      id: 'hr_task_3',
+      label: 'Benefits Package Comparison Analysis',
+      type: NodeType.child
+    );
+    
+    final recruitmentParent = Node<String>(
+      id: 'recruitment',
+      label: 'Talent Acquisition and Recruitment Pipeline Management',
+      type: NodeType.parent,
+      children: [hrTask1, hrTask2, hrTask3],
+    );
+    
+    // Standalone Projects (no folder parent)
+    final standaloneChild1 = Node<String>(
+      id: 'standalone_1',
+      label: 'Infrastructure Modernization Initiative - Cloud Migration Phase 2',
+      type: NodeType.child
+    );
+    final standaloneChild2 = Node<String>(
+      id: 'standalone_2',
+      label: 'Security Audit and Compliance Report',
+      type: NodeType.child
+    );
+    
+    final standaloneParent = Node<String>(
+      id: 'standalone_parent',
+      label: 'Cross-Departmental IT Infrastructure Projects and Initiatives',
+      type: NodeType.parent,
+      children: [standaloneChild1, standaloneChild2],
+    );
+    
+    return [
+      engineeringFolder,
+      marketingFolder,
+      Node<String>(
+        id: 'hr_folder',
+        label: 'Human Resources - People Operations and Culture',
+        type: NodeType.folder,
+        children: [recruitmentParent],
+      ),
+      standaloneParent,
+    ];
   }
 }
 
