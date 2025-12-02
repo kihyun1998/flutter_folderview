@@ -417,6 +417,45 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
 
         const SizedBox(height: 24),
 
+        // Track Radius
+        _buildSection(
+          title: 'Track Radius',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _scrollbarTrackRadius,
+                min: 0.0,
+                max: 12.0,
+                divisions: 24,
+                label: _scrollbarTrackRadius.toStringAsFixed(1),
+                onChanged: (value) =>
+                    setState(() => _scrollbarTrackRadius = value),
+              ),
+              Text(
+                'Radius: ${_scrollbarTrackRadius.toStringAsFixed(1)}px',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Always Visible Toggle
+        _buildSection(
+          title: 'Always Visible',
+          child: SwitchListTile(
+            title: const Text('Show scrollbar without hover'),
+            subtitle: const Text('Keep scrollbar visible at all times'),
+            value: _scrollbarAlwaysVisible,
+            onChanged: (value) => setState(() => _scrollbarAlwaysVisible = value),
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
         // Reset Button
         FilledButton.icon(
           onPressed: _resetToDefaults,
