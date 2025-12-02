@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/node.dart';
 import 'folder_view_line_theme.dart';
+import 'folder_view_scrollbar_theme.dart';
 
 /// Master theme class for the entire FolderView component
 ///
@@ -14,16 +15,21 @@ class FlutterFolderViewTheme {
   /// Theme for connection lines between nodes
   final FolderViewLineTheme lineTheme;
 
+  /// Theme for scrollbars
+  final FolderViewScrollbarTheme scrollbarTheme;
+
   // Future theme properties can be added here:
   // final FolderViewNodeTheme? nodeTheme;
   // final FolderViewTextTheme? textTheme;
   // final FolderViewIconTheme? iconTheme;
-  // final FolderViewScrollbarTheme? scrollbarTheme;
   // final FolderViewAnimationTheme? animationTheme;
   // final FolderViewSpacingTheme? spacingTheme;
 
   /// Creates a [FlutterFolderViewTheme] with the given properties
-  const FlutterFolderViewTheme({required this.lineTheme});
+  const FlutterFolderViewTheme({
+    required this.lineTheme,
+    required this.scrollbarTheme,
+  });
 
   /// Creates a light theme with sensible defaults
   factory FlutterFolderViewTheme.light() {
@@ -32,6 +38,10 @@ class FlutterFolderViewTheme {
         lineColor: const Color(0xFF9E9E9E), // Grey 500
         lineWidth: 1.5,
         lineStyle: LineStyle.connector,
+      ),
+      scrollbarTheme: FolderViewScrollbarTheme(
+        thumbColor: Colors.grey.shade600,
+        trackColor: Colors.grey.shade200,
       ),
     );
   }
@@ -44,12 +54,22 @@ class FlutterFolderViewTheme {
         lineWidth: 1.5,
         lineStyle: LineStyle.connector,
       ),
+      scrollbarTheme: FolderViewScrollbarTheme(
+        thumbColor: Colors.grey.shade400,
+        trackColor: Colors.grey.shade800,
+      ),
     );
   }
 
   /// Creates a copy of this theme with the given fields replaced with new values
-  FlutterFolderViewTheme copyWith({FolderViewLineTheme? lineTheme}) {
-    return FlutterFolderViewTheme(lineTheme: lineTheme ?? this.lineTheme);
+  FlutterFolderViewTheme copyWith({
+    FolderViewLineTheme? lineTheme,
+    FolderViewScrollbarTheme? scrollbarTheme,
+  }) {
+    return FlutterFolderViewTheme(
+      lineTheme: lineTheme ?? this.lineTheme,
+      scrollbarTheme: scrollbarTheme ?? this.scrollbarTheme,
+    );
   }
 
   /// Linearly interpolate between two [FlutterFolderViewTheme]s
@@ -66,6 +86,11 @@ class FlutterFolderViewTheme {
 
     return FlutterFolderViewTheme(
       lineTheme: FolderViewLineTheme.lerp(a.lineTheme, b.lineTheme, t),
+      scrollbarTheme: FolderViewScrollbarTheme.lerp(
+        a.scrollbarTheme,
+        b.scrollbarTheme,
+        t,
+      ),
     );
   }
 
@@ -73,14 +98,19 @@ class FlutterFolderViewTheme {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    return other is FlutterFolderViewTheme && other.lineTheme == lineTheme;
+    return other is FlutterFolderViewTheme &&
+        other.lineTheme == lineTheme &&
+        other.scrollbarTheme == scrollbarTheme;
   }
 
   @override
-  int get hashCode => lineTheme.hashCode;
+  int get hashCode => Object.hash(lineTheme, scrollbarTheme);
 
   @override
   String toString() {
-    return 'FlutterFolderViewTheme(lineTheme: $lineTheme)';
+    return 'FlutterFolderViewTheme('
+        'lineTheme: $lineTheme, '
+        'scrollbarTheme: $scrollbarTheme'
+        ')';
   }
 }

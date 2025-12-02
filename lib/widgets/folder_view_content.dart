@@ -84,7 +84,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         ),
         // Only add spacing when horizontal scrollbar is actually needed
         if (needsHorizontalScroll)
-          SizedBox(height: FolderViewHorizontalScrollbar.scrollbarTrackWidth),
+          SizedBox(height: theme.scrollbarTheme.trackWidth),
       ],
     );
 
@@ -131,6 +131,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                 verticalScrollbarController: widget.verticalBarController,
                 contentHeight: widget.contentHeight,
                 needsHorizontalScroll: widget.needsHorizontalScroll,
+                scrollbarTheme: widget.theme.scrollbarTheme,
               ),
 
             /// Horizontal scrollbar
@@ -139,6 +140,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                 isHover: _isHover,
                 horizontalScrollbarController: widget.horizontalBarController,
                 contentWidth: widget.contentWidth,
+                scrollbarTheme: widget.theme.scrollbarTheme,
               ),
           ],
         ),

@@ -1,11 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
+import '../themes/folder_view_scrollbar_theme.dart';
+
 class FolderViewVerticalScrollbar extends StatelessWidget {
   final bool isHover;
   final ScrollController verticalScrollbarController;
   final double contentHeight;
   final bool needsHorizontalScroll;
+  final FolderViewScrollbarTheme scrollbarTheme;
 
   const FolderViewVerticalScrollbar({
     super.key,
@@ -13,44 +16,45 @@ class FolderViewVerticalScrollbar extends StatelessWidget {
     required this.verticalScrollbarController,
     required this.contentHeight,
     required this.needsHorizontalScroll,
+    required this.scrollbarTheme,
   });
 
-  static const double scrollbarTrackWidth = 16.0;
-  static const double scrollbarWidth = 12.0;
-  static const double scrollbarRadius = 4.0;
+
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
       top: 0,
       right: 0,
-      bottom: needsHorizontalScroll ? scrollbarTrackWidth : 0,
+      bottom: needsHorizontalScroll ? scrollbarTheme.trackWidth : 0,
       child: AnimatedOpacity(
-        opacity: isHover ? 0.8 : 0.0,
-        duration: const Duration(milliseconds: 200),
+        opacity: isHover
+            ? scrollbarTheme.hoverOpacity
+            : scrollbarTheme.nonHoverOpacity,
+        duration: scrollbarTheme.hoverAnimationDuration,
         child: Container(
-          width: scrollbarTrackWidth,
+          width: scrollbarTheme.trackWidth,
           decoration: BoxDecoration(
-            color: Colors.grey[200],
-            borderRadius: BorderRadius.circular(8),
+            color: scrollbarTheme.trackColor,
+            borderRadius: BorderRadius.circular(scrollbarTheme.trackRadius),
           ),
           child: Theme(
             data: Theme.of(context).copyWith(
               scrollbarTheme: ScrollbarThemeData(
-                thumbColor: WidgetStateProperty.all(Colors.red),
-                radius: const Radius.circular(scrollbarRadius),
-                thickness: WidgetStateProperty.all(scrollbarWidth),
+                thumbColor: WidgetStateProperty.all(scrollbarTheme.thumbColor),
+                radius: Radius.circular(scrollbarTheme.radius),
+                thickness: WidgetStateProperty.all(scrollbarTheme.thickness),
               ),
             ),
             child: Scrollbar(
               controller: verticalScrollbarController,
-              thumbVisibility: true,
-              trackVisibility: false,
+              thumbVisibility: scrollbarTheme.thumbVisibility,
+              trackVisibility: scrollbarTheme.trackVisibility,
               child: SingleChildScrollView(
                 controller: verticalScrollbarController,
                 scrollDirection: Axis.vertical,
                 child: SizedBox(
-                  width: scrollbarTrackWidth,
+                  width: scrollbarTheme.trackWidth,
                   height: contentHeight,
                 ),
               ),

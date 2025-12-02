@@ -16,6 +16,16 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   double _lineWidth = 1.5;
   LineStyle _lineStyle = LineStyle.connector;
 
+  // Scrollbar Theme State
+  Color _scrollbarThumbColor = Colors.grey.shade600;
+  Color _scrollbarTrackColor = Colors.grey.shade200;
+  double _scrollbarThickness = 12.0;
+  double _scrollbarRadius = 4.0;
+  double _scrollbarHoverOpacity = 0.8;
+  double _scrollbarTrackWidth = 16.0;
+  double _scrollbarTrackRadius = 8.0;
+  bool _scrollbarAlwaysVisible = false;
+
   // Predefined colors for quick selection
   final List<Color> _presetColors = [
     const Color(0xFF2196F3), // Blue
@@ -34,6 +44,16 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         lineColor: _lineColor,
         lineWidth: _lineWidth,
         lineStyle: _lineStyle,
+      ),
+      scrollbarTheme: FolderViewScrollbarTheme(
+        thumbColor: _scrollbarThumbColor,
+        trackColor: _scrollbarTrackColor,
+        thickness: _scrollbarThickness,
+        radius: _scrollbarRadius,
+        hoverOpacity: _scrollbarHoverOpacity,
+        nonHoverOpacity: _scrollbarAlwaysVisible ? 1.0 : 0.0,
+        trackWidth: _scrollbarTrackWidth,
+        trackRadius: _scrollbarTrackRadius,
       ),
     );
 
@@ -201,6 +221,202 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
 
         const SizedBox(height: 24),
 
+        // Divider
+        const Divider(height: 32),
+
+        Text(
+          'Scrollbar Theme Controls',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 24),
+
+        // Scrollbar Thumb Color
+        _buildSection(
+          title: 'Thumb Color',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _presetColors.map((color) {
+                  final isSelected = _scrollbarThumbColor == color;
+                  return InkWell(
+                    onTap: () => setState(() => _scrollbarThumbColor = color),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.transparent,
+                          width: 3,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Color: #${_scrollbarThumbColor.value.toRadixString(16).substring(2).toUpperCase()}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Scrollbar Track Color
+        _buildSection(
+          title: 'Track Color',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  Colors.grey.shade200,
+                  Colors.grey.shade300,
+                  Colors.blue.shade100,
+                  Colors.green.shade100,
+                  Colors.orange.shade100,
+                  Colors.purple.shade100,
+                ].map((color) {
+                  final isSelected = _scrollbarTrackColor == color;
+                  return InkWell(
+                    onTap: () => setState(() => _scrollbarTrackColor = color),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.transparent,
+                          width: 3,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Color: #${_scrollbarTrackColor.value.toRadixString(16).substring(2).toUpperCase()}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Scrollbar Thickness
+        _buildSection(
+          title: 'Thumb Thickness',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _scrollbarThickness,
+                min: 8.0,
+                max: 20.0,
+                divisions: 12,
+                label: _scrollbarThickness.toStringAsFixed(0),
+                onChanged: (value) => setState(() => _scrollbarThickness = value),
+              ),
+              Text(
+                'Thickness: ${_scrollbarThickness.toStringAsFixed(0)}px',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Scrollbar Radius
+        _buildSection(
+          title: 'Thumb Radius',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _scrollbarRadius,
+                min: 0.0,
+                max: 10.0,
+                divisions: 20,
+                label: _scrollbarRadius.toStringAsFixed(1),
+                onChanged: (value) => setState(() => _scrollbarRadius = value),
+              ),
+              Text(
+                'Radius: ${_scrollbarRadius.toStringAsFixed(1)}px',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Hover Opacity
+        _buildSection(
+          title: 'Hover Opacity',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _scrollbarHoverOpacity,
+                min: 0.0,
+                max: 1.0,
+                divisions: 20,
+                label: _scrollbarHoverOpacity.toStringAsFixed(2),
+                onChanged: (value) => setState(() => _scrollbarHoverOpacity = value),
+              ),
+              Text(
+                'Opacity: ${_scrollbarHoverOpacity.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Track Width
+        _buildSection(
+          title: 'Track Width',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _scrollbarTrackWidth,
+                min: 12.0,
+                max: 24.0,
+                divisions: 12,
+                label: _scrollbarTrackWidth.toStringAsFixed(0),
+                onChanged: (value) => setState(() => _scrollbarTrackWidth = value),
+              ),
+              Text(
+                'Width: ${_scrollbarTrackWidth.toStringAsFixed(0)}px',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
         // Reset Button
         FilledButton.icon(
           onPressed: _resetToDefaults,
@@ -230,6 +446,14 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
       _lineColor = const Color(0xFF2196F3);
       _lineWidth = 1.5;
       _lineStyle = LineStyle.connector;
+      _scrollbarThumbColor = Colors.grey.shade600;
+      _scrollbarTrackColor = Colors.grey.shade200;
+      _scrollbarThickness = 12.0;
+      _scrollbarRadius = 4.0;
+      _scrollbarHoverOpacity = 0.8;
+      _scrollbarTrackWidth = 16.0;
+      _scrollbarTrackRadius = 8.0;
+      _scrollbarAlwaysVisible = false;
     });
   }
 }
