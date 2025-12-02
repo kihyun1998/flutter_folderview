@@ -55,14 +55,14 @@ class FolderView<T> extends StatelessWidget {
         final needsVerticalScroll = contentHeight > availableHeight;
 
         return SyncedScrollControllers(
-          builder:
-              (
-                context,
-                verticalController,
-                verticalScrollbarController,
-                horizontalController,
-                horizontalScrollbarController,
-              ) {
+              builder:
+                  (
+                    context,
+                    verticalController,
+                    verticalScrollbarController,
+                    horizontalController,
+                    horizontalScrollbarController,
+                  ) {
                 return FolderViewContent<T>(
                   data: displayNodes,
                   mode: mode,
@@ -70,6 +70,7 @@ class FolderView<T> extends StatelessWidget {
                   selectedNodeIds: selectedNodeIds,
                   contentWidth: contentWidth,
                   contentHeight: contentHeight,
+                  viewportWidth: availableWidth,
                   needsHorizontalScroll: needsHorizontalScroll,
                   needsVerticalScroll: needsVerticalScroll,
                   horizontalController: horizontalController!,

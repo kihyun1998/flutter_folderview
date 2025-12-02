@@ -20,6 +20,7 @@ class FolderViewContent<T> extends StatefulWidget {
 
   final double contentWidth;
   final double contentHeight;
+  final double viewportWidth;
 
   final List<Node<T>> data;
   final ViewMode mode;
@@ -37,6 +38,7 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.needsHorizontalScroll,
     required this.contentWidth,
     required this.contentHeight,
+    required this.viewportWidth,
     required this.data,
     required this.mode,
     required this.onNodeTap,
@@ -50,6 +52,7 @@ class FolderViewContent<T> extends StatefulWidget {
 
 class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   bool _isHover = false;
+  final GlobalKey _listViewKey = GlobalKey();
 
   /// Build the ListView
   Widget _buildListView({
@@ -60,6 +63,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     required ScrollController horizontalController,
     required ScrollController verticalController,
     required double contentWidth,
+    required double viewportWidth,
     required bool needsHorizontalScroll,
     required FlutterFolderViewTheme theme,
   }) {
@@ -67,6 +71,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       children: [
         Expanded(
           child: ListView.builder(
+            key: _listViewKey,
             controller: verticalController,
             itemCount: data.length,
             itemBuilder: (context, index) {
@@ -88,19 +93,18 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       ],
     );
 
-    if (needsHorizontalScroll) {
-      return SingleChildScrollView(
-        controller: horizontalController,
-        scrollDirection: Axis.horizontal,
-        physics: const ClampingScrollPhysics(),
-        child: SizedBox(
-          width: contentWidth,
-          child: listView,
-        ),
-      );
-    } else {
-      return listView;
-    }
+    // Always wrap in SingleChildScrollView to maintain tree stability
+    return SingleChildScrollView(
+      controller: horizontalController,
+      scrollDirection: Axis.horizontal,
+      physics: needsHorizontalScroll
+          ? const ClampingScrollPhysics()
+          : const NeverScrollableScrollPhysics(),
+      child: SizedBox(
+        width: needsHorizontalScroll ? contentWidth : viewportWidth,
+        child: listView,
+      ),
+    );
   }
 
   @override
@@ -120,6 +124,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
               horizontalController: widget.horizontalController,
               verticalController: widget.verticalController,
               contentWidth: widget.contentWidth,
+              viewportWidth: widget.viewportWidth,
               needsHorizontalScroll: widget.needsHorizontalScroll,
               theme: widget.theme,
             ),

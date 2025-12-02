@@ -2,18 +2,9 @@
 import 'package:flutter/material.dart';
 
 class SyncedScrollControllers extends StatefulWidget {
-  final ScrollController? scrollController;
-  final ScrollController? verticalScrollbarController;
-  final ScrollController? horizontalScrollController;
-  final ScrollController? horizontalScrollbarController;
-
   const SyncedScrollControllers({
     super.key,
     required this.builder,
-    this.scrollController,
-    this.verticalScrollbarController,
-    this.horizontalScrollController,
-    this.horizontalScrollbarController,
   });
 
   final Widget Function(
@@ -45,13 +36,6 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
   }
 
   @override
-  void didUpdateWidget(covariant SyncedScrollControllers oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _disposeOrUnsubscribe();
-    _initControllers();
-  }
-
-  @override
   void dispose() {
     _disposeOrUnsubscribe();
     super.dispose();
@@ -61,26 +45,16 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
     _doNotReissueJump.clear();
 
     /// Main vertical scroll controller
-    _sc11 = widget.scrollController ?? ScrollController();
+    _sc11 = ScrollController();
 
     /// Main horizontal scroll controller
-    _sc21 = widget.horizontalScrollController ?? ScrollController();
+    _sc21 = ScrollController();
 
     /// Vertical scrollbar controller
-    _sc12 = widget.verticalScrollbarController ??
-        ScrollController(
-            initialScrollOffset:
-                _sc11!.hasClients && _sc11!.positions.isNotEmpty
-                    ? _sc11!.offset
-                    : 0.0);
+    _sc12 = ScrollController(initialScrollOffset: 0.0);
     
     /// Horizontal scrollbar controller
-    _sc22 = widget.horizontalScrollbarController ??
-        ScrollController(
-            initialScrollOffset:
-                _sc21!.hasClients && _sc21!.positions.isNotEmpty
-                    ? _sc21!.offset
-                    : 0.0);
+    _sc22 = ScrollController(initialScrollOffset: 0.0);
 
     _syncScrollControllers(_sc11!, _sc12!);
     _syncScrollControllers(_sc21!, _sc22!);
@@ -118,10 +92,10 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
     });
     _listenersMap.clear();
 
-    if (widget.scrollController == null) _sc11?.dispose();
-    if (widget.horizontalScrollController == null) _sc21?.dispose();
-    if (widget.verticalScrollbarController == null) _sc12?.dispose();
-    if (widget.horizontalScrollbarController == null) _sc22?.dispose();
+    _sc11?.dispose();
+    _sc21?.dispose();
+    _sc12?.dispose();
+    _sc22?.dispose();
   }
 
   @override
