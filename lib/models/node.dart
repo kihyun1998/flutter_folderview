@@ -9,6 +9,12 @@ enum NodeType {
   child,
 }
 
+enum LineStyle {
+  connector, // Traditional tree lines with ├─ and └─
+  none,      // No lines
+  scope,     // Vertical indent guide lines only (like VS Code)
+}
+
 class Node<T> {
   final String id;
   final String label;

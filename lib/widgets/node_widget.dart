@@ -9,6 +9,7 @@ class NodeWidget<T> extends StatefulWidget {
   final bool isLast;
   final bool isRoot;
   final Set<String>? selectedNodeIds;
+  final LineStyle lineStyle;
 
   const NodeWidget({
     super.key,
@@ -18,6 +19,7 @@ class NodeWidget<T> extends StatefulWidget {
     this.isLast = false,
     this.isRoot = false,
     this.selectedNodeIds,
+    this.lineStyle = LineStyle.connector,
   });
 
   @override
@@ -82,7 +84,11 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           height: widget.isLast ? _rowHeight / 2 : null,
           width: _indentWidth,
           child: CustomPaint(
-            painter: _LinePainter(isLast: widget.isLast, isRoot: widget.isRoot),
+            painter: _LinePainter(
+              isLast: widget.isLast,
+              isRoot: widget.isRoot,
+              lineStyle: widget.lineStyle,
+            ),
           ),
         ),
 
@@ -154,6 +160,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                         isLast: entry.key == widget.node.children.length - 1,
                         isRoot: false,
                         selectedNodeIds: widget.selectedNodeIds,
+                        lineStyle: widget.lineStyle,
                       );
                     }).toList(),
                   ),
@@ -182,11 +189,21 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
 class _LinePainter extends CustomPainter {
   final bool isLast;
   final bool isRoot;
+  final LineStyle lineStyle;
 
-  _LinePainter({required this.isLast, required this.isRoot});
+  _LinePainter({
+    required this.isLast,
+    required this.isRoot,
+    required this.lineStyle,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Don't draw any lines for root nodes or when lineStyle is none
+    if (isRoot || lineStyle == LineStyle.none) {
+      return;
+    }
+
     final paint = Paint()
       ..color = Colors.grey
       ..strokeWidth = 1.0
@@ -194,33 +211,45 @@ class _LinePainter extends CustomPainter {
 
     final double centerX = size.width / 2;
 
-    // Vertical Line
-    // If not last, we draw full height (handled by Container size, but here we draw to size.height).
-    // If last, we draw to size.height (which is passed as half row height).
-    canvas.drawLine(Offset(centerX, 0), Offset(centerX, size.height), paint);
+    switch (lineStyle) {
+      case LineStyle.connector:
+        // Traditional tree lines with ├─ and └─
+        // Vertical Line
+        canvas.drawLine(
+          Offset(centerX, 0),
+          Offset(centerX, size.height),
+          paint,
+        );
 
-    // Horizontal Connector (├ or └)
-    // Drawn from center to right
-    // Only if we are NOT a root node that is just floating?
-    // Actually, even roots usually have connectors if they are in a list.
-    // But if it's the very first root?
-    // Let's assume standard tree behavior.
+        // Horizontal Connector
+        double connectorY = isLast ? size.height : 20.0;
+        canvas.drawLine(
+          Offset(centerX, connectorY),
+          Offset(size.width, connectorY),
+          paint,
+        );
+        break;
 
-    // The connector should be at 20px (half row height) from top.
-    // If isLast is true, size.height IS 20px. So we draw at bottom.
-    // If isLast is false, size.height is large. We draw at 20px.
+      case LineStyle.scope:
+        // Vertical indent guide line only (like VS Code)
+        // Draw vertical line for the full height to show scope
+        canvas.drawLine(
+          Offset(centerX, 0),
+          Offset(centerX, size.height),
+          paint,
+        );
+        break;
 
-    double connectorY = isLast ? size.height : 20.0;
-
-    canvas.drawLine(
-      Offset(centerX, connectorY),
-      Offset(size.width, connectorY),
-      paint,
-    );
+      case LineStyle.none:
+        // Already handled above (early return)
+        break;
+    }
   }
 
   @override
   bool shouldRepaint(covariant _LinePainter oldDelegate) {
-    return oldDelegate.isLast != isLast || oldDelegate.isRoot != isRoot;
+    return oldDelegate.isLast != isLast ||
+        oldDelegate.isRoot != isRoot ||
+        oldDelegate.lineStyle != lineStyle;
   }
 }

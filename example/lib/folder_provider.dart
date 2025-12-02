@@ -11,6 +11,7 @@ class FolderState extends _$FolderState {
       mode: ViewMode.folder,
       nodes: _generateMockData(),
       selectedIds: {},
+      lineStyle: LineStyle.connector,
     );
   }
 
@@ -40,6 +41,10 @@ class FolderState extends _$FolderState {
     }
 
     state = state.copyWith(selectedIds: currentSelected);
+  }
+
+  void setLineStyle(LineStyle lineStyle) {
+    state = state.copyWith(lineStyle: lineStyle);
   }
 
   List<Node<String>> _toggleNodeRecursive(List<Node<String>> nodes, String targetId) {
@@ -216,22 +221,26 @@ class FolderViewModel {
   final ViewMode mode;
   final List<Node<String>> nodes;
   final Set<String> selectedIds;
+  final LineStyle lineStyle;
 
   FolderViewModel({
     required this.mode, 
     required this.nodes, 
     this.selectedIds = const {},
+    required this.lineStyle,
   });
 
   FolderViewModel copyWith({
     ViewMode? mode, 
     List<Node<String>>? nodes,
     Set<String>? selectedIds,
+    LineStyle? lineStyle,
   }) {
     return FolderViewModel(
       mode: mode ?? this.mode,
       nodes: nodes ?? this.nodes,
       selectedIds: selectedIds ?? this.selectedIds,
+      lineStyle: lineStyle ?? this.lineStyle,
     );
   }
 }

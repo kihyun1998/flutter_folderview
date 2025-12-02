@@ -10,6 +10,7 @@ class FolderView<T> extends StatelessWidget {
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
   final Set<String>? selectedNodeIds;
+  final LineStyle lineStyle;
 
   const FolderView({
     super.key,
@@ -17,6 +18,7 @@ class FolderView<T> extends StatelessWidget {
     required this.mode,
     this.onNodeTap,
     this.selectedNodeIds,
+    this.lineStyle = LineStyle.connector,
   });
 
   @override
@@ -63,6 +65,7 @@ class FolderView<T> extends StatelessWidget {
               verticalController: verticalController!,
               horizontalBarController: horizontalScrollbarController!,
               verticalBarController: verticalScrollbarController!,
+              lineStyle: lineStyle,
             );
           },
         );

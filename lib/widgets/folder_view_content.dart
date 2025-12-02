@@ -24,6 +24,7 @@ class FolderViewContent<T> extends StatefulWidget {
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
   final Set<String>? selectedNodeIds;
+  final LineStyle lineStyle;
 
   const FolderViewContent({
     super.key,
@@ -39,6 +40,7 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.mode,
     required this.onNodeTap,
     required this.selectedNodeIds,
+    this.lineStyle = LineStyle.connector,
   });
 
   @override
@@ -58,6 +60,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     required ScrollController verticalController,
     required double contentWidth,
     required bool needsHorizontalScroll,
+    required LineStyle lineStyle,
   }) {
     final Widget listView = Column(
       children: [
@@ -73,6 +76,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                 isLast: index == data.length - 1,
                 isRoot: true,
                 selectedNodeIds: selectedNodeIds,
+                lineStyle: lineStyle,
               );
             },
           ),
@@ -116,6 +120,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
               verticalController: widget.verticalController,
               contentWidth: widget.contentWidth,
               needsHorizontalScroll: widget.needsHorizontalScroll,
+              lineStyle: widget.lineStyle,
             ),
 
             /// Vertical scrollbar
