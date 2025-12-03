@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/node.dart';
+import '../themes/flutter_folder_view_theme.dart';
 import '../themes/folder_view_line_theme.dart';
 
 class NodeWidget<T> extends StatefulWidget {
@@ -10,7 +11,7 @@ class NodeWidget<T> extends StatefulWidget {
   final bool isLast;
   final bool isRoot;
   final Set<String>? selectedNodeIds;
-  final FolderViewLineTheme lineTheme;
+  final FlutterFolderViewTheme theme;
 
   const NodeWidget({
     super.key,
@@ -20,7 +21,7 @@ class NodeWidget<T> extends StatefulWidget {
     this.isLast = false,
     this.isRoot = false,
     this.selectedNodeIds,
-    required this.lineTheme,
+    required this.theme,
   });
 
   @override
@@ -88,7 +89,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
             painter: _LinePainter(
               isLast: widget.isLast,
               isRoot: widget.isRoot,
-              lineTheme: widget.lineTheme,
+              lineTheme: widget.theme.lineTheme,
             ),
           ),
         ),
@@ -135,7 +136,12 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                             const SizedBox(width: 8),
 
                             // Label
-                            Expanded(child: Text(widget.node.label)),
+                            Expanded(
+                              child: Text(
+                                widget.node.label,
+                                style: _getTextStyle(),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -161,7 +167,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                         isLast: entry.key == widget.node.children.length - 1,
                         isRoot: false,
                         selectedNodeIds: widget.selectedNodeIds,
-                        lineTheme: widget.lineTheme,
+                        theme: widget.theme,
                       );
                     }).toList(),
                   ),
@@ -184,6 +190,32 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     } else {
       return Icons.insert_drive_file;
     }
+  }
+
+  TextStyle? _getTextStyle() {
+    TextStyle? style = widget.theme.textTheme.textStyle;
+
+    if (widget.selectedNodeIds?.contains(widget.node.id) ?? false) {
+      style = style?.merge(widget.theme.textTheme.selectedTextStyle) ??
+          widget.theme.textTheme.selectedTextStyle;
+    }
+
+    switch (widget.node.type) {
+      case NodeType.folder:
+        style = style?.merge(widget.theme.textTheme.folderTextStyle) ??
+            widget.theme.textTheme.folderTextStyle;
+        break;
+      case NodeType.parent:
+        style = style?.merge(widget.theme.textTheme.parentTextStyle) ??
+            widget.theme.textTheme.parentTextStyle;
+        break;
+      case NodeType.child:
+        style = style?.merge(widget.theme.textTheme.childTextStyle) ??
+            widget.theme.textTheme.childTextStyle;
+        break;
+    }
+
+    return style;
   }
 }
 

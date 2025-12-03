@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/node.dart';
 import 'folder_view_line_theme.dart';
 import 'folder_view_scrollbar_theme.dart';
+import 'folder_view_text_theme.dart';
 
 /// Master theme class for the entire FolderView component
 ///
@@ -18,6 +19,9 @@ class FlutterFolderViewTheme {
   /// Theme for scrollbars
   final FolderViewScrollbarTheme scrollbarTheme;
 
+  /// Theme for text styles
+  final FolderViewTextTheme textTheme;
+
   // Future theme properties can be added here:
   // final FolderViewNodeTheme? nodeTheme;
   // final FolderViewTextTheme? textTheme;
@@ -29,6 +33,7 @@ class FlutterFolderViewTheme {
   const FlutterFolderViewTheme({
     required this.lineTheme,
     required this.scrollbarTheme,
+    this.textTheme = const FolderViewTextTheme(),
   });
 
   /// Creates a light theme with sensible defaults
@@ -42,6 +47,10 @@ class FlutterFolderViewTheme {
       scrollbarTheme: FolderViewScrollbarTheme(
         thumbColor: Colors.grey.shade600,
         trackColor: Colors.grey.shade200,
+      ),
+      textTheme: const FolderViewTextTheme(
+        textStyle: TextStyle(color: Colors.black87),
+        selectedTextStyle: TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -58,6 +67,10 @@ class FlutterFolderViewTheme {
         thumbColor: Colors.grey.shade400,
         trackColor: Colors.grey.shade800,
       ),
+      textTheme: const FolderViewTextTheme(
+        textStyle: TextStyle(color: Colors.white70),
+        selectedTextStyle: TextStyle(fontWeight: FontWeight.bold),
+      ),
     );
   }
 
@@ -65,10 +78,12 @@ class FlutterFolderViewTheme {
   FlutterFolderViewTheme copyWith({
     FolderViewLineTheme? lineTheme,
     FolderViewScrollbarTheme? scrollbarTheme,
+    FolderViewTextTheme? textTheme,
   }) {
     return FlutterFolderViewTheme(
       lineTheme: lineTheme ?? this.lineTheme,
       scrollbarTheme: scrollbarTheme ?? this.scrollbarTheme,
+      textTheme: textTheme ?? this.textTheme,
     );
   }
 
@@ -91,6 +106,7 @@ class FlutterFolderViewTheme {
         b.scrollbarTheme,
         t,
       ),
+      textTheme: FolderViewTextTheme.lerp(a.textTheme, b.textTheme, t),
     );
   }
 
@@ -100,17 +116,19 @@ class FlutterFolderViewTheme {
     if (other.runtimeType != runtimeType) return false;
     return other is FlutterFolderViewTheme &&
         other.lineTheme == lineTheme &&
-        other.scrollbarTheme == scrollbarTheme;
+        other.scrollbarTheme == scrollbarTheme &&
+        other.textTheme == textTheme;
   }
 
   @override
-  int get hashCode => Object.hash(lineTheme, scrollbarTheme);
+  int get hashCode => Object.hash(lineTheme, scrollbarTheme, textTheme);
 
   @override
   String toString() {
     return 'FlutterFolderViewTheme('
         'lineTheme: $lineTheme, '
-        'scrollbarTheme: $scrollbarTheme'
+        'scrollbarTheme: $scrollbarTheme, '
+        'textTheme: $textTheme'
         ')';
   }
 }

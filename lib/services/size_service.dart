@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../models/node.dart';
+import '../themes/folder_view_text_theme.dart';
 
 class SizeService {
   /// Calculate the total content width of all nodes
   static double calculateContentWidth<T>({
     required List<Node<T>> nodes,
-    required TextStyle textStyle,
+    required FolderViewTextTheme textTheme,
     double linePaintWidth = 20.0,
     double iconSize = 20.0,
     double spacing = 8.0,
@@ -18,7 +19,7 @@ class SizeService {
     for (var node in nodes) {
       final nodeWidth = _calculateNodeWidth(
         node: node,
-        textStyle: textStyle,
+        textTheme: textTheme,
         depth: 0,
         linePaintWidth: linePaintWidth,
         iconSize: iconSize,
@@ -33,7 +34,7 @@ class SizeService {
       if (node.isExpanded && node.children.isNotEmpty) {
         final childrenWidth = calculateContentWidth(
           nodes: node.children,
-          textStyle: textStyle,
+          textTheme: textTheme,
           linePaintWidth: linePaintWidth,
           iconSize: iconSize,
           spacing: spacing,
@@ -54,7 +55,7 @@ class SizeService {
   /// Calculate the width of a single node
   static double _calculateNodeWidth<T>({
     required Node<T> node,
-    required TextStyle textStyle,
+    required FolderViewTextTheme textTheme,
     required int depth,
     required double linePaintWidth,
     required double iconSize,
@@ -73,9 +74,23 @@ class SizeService {
     // Spacing after icon
     width += spacing;
 
+    // Resolve style
+    TextStyle style = textTheme.textStyle ?? const TextStyle(fontSize: 14);
+    switch (node.type) {
+      case NodeType.folder:
+        style = style.merge(textTheme.folderTextStyle);
+        break;
+      case NodeType.parent:
+        style = style.merge(textTheme.parentTextStyle);
+        break;
+      case NodeType.child:
+        style = style.merge(textTheme.childTextStyle);
+        break;
+    }
+
     // Text width
     final textPainter = TextPainter(
-      text: TextSpan(text: node.label, style: textStyle),
+      text: TextSpan(text: node.label, style: style),
       textDirection: TextDirection.ltr,
       maxLines: 1,
     )..layout();

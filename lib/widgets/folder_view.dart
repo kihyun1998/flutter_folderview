@@ -36,13 +36,12 @@ class FolderView<T> extends StatelessWidget {
         final double availableHeight = constraints.maxHeight;
         final double availableWidth = constraints.maxWidth;
 
-        // Default text style for measurement
-        final textStyle = const TextStyle(fontSize: 14);
+
 
         // Calculate content dimensions
         final contentWidth = SizeService.calculateContentWidth(
           nodes: displayNodes,
-          textStyle: textStyle,
+          textTheme: effectiveTheme.textTheme,
           maxWidth: availableWidth * 3, // Allow up to 3x viewport width
         );
 

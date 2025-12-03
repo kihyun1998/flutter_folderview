@@ -26,6 +26,13 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   double _scrollbarTrackRadius = 8.0;
   bool _scrollbarAlwaysVisible = false;
 
+  // Text Theme State
+  Color _textColor = Colors.black87;
+  double _fontSize = 14.0;
+  Color _folderTextColor = Colors.black87;
+  Color _parentTextColor = Colors.black87;
+  Color _childTextColor = Colors.black87;
+
   // Predefined colors for quick selection
   final List<Color> _presetColors = [
     const Color(0xFF2196F3), // Blue
@@ -54,6 +61,20 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         nonHoverOpacity: _scrollbarAlwaysVisible ? 1.0 : 0.0,
         trackWidth: _scrollbarTrackWidth,
         trackRadius: _scrollbarTrackRadius,
+      ),
+      textTheme: FolderViewTextTheme(
+        textStyle: TextStyle(color: _textColor, fontSize: _fontSize),
+        folderTextStyle: TextStyle(
+          color: _folderTextColor,
+          fontWeight: FontWeight.bold,
+        ),
+        parentTextStyle: TextStyle(
+          color: _parentTextColor,
+          fontWeight: FontWeight.w500,
+        ),
+        childTextStyle: TextStyle(
+          color: _childTextColor,
+        ),
       ),
     );
 
@@ -156,7 +177,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Color: #${_lineColor.value.toRadixString(16).substring(2).toUpperCase()}',
+                'Color: #${_lineColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -263,7 +284,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Color: #${_scrollbarThumbColor.value.toRadixString(16).substring(2).toUpperCase()}',
+                'Color: #${_scrollbarThumbColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -312,7 +333,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Color: #${_scrollbarTrackColor.value.toRadixString(16).substring(2).toUpperCase()}',
+                'Color: #${_scrollbarTrackColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -456,6 +477,85 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
 
         const SizedBox(height: 24),
 
+        // Divider
+        const Divider(height: 32),
+
+        Text(
+          'Text Theme Controls',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 24),
+
+        // Text Color
+        _buildSection(
+          title: 'Base Text Color',
+          child: _buildColorPicker(
+            _textColor,
+            (color) => setState(() => _textColor = color),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Font Size
+        _buildSection(
+          title: 'Font Size',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _fontSize,
+                min: 10.0,
+                max: 24.0,
+                divisions: 14,
+                label: _fontSize.toStringAsFixed(1),
+                onChanged: (value) => setState(() => _fontSize = value),
+              ),
+              Text(
+                'Size: ${_fontSize.toStringAsFixed(1)}px',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Folder Text Color
+        _buildSection(
+          title: 'Folder Text Color',
+          child: _buildColorPicker(
+            _folderTextColor,
+            (color) => setState(() => _folderTextColor = color),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Parent Text Color
+        _buildSection(
+          title: 'Parent Text Color',
+          child: _buildColorPicker(
+            _parentTextColor,
+            (color) => setState(() => _parentTextColor = color),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Child Text Color
+        _buildSection(
+          title: 'Child Text Color',
+          child: _buildColorPicker(
+            _childTextColor,
+            (color) => setState(() => _childTextColor = color),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        const SizedBox(height: 24),
+
         // Reset Button
         FilledButton.icon(
           onPressed: _resetToDefaults,
@@ -493,6 +593,53 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
       _scrollbarTrackWidth = 16.0;
       _scrollbarTrackRadius = 8.0;
       _scrollbarAlwaysVisible = false;
+      _textColor = Colors.black87;
+      _fontSize = 14.0;
+      _folderTextColor = Colors.black87;
+      _parentTextColor = Colors.black87;
+      _childTextColor = Colors.black87;
     });
+  }
+
+  Widget _buildColorPicker(Color currentColor, ValueChanged<Color> onColorChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ..._presetColors,
+            Colors.black87,
+            Colors.white,
+          ].map((color) {
+            final isSelected = currentColor == color;
+            return InkWell(
+              onTap: () => onColorChanged(color),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey.shade300,
+                    width: 3,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Color: #${currentColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    );
   }
 }

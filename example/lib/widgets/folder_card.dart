@@ -168,6 +168,19 @@ class _FolderCardState extends State<FolderCard> {
                 mode: config.mode,
                 onNodeTap: _handleNodeTap,
                 selectedNodeIds: selectedNodeIds,
+                theme: (Theme.of(context).brightness == Brightness.dark
+                        ? FlutterFolderViewTheme.dark()
+                        : FlutterFolderViewTheme.light())
+                    .copyWith(
+                  lineTheme: FolderViewLineTheme(
+                    lineColor: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF757575)
+                        : const Color(0xFF9E9E9E),
+                    lineWidth: 1.5,
+                    lineStyle: config.lineStyle,
+                  ),
+                  textTheme: config.textTheme,
+                ),
               ),
             ),
           ),

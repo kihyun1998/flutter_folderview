@@ -7,6 +7,7 @@ class CardConfig {
   final LineStyle lineStyle;
   final Color primaryColor;
   final List<Node<String>> data;
+  final FolderViewTextTheme? textTheme;
 
   CardConfig({
     required this.title,
@@ -14,6 +15,7 @@ class CardConfig {
     required this.lineStyle,
     required this.primaryColor,
     required this.data,
+    this.textTheme,
   });
 
   CardConfig copyWith({
@@ -22,6 +24,7 @@ class CardConfig {
     LineStyle? lineStyle,
     Color? primaryColor,
     List<Node<String>>? data,
+    FolderViewTextTheme? textTheme,
   }) {
     return CardConfig(
       title: title ?? this.title,
@@ -29,6 +32,7 @@ class CardConfig {
       lineStyle: lineStyle ?? this.lineStyle,
       primaryColor: primaryColor ?? this.primaryColor,
       data: data ?? this.data,
+      textTheme: textTheme ?? this.textTheme,
     );
   }
 }

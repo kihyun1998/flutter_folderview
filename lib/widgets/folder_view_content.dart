@@ -82,7 +82,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                 isLast: index == data.length - 1,
                 isRoot: true,
                 selectedNodeIds: selectedNodeIds,
-                lineTheme: theme.lineTheme,
+                theme: theme,
               );
             },
           ),

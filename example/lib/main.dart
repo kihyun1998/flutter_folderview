@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
+import 'package:flutter_folderview/themes/folder_view_text_theme.dart';
 
 import 'data/corporate_data.dart';
 import 'data/filesystem_data.dart';
@@ -114,6 +115,18 @@ class MyHomePage extends StatelessWidget {
                     lineStyle: LineStyle.scope,
                     primaryColor: Colors.purple,
                     data: getSoftwareComponentData(),
+                    textTheme: const FolderViewTextTheme(
+                      textStyle: TextStyle(fontSize: 14),
+                      folderTextStyle: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color: Colors.purple,
+                      ),
+                      parentTextStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      childTextStyle: TextStyle(color: Colors.purpleAccent),
+                    ),
                   ),
                 ),
               ],
