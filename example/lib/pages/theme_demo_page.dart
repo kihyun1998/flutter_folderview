@@ -33,6 +33,60 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   Color _parentTextColor = Colors.black87;
   Color _childTextColor = Colors.black87;
 
+  // FolderView State
+  late List<Node<String>> _treeData;
+  Set<String> _selectedNodeIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _treeData = getThemeDemoData();
+  }
+
+  void _handleNodeTap(Node<String> node) {
+    setState(() {
+      if (node.type == NodeType.child) {
+        // Toggle selection for child nodes
+        if (_selectedNodeIds.contains(node.id)) {
+          _selectedNodeIds.remove(node.id);
+        } else {
+          _selectedNodeIds.add(node.id);
+        }
+      } else if (node.canExpand) {
+        // Toggle expansion for parent and folder nodes
+        _treeData = _toggleNodeRecursive(_treeData, node.id);
+      }
+    });
+  }
+
+  List<Node<String>> _toggleNodeRecursive(
+    List<Node<String>> nodes,
+    String targetId,
+  ) {
+    return nodes.map((node) {
+      if (node.id == targetId) {
+        return Node<String>(
+          id: node.id,
+          label: node.label,
+          type: node.type,
+          data: node.data,
+          children: node.children,
+          isExpanded: !node.isExpanded,
+        );
+      } else if (node.children.isNotEmpty) {
+        return Node<String>(
+          id: node.id,
+          label: node.label,
+          type: node.type,
+          data: node.data,
+          children: _toggleNodeRecursive(node.children, targetId),
+          isExpanded: node.isExpanded,
+        );
+      }
+      return node;
+    }).toList();
+  }
+
   // Predefined colors for quick selection
   final List<Color> _presetColors = [
     const Color(0xFF2196F3), // Blue
@@ -118,8 +172,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: FolderView<String>(
-                          data: getThemeDemoData(),
+                          data: _treeData,
                           mode: ViewMode.folder,
+                          onNodeTap: _handleNodeTap,
+                          selectedNodeIds: _selectedNodeIds,
                           theme: theme,
                         ),
                       ),
@@ -598,6 +654,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
       _folderTextColor = Colors.black87;
       _parentTextColor = Colors.black87;
       _childTextColor = Colors.black87;
+      _treeData = getThemeDemoData();
+      _selectedNodeIds = {};
     });
   }
 
