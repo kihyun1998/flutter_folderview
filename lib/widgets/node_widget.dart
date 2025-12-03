@@ -34,7 +34,6 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   late Animation<double> _iconTurns;
   late Animation<double> _heightFactor;
 
-  static const double _iconSize = 20.0;
   static const double _rowHeight = 40.0;
 
   @override
@@ -84,7 +83,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           top: 0,
           bottom: widget.isLast ? null : 0,
           height: widget.isLast ? _rowHeight / 2 : null,
-          width: _iconSize,
+          width: widget.theme.iconTheme.iconSize,
           child: CustomPaint(
             painter: _LinePainter(
               isLast: widget.isLast,
@@ -105,7 +104,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // // Spacer for the connector line (Non-clickable)
-                  const SizedBox(width: _iconSize),
+                  SizedBox(width: widget.theme.iconTheme.iconSize),
 
                   // Clickable Content
                   Expanded(
@@ -124,15 +123,21 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                               RotationTransition(
                                 turns: _iconTurns,
                                 child: Icon(
-                                  Icons.chevron_right,
-                                  size: _iconSize,
+                                  widget.theme.iconTheme.expandIcon ??
+                                      Icons.chevron_right,
+                                  size: widget.theme.iconTheme.iconSize,
+                                  color: _getIconColor(),
                                 ),
                               )
                             else
-                              const SizedBox(width: _iconSize),
+                              SizedBox(width: widget.theme.iconTheme.iconSize),
 
                             // Node Icon
-                            Icon(_getNodeIcon(), size: _iconSize),
+                            Icon(
+                              _getNodeIcon(),
+                              size: widget.theme.iconTheme.iconSize,
+                              color: _getIconColor(),
+                            ),
                             const SizedBox(width: 8),
 
                             // Label
@@ -150,14 +155,14 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                 ],
               ),
             ),
-
             // Children
             ClipRect(
               child: SizeTransition(
                 sizeFactor: _heightFactor,
                 axisAlignment: -1.0, // Expand from top
                 child: Padding(
-                  padding: const EdgeInsets.only(left: _iconSize),
+                  padding:
+                      EdgeInsets.only(left: widget.theme.iconTheme.iconSize),
                   child: Column(
                     children: widget.node.children.asMap().entries.map((entry) {
                       return NodeWidget<T>(
@@ -174,6 +179,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                 ),
               ),
             ),
+
           ],
         ),
       ],
@@ -181,15 +187,36 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   }
 
   IconData _getNodeIcon() {
-    if (widget.node.type == NodeType.folder) {
-      return widget.node.isExpanded ? Icons.folder_open : Icons.folder;
-    } else if (widget.node.type == NodeType.parent) {
-      return widget.mode == ViewMode.tree
-          ? Icons.account_tree
-          : Icons.description;
-    } else {
-      return Icons.insert_drive_file;
+    final iconTheme = widget.theme.iconTheme;
+
+    switch (widget.node.type) {
+      case NodeType.folder:
+        return widget.node.isExpanded
+            ? (iconTheme.folderOpenIcon ?? Icons.folder_open)
+            : (iconTheme.folderIcon ?? Icons.folder);
+      case NodeType.parent:
+        if (widget.mode == ViewMode.tree) {
+          return widget.node.isExpanded
+              ? (iconTheme.parentOpenIcon ??
+                  iconTheme.parentIcon ??
+                  Icons.account_tree)
+              : (iconTheme.parentIcon ?? Icons.account_tree);
+        } else {
+          return iconTheme.parentIcon ?? Icons.description;
+        }
+      case NodeType.child:
+        return iconTheme.childIcon ?? Icons.insert_drive_file;
     }
+  }
+
+  Color? _getIconColor() {
+    final iconTheme = widget.theme.iconTheme;
+
+    if (widget.selectedNodeIds?.contains(widget.node.id) ?? false) {
+      return iconTheme.selectedIconColor;
+    }
+
+    return iconTheme.iconColor;
   }
 
   TextStyle? _getTextStyle() {

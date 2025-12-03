@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
+import 'package:flutter_folderview/themes/folder_view_icon_theme.dart';
 
 import '../data/theme_demo_data.dart';
 
@@ -32,6 +33,11 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   Color _folderTextColor = Colors.black87;
   Color _parentTextColor = Colors.black87;
   Color _childTextColor = Colors.black87;
+
+  // Icon Theme State
+  double _iconSize = 20.0;
+  Color _iconColor = Colors.grey.shade700;
+  Color _selectedIconColor = Colors.blue.shade700;
 
   // FolderView State
   late List<Node<String>> _treeData;
@@ -126,9 +132,12 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           color: _parentTextColor,
           fontWeight: FontWeight.w500,
         ),
-        childTextStyle: TextStyle(
-          color: _childTextColor,
-        ),
+        childTextStyle: TextStyle(color: _childTextColor),
+      ),
+      iconTheme: FolderViewIconTheme(
+        iconSize: _iconSize,
+        iconColor: _iconColor,
+        selectedIconColor: _selectedIconColor,
       ),
     );
 
@@ -358,34 +367,36 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: [
-                  Colors.grey.shade200,
-                  Colors.grey.shade300,
-                  Colors.blue.shade100,
-                  Colors.green.shade100,
-                  Colors.orange.shade100,
-                  Colors.purple.shade100,
-                ].map((color) {
-                  final isSelected = _scrollbarTrackColor == color;
-                  return InkWell(
-                    onTap: () => setState(() => _scrollbarTrackColor = color),
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: color,
+                children:
+                    [
+                      Colors.grey.shade200,
+                      Colors.grey.shade300,
+                      Colors.blue.shade100,
+                      Colors.green.shade100,
+                      Colors.orange.shade100,
+                      Colors.purple.shade100,
+                    ].map((color) {
+                      final isSelected = _scrollbarTrackColor == color;
+                      return InkWell(
+                        onTap: () =>
+                            setState(() => _scrollbarTrackColor = color),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.transparent,
-                          width: 3,
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+                      );
+                    }).toList(),
               ),
               const SizedBox(height: 8),
               Text(
@@ -410,7 +421,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                 max: 20.0,
                 divisions: 12,
                 label: _scrollbarThickness.toStringAsFixed(0),
-                onChanged: (value) => setState(() => _scrollbarThickness = value),
+                onChanged: (value) =>
+                    setState(() => _scrollbarThickness = value),
               ),
               Text(
                 'Thickness: ${_scrollbarThickness.toStringAsFixed(0)}px',
@@ -458,7 +470,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                 max: 1.0,
                 divisions: 20,
                 label: _scrollbarHoverOpacity.toStringAsFixed(2),
-                onChanged: (value) => setState(() => _scrollbarHoverOpacity = value),
+                onChanged: (value) =>
+                    setState(() => _scrollbarHoverOpacity = value),
               ),
               Text(
                 'Opacity: ${_scrollbarHoverOpacity.toStringAsFixed(2)}',
@@ -482,7 +495,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                 max: 24.0,
                 divisions: 12,
                 label: _scrollbarTrackWidth.toStringAsFixed(0),
-                onChanged: (value) => setState(() => _scrollbarTrackWidth = value),
+                onChanged: (value) =>
+                    setState(() => _scrollbarTrackWidth = value),
               ),
               Text(
                 'Width: ${_scrollbarTrackWidth.toStringAsFixed(0)}px',
@@ -526,7 +540,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             title: const Text('Show scrollbar without hover'),
             subtitle: const Text('Keep scrollbar visible at all times'),
             value: _scrollbarAlwaysVisible,
-            onChanged: (value) => setState(() => _scrollbarAlwaysVisible = value),
+            onChanged: (value) =>
+                setState(() => _scrollbarAlwaysVisible = value),
             contentPadding: EdgeInsets.zero,
           ),
         ),
@@ -612,6 +627,61 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
 
         const SizedBox(height: 24),
 
+        // Divider
+        const Divider(height: 32),
+
+        Text(
+          'Icon Theme Controls',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 24),
+
+        // Icon Size
+        _buildSection(
+          title: 'Icon Size',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Slider(
+                value: _iconSize,
+                min: 12.0,
+                max: 32.0,
+                divisions: 20,
+                label: _iconSize.toStringAsFixed(1),
+                onChanged: (value) => setState(() => _iconSize = value),
+              ),
+              Text(
+                'Size: ${_iconSize.toStringAsFixed(1)}px',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Icon Color
+        _buildSection(
+          title: 'Icon Color',
+          child: _buildColorPicker(
+            _iconColor,
+            (color) => setState(() => _iconColor = color),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Selected Icon Color
+        _buildSection(
+          title: 'Selected Icon Color',
+          child: _buildColorPicker(
+            _selectedIconColor,
+            (color) => setState(() => _selectedIconColor = color),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
         // Reset Button
         FilledButton.icon(
           onPressed: _resetToDefaults,
@@ -626,10 +696,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        Text(title, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         child,
       ],
@@ -654,23 +721,27 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
       _folderTextColor = Colors.black87;
       _parentTextColor = Colors.black87;
       _childTextColor = Colors.black87;
+      _iconSize = 20.0;
+      _iconColor = Colors.grey.shade700;
+      _selectedIconColor = Colors.blue.shade700;
       _treeData = getThemeDemoData();
       _selectedNodeIds = {};
     });
   }
 
-  Widget _buildColorPicker(Color currentColor, ValueChanged<Color> onColorChanged) {
+  Widget _buildColorPicker(
+    Color currentColor,
+    ValueChanged<Color> onColorChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: [
-            ..._presetColors,
-            Colors.black87,
-            Colors.white,
-          ].map((color) {
+          children: [..._presetColors, Colors.black87, Colors.white].map((
+            color,
+          ) {
             final isSelected = currentColor == color;
             return InkWell(
               onTap: () => onColorChanged(color),

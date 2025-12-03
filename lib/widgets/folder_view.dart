@@ -42,6 +42,7 @@ class FolderView<T> extends StatelessWidget {
         final contentWidth = SizeService.calculateContentWidth(
           nodes: displayNodes,
           textTheme: effectiveTheme.textTheme,
+          iconSize: effectiveTheme.iconTheme.iconSize,
           maxWidth: availableWidth * 3, // Allow up to 3x viewport width
         );
 
