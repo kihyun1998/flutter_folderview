@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../models/node.dart';
 import 'folder_view_icon_theme.dart';
 import 'folder_view_line_theme.dart';
+import 'folder_view_node_style_theme.dart';
 import 'folder_view_scrollbar_theme.dart';
+import 'folder_view_spacing_theme.dart';
 import 'folder_view_text_theme.dart';
 
 /// Master theme class for the entire FolderView component
@@ -26,10 +28,14 @@ class FlutterFolderViewTheme {
   /// Theme for icons
   final FolderViewIconTheme iconTheme;
 
+  /// Theme for spacing and padding
+  final FolderViewSpacingTheme spacingTheme;
+
+  /// Theme for node visual styling
+  final FolderViewNodeStyleTheme nodeStyleTheme;
+
   // Future theme properties can be added here:
-  // final FolderViewNodeTheme? nodeTheme;
   // final FolderViewAnimationTheme? animationTheme;
-  // final FolderViewSpacingTheme? spacingTheme;
 
   /// Creates a [FlutterFolderViewTheme] with the given properties
   const FlutterFolderViewTheme({
@@ -37,6 +43,8 @@ class FlutterFolderViewTheme {
     required this.scrollbarTheme,
     this.textTheme = const FolderViewTextTheme(),
     this.iconTheme = const FolderViewIconTheme(),
+    this.spacingTheme = const FolderViewSpacingTheme(),
+    this.nodeStyleTheme = const FolderViewNodeStyleTheme(),
   });
 
   /// Creates a light theme with sensible defaults
@@ -60,6 +68,7 @@ class FlutterFolderViewTheme {
         iconColor: Colors.grey.shade700,
         selectedIconColor: Colors.blue.shade700,
       ),
+      spacingTheme: const FolderViewSpacingTheme(),
     );
   }
 
@@ -84,6 +93,7 @@ class FlutterFolderViewTheme {
         iconColor: Colors.grey.shade400,
         selectedIconColor: Colors.blue.shade300,
       ),
+      spacingTheme: const FolderViewSpacingTheme(),
     );
   }
 
@@ -93,12 +103,16 @@ class FlutterFolderViewTheme {
     FolderViewScrollbarTheme? scrollbarTheme,
     FolderViewTextTheme? textTheme,
     FolderViewIconTheme? iconTheme,
+    FolderViewSpacingTheme? spacingTheme,
+    FolderViewNodeStyleTheme? nodeStyleTheme,
   }) {
     return FlutterFolderViewTheme(
       lineTheme: lineTheme ?? this.lineTheme,
       scrollbarTheme: scrollbarTheme ?? this.scrollbarTheme,
       textTheme: textTheme ?? this.textTheme,
       iconTheme: iconTheme ?? this.iconTheme,
+      spacingTheme: spacingTheme ?? this.spacingTheme,
+      nodeStyleTheme: nodeStyleTheme ?? this.nodeStyleTheme,
     );
   }
 
@@ -123,6 +137,16 @@ class FlutterFolderViewTheme {
       ),
       textTheme: FolderViewTextTheme.lerp(a.textTheme, b.textTheme, t),
       iconTheme: FolderViewIconTheme.lerp(a.iconTheme, b.iconTheme, t),
+      spacingTheme: FolderViewSpacingTheme.lerp(
+        a.spacingTheme,
+        b.spacingTheme,
+        t,
+      ),
+      nodeStyleTheme: FolderViewNodeStyleTheme.lerp(
+        a.nodeStyleTheme,
+        b.nodeStyleTheme,
+        t,
+      ),
     );
   }
 
@@ -134,11 +158,20 @@ class FlutterFolderViewTheme {
         other.lineTheme == lineTheme &&
         other.scrollbarTheme == scrollbarTheme &&
         other.textTheme == textTheme &&
-        other.iconTheme == iconTheme;
+        other.iconTheme == iconTheme &&
+        other.spacingTheme == spacingTheme &&
+        other.nodeStyleTheme == nodeStyleTheme;
   }
 
   @override
-  int get hashCode => Object.hash(lineTheme, scrollbarTheme, textTheme, iconTheme);
+  int get hashCode => Object.hash(
+    lineTheme,
+    scrollbarTheme,
+    textTheme,
+    iconTheme,
+    spacingTheme,
+    nodeStyleTheme,
+  );
 
   @override
   String toString() {
@@ -146,7 +179,9 @@ class FlutterFolderViewTheme {
         'lineTheme: $lineTheme, '
         'scrollbarTheme: $scrollbarTheme, '
         'textTheme: $textTheme, '
-        'iconTheme: $iconTheme'
+        'iconTheme: $iconTheme, '
+        'spacingTheme: $spacingTheme, '
+        'nodeStyleTheme: $nodeStyleTheme'
         ')';
   }
 }

@@ -45,12 +45,16 @@ class FolderView<T> extends StatelessWidget {
           nodes: displayNodes,
           textTheme: effectiveTheme.textTheme,
           iconSize: effectiveTheme.iconTheme.iconSize,
+          leftPadding: effectiveTheme.spacingTheme.contentPadding.left,
+          rightPadding: effectiveTheme.spacingTheme.contentPadding.right,
           maxWidth: availableWidth * 3, // Allow up to 3x viewport width
         );
 
         final contentHeight = SizeService.calculateContentHeight(
           nodes: displayNodes,
           rowHeight: 40.0,
+          topPadding: effectiveTheme.spacingTheme.contentPadding.top,
+          bottomPadding: effectiveTheme.spacingTheme.contentPadding.bottom,
         );
 
         final needsHorizontalScroll = contentWidth > availableWidth;

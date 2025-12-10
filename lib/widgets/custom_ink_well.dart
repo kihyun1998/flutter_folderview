@@ -15,6 +15,9 @@ class CustomInkWell extends StatefulWidget {
   /// interval
   final int clickInterval;
 
+  /// Border radius for the ink well
+  final double borderRadius;
+
   /// colors
   final Color? backgroundColor;
   final Color? selectedColor;
@@ -36,6 +39,7 @@ class CustomInkWell extends StatefulWidget {
     this.isSelected = false,
     this.mouseCursor,
     required this.clickInterval,
+    this.borderRadius = 8.0,
     this.backgroundColor,
     this.selectedColor,
     this.hoverColor,
@@ -111,11 +115,11 @@ class _CustomInkWellState extends State<CustomInkWell> {
             color: widget.isSelected
                 ? widget.selectedColor ?? Colors.transparent
                 : widget.backgroundColor ?? Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(widget.borderRadius),
           ),
           child: InkWell(
             mouseCursor: widget.mouseCursor,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(widget.borderRadius),
             onTap: widget.onTap != null ? _handleTap : null,
             onSecondaryTapDown: widget.onSecondaryTapDown,
             splashColor: widget.splashColor ?? Colors.transparent,

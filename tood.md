@@ -1,0 +1,1 @@
+1. text style 합치기(base, select만 있음.)

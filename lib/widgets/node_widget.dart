@@ -158,6 +158,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
 
     return CustomInkWell(
       clickInterval: 300,
+      borderRadius: widget.theme.nodeStyleTheme.borderRadius,
       isSelected: isSelected,
       backgroundColor: Colors.transparent,
       selectedColor: Theme.of(context).colorScheme.primaryContainer,
@@ -189,44 +190,48 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     );
   }
 
-  /// Build content for folder/parent nodes with simple InkWell
+  /// Build content for folder/parent nodes with CustomInkWell
   Widget _buildFolderParentNodeContent() {
     final isSelected =
         widget.selectedNodeIds?.contains(widget.node.id) ?? false;
 
-    return InkWell(
+    return CustomInkWell(
+      clickInterval: 300,
+      borderRadius: widget.theme.nodeStyleTheme.borderRadius,
+      isSelected: isSelected,
+      backgroundColor: Colors.transparent,
+      selectedColor: Theme.of(context).colorScheme.primaryContainer,
+      hoverColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+      highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
       onTap: () => widget.onTap?.call(widget.node),
-      child: Container(
-        color: isSelected
-            ? Theme.of(context).colorScheme.primaryContainer
-            : null,
-        child: Row(
-          children: [
-            // Expand/Collapse Icon
-            if (widget.node.canExpand)
-              RotationTransition(
-                turns: _iconTurns,
-                child: Icon(
-                  widget.theme.iconTheme.expandIcon ?? Icons.chevron_right,
-                  size: widget.theme.iconTheme.iconSize,
-                  color: _getIconColor(),
-                ),
-              )
-            else
-              SizedBox(width: widget.theme.iconTheme.iconSize),
+      onDoubleTap: null, // Folder/Parent nodes don't use double tap
+      child: Row(
+        children: [
+          // Expand/Collapse Icon
+          if (widget.node.canExpand)
+            RotationTransition(
+              turns: _iconTurns,
+              child: Icon(
+                widget.theme.iconTheme.expandIcon ?? Icons.chevron_right,
+                size: widget.theme.iconTheme.iconSize,
+                color: _getIconColor(),
+              ),
+            )
+          else
+            SizedBox(width: widget.theme.iconTheme.iconSize),
 
-            // Node Icon
-            Icon(
-              _getNodeIcon(),
-              size: widget.theme.iconTheme.iconSize,
-              color: _getIconColor(),
-            ),
-            const SizedBox(width: 8),
+          // Node Icon
+          Icon(
+            _getNodeIcon(),
+            size: widget.theme.iconTheme.iconSize,
+            color: _getIconColor(),
+          ),
+          const SizedBox(width: 8),
 
-            // Label
-            Expanded(child: Text(widget.node.label, style: _getTextStyle())),
-          ],
-        ),
+          // Label
+          Expanded(child: Text(widget.node.label, style: _getTextStyle())),
+        ],
       ),
     );
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
-import 'package:flutter_folderview/themes/folder_view_icon_theme.dart';
 
 import '../data/theme_demo_data.dart';
 
@@ -41,6 +40,15 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
 
   // View Mode State
   ViewMode _viewMode = ViewMode.folder;
+
+  // Spacing Theme State
+  double _contentPaddingLeft = 0.0;
+  double _contentPaddingRight = 0.0;
+  double _contentPaddingTop = 0.0;
+  double _contentPaddingBottom = 0.0;
+
+  // Node Style Theme State
+  double _nodeBorderRadius = 8.0;
 
   // FolderView State
   late List<Node<String>> _treeData;
@@ -151,20 +159,14 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         thickness: _scrollbarThickness,
         radius: _scrollbarRadius,
         hoverOpacity: _scrollbarHoverOpacity,
-        nonHoverOpacity: _scrollbarAlwaysVisible ? 1.0 : 0.0,
         trackWidth: _scrollbarTrackWidth,
         trackRadius: _scrollbarTrackRadius,
+        nonHoverOpacity: _scrollbarAlwaysVisible ? 1.0 : 0.0,
       ),
       textTheme: FolderViewTextTheme(
         textStyle: TextStyle(color: _textColor, fontSize: _fontSize),
-        folderTextStyle: TextStyle(
-          color: _folderTextColor,
-          fontWeight: FontWeight.bold,
-        ),
-        parentTextStyle: TextStyle(
-          color: _parentTextColor,
-          fontWeight: FontWeight.w500,
-        ),
+        folderTextStyle: TextStyle(color: _folderTextColor),
+        parentTextStyle: TextStyle(color: _parentTextColor),
         childTextStyle: TextStyle(color: _childTextColor),
       ),
       iconTheme: FolderViewIconTheme(
@@ -172,6 +174,15 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         iconColor: _iconColor,
         selectedIconColor: _selectedIconColor,
       ),
+      spacingTheme: FolderViewSpacingTheme(
+        contentPadding: EdgeInsets.only(
+          left: _contentPaddingLeft,
+          right: _contentPaddingRight,
+          top: _contentPaddingTop,
+          bottom: _contentPaddingBottom,
+        ),
+      ),
+      nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _nodeBorderRadius),
     );
 
     return Scaffold(
@@ -781,6 +792,162 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
 
         const SizedBox(height: 24),
 
+        // Spacing Theme
+        ExpansionTile(
+          initiallyExpanded: false,
+          title: Text(
+            'Spacing Theme',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left Padding
+                  _buildSection(
+                    title: 'Left Padding',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _contentPaddingLeft,
+                          min: 0.0,
+                          max: 48.0,
+                          divisions: 48,
+                          label: _contentPaddingLeft.toStringAsFixed(0),
+                          onChanged: (value) =>
+                              setState(() => _contentPaddingLeft = value),
+                        ),
+                        Text(
+                          'Padding: ${_contentPaddingLeft.toStringAsFixed(0)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Right Padding
+                  _buildSection(
+                    title: 'Right Padding',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _contentPaddingRight,
+                          min: 0.0,
+                          max: 48.0,
+                          divisions: 48,
+                          label: _contentPaddingRight.toStringAsFixed(0),
+                          onChanged: (value) =>
+                              setState(() => _contentPaddingRight = value),
+                        ),
+                        Text(
+                          'Padding: ${_contentPaddingRight.toStringAsFixed(0)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Top Padding
+                  _buildSection(
+                    title: 'Top Padding',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _contentPaddingTop,
+                          min: 0.0,
+                          max: 48.0,
+                          divisions: 48,
+                          label: _contentPaddingTop.toStringAsFixed(0),
+                          onChanged: (value) =>
+                              setState(() => _contentPaddingTop = value),
+                        ),
+                        Text(
+                          'Padding: ${_contentPaddingTop.toStringAsFixed(0)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Bottom Padding
+                  _buildSection(
+                    title: 'Bottom Padding',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _contentPaddingBottom,
+                          min: 0.0,
+                          max: 48.0,
+                          divisions: 48,
+                          label: _contentPaddingBottom.toStringAsFixed(0),
+                          onChanged: (value) =>
+                              setState(() => _contentPaddingBottom = value),
+                        ),
+                        Text(
+                          'Padding: ${_contentPaddingBottom.toStringAsFixed(0)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+
+        // Node Style Theme
+        ExpansionTile(
+          initiallyExpanded: false,
+          title: Text(
+            'Node Style Theme',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Border Radius
+                  _buildSection(
+                    title: 'Border Radius',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _nodeBorderRadius,
+                          min: 0.0,
+                          max: 20.0,
+                          divisions: 40,
+                          label: _nodeBorderRadius.toStringAsFixed(1),
+                          onChanged: (value) =>
+                              setState(() => _nodeBorderRadius = value),
+                        ),
+                        Text(
+                          'Radius: ${_nodeBorderRadius.toStringAsFixed(1)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+
         // Reset Button
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -827,6 +994,11 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
       _iconColor = Colors.grey.shade700;
       _selectedIconColor = Colors.blue.shade700;
       _viewMode = ViewMode.folder;
+      _contentPaddingLeft = 0.0;
+      _contentPaddingRight = 0.0;
+      _contentPaddingTop = 0.0;
+      _contentPaddingBottom = 0.0;
+      _nodeBorderRadius = 8.0;
       _treeData = getThemeDemoData();
       _selectedNodeIds = {};
     });

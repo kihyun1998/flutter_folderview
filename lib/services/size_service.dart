@@ -11,6 +11,7 @@ class SizeService {
     double linePaintWidth = 20.0,
     double iconSize = 20.0,
     double spacing = 8.0,
+    double leftPadding = 0.0,
     double rightPadding = 16.0,
     double maxWidth = double.infinity,
   }) {
@@ -38,6 +39,7 @@ class SizeService {
           linePaintWidth: linePaintWidth,
           iconSize: iconSize,
           spacing: spacing,
+          leftPadding: 0.0, // Children don't need extra left padding
           rightPadding: rightPadding,
           maxWidth: maxWidth,
         );
@@ -49,7 +51,9 @@ class SizeService {
       }
     }
 
-    return maxNodeWidth.clamp(0.0, maxWidth);
+    // Add left and right padding to the final width
+    final totalWidth = leftPadding + maxNodeWidth;
+    return totalWidth.clamp(0.0, maxWidth);
   }
 
   /// Calculate the width of a single node
@@ -107,6 +111,8 @@ class SizeService {
   static double calculateContentHeight<T>({
     required List<Node<T>> nodes,
     double rowHeight = 40.0,
+    double topPadding = 0.0,
+    double bottomPadding = 0.0,
   }) {
     double height = 0.0;
 
@@ -119,10 +125,14 @@ class SizeService {
         height += calculateContentHeight(
           nodes: node.children,
           rowHeight: rowHeight,
+          // Children don't need extra padding
+          topPadding: 0.0,
+          bottomPadding: 0.0,
         );
       }
     }
 
-    return height;
+    // Add top and bottom padding to the total height
+    return height + topPadding + bottomPadding;
   }
 }

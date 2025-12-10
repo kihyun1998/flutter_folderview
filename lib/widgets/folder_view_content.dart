@@ -79,6 +79,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
           child: ListView.builder(
             key: _listViewKey,
             controller: verticalController,
+            padding: theme.spacingTheme.contentPadding,
             itemCount: data.length,
             itemBuilder: (context, index) {
               return NodeWidget<T>(
