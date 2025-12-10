@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_folderview/widgets/custom_ink_well.dart';
 
 import '../models/node.dart';
 import '../themes/flutter_folder_view_theme.dart';
@@ -8,6 +9,8 @@ class NodeWidget<T> extends StatefulWidget {
   final Node<T> node;
   final ViewMode mode;
   final Function(Node<T>)? onTap;
+  final Function(Node<T>)? onDoubleTap;
+  final Function(Node<T>, TapDownDetails)? onSecondaryTap;
   final bool isLast;
   final bool isRoot;
   final Set<String>? selectedNodeIds;
@@ -18,6 +21,8 @@ class NodeWidget<T> extends StatefulWidget {
     required this.node,
     required this.mode,
     this.onTap,
+    this.onDoubleTap,
+    this.onSecondaryTap,
     this.isLast = false,
     this.isRoot = false,
     this.selectedNodeIds,
@@ -111,49 +116,9 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
 
                   // Clickable Content
                   Expanded(
-                    child: InkWell(
-                      onTap: () => widget.onTap?.call(widget.node),
-                      child: Container(
-                        color:
-                            (widget.selectedNodeIds?.contains(widget.node.id) ??
-                                false)
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : null,
-                        child: Row(
-                          children: [
-                            // Expand/Collapse Icon
-                            if (widget.node.canExpand)
-                              RotationTransition(
-                                turns: _iconTurns,
-                                child: Icon(
-                                  widget.theme.iconTheme.expandIcon ??
-                                      Icons.chevron_right,
-                                  size: widget.theme.iconTheme.iconSize,
-                                  color: _getIconColor(),
-                                ),
-                              )
-                            else
-                              SizedBox(width: widget.theme.iconTheme.iconSize),
-
-                            // Node Icon
-                            Icon(
-                              _getNodeIcon(),
-                              size: widget.theme.iconTheme.iconSize,
-                              color: _getIconColor(),
-                            ),
-                            const SizedBox(width: 8),
-
-                            // Label
-                            Expanded(
-                              child: Text(
-                                widget.node.label,
-                                style: _getTextStyle(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    child: widget.node.type == NodeType.child
+                        ? _buildChildNodeContent()
+                        : _buildFolderParentNodeContent(),
                   ),
                 ],
               ),
@@ -169,6 +134,8 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                       node: entry.value,
                       mode: widget.mode,
                       onTap: widget.onTap,
+                      onDoubleTap: widget.onDoubleTap,
+                      onSecondaryTap: widget.onSecondaryTap,
                       isLast: entry.key == widget.node.children.length - 1,
                       isRoot: false,
                       selectedNodeIds: widget.selectedNodeIds,
@@ -181,6 +148,86 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           ],
         ),
       ],
+    );
+  }
+
+  /// Build content for child nodes (leaf nodes) with CustomInkWell
+  Widget _buildChildNodeContent() {
+    final isSelected =
+        widget.selectedNodeIds?.contains(widget.node.id) ?? false;
+
+    return CustomInkWell(
+      clickInterval: 300,
+      isSelected: isSelected,
+      backgroundColor: Colors.transparent,
+      selectedColor: Theme.of(context).colorScheme.primaryContainer,
+      hoverColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+      highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      onTap: () => widget.onTap?.call(widget.node),
+      onDoubleTap: () => widget.onDoubleTap?.call(widget.node),
+      onSecondaryTapDown: widget.onSecondaryTap != null
+          ? (details) => widget.onSecondaryTap?.call(widget.node, details)
+          : null,
+      child: Row(
+        children: [
+          // No expand icon for leaf nodes
+          SizedBox(width: widget.theme.iconTheme.iconSize),
+
+          // Node Icon
+          Icon(
+            _getNodeIcon(),
+            size: widget.theme.iconTheme.iconSize,
+            color: _getIconColor(),
+          ),
+          const SizedBox(width: 8),
+
+          // Label
+          Expanded(child: Text(widget.node.label, style: _getTextStyle())),
+        ],
+      ),
+    );
+  }
+
+  /// Build content for folder/parent nodes with simple InkWell
+  Widget _buildFolderParentNodeContent() {
+    final isSelected =
+        widget.selectedNodeIds?.contains(widget.node.id) ?? false;
+
+    return InkWell(
+      onTap: () => widget.onTap?.call(widget.node),
+      child: Container(
+        color: isSelected
+            ? Theme.of(context).colorScheme.primaryContainer
+            : null,
+        child: Row(
+          children: [
+            // Expand/Collapse Icon
+            if (widget.node.canExpand)
+              RotationTransition(
+                turns: _iconTurns,
+                child: Icon(
+                  widget.theme.iconTheme.expandIcon ?? Icons.chevron_right,
+                  size: widget.theme.iconTheme.iconSize,
+                  color: _getIconColor(),
+                ),
+              )
+            else
+              SizedBox(width: widget.theme.iconTheme.iconSize),
+
+            // Node Icon
+            Icon(
+              _getNodeIcon(),
+              size: widget.theme.iconTheme.iconSize,
+              color: _getIconColor(),
+            ),
+            const SizedBox(width: 8),
+
+            // Label
+            Expanded(child: Text(widget.node.label, style: _getTextStyle())),
+          ],
+        ),
+      ),
     );
   }
 

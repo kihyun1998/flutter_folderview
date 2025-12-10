@@ -68,6 +68,36 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     });
   }
 
+  void _handleSecondaryTap(Node<String> node, TapDownDetails details) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('우클릭: ${node.label} (${node.type.name})'),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          bottom:
+              MediaQuery.of(context).size.height -
+              details.globalPosition.dy -
+              50,
+          left: 10,
+          right: 10,
+        ),
+      ),
+    );
+  }
+
+  void _handleDoubleTap(Node<String> node) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('더블클릭: ${node.label} (${node.type.name})'),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   List<Node<String>> _toggleNodeRecursive(
     List<Node<String>> nodes,
     String targetId,
@@ -187,6 +217,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                           data: _treeData,
                           mode: _viewMode,
                           onNodeTap: _handleNodeTap,
+                          onDoubleNodeTap: _handleDoubleTap,
+                          onSecondaryNodeTap: _handleSecondaryTap,
                           selectedNodeIds: _selectedNodeIds,
                           theme: theme,
                         ),

@@ -35,6 +35,28 @@ class _FolderCardState extends State<FolderCard> {
     });
   }
 
+  void _handleSecondaryTap(Node<String> node, TapDownDetails details) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('우클릭: ${node.label} (${node.type.name})'),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _handleDoubleTap(Node<String> node) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('더블클릭: ${node.label} (${node.type.name})'),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   List<Node<String>> _toggleNodeRecursive(
     List<Node<String>> nodes,
     String targetId,
@@ -167,20 +189,24 @@ class _FolderCardState extends State<FolderCard> {
                 data: _getDisplayNodes(),
                 mode: config.mode,
                 onNodeTap: _handleNodeTap,
+                onDoubleNodeTap: _handleDoubleTap,
+                onSecondaryNodeTap: _handleSecondaryTap,
                 selectedNodeIds: selectedNodeIds,
-                theme: (Theme.of(context).brightness == Brightness.dark
-                        ? FlutterFolderViewTheme.dark()
-                        : FlutterFolderViewTheme.light())
-                    .copyWith(
-                  lineTheme: FolderViewLineTheme(
-                    lineColor: Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF757575)
-                        : const Color(0xFF9E9E9E),
-                    lineWidth: 1.5,
-                    lineStyle: config.lineStyle,
-                  ),
-                  textTheme: config.textTheme,
-                ),
+                theme:
+                    (Theme.of(context).brightness == Brightness.dark
+                            ? FlutterFolderViewTheme.dark()
+                            : FlutterFolderViewTheme.light())
+                        .copyWith(
+                          lineTheme: FolderViewLineTheme(
+                            lineColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF757575)
+                                : const Color(0xFF9E9E9E),
+                            lineWidth: 1.5,
+                            lineStyle: config.lineStyle,
+                          ),
+                          textTheme: config.textTheme,
+                        ),
               ),
             ),
           ),

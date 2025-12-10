@@ -11,6 +11,8 @@ class FolderView<T> extends StatelessWidget {
   final List<Node<T>> data;
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
+  final Function(Node<T>)? onDoubleNodeTap;
+  final Function(Node<T>, TapDownDetails)? onSecondaryNodeTap;
   final Set<String>? selectedNodeIds;
   final FlutterFolderViewTheme? theme;
 
@@ -19,6 +21,8 @@ class FolderView<T> extends StatelessWidget {
     required this.data,
     required this.mode,
     this.onNodeTap,
+    this.onDoubleNodeTap,
+    this.onSecondaryNodeTap,
     this.selectedNodeIds,
     this.theme,
   });
@@ -35,8 +39,6 @@ class FolderView<T> extends StatelessWidget {
       builder: (context, constraints) {
         final double availableHeight = constraints.maxHeight;
         final double availableWidth = constraints.maxWidth;
-
-
 
         // Calculate content dimensions
         final contentWidth = SizeService.calculateContentWidth(
@@ -55,18 +57,20 @@ class FolderView<T> extends StatelessWidget {
         final needsVerticalScroll = contentHeight > availableHeight;
 
         return SyncedScrollControllers(
-              builder:
-                  (
-                    context,
-                    verticalController,
-                    verticalScrollbarController,
-                    horizontalController,
-                    horizontalScrollbarController,
-                  ) {
+          builder:
+              (
+                context,
+                verticalController,
+                verticalScrollbarController,
+                horizontalController,
+                horizontalScrollbarController,
+              ) {
                 return FolderViewContent<T>(
                   data: displayNodes,
                   mode: mode,
                   onNodeTap: onNodeTap,
+                  onDoubleNodeTap: onDoubleNodeTap,
+                  onSecondaryNodeTap: onSecondaryNodeTap,
                   selectedNodeIds: selectedNodeIds,
                   contentWidth: contentWidth,
                   contentHeight: contentHeight,

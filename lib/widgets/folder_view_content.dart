@@ -25,6 +25,8 @@ class FolderViewContent<T> extends StatefulWidget {
   final List<Node<T>> data;
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
+  final Function(Node<T>)? onDoubleNodeTap;
+  final Function(Node<T>, TapDownDetails)? onSecondaryNodeTap;
   final Set<String>? selectedNodeIds;
   final FlutterFolderViewTheme theme;
 
@@ -42,6 +44,8 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.data,
     required this.mode,
     required this.onNodeTap,
+    this.onDoubleNodeTap,
+    this.onSecondaryNodeTap,
     required this.selectedNodeIds,
     required this.theme,
   });
@@ -59,6 +63,8 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     required List<Node<T>> data,
     required ViewMode mode,
     required Function(Node<T>)? onNodeTap,
+    required Function(Node<T>)? onDoubleNodeTap,
+    required Function(Node<T>, TapDownDetails)? onSecondaryNodeTap,
     required Set<String>? selectedNodeIds,
     required ScrollController horizontalController,
     required ScrollController verticalController,
@@ -79,6 +85,8 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                 node: data[index],
                 mode: mode,
                 onTap: onNodeTap,
+                onDoubleTap: onDoubleNodeTap,
+                onSecondaryTap: onSecondaryNodeTap,
                 isLast: index == data.length - 1,
                 isRoot: true,
                 selectedNodeIds: selectedNodeIds,
@@ -120,6 +128,8 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
               data: widget.data,
               mode: widget.mode,
               onNodeTap: widget.onNodeTap,
+              onDoubleNodeTap: widget.onDoubleNodeTap,
+              onSecondaryNodeTap: widget.onSecondaryNodeTap,
               selectedNodeIds: widget.selectedNodeIds,
               horizontalController: widget.horizontalController,
               verticalController: widget.verticalController,
