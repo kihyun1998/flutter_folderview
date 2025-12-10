@@ -661,16 +661,6 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text Color
-                  _buildSection(
-                    title: 'Base Text Color',
-                    child: _buildColorPicker(
-                      _textColor,
-                      (color) => setState(() => _textColor = color),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
                   // Font Size
                   _buildSection(
                     title: 'Font Size',

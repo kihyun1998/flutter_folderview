@@ -91,12 +91,23 @@ class FolderView<T> extends StatelessWidget {
 
   List<Node<T>> _getDisplayNodes() {
     if (mode == ViewMode.tree) {
-      // In Tree Mode, we only show Parent nodes at the root level (and their children when expanded)
-      // Assuming the input 'data' contains all root nodes.
-      // If the input data is mixed, we might need to filter.
-      // Based on requirements: "Tree mode: Parent > Child only. No Parent of Parent."
-      // So we expect the root list to contain Parent nodes.
-      return data.where((n) => n.type == NodeType.parent).toList();
+      // In Tree Mode, we only show Parent nodes at the root level
+      // If data contains Folders, we need to extract Parents from within them
+      List<Node<T>> parents = [];
+
+      for (var node in data) {
+        if (node.type == NodeType.parent) {
+          // Direct parent node
+          parents.add(node);
+        } else if (node.type == NodeType.folder) {
+          // Extract parent nodes from folder
+          parents.addAll(
+            node.children.where((child) => child.type == NodeType.parent),
+          );
+        }
+      }
+
+      return parents;
     } else {
       // In Folder Mode, we show Folders and Parents at the root level.
       // "Folder mode: Folder > Parent > Child. Parent of Parent is Folder."
