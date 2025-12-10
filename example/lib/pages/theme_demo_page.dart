@@ -39,6 +39,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   Color _iconColor = Colors.grey.shade700;
   Color _selectedIconColor = Colors.blue.shade700;
 
+  // View Mode State
+  ViewMode _viewMode = ViewMode.folder;
+
   // FolderView State
   late List<Node<String>> _treeData;
   Set<String> _selectedNodeIds = {};
@@ -182,7 +185,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                         padding: const EdgeInsets.all(16.0),
                         child: FolderView<String>(
                           data: _treeData,
-                          mode: ViewMode.folder,
+                          mode: _viewMode,
                           onNodeTap: _handleNodeTap,
                           selectedNodeIds: _selectedNodeIds,
                           theme: theme,
@@ -203,490 +206,567 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        Text(
-          'Line Theme Controls',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 24),
-
-        // Line Color
-        _buildSection(
-          title: 'Line Color',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _presetColors.map((color) {
-                  final isSelected = _lineColor == color;
-                  return InkWell(
-                    onTap: () => setState(() => _lineColor = color),
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.transparent,
-                          width: 3,
-                        ),
+        // View Mode Section
+        ExpansionTile(
+          initiallyExpanded: true,
+          title: Text(
+            'View Mode',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                children: [
+                  SegmentedButton<ViewMode>(
+                    segments: const [
+                      ButtonSegment<ViewMode>(
+                        value: ViewMode.folder,
+                        label: Text('Folder Mode'),
+                        icon: Icon(Icons.folder_outlined),
                       ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Color: #${_lineColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Line Width
-        _buildSection(
-          title: 'Line Width',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _lineWidth,
-                min: 0.5,
-                max: 5.0,
-                divisions: 18,
-                label: _lineWidth.toStringAsFixed(1),
-                onChanged: (value) => setState(() => _lineWidth = value),
-              ),
-              Text(
-                'Width: ${_lineWidth.toStringAsFixed(1)}px',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Line Style
-        _buildSection(
-          title: 'Line Style',
-          child: Column(
-            children: [
-              RadioListTile<LineStyle>(
-                title: const Text('Connector'),
-                subtitle: const Text('Traditional tree lines ├─ and └─'),
-                value: LineStyle.connector,
-                groupValue: _lineStyle,
-                onChanged: (value) => setState(() => _lineStyle = value!),
-              ),
-              RadioListTile<LineStyle>(
-                title: const Text('Scope'),
-                subtitle: const Text('Vertical indent guide (like VS Code)'),
-                value: LineStyle.scope,
-                groupValue: _lineStyle,
-                onChanged: (value) => setState(() => _lineStyle = value!),
-              ),
-              RadioListTile<LineStyle>(
-                title: const Text('None'),
-                subtitle: const Text('No connection lines'),
-                value: LineStyle.none,
-                groupValue: _lineStyle,
-                onChanged: (value) => setState(() => _lineStyle = value!),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Divider
-        const Divider(height: 32),
-
-        Text(
-          'Scrollbar Theme Controls',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 24),
-
-        // Scrollbar Thumb Color
-        _buildSection(
-          title: 'Thumb Color',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _presetColors.map((color) {
-                  final isSelected = _scrollbarThumbColor == color;
-                  return InkWell(
-                    onTap: () => setState(() => _scrollbarThumbColor = color),
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.transparent,
-                          width: 3,
-                        ),
+                      ButtonSegment<ViewMode>(
+                        value: ViewMode.tree,
+                        label: Text('Tree Mode'),
+                        icon: Icon(Icons.account_tree_outlined),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    ],
+                    selected: {_viewMode},
+                    onSelectionChanged: (Set<ViewMode> newSelection) {
+                      setState(() => _viewMode = newSelection.first);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _viewMode == ViewMode.folder
+                        ? 'Folder > Parent > Child'
+                        : 'Parent > Child only',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Color: #${_scrollbarThumbColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
 
-        const SizedBox(height: 24),
+        // Line Theme Section
+        ExpansionTile(
+          title: Text(
+            'Line Theme',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Line Color
+                  _buildSection(
+                    title: 'Line Color',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _presetColors.map((color) {
+                            final isSelected = _lineColor == color;
+                            return InkWell(
+                              onTap: () => setState(() => _lineColor = color),
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Colors.transparent,
+                                    width: 3,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Color: #${_lineColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
-        // Scrollbar Track Color
-        _buildSection(
-          title: 'Track Color',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children:
-                    [
-                      Colors.grey.shade200,
-                      Colors.grey.shade300,
-                      Colors.blue.shade100,
-                      Colors.green.shade100,
-                      Colors.orange.shade100,
-                      Colors.purple.shade100,
-                    ].map((color) {
-                      final isSelected = _scrollbarTrackColor == color;
-                      return InkWell(
-                        onTap: () =>
-                            setState(() => _scrollbarTrackColor = color),
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.transparent,
-                              width: 3,
-                            ),
+                  // Line Width
+                  _buildSection(
+                    title: 'Line Width',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _lineWidth,
+                          min: 0.5,
+                          max: 5.0,
+                          divisions: 18,
+                          label: _lineWidth.toStringAsFixed(1),
+                          onChanged: (value) =>
+                              setState(() => _lineWidth = value),
+                        ),
+                        Text(
+                          'Width: ${_lineWidth.toStringAsFixed(1)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Line Style
+                  _buildSection(
+                    title: 'Line Style',
+                    child: Column(
+                      children: [
+                        RadioListTile<LineStyle>(
+                          title: const Text('Connector'),
+                          subtitle: const Text(
+                            'Traditional tree lines ├─ and └─',
                           ),
+                          value: LineStyle.connector,
+                          groupValue: _lineStyle,
+                          onChanged: (value) =>
+                              setState(() => _lineStyle = value!),
                         ),
-                      );
-                    }).toList(),
+                        RadioListTile<LineStyle>(
+                          title: const Text('Scope'),
+                          subtitle: const Text(
+                            'Vertical indent guide (like VS Code)',
+                          ),
+                          value: LineStyle.scope,
+                          groupValue: _lineStyle,
+                          onChanged: (value) =>
+                              setState(() => _lineStyle = value!),
+                        ),
+                        RadioListTile<LineStyle>(
+                          title: const Text('None'),
+                          subtitle: const Text('No connection lines'),
+                          value: LineStyle.none,
+                          groupValue: _lineStyle,
+                          onChanged: (value) =>
+                              setState(() => _lineStyle = value!),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Color: #${_scrollbarTrackColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
+            ),
+          ],
+        ),
+
+        // Scrollbar Theme Section
+        ExpansionTile(
+          title: Text(
+            'Scrollbar Theme',
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-        ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Scrollbar Thumb Color
+                  _buildSection(
+                    title: 'Thumb Color',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _presetColors.map((color) {
+                            final isSelected = _scrollbarThumbColor == color;
+                            return InkWell(
+                              onTap: () =>
+                                  setState(() => _scrollbarThumbColor = color),
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Colors.transparent,
+                                    width: 3,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Color: #${_scrollbarThumbColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
-        const SizedBox(height: 24),
+                  // Scrollbar Track Color
+                  _buildSection(
+                    title: 'Track Color',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children:
+                              [
+                                Colors.grey.shade200,
+                                Colors.grey.shade300,
+                                Colors.blue.shade100,
+                                Colors.green.shade100,
+                                Colors.orange.shade100,
+                                Colors.purple.shade100,
+                              ].map((color) {
+                                final isSelected =
+                                    _scrollbarTrackColor == color;
+                                return InkWell(
+                                  onTap: () => setState(
+                                    () => _scrollbarTrackColor = color,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: color,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.primary
+                                            : Colors.transparent,
+                                        width: 3,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Color: #${_scrollbarTrackColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
-        // Scrollbar Thickness
-        _buildSection(
-          title: 'Thumb Thickness',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _scrollbarThickness,
-                min: 8.0,
-                max: 20.0,
-                divisions: 12,
-                label: _scrollbarThickness.toStringAsFixed(0),
-                onChanged: (value) =>
-                    setState(() => _scrollbarThickness = value),
+                  // Scrollbar Thickness
+                  _buildSection(
+                    title: 'Thumb Thickness',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _scrollbarThickness,
+                          min: 8.0,
+                          max: 20.0,
+                          divisions: 12,
+                          label: _scrollbarThickness.toStringAsFixed(0),
+                          onChanged: (value) =>
+                              setState(() => _scrollbarThickness = value),
+                        ),
+                        Text(
+                          'Thickness: ${_scrollbarThickness.toStringAsFixed(0)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Scrollbar Radius
+                  _buildSection(
+                    title: 'Thumb Radius',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _scrollbarRadius,
+                          min: 0.0,
+                          max: 10.0,
+                          divisions: 20,
+                          label: _scrollbarRadius.toStringAsFixed(1),
+                          onChanged: (value) =>
+                              setState(() => _scrollbarRadius = value),
+                        ),
+                        Text(
+                          'Radius: ${_scrollbarRadius.toStringAsFixed(1)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Hover Opacity
+                  _buildSection(
+                    title: 'Hover Opacity',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _scrollbarHoverOpacity,
+                          min: 0.0,
+                          max: 1.0,
+                          divisions: 20,
+                          label: _scrollbarHoverOpacity.toStringAsFixed(2),
+                          onChanged: (value) =>
+                              setState(() => _scrollbarHoverOpacity = value),
+                        ),
+                        Text(
+                          'Opacity: ${_scrollbarHoverOpacity.toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Track Width
+                  _buildSection(
+                    title: 'Track Width',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _scrollbarTrackWidth,
+                          min: 12.0,
+                          max: 24.0,
+                          divisions: 12,
+                          label: _scrollbarTrackWidth.toStringAsFixed(0),
+                          onChanged: (value) =>
+                              setState(() => _scrollbarTrackWidth = value),
+                        ),
+                        Text(
+                          'Width: ${_scrollbarTrackWidth.toStringAsFixed(0)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Track Radius
+                  _buildSection(
+                    title: 'Track Radius',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _scrollbarTrackRadius,
+                          min: 0.0,
+                          max: 12.0,
+                          divisions: 24,
+                          label: _scrollbarTrackRadius.toStringAsFixed(1),
+                          onChanged: (value) =>
+                              setState(() => _scrollbarTrackRadius = value),
+                        ),
+                        Text(
+                          'Radius: ${_scrollbarTrackRadius.toStringAsFixed(1)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Always Visible Toggle
+                  _buildSection(
+                    title: 'Always Visible',
+                    child: SwitchListTile(
+                      title: const Text('Show scrollbar without hover'),
+                      subtitle: const Text(
+                        'Keep scrollbar visible at all times',
+                      ),
+                      value: _scrollbarAlwaysVisible,
+                      onChanged: (value) =>
+                          setState(() => _scrollbarAlwaysVisible = value),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                'Thickness: ${_scrollbarThickness.toStringAsFixed(0)}px',
-                style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+
+        // Text Theme Section
+        ExpansionTile(
+          title: Text(
+            'Text Theme',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Text Color
+                  _buildSection(
+                    title: 'Base Text Color',
+                    child: _buildColorPicker(
+                      _textColor,
+                      (color) => setState(() => _textColor = color),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Font Size
+                  _buildSection(
+                    title: 'Font Size',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _fontSize,
+                          min: 10.0,
+                          max: 24.0,
+                          divisions: 14,
+                          label: _fontSize.toStringAsFixed(1),
+                          onChanged: (value) =>
+                              setState(() => _fontSize = value),
+                        ),
+                        Text(
+                          'Size: ${_fontSize.toStringAsFixed(1)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Folder Text Color
+                  _buildSection(
+                    title: 'Folder Text Color',
+                    child: _buildColorPicker(
+                      _folderTextColor,
+                      (color) => setState(() => _folderTextColor = color),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Parent Text Color
+                  _buildSection(
+                    title: 'Parent Text Color',
+                    child: _buildColorPicker(
+                      _parentTextColor,
+                      (color) => setState(() => _parentTextColor = color),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Child Text Color
+                  _buildSection(
+                    title: 'Child Text Color',
+                    child: _buildColorPicker(
+                      _childTextColor,
+                      (color) => setState(() => _childTextColor = color),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
 
-        const SizedBox(height: 24),
+        // Icon Theme Section
+        ExpansionTile(
+          title: Text(
+            'Icon Theme',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Icon Size
+                  _buildSection(
+                    title: 'Icon Size',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Slider(
+                          value: _iconSize,
+                          min: 12.0,
+                          max: 32.0,
+                          divisions: 20,
+                          label: _iconSize.toStringAsFixed(1),
+                          onChanged: (value) =>
+                              setState(() => _iconSize = value),
+                        ),
+                        Text(
+                          'Size: ${_iconSize.toStringAsFixed(1)}px',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
-        // Scrollbar Radius
-        _buildSection(
-          title: 'Thumb Radius',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _scrollbarRadius,
-                min: 0.0,
-                max: 10.0,
-                divisions: 20,
-                label: _scrollbarRadius.toStringAsFixed(1),
-                onChanged: (value) => setState(() => _scrollbarRadius = value),
+                  // Icon Color
+                  _buildSection(
+                    title: 'Icon Color',
+                    child: _buildColorPicker(
+                      _iconColor,
+                      (color) => setState(() => _iconColor = color),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Selected Icon Color
+                  _buildSection(
+                    title: 'Selected Icon Color',
+                    child: _buildColorPicker(
+                      _selectedIconColor,
+                      (color) => setState(() => _selectedIconColor = color),
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                'Radius: ${_scrollbarRadius.toStringAsFixed(1)}px',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Hover Opacity
-        _buildSection(
-          title: 'Hover Opacity',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _scrollbarHoverOpacity,
-                min: 0.0,
-                max: 1.0,
-                divisions: 20,
-                label: _scrollbarHoverOpacity.toStringAsFixed(2),
-                onChanged: (value) =>
-                    setState(() => _scrollbarHoverOpacity = value),
-              ),
-              Text(
-                'Opacity: ${_scrollbarHoverOpacity.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Track Width
-        _buildSection(
-          title: 'Track Width',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _scrollbarTrackWidth,
-                min: 12.0,
-                max: 24.0,
-                divisions: 12,
-                label: _scrollbarTrackWidth.toStringAsFixed(0),
-                onChanged: (value) =>
-                    setState(() => _scrollbarTrackWidth = value),
-              ),
-              Text(
-                'Width: ${_scrollbarTrackWidth.toStringAsFixed(0)}px',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Track Radius
-        _buildSection(
-          title: 'Track Radius',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _scrollbarTrackRadius,
-                min: 0.0,
-                max: 12.0,
-                divisions: 24,
-                label: _scrollbarTrackRadius.toStringAsFixed(1),
-                onChanged: (value) =>
-                    setState(() => _scrollbarTrackRadius = value),
-              ),
-              Text(
-                'Radius: ${_scrollbarTrackRadius.toStringAsFixed(1)}px',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Always Visible Toggle
-        _buildSection(
-          title: 'Always Visible',
-          child: SwitchListTile(
-            title: const Text('Show scrollbar without hover'),
-            subtitle: const Text('Keep scrollbar visible at all times'),
-            value: _scrollbarAlwaysVisible,
-            onChanged: (value) =>
-                setState(() => _scrollbarAlwaysVisible = value),
-            contentPadding: EdgeInsets.zero,
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Divider
-        const Divider(height: 32),
-
-        Text(
-          'Text Theme Controls',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 24),
-
-        // Text Color
-        _buildSection(
-          title: 'Base Text Color',
-          child: _buildColorPicker(
-            _textColor,
-            (color) => setState(() => _textColor = color),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Font Size
-        _buildSection(
-          title: 'Font Size',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _fontSize,
-                min: 10.0,
-                max: 24.0,
-                divisions: 14,
-                label: _fontSize.toStringAsFixed(1),
-                onChanged: (value) => setState(() => _fontSize = value),
-              ),
-              Text(
-                'Size: ${_fontSize.toStringAsFixed(1)}px',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Folder Text Color
-        _buildSection(
-          title: 'Folder Text Color',
-          child: _buildColorPicker(
-            _folderTextColor,
-            (color) => setState(() => _folderTextColor = color),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Parent Text Color
-        _buildSection(
-          title: 'Parent Text Color',
-          child: _buildColorPicker(
-            _parentTextColor,
-            (color) => setState(() => _parentTextColor = color),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Child Text Color
-        _buildSection(
-          title: 'Child Text Color',
-          child: _buildColorPicker(
-            _childTextColor,
-            (color) => setState(() => _childTextColor = color),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        const SizedBox(height: 24),
-
-        // Divider
-        const Divider(height: 32),
-
-        Text(
-          'Icon Theme Controls',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 24),
-
-        // Icon Size
-        _buildSection(
-          title: 'Icon Size',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Slider(
-                value: _iconSize,
-                min: 12.0,
-                max: 32.0,
-                divisions: 20,
-                label: _iconSize.toStringAsFixed(1),
-                onChanged: (value) => setState(() => _iconSize = value),
-              ),
-              Text(
-                'Size: ${_iconSize.toStringAsFixed(1)}px',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Icon Color
-        _buildSection(
-          title: 'Icon Color',
-          child: _buildColorPicker(
-            _iconColor,
-            (color) => setState(() => _iconColor = color),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Selected Icon Color
-        _buildSection(
-          title: 'Selected Icon Color',
-          child: _buildColorPicker(
-            _selectedIconColor,
-            (color) => setState(() => _selectedIconColor = color),
-          ),
+            ),
+          ],
         ),
 
         const SizedBox(height: 24),
 
         // Reset Button
-        FilledButton.icon(
-          onPressed: _resetToDefaults,
-          icon: const Icon(Icons.refresh),
-          label: const Text('Reset to Default'),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: FilledButton.icon(
+            onPressed: _resetToDefaults,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Reset to Default'),
+          ),
         ),
       ],
     );
@@ -724,6 +804,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
       _iconSize = 20.0;
       _iconColor = Colors.grey.shade700;
       _selectedIconColor = Colors.blue.shade700;
+      _viewMode = ViewMode.folder;
       _treeData = getThemeDemoData();
       _selectedNodeIds = {};
     });

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
-import 'package:flutter_folderview/themes/folder_view_text_theme.dart';
 
 import 'data/corporate_data.dart';
 import 'data/filesystem_data.dart';
