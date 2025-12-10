@@ -103,8 +103,11 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // // Spacer for the connector line (Non-clickable)
-                  SizedBox(width: widget.theme.iconTheme.iconSize),
+                  // Spacer for the connector line (Non-clickable)
+                  // Root nodes have no left space, child nodes have iconSize space
+                  SizedBox(
+                    width: widget.isRoot ? 0 : widget.theme.iconTheme.iconSize,
+                  ),
 
                   // Clickable Content
                   Expanded(
@@ -160,26 +163,21 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
               child: SizeTransition(
                 sizeFactor: _heightFactor,
                 axisAlignment: -1.0, // Expand from top
-                child: Padding(
-                  padding:
-                      EdgeInsets.only(left: widget.theme.iconTheme.iconSize),
-                  child: Column(
-                    children: widget.node.children.asMap().entries.map((entry) {
-                      return NodeWidget<T>(
-                        node: entry.value,
-                        mode: widget.mode,
-                        onTap: widget.onTap,
-                        isLast: entry.key == widget.node.children.length - 1,
-                        isRoot: false,
-                        selectedNodeIds: widget.selectedNodeIds,
-                        theme: widget.theme,
-                      );
-                    }).toList(),
-                  ),
+                child: Column(
+                  children: widget.node.children.asMap().entries.map((entry) {
+                    return NodeWidget<T>(
+                      node: entry.value,
+                      mode: widget.mode,
+                      onTap: widget.onTap,
+                      isLast: entry.key == widget.node.children.length - 1,
+                      isRoot: false,
+                      selectedNodeIds: widget.selectedNodeIds,
+                      theme: widget.theme,
+                    );
+                  }).toList(),
                 ),
               ),
             ),
-
           ],
         ),
       ],
@@ -198,8 +196,8 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
         if (widget.mode == ViewMode.tree) {
           return widget.node.isExpanded
               ? (iconTheme.parentOpenIcon ??
-                  iconTheme.parentIcon ??
-                  Icons.account_tree)
+                    iconTheme.parentIcon ??
+                    Icons.account_tree)
               : (iconTheme.parentIcon ?? Icons.account_tree);
         } else {
           return iconTheme.parentIcon ?? Icons.description;
@@ -223,21 +221,25 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     TextStyle? style = widget.theme.textTheme.textStyle;
 
     if (widget.selectedNodeIds?.contains(widget.node.id) ?? false) {
-      style = style?.merge(widget.theme.textTheme.selectedTextStyle) ??
+      style =
+          style?.merge(widget.theme.textTheme.selectedTextStyle) ??
           widget.theme.textTheme.selectedTextStyle;
     }
 
     switch (widget.node.type) {
       case NodeType.folder:
-        style = style?.merge(widget.theme.textTheme.folderTextStyle) ??
+        style =
+            style?.merge(widget.theme.textTheme.folderTextStyle) ??
             widget.theme.textTheme.folderTextStyle;
         break;
       case NodeType.parent:
-        style = style?.merge(widget.theme.textTheme.parentTextStyle) ??
+        style =
+            style?.merge(widget.theme.textTheme.parentTextStyle) ??
             widget.theme.textTheme.parentTextStyle;
         break;
       case NodeType.child:
-        style = style?.merge(widget.theme.textTheme.childTextStyle) ??
+        style =
+            style?.merge(widget.theme.textTheme.childTextStyle) ??
             widget.theme.textTheme.childTextStyle;
         break;
     }
