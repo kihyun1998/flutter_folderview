@@ -13,6 +13,7 @@ class NodeWidget<T> extends StatefulWidget {
   final Function(Node<T>, TapDownDetails)? onSecondaryTap;
   final bool isLast;
   final bool isRoot;
+  final int depth;
   final Set<String>? selectedNodeIds;
   final FlutterFolderViewTheme theme;
 
@@ -25,6 +26,7 @@ class NodeWidget<T> extends StatefulWidget {
     this.onSecondaryTap,
     this.isLast = false,
     this.isRoot = false,
+    this.depth = 0,
     this.selectedNodeIds,
     required this.theme,
   });
@@ -84,7 +86,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       children: [
         // 1. Vertical Line (Pipeline)
         Positioned(
-          left: 0,
+          left: widget.isRoot ? 0 : (widget.depth - 1) * widget.theme.iconTheme.iconSize,
           top: 0,
           bottom: widget.isLast ? null : 0,
           height: widget.isLast ? _rowHeight / 2 : null,
@@ -109,9 +111,9 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Spacer for the connector line (Non-clickable)
-                  // Root nodes have no left space, child nodes have iconSize space
+                  // Indent based on depth
                   SizedBox(
-                    width: widget.isRoot ? 0 : widget.theme.iconTheme.iconSize,
+                    width: widget.depth * widget.theme.iconTheme.iconSize,
                   ),
 
                   // Clickable Content
@@ -138,6 +140,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                       onSecondaryTap: widget.onSecondaryTap,
                       isLast: entry.key == widget.node.children.length - 1,
                       isRoot: false,
+                      depth: widget.depth + 1,
                       selectedNodeIds: widget.selectedNodeIds,
                       theme: widget.theme,
                     );
