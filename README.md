@@ -1,39 +1,74 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Flutter FolderView
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A customizable Flutter widget for displaying hierarchical data in tree and folder views.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- 🌲 Dual view modes (Tree / Folder)
+- 📁 Three node types (Folder / Parent / Child)
+- 🎨 Customizable themes (icons, text, lines, colors)
+- 🎯 Interactive (tap, double-tap, right-click handlers)
+- ✨ Multiple line styles (Connector / Scope / None)
 
-## Getting started
+## Installation
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+```yaml
+dependencies:
+  flutter_folderview: ^0.1.0
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
 ```dart
-const like = 'sample';
+import 'package:flutter_folderview/flutter_folderview.dart';
+
+FolderView(
+  data: [
+    Node(
+      id: '1',
+      label: 'Documents',
+      type: NodeType.folder,
+      children: [
+        Node(
+          id: '2',
+          label: 'Work',
+          type: NodeType.parent,
+          children: [
+            Node(id: '3', label: 'Report.pdf', type: NodeType.child),
+          ],
+        ),
+      ],
+    ),
+  ],
+  mode: ViewMode.folder, // or ViewMode.tree
+  onNodeTap: (node) => print('Tapped: ${node.label}'),
+)
 ```
 
-## Additional information
+### View Modes
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+- `ViewMode.folder`: Shows folders at root with parent-child hierarchy
+- `ViewMode.tree`: Shows parent nodes at root (folders flattened)
+
+### Line Styles
+
+```dart
+theme: FlutterFolderViewTheme(
+  lineTheme: FolderViewLineTheme(
+    lineStyle: LineStyle.connector, // ├─ └─ style
+    // lineStyle: LineStyle.scope,   // VS Code style
+    // lineStyle: LineStyle.none,    // No lines
+  ),
+)
+```
+
+## Example
+
+Run the example app for more demos:
+
+```bash
+cd example
+flutter run
+```
+
+See [example/](example/) for complete examples with custom themes and different data structures.
