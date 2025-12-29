@@ -61,33 +61,32 @@ class FolderView<T> extends StatelessWidget {
         final needsVerticalScroll = contentHeight > availableHeight;
 
         return SyncedScrollControllers(
-          builder:
-              (
-                context,
-                verticalController,
-                verticalScrollbarController,
-                horizontalController,
-                horizontalScrollbarController,
-              ) {
-                return FolderViewContent<T>(
-                  data: displayNodes,
-                  mode: mode,
-                  onNodeTap: onNodeTap,
-                  onDoubleNodeTap: onDoubleNodeTap,
-                  onSecondaryNodeTap: onSecondaryNodeTap,
-                  selectedNodeIds: selectedNodeIds,
-                  contentWidth: contentWidth,
-                  contentHeight: contentHeight,
-                  viewportWidth: availableWidth,
-                  needsHorizontalScroll: needsHorizontalScroll,
-                  needsVerticalScroll: needsVerticalScroll,
-                  horizontalController: horizontalController!,
-                  verticalController: verticalController!,
-                  horizontalBarController: horizontalScrollbarController!,
-                  verticalBarController: verticalScrollbarController!,
-                  theme: effectiveTheme,
-                );
-              },
+          builder: (
+            context,
+            verticalController,
+            verticalScrollbarController,
+            horizontalController,
+            horizontalScrollbarController,
+          ) {
+            return FolderViewContent<T>(
+              data: displayNodes,
+              mode: mode,
+              onNodeTap: onNodeTap,
+              onDoubleNodeTap: onDoubleNodeTap,
+              onSecondaryNodeTap: onSecondaryNodeTap,
+              selectedNodeIds: selectedNodeIds,
+              contentWidth: contentWidth,
+              contentHeight: contentHeight,
+              viewportWidth: availableWidth,
+              needsHorizontalScroll: needsHorizontalScroll,
+              needsVerticalScroll: needsVerticalScroll,
+              horizontalController: horizontalController!,
+              verticalController: verticalController!,
+              horizontalBarController: horizontalScrollbarController!,
+              verticalBarController: verticalScrollbarController!,
+              theme: effectiveTheme,
+            );
+          },
         );
       },
     );

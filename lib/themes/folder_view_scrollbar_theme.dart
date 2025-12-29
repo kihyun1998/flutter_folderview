@@ -107,9 +107,8 @@ class FolderViewScrollbarTheme {
       thumbVisibility: t < 0.5 ? a.thumbVisibility : b.thumbVisibility,
       hoverOpacity: lerpDouble(a.hoverOpacity, b.hoverOpacity, t),
       nonHoverOpacity: lerpDouble(a.nonHoverOpacity, b.nonHoverOpacity, t),
-      hoverAnimationDuration: t < 0.5
-          ? a.hoverAnimationDuration
-          : b.hoverAnimationDuration,
+      hoverAnimationDuration:
+          t < 0.5 ? a.hoverAnimationDuration : b.hoverAnimationDuration,
       trackWidth: lerpDouble(a.trackWidth, b.trackWidth, t),
       trackRadius: lerpDouble(a.trackRadius, b.trackRadius, t),
       trackVisibility: t < 0.5 ? a.trackVisibility : b.trackVisibility,

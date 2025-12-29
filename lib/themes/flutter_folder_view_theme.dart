@@ -165,13 +165,13 @@ class FlutterFolderViewTheme {
 
   @override
   int get hashCode => Object.hash(
-    lineTheme,
-    scrollbarTheme,
-    textTheme,
-    iconTheme,
-    spacingTheme,
-    nodeStyleTheme,
-  );
+        lineTheme,
+        scrollbarTheme,
+        textTheme,
+        iconTheme,
+        spacingTheme,
+        nodeStyleTheme,
+      );
 
   @override
   String toString() {

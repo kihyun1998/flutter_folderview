@@ -17,8 +17,6 @@ class FolderViewHorizontalScrollbar extends StatelessWidget {
     required this.scrollbarTheme,
   });
 
-
-
   @override
   Widget build(BuildContext context) {
     return Positioned(

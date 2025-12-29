@@ -119,7 +119,7 @@ class _FolderCardState extends State<FolderCard> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: config.primaryColor.withOpacity(0.1),
+              color: config.primaryColor.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),

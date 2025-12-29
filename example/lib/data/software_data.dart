@@ -7,21 +7,13 @@ List<Node<String>> getSoftwareComponentData() {
     label: 'Frontend Layer',
     type: NodeType.parent,
     children: [
-      Node<String>(
-        id: 'sw_ui_1',
-        label: 'LoginScreen',
-        type: NodeType.child,
-      ),
+      Node<String>(id: 'sw_ui_1', label: 'LoginScreen', type: NodeType.child),
       Node<String>(
         id: 'sw_ui_2',
         label: 'DashboardWidget',
         type: NodeType.child,
       ),
-      Node<String>(
-        id: 'sw_ui_3',
-        label: 'NavigationBar',
-        type: NodeType.child,
-      ),
+      Node<String>(id: 'sw_ui_3', label: 'NavigationBar', type: NodeType.child),
     ],
   );
 
@@ -41,11 +33,7 @@ List<Node<String>> getSoftwareComponentData() {
         label: 'DatabaseService',
         type: NodeType.child,
       ),
-      Node<String>(
-        id: 'sw_api_3',
-        label: 'CacheManager',
-        type: NodeType.child,
-      ),
+      Node<String>(id: 'sw_api_3', label: 'CacheManager', type: NodeType.child),
     ],
   );
 
@@ -55,11 +43,7 @@ List<Node<String>> getSoftwareComponentData() {
     label: 'Data Layer',
     type: NodeType.parent,
     children: [
-      Node<String>(
-        id: 'sw_model_1',
-        label: 'UserModel',
-        type: NodeType.child,
-      ),
+      Node<String>(id: 'sw_model_1', label: 'UserModel', type: NodeType.child),
       Node<String>(
         id: 'sw_model_2',
         label: 'ProductModel',
@@ -79,11 +63,7 @@ List<Node<String>> getSoftwareComponentData() {
         label: 'DateFormatter',
         type: NodeType.child,
       ),
-      Node<String>(
-        id: 'sw_util_2',
-        label: 'Validator',
-        type: NodeType.child,
-      ),
+      Node<String>(id: 'sw_util_2', label: 'Validator', type: NodeType.child),
     ],
   );
 

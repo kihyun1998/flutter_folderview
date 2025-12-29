@@ -7,11 +7,7 @@ List<Node<String>> getFileSystemData() {
     label: 'Documents',
     type: NodeType.parent,
     children: [
-      Node<String>(
-        id: 'fs_doc_1',
-        label: 'resume.pdf',
-        type: NodeType.child,
-      ),
+      Node<String>(id: 'fs_doc_1', label: 'resume.pdf', type: NodeType.child),
       Node<String>(
         id: 'fs_doc_2',
         label: 'cover_letter.docx',
@@ -31,16 +27,8 @@ List<Node<String>> getFileSystemData() {
     label: 'Pictures',
     type: NodeType.parent,
     children: [
-      Node<String>(
-        id: 'fs_pic_1',
-        label: 'vacation.jpg',
-        type: NodeType.child,
-      ),
-      Node<String>(
-        id: 'fs_pic_2',
-        label: 'profile.png',
-        type: NodeType.child,
-      ),
+      Node<String>(id: 'fs_pic_1', label: 'vacation.jpg', type: NodeType.child),
+      Node<String>(id: 'fs_pic_2', label: 'profile.png', type: NodeType.child),
     ],
   );
 
@@ -50,21 +38,9 @@ List<Node<String>> getFileSystemData() {
     label: 'Downloads',
     type: NodeType.parent,
     children: [
-      Node<String>(
-        id: 'fs_dl_1',
-        label: 'installer.exe',
-        type: NodeType.child,
-      ),
-      Node<String>(
-        id: 'fs_dl_2',
-        label: 'archive.zip',
-        type: NodeType.child,
-      ),
-      Node<String>(
-        id: 'fs_dl_3',
-        label: 'readme.txt',
-        type: NodeType.child,
-      ),
+      Node<String>(id: 'fs_dl_1', label: 'installer.exe', type: NodeType.child),
+      Node<String>(id: 'fs_dl_2', label: 'archive.zip', type: NodeType.child),
+      Node<String>(id: 'fs_dl_3', label: 'readme.txt', type: NodeType.child),
     ],
   );
 
@@ -74,16 +50,8 @@ List<Node<String>> getFileSystemData() {
     label: 'Projects',
     type: NodeType.parent,
     children: [
-      Node<String>(
-        id: 'fs_proj_1',
-        label: 'flutter_app',
-        type: NodeType.child,
-      ),
-      Node<String>(
-        id: 'fs_proj_2',
-        label: 'website',
-        type: NodeType.child,
-      ),
+      Node<String>(id: 'fs_proj_1', label: 'flutter_app', type: NodeType.child),
+      Node<String>(id: 'fs_proj_2', label: 'website', type: NodeType.child),
     ],
   );
 

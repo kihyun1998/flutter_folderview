@@ -373,35 +373,36 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                   // Line Style
                   _buildSection(
                     title: 'Line Style',
-                    child: Column(
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
                       children: [
-                        RadioListTile<LineStyle>(
-                          title: const Text('Connector'),
-                          subtitle: const Text(
-                            'Traditional tree lines ├─ and └─',
-                          ),
-                          value: LineStyle.connector,
-                          groupValue: _lineStyle,
-                          onChanged: (value) =>
-                              setState(() => _lineStyle = value!),
+                        ChoiceChip(
+                          label: const Text('Connector'),
+                          selected: _lineStyle == LineStyle.connector,
+                          onSelected: (selected) {
+                            if (selected) {
+                              setState(() => _lineStyle = LineStyle.connector);
+                            }
+                          },
                         ),
-                        RadioListTile<LineStyle>(
-                          title: const Text('Scope'),
-                          subtitle: const Text(
-                            'Vertical indent guide (like VS Code)',
-                          ),
-                          value: LineStyle.scope,
-                          groupValue: _lineStyle,
-                          onChanged: (value) =>
-                              setState(() => _lineStyle = value!),
+                        ChoiceChip(
+                          label: const Text('Scope'),
+                          selected: _lineStyle == LineStyle.scope,
+                          onSelected: (selected) {
+                            if (selected) {
+                              setState(() => _lineStyle = LineStyle.scope);
+                            }
+                          },
                         ),
-                        RadioListTile<LineStyle>(
-                          title: const Text('None'),
-                          subtitle: const Text('No connection lines'),
-                          value: LineStyle.none,
-                          groupValue: _lineStyle,
-                          onChanged: (value) =>
-                              setState(() => _lineStyle = value!),
+                        ChoiceChip(
+                          label: const Text('None'),
+                          selected: _lineStyle == LineStyle.none,
+                          onSelected: (selected) {
+                            if (selected) {
+                              setState(() => _lineStyle = LineStyle.none);
+                            }
+                          },
                         ),
                       ],
                     ),

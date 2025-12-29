@@ -86,7 +86,9 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       children: [
         // 1. Vertical Line (Pipeline)
         Positioned(
-          left: widget.isRoot ? 0 : (widget.depth - 1) * widget.theme.iconTheme.iconSize,
+          left: widget.isRoot
+              ? 0
+              : (widget.depth - 1) * widget.theme.iconTheme.iconSize,
           top: 0,
           bottom: widget.isLast ? null : 0,
           height: widget.isLast ? _rowHeight / 2 : null,
@@ -166,8 +168,9 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       backgroundColor: Colors.transparent,
       selectedColor: Theme.of(context).colorScheme.primaryContainer,
       hoverColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-      splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-      highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+      highlightColor:
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       onTap: () => widget.onTap?.call(widget.node),
       onDoubleTap: () => widget.onDoubleTap?.call(widget.node),
       onSecondaryTapDown: widget.onSecondaryTap != null
@@ -205,8 +208,9 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       backgroundColor: Colors.transparent,
       selectedColor: Theme.of(context).colorScheme.primaryContainer,
       hoverColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-      splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-      highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+      splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+      highlightColor:
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       onTap: () => widget.onTap?.call(widget.node),
       onDoubleTap: null, // Folder/Parent nodes don't use double tap
       child: Row(
@@ -251,8 +255,8 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
         if (widget.mode == ViewMode.tree) {
           return widget.node.isExpanded
               ? (iconTheme.parentOpenIcon ??
-                    iconTheme.parentIcon ??
-                    Icons.account_tree)
+                  iconTheme.parentIcon ??
+                  Icons.account_tree)
               : (iconTheme.parentIcon ?? Icons.account_tree);
         } else {
           return iconTheme.parentIcon ?? Icons.description;
@@ -276,25 +280,21 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     TextStyle? style = widget.theme.textTheme.textStyle;
 
     if (widget.selectedNodeIds?.contains(widget.node.id) ?? false) {
-      style =
-          style?.merge(widget.theme.textTheme.selectedTextStyle) ??
+      style = style?.merge(widget.theme.textTheme.selectedTextStyle) ??
           widget.theme.textTheme.selectedTextStyle;
     }
 
     switch (widget.node.type) {
       case NodeType.folder:
-        style =
-            style?.merge(widget.theme.textTheme.folderTextStyle) ??
+        style = style?.merge(widget.theme.textTheme.folderTextStyle) ??
             widget.theme.textTheme.folderTextStyle;
         break;
       case NodeType.parent:
-        style =
-            style?.merge(widget.theme.textTheme.parentTextStyle) ??
+        style = style?.merge(widget.theme.textTheme.parentTextStyle) ??
             widget.theme.textTheme.parentTextStyle;
         break;
       case NodeType.child:
-        style =
-            style?.merge(widget.theme.textTheme.childTextStyle) ??
+        style = style?.merge(widget.theme.textTheme.childTextStyle) ??
             widget.theme.textTheme.childTextStyle;
         break;
     }

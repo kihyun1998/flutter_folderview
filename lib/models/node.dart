@@ -11,8 +11,8 @@ enum NodeType {
 
 enum LineStyle {
   connector, // Traditional tree lines with ├─ and └─
-  none,      // No lines
-  scope,     // Vertical indent guide lines only (like VS Code)
+  none, // No lines
+  scope, // Vertical indent guide lines only (like VS Code)
 }
 
 class Node<T> {

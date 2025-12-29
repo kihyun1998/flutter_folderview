@@ -10,7 +10,8 @@ List<Node<String>> getCorporateData() {
     ),
     Node<String>(
       id: 'corp_eng_auth_member_2',
-      label: 'Sarah Johnson - OAuth 2.0 Security Specialist and Implementation Engineer',
+      label:
+          'Sarah Johnson - OAuth 2.0 Security Specialist and Implementation Engineer',
       type: NodeType.child,
     ),
     Node<String>(
@@ -30,7 +31,8 @@ List<Node<String>> getCorporateData() {
   final dbTeamMembers = [
     Node<String>(
       id: 'corp_eng_db_member_1',
-      label: 'Emily Rodriguez - Database Architecture and Performance Optimization Lead',
+      label:
+          'Emily Rodriguez - Database Architecture and Performance Optimization Lead',
       type: NodeType.child,
     ),
     Node<String>(
@@ -58,12 +60,14 @@ List<Node<String>> getCorporateData() {
   final dashboardTeamMembers = [
     Node<String>(
       id: 'corp_eng_dash_member_1',
-      label: 'Jessica Williams - Senior UI/UX Developer and Design Systems Lead',
+      label:
+          'Jessica Williams - Senior UI/UX Developer and Design Systems Lead',
       type: NodeType.child,
     ),
     Node<String>(
       id: 'corp_eng_dash_member_2',
-      label: 'Robert Taylor - Real-time Analytics and Data Visualization Engineer',
+      label:
+          'Robert Taylor - Real-time Analytics and Data Visualization Engineer',
       type: NodeType.child,
     ),
     Node<String>(
@@ -83,7 +87,8 @@ List<Node<String>> getCorporateData() {
   final mobileTeamMembers = [
     Node<String>(
       id: 'corp_eng_mobile_member_1',
-      label: 'Christopher Lee - Mobile-First Design and Responsive Layout Expert',
+      label:
+          'Christopher Lee - Mobile-First Design and Responsive Layout Expert',
       type: NodeType.child,
     ),
     Node<String>(
@@ -102,7 +107,8 @@ List<Node<String>> getCorporateData() {
 
   final frontendProject = Node<String>(
     id: 'corp_frontend_proj',
-    label: 'Frontend User Interface Modernization and Component Library Development',
+    label:
+        'Frontend User Interface Modernization and Component Library Development',
     type: NodeType.parent,
     children: [dashboardTeam, mobileTeam],
   );
@@ -118,19 +124,22 @@ List<Node<String>> getCorporateData() {
   final campaignTeamMembers = [
     Node<String>(
       id: 'corp_marketing_campaign_member_1',
-      label: 'Jennifer Thompson - Social Media Strategy and Content Marketing Director',
+      label:
+          'Jennifer Thompson - Social Media Strategy and Content Marketing Director',
       type: NodeType.child,
     ),
     Node<String>(
       id: 'corp_marketing_campaign_member_2',
-      label: 'Daniel White - Digital Campaign Analytics and ROI Optimization Manager',
+      label:
+          'Daniel White - Digital Campaign Analytics and ROI Optimization Manager',
       type: NodeType.child,
     ),
   ];
 
   final campaignTeam = Node<String>(
     id: 'corp_marketing_campaign_team',
-    label: 'Q4 Social Media Campaign Strategy and Customer Engagement Initiative',
+    label:
+        'Q4 Social Media Campaign Strategy and Customer Engagement Initiative',
     type: NodeType.parent,
     children: campaignTeamMembers,
   );
@@ -138,7 +147,8 @@ List<Node<String>> getCorporateData() {
   final brandTeamMembers = [
     Node<String>(
       id: 'corp_marketing_brand_member_1',
-      label: 'Sophia Garcia - Creative Director and Brand Identity Design Specialist',
+      label:
+          'Sophia Garcia - Creative Director and Brand Identity Design Specialist',
       type: NodeType.child,
     ),
   ];
@@ -159,7 +169,8 @@ List<Node<String>> getCorporateData() {
 
   final marketingFolder = Node<String>(
     id: 'corp_marketing',
-    label: 'Marketing & Communications Department - Strategic Planning Division',
+    label:
+        'Marketing & Communications Department - Strategic Planning Division',
     type: NodeType.folder,
     children: [marketingProject],
   );
@@ -168,19 +179,22 @@ List<Node<String>> getCorporateData() {
   final recruitmentTeamMembers = [
     Node<String>(
       id: 'corp_hr_recruit_member_1',
-      label: 'Matthew Brown - Talent Acquisition Manager and Recruitment Pipeline Coordinator',
+      label:
+          'Matthew Brown - Talent Acquisition Manager and Recruitment Pipeline Coordinator',
       type: NodeType.child,
     ),
     Node<String>(
       id: 'corp_hr_recruit_member_2',
-      label: 'Olivia Davis - Employee Onboarding and Training Program Development Specialist',
+      label:
+          'Olivia Davis - Employee Onboarding and Training Program Development Specialist',
       type: NodeType.child,
     ),
   ];
 
   final recruitmentTeam = Node<String>(
     id: 'corp_hr_recruitment_team',
-    label: 'Talent Acquisition, Onboarding Process, and Employee Integration Program',
+    label:
+        'Talent Acquisition, Onboarding Process, and Employee Integration Program',
     type: NodeType.parent,
     children: recruitmentTeamMembers,
   );
@@ -188,28 +202,32 @@ List<Node<String>> getCorporateData() {
   final performanceTeamMembers = [
     Node<String>(
       id: 'corp_hr_perf_member_1',
-      label: 'William Wilson - Performance Review System Administrator and HR Analytics Lead',
+      label:
+          'William Wilson - Performance Review System Administrator and HR Analytics Lead',
       type: NodeType.child,
     ),
   ];
 
   final performanceTeam = Node<String>(
     id: 'corp_hr_performance_team',
-    label: 'Annual Performance Review and Employee Development Assessment Program',
+    label:
+        'Annual Performance Review and Employee Development Assessment Program',
     type: NodeType.parent,
     children: performanceTeamMembers,
   );
 
   final hrProject = Node<String>(
     id: 'corp_hr_proj',
-    label: 'Human Resources Management and Employee Relations Strategic Division',
+    label:
+        'Human Resources Management and Employee Relations Strategic Division',
     type: NodeType.parent,
     children: [recruitmentTeam, performanceTeam],
   );
 
   final hrFolder = Node<String>(
     id: 'corp_hr',
-    label: 'Human Resources - People Operations, Culture, and Organizational Development',
+    label:
+        'Human Resources - People Operations, Culture, and Organizational Development',
     type: NodeType.folder,
     children: [hrProject],
   );

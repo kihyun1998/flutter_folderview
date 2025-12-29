@@ -52,7 +52,7 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
     /// Vertical scrollbar controller
     _sc12 = ScrollController(initialScrollOffset: 0.0);
-    
+
     /// Horizontal scrollbar controller
     _sc22 = ScrollController(initialScrollOffset: 0.0);
 

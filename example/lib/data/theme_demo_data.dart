@@ -107,7 +107,8 @@ List<Node<String>> getThemeDemoData() {
     ),
     Node<String>(
       id: '3',
-      label: 'Usage Example with really long long long long label to test horizontal scroll',
+      label:
+          'Usage Example with really long long long long label to test horizontal scroll',
       type: NodeType.folder,
       isExpanded: true,
       children: [
