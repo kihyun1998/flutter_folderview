@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'data/corporate_data.dart';
 import 'data/filesystem_data.dart';
 import 'data/government_data.dart';
 import 'data/software_data.dart';
 import 'models/card_config.dart';
+import 'pages/large_dataset_page.dart';
 import 'pages/theme_demo_page.dart';
 import 'widgets/folder_card.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -47,6 +49,18 @@ class MyHomePage extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.dataset_outlined),
+            tooltip: 'Large Dataset Test',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LargeDatasetPage(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.palette),
             tooltip: 'Theme Demo',
