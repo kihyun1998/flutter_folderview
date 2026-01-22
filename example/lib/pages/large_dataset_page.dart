@@ -61,10 +61,7 @@ class LargeDatasetPage extends ConsumerWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Colors.blue.shade700,
-                    ),
+                    Icon(Icons.info_outline, color: Colors.blue.shade700),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -110,8 +107,9 @@ class LargeDatasetPage extends ConsumerWidget {
                     onDoubleNodeTap: (node) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content:
-                              Text('Double tap: ${node.label} (${node.type.name})'),
+                          content: Text(
+                            'Double tap: ${node.label} (${node.type.name})',
+                          ),
                           duration: const Duration(seconds: 1),
                           behavior: SnackBarBehavior.floating,
                         ),
@@ -120,26 +118,30 @@ class LargeDatasetPage extends ConsumerWidget {
                     onSecondaryNodeTap: (node, details) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content:
-                              Text('Right click: ${node.label} (${node.type.name})'),
+                          content: Text(
+                            'Right click: ${node.label} (${node.type.name})',
+                          ),
                           duration: const Duration(seconds: 1),
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
                     },
                     selectedNodeIds: viewModel.selectedIds,
-                    theme: (Theme.of(context).brightness == Brightness.dark
-                            ? FlutterFolderViewTheme.dark()
-                            : FlutterFolderViewTheme.light())
-                        .copyWith(
-                      lineTheme: FolderViewLineTheme(
-                        lineColor: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF757575)
-                            : const Color(0xFF9E9E9E),
-                        lineWidth: 1.5,
-                        lineStyle: viewModel.lineStyle,
-                      ),
-                    ),
+                    theme:
+                        (Theme.of(context).brightness == Brightness.dark
+                                ? FlutterFolderViewTheme.dark()
+                                : FlutterFolderViewTheme.light())
+                            .copyWith(
+                              lineTheme: FolderViewLineTheme(
+                                lineColor:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF757575)
+                                    : const Color(0xFF9E9E9E),
+                                lineWidth: 1.5,
+                                lineStyle: viewModel.lineStyle,
+                              ),
+                            ),
                   ),
                 ),
               ),

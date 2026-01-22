@@ -1,6 +1,6 @@
 name: flutter_folderview
 description: "A customizable Flutter widget for displaying hierarchical data in tree and folder views with rich theming support."
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/kihyun1998/flutter_folderview
 repository: https://github.com/kihyun1998/flutter_folderview
 issue_tracker: https://github.com/kihyun1998/flutter_folderview/issues

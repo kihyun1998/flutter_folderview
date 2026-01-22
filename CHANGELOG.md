@@ -1,3 +1,11 @@
+## 0.1.1
+
+### Bug Fixes
+- Fixed scroll position calculation when switching between view modes or expanding/collapsing nodes by adding dynamic key based on mode and content height
+
+### Examples
+- Added large dataset demo page with 500 nodes (10 folders × 5 parents × 10 children) for performance testing
+
 ## 0.1.0
 
 ### Initial Release
