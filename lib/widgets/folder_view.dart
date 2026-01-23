@@ -61,7 +61,7 @@ class FolderView<T> extends StatelessWidget {
         final needsVerticalScroll = contentHeight > availableHeight;
 
         return SyncedScrollControllers(
-          key: ValueKey('$mode-$contentHeight'),
+          key: ValueKey(mode),
           builder: (
             context,
             verticalController,

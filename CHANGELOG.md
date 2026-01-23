@@ -1,3 +1,8 @@
+## 0.1.2
+
+### Bug Fixes
+- Fixed scroll position being reset when expanding/collapsing nodes by removing contentHeight from SyncedScrollControllers key
+
 ## 0.1.1
 
 ### Bug Fixes
