@@ -21,7 +21,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   Color _folderIconColor = const Color(0xFF616161);
   double _folderPadding = 0.0;
   double _folderMargin = 0.0;
-  double _folderIconSpacing = 8.0;
+
   Color _folderTextColor = Colors.black87;
   double _folderFontSize = 14.0;
 
@@ -35,7 +35,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   Color _parentIconColor = const Color(0xFF616161);
   double _parentPadding = 0.0;
   double _parentMargin = 0.0;
-  double _parentIconSpacing = 8.0;
+
   Color _parentTextColor = Colors.black87;
   double _parentFontSize = 14.0;
 
@@ -49,7 +49,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   Color _childIconColor = const Color(0xFF616161);
   double _childPadding = 0.0;
   double _childMargin = 0.0;
-  double _childIconSpacing = 8.0;
+
   Color _childTextColor = Colors.black87;
   double _childFontSize = 14.0;
   Color _childSelectedBg = const Color(0xFFE3F2FD);
@@ -167,9 +167,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         ),
         width: _folderIconSize,
         height: _folderIconSize,
-        padding: EdgeInsets.all(_folderPadding),
-        margin: EdgeInsets.all(_folderMargin),
-        iconToTextSpacing: _folderIconSpacing,
+        padding: EdgeInsets.symmetric(horizontal: _folderPadding),
+        margin: EdgeInsets.symmetric(horizontal: _folderMargin),
+
         textStyle: TextStyle(
           color: _folderTextColor,
           fontSize: _folderFontSize,
@@ -186,9 +186,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         ),
         width: _parentIconSize,
         height: _parentIconSize,
-        padding: EdgeInsets.all(_parentPadding),
-        margin: EdgeInsets.all(_parentMargin),
-        iconToTextSpacing: _parentIconSpacing,
+        padding: EdgeInsets.symmetric(horizontal: _parentPadding),
+        margin: EdgeInsets.symmetric(horizontal: _parentMargin),
+
         textStyle: TextStyle(
           color: _parentTextColor,
           fontSize: _parentFontSize,
@@ -205,9 +205,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         ),
         width: _childIconSize,
         height: _childIconSize,
-        padding: EdgeInsets.all(_childPadding),
-        margin: EdgeInsets.all(_childMargin),
-        iconToTextSpacing: _childIconSpacing,
+        padding: EdgeInsets.symmetric(horizontal: _childPadding),
+        margin: EdgeInsets.symmetric(horizontal: _childMargin),
+
         textStyle: TextStyle(color: _childTextColor, fontSize: _childFontSize),
         selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         selectedBackgroundColor: _childSelectedBg,
@@ -224,8 +224,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         ),
         width: _expandIconSize,
         height: _expandIconSize,
-        padding: EdgeInsets.all(_expandPadding),
-        margin: EdgeInsets.all(_expandMargin),
+        padding: EdgeInsets.only(left: _expandPadding),
+        margin: EdgeInsets.only(left: _expandMargin),
       ),
       scrollbarTheme: FolderViewScrollbarTheme(
         thumbColor: Colors.grey.shade600,
@@ -285,7 +285,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _folderIconColor = const Color(0xFF616161);
             _folderPadding = 0.0;
             _folderMargin = 0.0;
-            _folderIconSpacing = 8.0;
+
             _folderTextColor = Colors.black87;
             _folderFontSize = 14.0;
             _folderHoverColor = const Color(0xFFEEEEEE);
@@ -295,7 +295,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _parentIconColor = const Color(0xFF616161);
             _parentPadding = 0.0;
             _parentMargin = 0.0;
-            _parentIconSpacing = 8.0;
+
             _parentTextColor = Colors.black87;
             _parentFontSize = 14.0;
             _parentHoverColor = const Color(0xFFEEEEEE);
@@ -305,7 +305,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _childIconColor = const Color(0xFF616161);
             _childPadding = 0.0;
             _childMargin = 0.0;
-            _childIconSpacing = 8.0;
+
             _childTextColor = Colors.black87;
             _childFontSize = 14.0;
             _childSelectedBg = const Color(0xFFE3F2FD);
@@ -483,13 +483,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               8,
               (v) => setState(() => _folderMargin = v),
             ),
-            _slider(
-              'Spacing',
-              _folderIconSpacing,
-              0,
-              24,
-              (v) => setState(() => _folderIconSpacing = v),
-            ),
+
             _colorRow(
               'Text',
               _folderTextColor,
@@ -503,7 +497,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               (v) => setState(() => _folderFontSize = v),
             ),
             const Divider(),
-            const Text('Interaction', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+            const Text(
+              'Interaction',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 4),
             _colorRow(
               'Hover',
@@ -560,13 +557,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               8,
               (v) => setState(() => _parentMargin = v),
             ),
-            _slider(
-              'Spacing',
-              _parentIconSpacing,
-              0,
-              24,
-              (v) => setState(() => _parentIconSpacing = v),
-            ),
+
             _colorRow(
               'Text',
               _parentTextColor,
@@ -580,7 +571,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               (v) => setState(() => _parentFontSize = v),
             ),
             const Divider(),
-            const Text('Interaction', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+            const Text(
+              'Interaction',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 4),
             _colorRow(
               'Hover',
@@ -637,13 +631,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               8,
               (v) => setState(() => _childMargin = v),
             ),
-            _slider(
-              'Spacing',
-              _childIconSpacing,
-              0,
-              24,
-              (v) => setState(() => _childIconSpacing = v),
-            ),
+
             _colorRow(
               'Text',
               _childTextColor,
@@ -663,7 +651,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               (c) => setState(() => _childSelectedBg = c),
             ),
             const Divider(),
-            const Text('Interaction', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+            const Text(
+              'Interaction',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 4),
             _colorRow(
               'Hover',

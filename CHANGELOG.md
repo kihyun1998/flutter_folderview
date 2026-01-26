@@ -6,6 +6,11 @@
   - Colors fall back to Material theme defaults when not specified
   - Theme demo updated with interactive color pickers for all interaction colors
 
+### Refactoring
+- **Simplified Spacing Control**: Removed `iconToTextSpacing` property from all node themes
+  - Icon-to-text spacing is now controlled via icon `margin.right` for better consistency
+  - Reduced API surface and eliminated redundant spacing configuration
+
 ## 0.2.0
 
 ### BREAKING CHANGES

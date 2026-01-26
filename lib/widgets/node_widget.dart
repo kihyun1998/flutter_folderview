@@ -284,11 +284,10 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       child: Row(
         children: [
           // No expand icon for leaf nodes - just empty space
-          _buildExpandIcon(),
+          // _buildExpandIcon(),
 
           // Node Icon
           _buildNodeIcon(),
-          SizedBox(width: childTheme.iconToTextSpacing),
 
           // Label
           Expanded(child: Text(widget.node.label, style: _getTextStyle())),
@@ -335,10 +334,6 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
 
           // Node Icon
           _buildNodeIcon(),
-          SizedBox(
-              width: widget.node.type == NodeType.folder
-                  ? widget.theme.folderTheme.iconToTextSpacing
-                  : widget.theme.parentTheme.iconToTextSpacing),
 
           // Label
           Expanded(child: Text(widget.node.label, style: _getTextStyle())),

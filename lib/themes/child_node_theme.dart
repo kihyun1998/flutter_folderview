@@ -1,4 +1,5 @@
 import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/widgets.dart';
 
 import '../models/node.dart';
@@ -24,9 +25,6 @@ class ChildNodeTheme<T> {
 
   /// Margin around the icon widget
   final EdgeInsets margin;
-
-  /// Spacing between icon and text
-  final double iconToTextSpacing;
 
   /// Text style for child nodes
   final TextStyle? textStyle;
@@ -66,7 +64,6 @@ class ChildNodeTheme<T> {
     this.height = 20.0,
     this.padding = EdgeInsets.zero,
     this.margin = EdgeInsets.zero,
-    this.iconToTextSpacing = 8.0,
     this.textStyle,
     this.textStyleResolver,
     this.selectedTextStyle,
@@ -86,7 +83,6 @@ class ChildNodeTheme<T> {
     double? height,
     EdgeInsets? padding,
     EdgeInsets? margin,
-    double? iconToTextSpacing,
     TextStyle? textStyle,
     TextStyle? Function(Node<T> node)? textStyleResolver,
     TextStyle? selectedTextStyle,
@@ -104,7 +100,6 @@ class ChildNodeTheme<T> {
       height: height ?? this.height,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
-      iconToTextSpacing: iconToTextSpacing ?? this.iconToTextSpacing,
       textStyle: textStyle ?? this.textStyle,
       textStyleResolver: textStyleResolver ?? this.textStyleResolver,
       selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
@@ -138,8 +133,6 @@ class ChildNodeTheme<T> {
       height: lerpDouble(a.height, b.height, t) ?? 20.0,
       padding: EdgeInsets.lerp(a.padding, b.padding, t) ?? EdgeInsets.zero,
       margin: EdgeInsets.lerp(a.margin, b.margin, t) ?? EdgeInsets.zero,
-      iconToTextSpacing:
-          lerpDouble(a.iconToTextSpacing, b.iconToTextSpacing, t) ?? 8.0,
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       textStyleResolver: t < 0.5 ? a.textStyleResolver : b.textStyleResolver,
       selectedTextStyle:
@@ -156,66 +149,5 @@ class ChildNodeTheme<T> {
               300)
           .round(),
     );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other.runtimeType != runtimeType) return false;
-    return other is ChildNodeTheme<T> &&
-        other.widget == widget &&
-        other.width == width &&
-        other.height == height &&
-        other.padding == padding &&
-        other.margin == margin &&
-        other.iconToTextSpacing == iconToTextSpacing &&
-        other.textStyle == textStyle &&
-        other.selectedTextStyle == selectedTextStyle &&
-        other.selectedBackgroundColor == selectedBackgroundColor &&
-        other.hoverColor == hoverColor &&
-        other.splashColor == splashColor &&
-        other.highlightColor == highlightColor &&
-        other.clickInterval == clickInterval;
-    // Note: resolver functions are not compared as they cannot be reliably compared
-  }
-
-  @override
-  int get hashCode => Object.hash(
-        widget,
-        width,
-        height,
-        padding,
-        margin,
-        iconToTextSpacing,
-        textStyle,
-        selectedTextStyle,
-        selectedBackgroundColor,
-        hoverColor,
-        splashColor,
-        highlightColor,
-        clickInterval,
-        // Note: resolver functions are not included in hashCode
-      );
-
-  @override
-  String toString() {
-    return 'ChildNodeTheme<$T>('
-        'widget: $widget, '
-        'widgetResolver: ${widgetResolver != null ? 'provided' : 'null'}, '
-        'width: $width, '
-        'height: $height, '
-        'padding: $padding, '
-        'margin: $margin, '
-        'iconToTextSpacing: $iconToTextSpacing, '
-        'textStyle: $textStyle, '
-        'textStyleResolver: ${textStyleResolver != null ? 'provided' : 'null'}, '
-        'selectedTextStyle: $selectedTextStyle, '
-        'selectedTextStyleResolver: ${selectedTextStyleResolver != null ? 'provided' : 'null'}, '
-        'selectedBackgroundColor: $selectedBackgroundColor, '
-        'hoverColor: $hoverColor, '
-        'splashColor: $splashColor, '
-        'highlightColor: $highlightColor, '
-        'clickInterval: $clickInterval'
-        ')';
   }
 }

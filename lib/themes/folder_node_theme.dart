@@ -1,4 +1,5 @@
 import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/widgets.dart';
 
 import '../models/node.dart';
@@ -32,9 +33,6 @@ class FolderNodeTheme<T> {
   /// Margin around the icon widget
   final EdgeInsets margin;
 
-  /// Spacing between icon and text
-  final double iconToTextSpacing;
-
   /// Text style for folder nodes
   final TextStyle? textStyle;
 
@@ -61,7 +59,6 @@ class FolderNodeTheme<T> {
     this.height = 20.0,
     this.padding = EdgeInsets.zero,
     this.margin = EdgeInsets.zero,
-    this.iconToTextSpacing = 8.0,
     this.textStyle,
     this.textStyleResolver,
     this.hoverColor,
@@ -79,7 +76,6 @@ class FolderNodeTheme<T> {
     double? height,
     EdgeInsets? padding,
     EdgeInsets? margin,
-    double? iconToTextSpacing,
     TextStyle? textStyle,
     TextStyle? Function(Node<T> node)? textStyleResolver,
     Color? hoverColor,
@@ -95,7 +91,6 @@ class FolderNodeTheme<T> {
       height: height ?? this.height,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
-      iconToTextSpacing: iconToTextSpacing ?? this.iconToTextSpacing,
       textStyle: textStyle ?? this.textStyle,
       textStyleResolver: textStyleResolver ?? this.textStyleResolver,
       hoverColor: hoverColor ?? this.hoverColor,
@@ -125,68 +120,11 @@ class FolderNodeTheme<T> {
       height: lerpDouble(a.height, b.height, t) ?? 20.0,
       padding: EdgeInsets.lerp(a.padding, b.padding, t) ?? EdgeInsets.zero,
       margin: EdgeInsets.lerp(a.margin, b.margin, t) ?? EdgeInsets.zero,
-      iconToTextSpacing:
-          lerpDouble(a.iconToTextSpacing, b.iconToTextSpacing, t) ?? 8.0,
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       textStyleResolver: t < 0.5 ? a.textStyleResolver : b.textStyleResolver,
       hoverColor: Color.lerp(a.hoverColor, b.hoverColor, t),
       splashColor: Color.lerp(a.splashColor, b.splashColor, t),
       highlightColor: Color.lerp(a.highlightColor, b.highlightColor, t),
     );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other.runtimeType != runtimeType) return false;
-    return other is FolderNodeTheme<T> &&
-        other.widget == widget &&
-        other.openWidget == openWidget &&
-        other.width == width &&
-        other.height == height &&
-        other.padding == padding &&
-        other.margin == margin &&
-        other.iconToTextSpacing == iconToTextSpacing &&
-        other.textStyle == textStyle &&
-        other.hoverColor == hoverColor &&
-        other.splashColor == splashColor &&
-        other.highlightColor == highlightColor;
-    // Note: resolver functions are not compared as they cannot be reliably compared
-  }
-
-  @override
-  int get hashCode => Object.hash(
-        widget,
-        openWidget,
-        width,
-        height,
-        padding,
-        margin,
-        iconToTextSpacing,
-        textStyle,
-        hoverColor,
-        splashColor,
-        highlightColor,
-        // Note: resolver functions are not included in hashCode
-      );
-
-  @override
-  String toString() {
-    return 'FolderNodeTheme<$T>('
-        'widget: $widget, '
-        'widgetResolver: ${widgetResolver != null ? 'provided' : 'null'}, '
-        'openWidget: $openWidget, '
-        'openWidgetResolver: ${openWidgetResolver != null ? 'provided' : 'null'}, '
-        'width: $width, '
-        'height: $height, '
-        'padding: $padding, '
-        'margin: $margin, '
-        'iconToTextSpacing: $iconToTextSpacing, '
-        'textStyle: $textStyle, '
-        'textStyleResolver: ${textStyleResolver != null ? 'provided' : 'null'}, '
-        'hoverColor: $hoverColor, '
-        'splashColor: $splashColor, '
-        'highlightColor: $highlightColor'
-        ')';
   }
 }

@@ -86,7 +86,7 @@ class SizeService {
 
     // Node icon and spacing based on node type
     double iconWidth;
-    double iconToTextSpacing;
+
     TextStyle? textStyle;
 
     switch (node.type) {
@@ -94,27 +94,26 @@ class SizeService {
         iconWidth = folderTheme.width +
             folderTheme.padding.horizontal +
             folderTheme.margin.horizontal;
-        iconToTextSpacing = folderTheme.iconToTextSpacing;
+
         textStyle = folderTheme.textStyle ?? const TextStyle(fontSize: 14);
         break;
       case NodeType.parent:
         iconWidth = parentTheme.width +
             parentTheme.padding.horizontal +
             parentTheme.margin.horizontal;
-        iconToTextSpacing = parentTheme.iconToTextSpacing;
+
         textStyle = parentTheme.textStyle ?? const TextStyle(fontSize: 14);
         break;
       case NodeType.child:
         iconWidth = childTheme.width +
             childTheme.padding.horizontal +
             childTheme.margin.horizontal;
-        iconToTextSpacing = childTheme.iconToTextSpacing;
+
         textStyle = childTheme.textStyle ?? const TextStyle(fontSize: 14);
         break;
     }
 
     width += iconWidth;
-    width += iconToTextSpacing;
 
     // Text width
     final textPainter = TextPainter(
