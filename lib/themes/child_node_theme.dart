@@ -31,6 +31,10 @@ class ChildNodeTheme {
   /// Background color for selected child nodes
   final Color? selectedBackgroundColor;
 
+  /// Click interval in milliseconds for distinguishing single click from double click
+  /// Only applies to child nodes (leaf nodes)
+  final int clickInterval;
+
   /// Creates a [ChildNodeTheme]
   const ChildNodeTheme({
     this.widget,
@@ -42,6 +46,7 @@ class ChildNodeTheme {
     this.textStyle,
     this.selectedTextStyle,
     this.selectedBackgroundColor,
+    this.clickInterval = 300,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -55,6 +60,7 @@ class ChildNodeTheme {
     TextStyle? textStyle,
     TextStyle? selectedTextStyle,
     Color? selectedBackgroundColor,
+    int? clickInterval,
   }) {
     return ChildNodeTheme(
       widget: widget ?? this.widget,
@@ -67,6 +73,7 @@ class ChildNodeTheme {
       selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
       selectedBackgroundColor:
           selectedBackgroundColor ?? this.selectedBackgroundColor,
+      clickInterval: clickInterval ?? this.clickInterval,
     );
   }
 
@@ -95,6 +102,7 @@ class ChildNodeTheme {
           TextStyle.lerp(a.selectedTextStyle, b.selectedTextStyle, t),
       selectedBackgroundColor: Color.lerp(
           a.selectedBackgroundColor, b.selectedBackgroundColor, t),
+      clickInterval: (lerpDouble(a.clickInterval.toDouble(), b.clickInterval.toDouble(), t) ?? 300).round(),
     );
   }
 
@@ -111,7 +119,8 @@ class ChildNodeTheme {
         other.iconToTextSpacing == iconToTextSpacing &&
         other.textStyle == textStyle &&
         other.selectedTextStyle == selectedTextStyle &&
-        other.selectedBackgroundColor == selectedBackgroundColor;
+        other.selectedBackgroundColor == selectedBackgroundColor &&
+        other.clickInterval == clickInterval;
   }
 
   @override
@@ -125,6 +134,7 @@ class ChildNodeTheme {
         textStyle,
         selectedTextStyle,
         selectedBackgroundColor,
+        clickInterval,
       );
 
   @override
@@ -138,7 +148,8 @@ class ChildNodeTheme {
         'iconToTextSpacing: $iconToTextSpacing, '
         'textStyle: $textStyle, '
         'selectedTextStyle: $selectedTextStyle, '
-        'selectedBackgroundColor: $selectedBackgroundColor'
+        'selectedBackgroundColor: $selectedBackgroundColor, '
+        'clickInterval: $clickInterval'
         ')';
   }
 }

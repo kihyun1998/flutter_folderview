@@ -40,6 +40,9 @@ class FlutterFolderViewTheme {
   /// Theme for node visual styling
   final FolderViewNodeStyleTheme nodeStyleTheme;
 
+  /// Animation duration for expand/collapse animations in milliseconds
+  final int animationDuration;
+
   /// Creates a [FlutterFolderViewTheme] with the given properties
   const FlutterFolderViewTheme({
     required this.lineTheme,
@@ -50,6 +53,7 @@ class FlutterFolderViewTheme {
     this.expandIconTheme = const ExpandIconTheme(),
     this.spacingTheme = const FolderViewSpacingTheme(),
     this.nodeStyleTheme = const FolderViewNodeStyleTheme(),
+    this.animationDuration = 200,
   });
 
   /// Creates a light theme with sensible defaults
@@ -136,6 +140,7 @@ class FlutterFolderViewTheme {
     ExpandIconTheme? expandIconTheme,
     FolderViewSpacingTheme? spacingTheme,
     FolderViewNodeStyleTheme? nodeStyleTheme,
+    int? animationDuration,
   }) {
     return FlutterFolderViewTheme(
       lineTheme: lineTheme ?? this.lineTheme,
@@ -146,6 +151,7 @@ class FlutterFolderViewTheme {
       expandIconTheme: expandIconTheme ?? this.expandIconTheme,
       spacingTheme: spacingTheme ?? this.spacingTheme,
       nodeStyleTheme: nodeStyleTheme ?? this.nodeStyleTheme,
+      animationDuration: animationDuration ?? this.animationDuration,
     );
   }
 
@@ -183,6 +189,7 @@ class FlutterFolderViewTheme {
         b.nodeStyleTheme,
         t,
       ),
+      animationDuration: t < 0.5 ? a.animationDuration : b.animationDuration,
     );
   }
 
@@ -198,7 +205,8 @@ class FlutterFolderViewTheme {
         other.childTheme == childTheme &&
         other.expandIconTheme == expandIconTheme &&
         other.spacingTheme == spacingTheme &&
-        other.nodeStyleTheme == nodeStyleTheme;
+        other.nodeStyleTheme == nodeStyleTheme &&
+        other.animationDuration == animationDuration;
   }
 
   @override
@@ -211,6 +219,7 @@ class FlutterFolderViewTheme {
         expandIconTheme,
         spacingTheme,
         nodeStyleTheme,
+        animationDuration,
       );
 
   @override
@@ -223,7 +232,8 @@ class FlutterFolderViewTheme {
         'childTheme: $childTheme, '
         'expandIconTheme: $expandIconTheme, '
         'spacingTheme: $spacingTheme, '
-        'nodeStyleTheme: $nodeStyleTheme'
+        'nodeStyleTheme: $nodeStyleTheme, '
+        'animationDuration: $animationDuration'
         ')';
   }
 }

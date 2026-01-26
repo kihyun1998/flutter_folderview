@@ -17,11 +17,15 @@
 - **Enhanced Child Node Theming**:
   - `selectedTextStyle` and `selectedBackgroundColor` are now exclusive to `ChildNodeTheme`
   - Clearer separation of selection styling from other node types
+  - Added `clickInterval` property for configurable double-click detection (default: 300ms)
 - **New Theme Classes**:
   - `FolderNodeTheme`: Complete control over folder appearance including open/closed states
   - `ParentNodeTheme`: Dedicated theme for parent nodes
   - `ChildNodeTheme`: Enhanced theme with selection-specific properties
   - `ExpandIconTheme`: Separate theme for expand/collapse icons
+- **Interaction Customization**:
+  - Added `animationDuration` property to `FlutterFolderViewTheme` for configurable expand/collapse animation speed (default: 200ms)
+  - Click interval only applies to child nodes; folder/parent nodes use immediate single-click behavior
 
 ### Examples
 - Completely redesigned Theme Demo page with real-time controls for:
@@ -29,6 +33,8 @@
   - Icon-to-text spacing adjustments
   - Font size and text color customization
   - Border radius and line style controls
+  - Interaction controls: click interval (100-1000ms) and animation duration (50-800ms)
+  - Double-click demonstration with visual feedback
   - Live preview of theme changes
 
 ### Migration Guide
@@ -52,8 +58,13 @@ FlutterFolderViewTheme(
     textStyle: TextStyle(...),
   ),
   parentTheme: ParentNodeTheme(...),
-  childTheme: ChildNodeTheme(...),
+  childTheme: ChildNodeTheme(
+    widget: Icon(Icons.insert_drive_file),
+    clickInterval: 300, // milliseconds for double-click detection
+    ...
+  ),
   expandIconTheme: ExpandIconTheme(...),
+  animationDuration: 200, // milliseconds for expand/collapse animation
 )
 ```
 

@@ -54,6 +54,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   ViewMode _viewMode = ViewMode.folder;
   double _borderRadius = 8.0;
 
+  // Interaction
+  double _clickInterval = 300.0;
+  double _animationDuration = 200.0;
+
   late List<Node<String>> _data;
   Set<String> _selectedIds = {};
 
@@ -73,6 +77,30 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         _data = _toggle(_data, node.id);
       }
     });
+  }
+
+  void _handleDoubleTap(Node<String> node) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.mouse, color: Colors.white, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                '더블클릭: ${node.label}',
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   List<Node<String>> _toggle(List<Node<String>> nodes, String id) {
@@ -137,6 +165,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         textStyle: TextStyle(color: _childTextColor, fontSize: _childFontSize),
         selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         selectedBackgroundColor: _childSelectedBg,
+        clickInterval: _clickInterval.round(),
       ),
       expandIconTheme: ExpandIconTheme(
         widget: Icon(Icons.chevron_right, color: _expandIconColor, size: _expandIconSize),
@@ -150,6 +179,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         trackColor: Colors.grey.shade200,
       ),
       nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _borderRadius),
+      animationDuration: _animationDuration.round(),
     );
 
     return Scaffold(
@@ -170,6 +200,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                     data: _data,
                     mode: _viewMode,
                     onNodeTap: _handleTap,
+                    onDoubleNodeTap: _handleDoubleTap,
                     selectedNodeIds: _selectedIds,
                     theme: theme,
                   ),
@@ -193,6 +224,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         _buildParentControls(),
         _buildChildControls(),
         _buildNodeStyleControls(),
+        _buildInteractionControls(),
         const SizedBox(height: 16),
         FilledButton.icon(
           onPressed: () => setState(() {
@@ -227,6 +259,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _expandMargin = 0.0;
             _viewMode = ViewMode.folder;
             _borderRadius = 8.0;
+            _clickInterval = 300.0;
+            _animationDuration = 200.0;
             _data = getThemeDemoData();
             _selectedIds = {};
           }),
@@ -388,6 +422,27 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           children: [
             const Text('Node Style', style: TextStyle(fontWeight: FontWeight.bold)),
             _slider('Border Radius', _borderRadius, 0, 20, (v) => setState(() => _borderRadius = v)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInteractionControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Interaction', style: TextStyle(fontWeight: FontWeight.bold)),
+            _slider('Click Interval (ms)', _clickInterval, 100, 1000, (v) => setState(() => _clickInterval = v)),
+            const SizedBox(height: 4),
+            Text('Double-click detection time for child nodes', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+            const SizedBox(height: 12),
+            _slider('Animation Duration (ms)', _animationDuration, 50, 800, (v) => setState(() => _animationDuration = v)),
+            const SizedBox(height: 4),
+            Text('Expand/collapse animation speed', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
           ],
         ),
       ),

@@ -47,7 +47,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: Duration(milliseconds: widget.theme.animationDuration),
       vsync: this,
     );
     _iconTurns = Tween<double>(
@@ -249,7 +249,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     final childTheme = widget.theme.childTheme;
 
     return CustomInkWell(
-      clickInterval: 300,
+      clickInterval: childTheme.clickInterval,
       borderRadius: widget.theme.nodeStyleTheme.borderRadius,
       isSelected: isSelected,
       backgroundColor: Colors.transparent,
@@ -286,7 +286,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
         widget.selectedNodeIds?.contains(widget.node.id) ?? false;
 
     return CustomInkWell(
-      clickInterval: 300,
+      clickInterval: 0, // Not used for folder/parent nodes (no double tap)
       borderRadius: widget.theme.nodeStyleTheme.borderRadius,
       isSelected: isSelected,
       backgroundColor: Colors.transparent,
