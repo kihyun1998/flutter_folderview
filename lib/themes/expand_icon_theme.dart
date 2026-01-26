@@ -20,6 +20,12 @@ class ExpandIconTheme {
   /// Margin around the icon widget
   final EdgeInsets margin;
 
+  /// Color of the icon when collapsed
+  final Color? color;
+
+  /// Color of the icon when expanded
+  final Color? expandedColor;
+
   /// Creates an [ExpandIconTheme]
   const ExpandIconTheme({
     this.widget,
@@ -27,6 +33,8 @@ class ExpandIconTheme {
     this.height = 20.0,
     this.padding = EdgeInsets.zero,
     this.margin = EdgeInsets.zero,
+    this.color,
+    this.expandedColor,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -36,6 +44,8 @@ class ExpandIconTheme {
     double? height,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    Color? color,
+    Color? expandedColor,
   }) {
     return ExpandIconTheme(
       widget: widget ?? this.widget,
@@ -43,6 +53,8 @@ class ExpandIconTheme {
       height: height ?? this.height,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
+      color: color ?? this.color,
+      expandedColor: expandedColor ?? this.expandedColor,
     );
   }
 
@@ -64,6 +76,8 @@ class ExpandIconTheme {
       height: lerpDouble(a.height, b.height, t) ?? 20.0,
       padding: EdgeInsets.lerp(a.padding, b.padding, t) ?? EdgeInsets.zero,
       margin: EdgeInsets.lerp(a.margin, b.margin, t) ?? EdgeInsets.zero,
+      color: Color.lerp(a.color, b.color, t),
+      expandedColor: Color.lerp(a.expandedColor, b.expandedColor, t),
     );
   }
 
@@ -76,7 +90,9 @@ class ExpandIconTheme {
         other.width == width &&
         other.height == height &&
         other.padding == padding &&
-        other.margin == margin;
+        other.margin == margin &&
+        other.color == color &&
+        other.expandedColor == expandedColor;
   }
 
   @override
@@ -86,6 +102,8 @@ class ExpandIconTheme {
         height,
         padding,
         margin,
+        color,
+        expandedColor,
       );
 
   @override
@@ -95,7 +113,9 @@ class ExpandIconTheme {
         'width: $width, '
         'height: $height, '
         'padding: $padding, '
-        'margin: $margin'
+        'margin: $margin, '
+        'color: $color, '
+        'expandedColor: $expandedColor'
         ')';
   }
 }

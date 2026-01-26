@@ -62,6 +62,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   // Expand Icon
   double _expandIconSize = 20.0;
   Color _expandIconColor = const Color(0xFF616161);
+  Color _expandIconExpandedColor = const Color(0xFF2196F3);
   double _expandPadding = 0.0;
   double _expandMargin = 0.0;
 
@@ -273,15 +274,13 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         ),
       ),
       expandIconTheme: ExpandIconTheme(
-        widget: Icon(
-          Icons.chevron_right,
-          color: _expandIconColor,
-          size: _expandIconSize,
-        ),
+        widget: const Icon(Icons.chevron_right),
         width: _expandIconSize,
         height: _expandIconSize,
         padding: EdgeInsets.only(left: _expandPadding),
         margin: EdgeInsets.only(left: _expandMargin),
+        color: _expandIconColor,
+        expandedColor: _expandIconExpandedColor,
       ),
       scrollbarTheme: FolderViewScrollbarTheme(
         thumbColor: Colors.grey.shade600,
@@ -374,6 +373,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _childHighlightColor = const Color(0x1A2196F3);
             _expandIconSize = 20.0;
             _expandIconColor = const Color(0xFF616161);
+            _expandIconExpandedColor = const Color(0xFF2196F3);
             _expandPadding = 0.0;
             _expandMargin = 0.0;
             _viewMode = ViewMode.folder;
@@ -493,9 +493,14 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               (v) => setState(() => _expandIconSize = v),
             ),
             _colorRow(
-              'Color',
+              'Collapsed Color',
               _expandIconColor,
               (c) => setState(() => _expandIconColor = c),
+            ),
+            _colorRow(
+              'Expanded Color',
+              _expandIconExpandedColor,
+              (c) => setState(() => _expandIconExpandedColor = c),
             ),
             _slider(
               'Padding',

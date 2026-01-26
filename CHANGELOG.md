@@ -1,3 +1,14 @@
+## 0.2.3
+
+### Features
+
+- **Expand Icon Color Theming**: Added `color` and `expandedColor` properties to `ExpandIconTheme`
+  - `color`: Icon color when collapsed
+  - `expandedColor`: Icon color when expanded (falls back to `color` if not specified)
+  - Uses `IconTheme` wrapper to apply colors without affecting `RotationTransition` animation
+  - Preserves expand/collapse animation while allowing dynamic color changes
+  - Theme demo updated with separate color pickers for collapsed and expanded states
+
 ## 0.2.2
 
 ### Refactoring

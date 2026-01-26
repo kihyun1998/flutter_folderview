@@ -175,11 +175,11 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   }
 
   /// Build expand/collapse icon widget
-  Widget _buildExpandIcon({bool isChild = false}) {
+  Widget _buildExpandIcon() {
     final expandTheme = widget.theme.expandIconTheme;
 
     // For child nodes, always return empty space
-    if (isChild || expandTheme.widget == null) {
+    if (expandTheme.widget == null) {
       return SizedBox(
         width: expandTheme.width +
             expandTheme.padding.horizontal +
@@ -365,9 +365,6 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           : null,
       child: Row(
         children: [
-          // Empty space for expand icon to maintain alignment
-          _buildExpandIcon(isChild: true),
-
           // Node Icon
           _buildNodeIcon(),
 
@@ -390,6 +387,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   Widget _buildFolderParentNodeContent() {
     final isSelected =
         widget.selectedNodeIds?.contains(widget.node.id) ?? false;
+    final expandTheme = widget.theme.expandIconTheme;
 
     return CustomInkWell(
       clickInterval: 0, // Not used for folder/parent nodes (no double tap)
@@ -417,10 +415,22 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           if (widget.node.canExpand)
             RotationTransition(
               turns: _iconTurns,
-              child: _buildExpandIcon(),
+              child: IconTheme(
+                data: IconThemeData(
+                  color: widget.node.isExpanded
+                      ? (expandTheme.expandedColor ?? expandTheme.color)
+                      : expandTheme.color,
+                ),
+                child: _buildExpandIcon(),
+              ),
             )
           else
-            _buildExpandIcon(),
+            IconTheme(
+              data: IconThemeData(
+                color: expandTheme.color,
+              ),
+              child: _buildExpandIcon(),
+            ),
 
           // Node Icon
           _buildNodeIcon(),
