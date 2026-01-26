@@ -1,3 +1,11 @@
+## 0.2.1
+
+### Features
+- **Interaction Color Theming**: Added `hoverColor`, `splashColor`, and `highlightColor` properties to all node themes
+  - `FolderNodeTheme`, `ParentNodeTheme`, and `ChildNodeTheme` now support customizable interaction colors
+  - Colors fall back to Material theme defaults when not specified
+  - Theme demo updated with interactive color pickers for all interaction colors
+
 ## 0.2.0
 
 ### BREAKING CHANGES

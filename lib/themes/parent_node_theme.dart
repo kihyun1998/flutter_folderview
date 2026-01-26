@@ -42,6 +42,15 @@ class ParentNodeTheme<T> {
   /// If returns null, falls back to [textStyle]
   final TextStyle? Function(Node<T> node)? textStyleResolver;
 
+  /// Hover color when mouse hovers over the node
+  final Color? hoverColor;
+
+  /// Splash color for tap animations
+  final Color? splashColor;
+
+  /// Highlight color for tap feedback
+  final Color? highlightColor;
+
   /// Creates a [ParentNodeTheme]
   const ParentNodeTheme({
     this.widget,
@@ -55,6 +64,9 @@ class ParentNodeTheme<T> {
     this.iconToTextSpacing = 8.0,
     this.textStyle,
     this.textStyleResolver,
+    this.hoverColor,
+    this.splashColor,
+    this.highlightColor,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -70,6 +82,9 @@ class ParentNodeTheme<T> {
     double? iconToTextSpacing,
     TextStyle? textStyle,
     TextStyle? Function(Node<T> node)? textStyleResolver,
+    Color? hoverColor,
+    Color? splashColor,
+    Color? highlightColor,
   }) {
     return ParentNodeTheme<T>(
       widget: widget ?? this.widget,
@@ -83,6 +98,9 @@ class ParentNodeTheme<T> {
       iconToTextSpacing: iconToTextSpacing ?? this.iconToTextSpacing,
       textStyle: textStyle ?? this.textStyle,
       textStyleResolver: textStyleResolver ?? this.textStyleResolver,
+      hoverColor: hoverColor ?? this.hoverColor,
+      splashColor: splashColor ?? this.splashColor,
+      highlightColor: highlightColor ?? this.highlightColor,
     );
   }
 
@@ -111,6 +129,9 @@ class ParentNodeTheme<T> {
           lerpDouble(a.iconToTextSpacing, b.iconToTextSpacing, t) ?? 8.0,
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       textStyleResolver: t < 0.5 ? a.textStyleResolver : b.textStyleResolver,
+      hoverColor: Color.lerp(a.hoverColor, b.hoverColor, t),
+      splashColor: Color.lerp(a.splashColor, b.splashColor, t),
+      highlightColor: Color.lerp(a.highlightColor, b.highlightColor, t),
     );
   }
 
@@ -126,7 +147,10 @@ class ParentNodeTheme<T> {
         other.padding == padding &&
         other.margin == margin &&
         other.iconToTextSpacing == iconToTextSpacing &&
-        other.textStyle == textStyle;
+        other.textStyle == textStyle &&
+        other.hoverColor == hoverColor &&
+        other.splashColor == splashColor &&
+        other.highlightColor == highlightColor;
     // Note: resolver functions are not compared as they cannot be reliably compared
   }
 
@@ -140,6 +164,9 @@ class ParentNodeTheme<T> {
         margin,
         iconToTextSpacing,
         textStyle,
+        hoverColor,
+        splashColor,
+        highlightColor,
         // Note: resolver functions are not included in hashCode
       );
 
@@ -156,7 +183,10 @@ class ParentNodeTheme<T> {
         'margin: $margin, '
         'iconToTextSpacing: $iconToTextSpacing, '
         'textStyle: $textStyle, '
-        'textStyleResolver: ${textStyleResolver != null ? 'provided' : 'null'}'
+        'textStyleResolver: ${textStyleResolver != null ? 'provided' : 'null'}, '
+        'hoverColor: $hoverColor, '
+        'splashColor: $splashColor, '
+        'highlightColor: $highlightColor'
         ')';
   }
 }

@@ -25,6 +25,11 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   Color _folderTextColor = Colors.black87;
   double _folderFontSize = 14.0;
 
+  // Folder Interaction Colors
+  Color _folderHoverColor = const Color(0xFFEEEEEE);
+  Color _folderSplashColor = const Color(0x4D2196F3);
+  Color _folderHighlightColor = const Color(0x1A2196F3);
+
   // Parent Theme
   double _parentIconSize = 20.0;
   Color _parentIconColor = const Color(0xFF616161);
@@ -33,6 +38,11 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   double _parentIconSpacing = 8.0;
   Color _parentTextColor = Colors.black87;
   double _parentFontSize = 14.0;
+
+  // Parent Interaction Colors
+  Color _parentHoverColor = const Color(0xFFEEEEEE);
+  Color _parentSplashColor = const Color(0x4D2196F3);
+  Color _parentHighlightColor = const Color(0x1A2196F3);
 
   // Child Theme
   double _childIconSize = 20.0;
@@ -43,6 +53,11 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   Color _childTextColor = Colors.black87;
   double _childFontSize = 14.0;
   Color _childSelectedBg = const Color(0xFFE3F2FD);
+
+  // Child Interaction Colors
+  Color _childHoverColor = const Color(0xFFEEEEEE);
+  Color _childSplashColor = const Color(0x4D2196F3);
+  Color _childHighlightColor = const Color(0x1A2196F3);
 
   // Expand Icon
   double _expandIconSize = 20.0;
@@ -159,6 +174,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           color: _folderTextColor,
           fontSize: _folderFontSize,
         ),
+        hoverColor: _folderHoverColor,
+        splashColor: _folderSplashColor,
+        highlightColor: _folderHighlightColor,
       ),
       parentTheme: ParentNodeTheme<String>(
         widget: Icon(
@@ -175,6 +193,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           color: _parentTextColor,
           fontSize: _parentFontSize,
         ),
+        hoverColor: _parentHoverColor,
+        splashColor: _parentSplashColor,
+        highlightColor: _parentHighlightColor,
       ),
       childTheme: ChildNodeTheme<String>(
         widget: Icon(
@@ -190,6 +211,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         textStyle: TextStyle(color: _childTextColor, fontSize: _childFontSize),
         selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         selectedBackgroundColor: _childSelectedBg,
+        hoverColor: _childHoverColor,
+        splashColor: _childSplashColor,
+        highlightColor: _childHighlightColor,
         clickInterval: _clickInterval.round(),
       ),
       expandIconTheme: ExpandIconTheme(
@@ -264,6 +288,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _folderIconSpacing = 8.0;
             _folderTextColor = Colors.black87;
             _folderFontSize = 14.0;
+            _folderHoverColor = const Color(0xFFEEEEEE);
+            _folderSplashColor = const Color(0x4D2196F3);
+            _folderHighlightColor = const Color(0x1A2196F3);
             _parentIconSize = 20.0;
             _parentIconColor = const Color(0xFF616161);
             _parentPadding = 0.0;
@@ -271,6 +298,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _parentIconSpacing = 8.0;
             _parentTextColor = Colors.black87;
             _parentFontSize = 14.0;
+            _parentHoverColor = const Color(0xFFEEEEEE);
+            _parentSplashColor = const Color(0x4D2196F3);
+            _parentHighlightColor = const Color(0x1A2196F3);
             _childIconSize = 20.0;
             _childIconColor = const Color(0xFF616161);
             _childPadding = 0.0;
@@ -279,6 +309,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _childTextColor = Colors.black87;
             _childFontSize = 14.0;
             _childSelectedBg = const Color(0xFFE3F2FD);
+            _childHoverColor = const Color(0xFFEEEEEE);
+            _childSplashColor = const Color(0x4D2196F3);
+            _childHighlightColor = const Color(0x1A2196F3);
             _expandIconSize = 20.0;
             _expandIconColor = const Color(0xFF616161);
             _expandPadding = 0.0;
@@ -469,6 +502,24 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               24,
               (v) => setState(() => _folderFontSize = v),
             ),
+            const Divider(),
+            const Text('Interaction', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            _colorRow(
+              'Hover',
+              _folderHoverColor,
+              (c) => setState(() => _folderHoverColor = c),
+            ),
+            _colorRow(
+              'Splash',
+              _folderSplashColor,
+              (c) => setState(() => _folderSplashColor = c),
+            ),
+            _colorRow(
+              'Highlight',
+              _folderHighlightColor,
+              (c) => setState(() => _folderHighlightColor = c),
+            ),
           ],
         ),
       ),
@@ -527,6 +578,24 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               10,
               24,
               (v) => setState(() => _parentFontSize = v),
+            ),
+            const Divider(),
+            const Text('Interaction', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            _colorRow(
+              'Hover',
+              _parentHoverColor,
+              (c) => setState(() => _parentHoverColor = c),
+            ),
+            _colorRow(
+              'Splash',
+              _parentSplashColor,
+              (c) => setState(() => _parentSplashColor = c),
+            ),
+            _colorRow(
+              'Highlight',
+              _parentHighlightColor,
+              (c) => setState(() => _parentHighlightColor = c),
             ),
           ],
         ),
@@ -592,6 +661,24 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               'Selected BG',
               _childSelectedBg,
               (c) => setState(() => _childSelectedBg = c),
+            ),
+            const Divider(),
+            const Text('Interaction', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            _colorRow(
+              'Hover',
+              _childHoverColor,
+              (c) => setState(() => _childHoverColor = c),
+            ),
+            _colorRow(
+              'Splash',
+              _childSplashColor,
+              (c) => setState(() => _childSplashColor = c),
+            ),
+            _colorRow(
+              'Highlight',
+              _childHighlightColor,
+              (c) => setState(() => _childHighlightColor = c),
             ),
           ],
         ),

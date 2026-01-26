@@ -45,6 +45,15 @@ class ChildNodeTheme<T> {
   /// Background color for selected child nodes
   final Color? selectedBackgroundColor;
 
+  /// Hover color when mouse hovers over the node
+  final Color? hoverColor;
+
+  /// Splash color for tap animations
+  final Color? splashColor;
+
+  /// Highlight color for tap feedback
+  final Color? highlightColor;
+
   /// Click interval in milliseconds for distinguishing single click from double click
   /// Only applies to child nodes (leaf nodes)
   final int clickInterval;
@@ -63,6 +72,9 @@ class ChildNodeTheme<T> {
     this.selectedTextStyle,
     this.selectedTextStyleResolver,
     this.selectedBackgroundColor,
+    this.hoverColor,
+    this.splashColor,
+    this.highlightColor,
     this.clickInterval = 300,
   });
 
@@ -80,6 +92,9 @@ class ChildNodeTheme<T> {
     TextStyle? selectedTextStyle,
     TextStyle? Function(Node<T> node)? selectedTextStyleResolver,
     Color? selectedBackgroundColor,
+    Color? hoverColor,
+    Color? splashColor,
+    Color? highlightColor,
     int? clickInterval,
   }) {
     return ChildNodeTheme<T>(
@@ -97,6 +112,9 @@ class ChildNodeTheme<T> {
           selectedTextStyleResolver ?? this.selectedTextStyleResolver,
       selectedBackgroundColor:
           selectedBackgroundColor ?? this.selectedBackgroundColor,
+      hoverColor: hoverColor ?? this.hoverColor,
+      splashColor: splashColor ?? this.splashColor,
+      highlightColor: highlightColor ?? this.highlightColor,
       clickInterval: clickInterval ?? this.clickInterval,
     );
   }
@@ -130,6 +148,9 @@ class ChildNodeTheme<T> {
           t < 0.5 ? a.selectedTextStyleResolver : b.selectedTextStyleResolver,
       selectedBackgroundColor:
           Color.lerp(a.selectedBackgroundColor, b.selectedBackgroundColor, t),
+      hoverColor: Color.lerp(a.hoverColor, b.hoverColor, t),
+      splashColor: Color.lerp(a.splashColor, b.splashColor, t),
+      highlightColor: Color.lerp(a.highlightColor, b.highlightColor, t),
       clickInterval: (lerpDouble(
                   a.clickInterval.toDouble(), b.clickInterval.toDouble(), t) ??
               300)
@@ -151,6 +172,9 @@ class ChildNodeTheme<T> {
         other.textStyle == textStyle &&
         other.selectedTextStyle == selectedTextStyle &&
         other.selectedBackgroundColor == selectedBackgroundColor &&
+        other.hoverColor == hoverColor &&
+        other.splashColor == splashColor &&
+        other.highlightColor == highlightColor &&
         other.clickInterval == clickInterval;
     // Note: resolver functions are not compared as they cannot be reliably compared
   }
@@ -166,6 +190,9 @@ class ChildNodeTheme<T> {
         textStyle,
         selectedTextStyle,
         selectedBackgroundColor,
+        hoverColor,
+        splashColor,
+        highlightColor,
         clickInterval,
         // Note: resolver functions are not included in hashCode
       );
@@ -185,6 +212,9 @@ class ChildNodeTheme<T> {
         'selectedTextStyle: $selectedTextStyle, '
         'selectedTextStyleResolver: ${selectedTextStyleResolver != null ? 'provided' : 'null'}, '
         'selectedBackgroundColor: $selectedBackgroundColor, '
+        'hoverColor: $hoverColor, '
+        'splashColor: $splashColor, '
+        'highlightColor: $highlightColor, '
         'clickInterval: $clickInterval'
         ')';
   }

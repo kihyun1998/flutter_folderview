@@ -270,9 +270,11 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       backgroundColor: Colors.transparent,
       selectedColor: childTheme.selectedBackgroundColor ??
           Theme.of(context).colorScheme.primaryContainer,
-      hoverColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-      splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-      highlightColor:
+      hoverColor: childTheme.hoverColor ??
+          Theme.of(context).colorScheme.surfaceContainerHighest,
+      splashColor: childTheme.splashColor ??
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+      highlightColor: childTheme.highlightColor ??
           Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       onTap: () => widget.onTap?.call(widget.node),
       onDoubleTap: () => widget.onDoubleTap?.call(widget.node),
@@ -306,9 +308,17 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       isSelected: isSelected,
       backgroundColor: Colors.transparent,
       selectedColor: Theme.of(context).colorScheme.primaryContainer,
-      hoverColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-      splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-      highlightColor:
+      hoverColor: (widget.node.type == NodeType.folder
+              ? widget.theme.folderTheme.hoverColor
+              : widget.theme.parentTheme.hoverColor) ??
+          Theme.of(context).colorScheme.surfaceContainerHighest,
+      splashColor: (widget.node.type == NodeType.folder
+              ? widget.theme.folderTheme.splashColor
+              : widget.theme.parentTheme.splashColor) ??
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+      highlightColor: (widget.node.type == NodeType.folder
+              ? widget.theme.folderTheme.highlightColor
+              : widget.theme.parentTheme.highlightColor) ??
           Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       onTap: () => widget.onTap?.call(widget.node),
       onDoubleTap: null, // Folder/Parent nodes don't use double tap

@@ -73,10 +73,16 @@ class FlutterFolderViewTheme<T> {
         openWidget:
             Icon(Icons.folder_open, color: Colors.grey.shade700, size: 20),
         textStyle: const TextStyle(color: Colors.black87),
+        hoverColor: Colors.grey.shade200,
+        splashColor: Colors.blue.withValues(alpha: 0.3),
+        highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       parentTheme: ParentNodeTheme<T>(
         widget: Icon(Icons.account_tree, color: Colors.grey.shade700, size: 20),
         textStyle: const TextStyle(color: Colors.black87),
+        hoverColor: Colors.grey.shade200,
+        splashColor: Colors.blue.withValues(alpha: 0.3),
+        highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       childTheme: ChildNodeTheme<T>(
         widget: Icon(Icons.insert_drive_file,
@@ -84,6 +90,9 @@ class FlutterFolderViewTheme<T> {
         textStyle: const TextStyle(color: Colors.black87),
         selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         selectedBackgroundColor: Colors.blue.shade50,
+        hoverColor: Colors.grey.shade200,
+        splashColor: Colors.blue.withValues(alpha: 0.3),
+        highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       expandIconTheme: ExpandIconTheme(
         widget:
@@ -110,10 +119,16 @@ class FlutterFolderViewTheme<T> {
         openWidget:
             Icon(Icons.folder_open, color: Colors.grey.shade400, size: 20),
         textStyle: const TextStyle(color: Colors.white70),
+        hoverColor: Colors.grey.shade800,
+        splashColor: Colors.blue.withValues(alpha: 0.3),
+        highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       parentTheme: ParentNodeTheme<T>(
         widget: Icon(Icons.account_tree, color: Colors.grey.shade400, size: 20),
         textStyle: const TextStyle(color: Colors.white70),
+        hoverColor: Colors.grey.shade800,
+        splashColor: Colors.blue.withValues(alpha: 0.3),
+        highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       childTheme: ChildNodeTheme<T>(
         widget: Icon(Icons.insert_drive_file,
@@ -121,6 +136,9 @@ class FlutterFolderViewTheme<T> {
         textStyle: const TextStyle(color: Colors.white70),
         selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         selectedBackgroundColor: Colors.blue.shade900.withValues(alpha: 0.3),
+        hoverColor: Colors.grey.shade800,
+        splashColor: Colors.blue.withValues(alpha: 0.3),
+        highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       expandIconTheme: ExpandIconTheme(
         widget:
