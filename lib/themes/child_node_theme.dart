@@ -34,6 +34,10 @@ class ChildNodeTheme<T> {
   /// If returns null, falls back to [textStyle]
   final TextStyle? Function(Node<T> node)? textStyleResolver;
 
+  /// Resolver function to dynamically determine the label text based on node data
+  /// If returns null, falls back to [node.label]
+  final String? Function(Node<T> node)? labelResolver;
+
   /// Text style for selected child nodes
   final TextStyle? selectedTextStyle;
 
@@ -70,6 +74,7 @@ class ChildNodeTheme<T> {
     this.margin = EdgeInsets.zero,
     this.textStyle,
     this.textStyleResolver,
+    this.labelResolver,
     this.selectedTextStyle,
     this.selectedTextStyleResolver,
     this.selectedBackgroundColor,
@@ -90,6 +95,7 @@ class ChildNodeTheme<T> {
     EdgeInsets? margin,
     TextStyle? textStyle,
     TextStyle? Function(Node<T> node)? textStyleResolver,
+    String? Function(Node<T> node)? labelResolver,
     TextStyle? selectedTextStyle,
     TextStyle? Function(Node<T> node)? selectedTextStyleResolver,
     Color? selectedBackgroundColor,
@@ -108,6 +114,7 @@ class ChildNodeTheme<T> {
       margin: margin ?? this.margin,
       textStyle: textStyle ?? this.textStyle,
       textStyleResolver: textStyleResolver ?? this.textStyleResolver,
+      labelResolver: labelResolver ?? this.labelResolver,
       selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
       selectedTextStyleResolver:
           selectedTextStyleResolver ?? this.selectedTextStyleResolver,
@@ -142,6 +149,7 @@ class ChildNodeTheme<T> {
       margin: EdgeInsets.lerp(a.margin, b.margin, t) ?? EdgeInsets.zero,
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       textStyleResolver: t < 0.5 ? a.textStyleResolver : b.textStyleResolver,
+      labelResolver: t < 0.5 ? a.labelResolver : b.labelResolver,
       selectedTextStyle:
           TextStyle.lerp(a.selectedTextStyle, b.selectedTextStyle, t),
       selectedTextStyleResolver:

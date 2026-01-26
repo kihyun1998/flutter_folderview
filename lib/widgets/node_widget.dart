@@ -372,7 +372,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           Flexible(
             child: _wrapWithTooltip(
               Text(
-                widget.node.label,
+                _getLabel(),
                 style: _getTextStyle(),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -439,7 +439,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           Flexible(
             child: _wrapWithTooltip(
               Text(
-                widget.node.label,
+                _getLabel(),
                 style: _getTextStyle(),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -448,6 +448,30 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
         ],
       ),
     );
+  }
+
+  String _getLabel() {
+    String? resolvedLabel;
+
+    switch (widget.node.type) {
+      case NodeType.folder:
+        final folderTheme = widget.theme.folderTheme;
+        // Try resolver first
+        resolvedLabel = folderTheme.labelResolver?.call(widget.node);
+        break;
+      case NodeType.parent:
+        final parentTheme = widget.theme.parentTheme;
+        // Try resolver first
+        resolvedLabel = parentTheme.labelResolver?.call(widget.node);
+        break;
+      case NodeType.child:
+        final childTheme = widget.theme.childTheme;
+        // Try resolver first
+        resolvedLabel = childTheme.labelResolver?.call(widget.node);
+        break;
+    }
+
+    return resolvedLabel ?? widget.node.label;
   }
 
   TextStyle? _getTextStyle() {

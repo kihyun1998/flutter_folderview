@@ -1,3 +1,13 @@
+## 0.2.4
+
+### Features
+
+- **Label Resolver**: Added `labelResolver` property to all node themes
+  - `FolderNodeTheme`, `ParentNodeTheme`, and `ChildNodeTheme` now support dynamic label resolution
+  - Resolver function receives `Node<T>` and can return custom label based on `node.data`
+  - If resolver returns `null`, falls back to `node.label`
+  - Enables displaying different data fields conditionally (e.g., `node.data.displayName` vs `node.data.fullPath`)
+
 ## 0.2.3
 
 ### Features

@@ -41,6 +41,10 @@ class FolderNodeTheme<T> {
   /// If returns null, falls back to [textStyle]
   final TextStyle? Function(Node<T> node)? textStyleResolver;
 
+  /// Resolver function to dynamically determine the label text based on node data
+  /// If returns null, falls back to [node.label]
+  final String? Function(Node<T> node)? labelResolver;
+
   /// Hover color when mouse hovers over the node
   final Color? hoverColor;
 
@@ -65,6 +69,7 @@ class FolderNodeTheme<T> {
     this.margin = EdgeInsets.zero,
     this.textStyle,
     this.textStyleResolver,
+    this.labelResolver,
     this.hoverColor,
     this.splashColor,
     this.highlightColor,
@@ -83,6 +88,7 @@ class FolderNodeTheme<T> {
     EdgeInsets? margin,
     TextStyle? textStyle,
     TextStyle? Function(Node<T> node)? textStyleResolver,
+    String? Function(Node<T> node)? labelResolver,
     Color? hoverColor,
     Color? splashColor,
     Color? highlightColor,
@@ -99,6 +105,7 @@ class FolderNodeTheme<T> {
       margin: margin ?? this.margin,
       textStyle: textStyle ?? this.textStyle,
       textStyleResolver: textStyleResolver ?? this.textStyleResolver,
+      labelResolver: labelResolver ?? this.labelResolver,
       hoverColor: hoverColor ?? this.hoverColor,
       splashColor: splashColor ?? this.splashColor,
       highlightColor: highlightColor ?? this.highlightColor,
@@ -129,6 +136,7 @@ class FolderNodeTheme<T> {
       margin: EdgeInsets.lerp(a.margin, b.margin, t) ?? EdgeInsets.zero,
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       textStyleResolver: t < 0.5 ? a.textStyleResolver : b.textStyleResolver,
+      labelResolver: t < 0.5 ? a.labelResolver : b.labelResolver,
       hoverColor: Color.lerp(a.hoverColor, b.hoverColor, t),
       splashColor: Color.lerp(a.splashColor, b.splashColor, t),
       highlightColor: Color.lerp(a.highlightColor, b.highlightColor, t),
