@@ -73,6 +73,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   double _clickInterval = 300.0;
   double _animationDuration = 200.0;
 
+  // Layout
+  double _rowHeight = 40.0;
+  double _rowSpacing = 0.0;
+
   // Tooltip
   bool _folderTooltipEnabled = true;
   Color _folderTooltipBgColor = const Color(0xFF424242);
@@ -285,6 +289,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
       ),
       nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _borderRadius),
       animationDuration: _animationDuration.round(),
+      rowHeight: _rowHeight,
+      rowSpacing: _rowSpacing,
     );
 
     return Scaffold(
@@ -327,6 +333,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         _buildChildControls(),
         _buildTooltipControls(),
         _buildNodeStyleControls(),
+        _buildLayoutControls(),
         _buildInteractionControls(),
         const SizedBox(height: 16),
         FilledButton.icon(
@@ -373,6 +380,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _borderRadius = 8.0;
             _clickInterval = 300.0;
             _animationDuration = 200.0;
+            _rowHeight = 40.0;
+            _rowSpacing = 0.0;
             _folderTooltipEnabled = true;
             _folderTooltipBgColor = const Color(0xFF424242);
             _parentTooltipEnabled = true;
@@ -835,6 +844,48 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               0,
               20,
               (v) => setState(() => _borderRadius = v),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLayoutControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Layout',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            _slider(
+              'Row Height',
+              _rowHeight,
+              20,
+              80,
+              (v) => setState(() => _rowHeight = v),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Height of each row/node',
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 12),
+            _slider(
+              'Row Spacing',
+              _rowSpacing,
+              0,
+              20,
+              (v) => setState(() => _rowSpacing = v),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Vertical spacing between rows',
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
             ),
           ],
         ),

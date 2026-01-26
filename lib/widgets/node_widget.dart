@@ -13,6 +13,7 @@ class NodeWidget<T> extends StatefulWidget {
   final Function(Node<T>)? onDoubleTap;
   final Function(Node<T>, TapDownDetails)? onSecondaryTap;
   final bool isLast;
+  final bool isFirst;
   final bool isRoot;
   final int depth;
   final Set<String>? selectedNodeIds;
@@ -26,6 +27,7 @@ class NodeWidget<T> extends StatefulWidget {
     this.onDoubleTap,
     this.onSecondaryTap,
     this.isLast = false,
+    this.isFirst = false,
     this.isRoot = false,
     this.depth = 0,
     this.selectedNodeIds,
@@ -87,11 +89,12 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
         widget.theme.expandIconTheme.margin.horizontal;
 
     return Stack(
+      clipBehavior: Clip.none,
       children: [
         // 1. Vertical Line (Pipeline)
         Positioned(
           left: widget.isRoot ? 0 : (widget.depth - 1) * lineWidth,
-          top: 0,
+          top: widget.isFirst || widget.isRoot ? 0 : -widget.theme.rowSpacing,
           bottom: widget.isLast ? null : 0,
           height: widget.isLast ? widget.theme.rowHeight / 2 : null,
           width: lineWidth,
@@ -100,6 +103,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
               isLast: widget.isLast,
               isRoot: widget.isRoot,
               lineTheme: widget.theme.lineTheme,
+              rowHeight: widget.theme.rowHeight,
             ),
           ),
         ),
@@ -135,20 +139,32 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                 sizeFactor: _heightFactor,
                 axisAlignment: -1.0, // Expand from top
                 child: Column(
-                  children: widget.node.children.asMap().entries.map((entry) {
-                    return NodeWidget<T>(
-                      node: entry.value,
-                      mode: widget.mode,
-                      onTap: widget.onTap,
-                      onDoubleTap: widget.onDoubleTap,
-                      onSecondaryTap: widget.onSecondaryTap,
-                      isLast: entry.key == widget.node.children.length - 1,
-                      isRoot: false,
-                      depth: widget.depth + 1,
-                      selectedNodeIds: widget.selectedNodeIds,
-                      theme: widget.theme,
-                    );
-                  }).toList(),
+                  children: [
+                    // Spacing between tile and first child
+                    if (widget.theme.rowSpacing > 0 &&
+                        widget.node.children.isNotEmpty)
+                      SizedBox(height: widget.theme.rowSpacing),
+
+                    // Children with spacing between them
+                    for (int i = 0; i < widget.node.children.length; i++) ...[
+                      NodeWidget<T>(
+                        node: widget.node.children[i],
+                        mode: widget.mode,
+                        onTap: widget.onTap,
+                        onDoubleTap: widget.onDoubleTap,
+                        onSecondaryTap: widget.onSecondaryTap,
+                        isLast: i == widget.node.children.length - 1,
+                        isFirst: i == 0,
+                        isRoot: false,
+                        depth: widget.depth + 1,
+                        selectedNodeIds: widget.selectedNodeIds,
+                        theme: widget.theme,
+                      ),
+                      if (i < widget.node.children.length - 1 &&
+                          widget.theme.rowSpacing > 0)
+                        SizedBox(height: widget.theme.rowSpacing),
+                    ],
+                  ],
                 ),
               ),
             ),
@@ -464,11 +480,13 @@ class _LinePainter extends CustomPainter {
   final bool isLast;
   final bool isRoot;
   final FolderViewLineTheme lineTheme;
+  final double rowHeight;
 
   _LinePainter({
     required this.isLast,
     required this.isRoot,
     required this.lineTheme,
+    required this.rowHeight,
   });
 
   @override
@@ -497,7 +515,7 @@ class _LinePainter extends CustomPainter {
         );
 
         // Horizontal Connector
-        double connectorY = isLast ? size.height : 20.0;
+        double connectorY = isLast ? size.height : rowHeight / 2;
         canvas.drawLine(
           Offset(centerX, connectorY),
           Offset(size.width, connectorY),
@@ -525,6 +543,7 @@ class _LinePainter extends CustomPainter {
   bool shouldRepaint(covariant _LinePainter oldDelegate) {
     return oldDelegate.isLast != isLast ||
         oldDelegate.isRoot != isRoot ||
-        oldDelegate.lineTheme != lineTheme;
+        oldDelegate.lineTheme != lineTheme ||
+        oldDelegate.rowHeight != rowHeight;
   }
 }

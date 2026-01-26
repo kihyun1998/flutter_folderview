@@ -15,6 +15,11 @@
   - Centralized row height configuration (default: 40.0)
   - Replaces hardcoded height values in `NodeWidget` and `SizeService`
   - Consistent height calculation across all components
+- **Configurable Row Spacing**: Added `rowSpacing` property to `FlutterFolderViewTheme`
+  - Vertical spacing between rows/nodes (default: 0.0)
+  - Vertical lines extend through spacing areas to maintain continuous tree structure
+  - Uses `ListView.separated` when spacing is enabled for optimal rendering
+  - Dynamic connector positioning based on row height
 
 ### Refactoring
 - **Simplified Spacing Control**: Removed `iconToTextSpacing` property from all node themes

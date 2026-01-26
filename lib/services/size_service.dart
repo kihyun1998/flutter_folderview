@@ -134,20 +134,34 @@ class SizeService {
   static double calculateContentHeight<T>({
     required List<Node<T>> nodes,
     double rowHeight = 40.0,
+    double rowSpacing = 0.0,
     double topPadding = 0.0,
     double bottomPadding = 0.0,
   }) {
     double height = 0.0;
 
-    for (var node in nodes) {
+    for (int i = 0; i < nodes.length; i++) {
+      final node = nodes[i];
+
       // Add this node's height
       height += rowHeight;
 
+      // Add spacing after this node (except for the last node)
+      if (i < nodes.length - 1) {
+        height += rowSpacing;
+      }
+
       // If expanded, add children's height recursively
       if (node.isExpanded && node.children.isNotEmpty) {
+        // Add spacing before children
+        if (node.children.isNotEmpty) {
+          height += rowSpacing;
+        }
+
         height += calculateContentHeight(
           nodes: node.children,
           rowHeight: rowHeight,
+          rowSpacing: rowSpacing,
           // Children don't need extra padding
           topPadding: 0.0,
           bottomPadding: 0.0,

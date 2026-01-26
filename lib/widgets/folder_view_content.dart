@@ -76,25 +76,49 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     final Widget listView = Column(
       children: [
         Expanded(
-          child: ListView.builder(
-            key: _listViewKey,
-            controller: verticalController,
-            padding: theme.spacingTheme.contentPadding,
-            itemCount: data.length,
-            itemBuilder: (context, index) {
-              return NodeWidget<T>(
-                node: data[index],
-                mode: mode,
-                onTap: onNodeTap,
-                onDoubleTap: onDoubleNodeTap,
-                onSecondaryTap: onSecondaryNodeTap,
-                isLast: index == data.length - 1,
-                isRoot: true,
-                selectedNodeIds: selectedNodeIds,
-                theme: theme,
-              );
-            },
-          ),
+          child: theme.rowSpacing > 0
+              ? ListView.separated(
+                  key: _listViewKey,
+                  controller: verticalController,
+                  padding: theme.spacingTheme.contentPadding,
+                  itemCount: data.length,
+                  separatorBuilder: (context, index) =>
+                      SizedBox(height: theme.rowSpacing),
+                  itemBuilder: (context, index) {
+                    return NodeWidget<T>(
+                      node: data[index],
+                      mode: mode,
+                      onTap: onNodeTap,
+                      onDoubleTap: onDoubleNodeTap,
+                      onSecondaryTap: onSecondaryNodeTap,
+                      isLast: index == data.length - 1,
+                      isFirst: index == 0,
+                      isRoot: true,
+                      selectedNodeIds: selectedNodeIds,
+                      theme: theme,
+                    );
+                  },
+                )
+              : ListView.builder(
+                  key: _listViewKey,
+                  controller: verticalController,
+                  padding: theme.spacingTheme.contentPadding,
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    return NodeWidget<T>(
+                      node: data[index],
+                      mode: mode,
+                      onTap: onNodeTap,
+                      onDoubleTap: onDoubleNodeTap,
+                      onSecondaryTap: onSecondaryNodeTap,
+                      isLast: index == data.length - 1,
+                      isFirst: index == 0,
+                      isRoot: true,
+                      selectedNodeIds: selectedNodeIds,
+                      theme: theme,
+                    );
+                  },
+                ),
         ),
         // Only add spacing when horizontal scrollbar is actually needed
         if (needsHorizontalScroll)

@@ -55,6 +55,7 @@ class FolderView<T> extends StatelessWidget {
         final contentHeight = SizeService.calculateContentHeight(
           nodes: displayNodes,
           rowHeight: effectiveTheme.rowHeight,
+          rowSpacing: effectiveTheme.rowSpacing,
           topPadding: effectiveTheme.spacingTheme.contentPadding.top,
           bottomPadding: effectiveTheme.spacingTheme.contentPadding.bottom,
         );

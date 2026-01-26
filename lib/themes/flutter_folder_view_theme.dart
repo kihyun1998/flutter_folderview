@@ -46,6 +46,9 @@ class FlutterFolderViewTheme<T> {
   /// Height of each row/node in pixels
   final double rowHeight;
 
+  /// Vertical spacing between rows in pixels
+  final double rowSpacing;
+
   /// Creates a [FlutterFolderViewTheme] with the given properties
   const FlutterFolderViewTheme({
     required this.lineTheme,
@@ -58,6 +61,7 @@ class FlutterFolderViewTheme<T> {
     this.nodeStyleTheme = const FolderViewNodeStyleTheme(),
     this.animationDuration = 200,
     this.rowHeight = 40.0,
+    this.rowSpacing = 0.0,
   });
 
   /// Creates a light theme with sensible defaults
@@ -164,6 +168,7 @@ class FlutterFolderViewTheme<T> {
     FolderViewNodeStyleTheme? nodeStyleTheme,
     int? animationDuration,
     double? rowHeight,
+    double? rowSpacing,
   }) {
     return FlutterFolderViewTheme<T>(
       lineTheme: lineTheme ?? this.lineTheme,
@@ -176,6 +181,7 @@ class FlutterFolderViewTheme<T> {
       nodeStyleTheme: nodeStyleTheme ?? this.nodeStyleTheme,
       animationDuration: animationDuration ?? this.animationDuration,
       rowHeight: rowHeight ?? this.rowHeight,
+      rowSpacing: rowSpacing ?? this.rowSpacing,
     );
   }
 
@@ -215,6 +221,7 @@ class FlutterFolderViewTheme<T> {
       ),
       animationDuration: t < 0.5 ? a.animationDuration : b.animationDuration,
       rowHeight: t < 0.5 ? a.rowHeight : b.rowHeight,
+      rowSpacing: t < 0.5 ? a.rowSpacing : b.rowSpacing,
     );
   }
 
@@ -232,7 +239,8 @@ class FlutterFolderViewTheme<T> {
         other.spacingTheme == spacingTheme &&
         other.nodeStyleTheme == nodeStyleTheme &&
         other.animationDuration == animationDuration &&
-        other.rowHeight == rowHeight;
+        other.rowHeight == rowHeight &&
+        other.rowSpacing == rowSpacing;
   }
 
   @override
@@ -246,7 +254,7 @@ class FlutterFolderViewTheme<T> {
         spacingTheme,
         nodeStyleTheme,
         animationDuration,
-        rowHeight,
+        Object.hash(rowHeight, rowSpacing),
       );
 
   @override
@@ -261,7 +269,8 @@ class FlutterFolderViewTheme<T> {
         'spacingTheme: $spacingTheme, '
         'nodeStyleTheme: $nodeStyleTheme, '
         'animationDuration: $animationDuration, '
-        'rowHeight: $rowHeight'
+        'rowHeight: $rowHeight, '
+        'rowSpacing: $rowSpacing'
         ')';
   }
 }
