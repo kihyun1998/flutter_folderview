@@ -15,7 +15,7 @@ class NodeWidget<T> extends StatefulWidget {
   final bool isRoot;
   final int depth;
   final Set<String>? selectedNodeIds;
-  final FlutterFolderViewTheme theme;
+  final FlutterFolderViewTheme<T> theme;
 
   const NodeWidget({
     super.key,
@@ -185,6 +185,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   /// Build node icon widget based on node type
   Widget _buildNodeIcon() {
     Widget? iconWidget;
+    Widget? resolvedWidget;
     double width;
     double height;
     EdgeInsets padding;
@@ -193,9 +194,15 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     switch (widget.node.type) {
       case NodeType.folder:
         final folderTheme = widget.theme.folderTheme;
-        iconWidget = widget.node.isExpanded
-            ? folderTheme.openWidget ?? folderTheme.widget
-            : folderTheme.widget;
+        // Try resolver first
+        if (widget.node.isExpanded) {
+          resolvedWidget = folderTheme.openWidgetResolver?.call(widget.node);
+          iconWidget =
+              resolvedWidget ?? folderTheme.openWidget ?? folderTheme.widget;
+        } else {
+          resolvedWidget = folderTheme.widgetResolver?.call(widget.node);
+          iconWidget = resolvedWidget ?? folderTheme.widget;
+        }
         width = folderTheme.width;
         height = folderTheme.height;
         padding = folderTheme.padding;
@@ -204,11 +211,17 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       case NodeType.parent:
         final parentTheme = widget.theme.parentTheme;
         if (widget.mode == ViewMode.tree) {
-          iconWidget = widget.node.isExpanded
-              ? parentTheme.openWidget ?? parentTheme.widget
-              : parentTheme.widget;
+          if (widget.node.isExpanded) {
+            resolvedWidget = parentTheme.openWidgetResolver?.call(widget.node);
+            iconWidget =
+                resolvedWidget ?? parentTheme.openWidget ?? parentTheme.widget;
+          } else {
+            resolvedWidget = parentTheme.widgetResolver?.call(widget.node);
+            iconWidget = resolvedWidget ?? parentTheme.widget;
+          }
         } else {
-          iconWidget = parentTheme.widget;
+          resolvedWidget = parentTheme.widgetResolver?.call(widget.node);
+          iconWidget = resolvedWidget ?? parentTheme.widget;
         }
         width = parentTheme.width;
         height = parentTheme.height;
@@ -217,7 +230,9 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
         break;
       case NodeType.child:
         final childTheme = widget.theme.childTheme;
-        iconWidget = childTheme.widget;
+        // Try resolver first
+        resolvedWidget = childTheme.widgetResolver?.call(widget.node);
+        iconWidget = resolvedWidget ?? childTheme.widget;
         width = childTheme.width;
         height = childTheme.height;
         padding = childTheme.padding;
@@ -326,20 +341,35 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     final isSelected =
         widget.selectedNodeIds?.contains(widget.node.id) ?? false;
     TextStyle? style;
+    TextStyle? resolvedStyle;
 
     switch (widget.node.type) {
       case NodeType.folder:
-        style = widget.theme.folderTheme.textStyle;
+        final folderTheme = widget.theme.folderTheme;
+        // Try resolver first
+        resolvedStyle = folderTheme.textStyleResolver?.call(widget.node);
+        style = resolvedStyle ?? folderTheme.textStyle;
         break;
       case NodeType.parent:
-        style = widget.theme.parentTheme.textStyle;
+        final parentTheme = widget.theme.parentTheme;
+        // Try resolver first
+        resolvedStyle = parentTheme.textStyleResolver?.call(widget.node);
+        style = resolvedStyle ?? parentTheme.textStyle;
         break;
       case NodeType.child:
-        style = widget.theme.childTheme.textStyle;
+        final childTheme = widget.theme.childTheme;
+        // Try resolver first
+        resolvedStyle = childTheme.textStyleResolver?.call(widget.node);
+        style = resolvedStyle ?? childTheme.textStyle;
+
         // Apply selected style only for child nodes
         if (isSelected) {
-          style = style?.merge(widget.theme.childTheme.selectedTextStyle) ??
-              widget.theme.childTheme.selectedTextStyle;
+          TextStyle? selectedStyle;
+          final resolvedSelectedStyle =
+              childTheme.selectedTextStyleResolver?.call(widget.node);
+          selectedStyle = resolvedSelectedStyle ?? childTheme.selectedTextStyle;
+
+          style = style?.merge(selectedStyle) ?? selectedStyle;
         }
         break;
     }

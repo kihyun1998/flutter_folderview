@@ -10,13 +10,13 @@ import 'flutter_folder_view_theme.dart';
 /// Example:
 /// ```dart
 /// FolderViewTheme(
-///   data: FlutterFolderViewTheme.light(),
+///   data: FlutterFolderViewTheme<MyDataType>.light(),
 ///   child: FolderView(...),
 /// )
 /// ```
-class FolderViewTheme extends InheritedWidget {
+class FolderViewTheme<T> extends InheritedWidget {
   /// The theme data to provide to descendants
-  final FlutterFolderViewTheme data;
+  final FlutterFolderViewTheme<T> data;
 
   /// Creates a [FolderViewTheme] that provides [data] to its descendants
   const FolderViewTheme({
@@ -31,13 +31,13 @@ class FolderViewTheme extends InheritedWidget {
   ///
   /// Example:
   /// ```dart
-  /// final theme = FolderViewTheme.of(context);
+  /// final theme = FolderViewTheme.of<MyDataType>(context);
   /// final lineColor = theme.lineTheme.lineColor;
   /// ```
-  static FlutterFolderViewTheme of(BuildContext context) {
-    final FolderViewTheme? theme =
-        context.dependOnInheritedWidgetOfExactType<FolderViewTheme>();
-    return theme?.data ?? FlutterFolderViewTheme.light();
+  static FlutterFolderViewTheme<T> of<T>(BuildContext context) {
+    final FolderViewTheme<T>? theme =
+        context.dependOnInheritedWidgetOfExactType<FolderViewTheme<T>>();
+    return theme?.data ?? FlutterFolderViewTheme<T>.light();
   }
 
   /// Retrieves the [FlutterFolderViewTheme] from the closest [FolderViewTheme] ancestor
@@ -47,10 +47,10 @@ class FolderViewTheme extends InheritedWidget {
   /// needing to rebuild when the theme changes.
   ///
   /// If there is no [FolderViewTheme] ancestor, returns a default light theme.
-  static FlutterFolderViewTheme maybeOf(BuildContext context) {
-    final FolderViewTheme? theme =
-        context.getInheritedWidgetOfExactType<FolderViewTheme>();
-    return theme?.data ?? FlutterFolderViewTheme.light();
+  static FlutterFolderViewTheme<T> maybeOf<T>(BuildContext context) {
+    final FolderViewTheme<T>? theme =
+        context.getInheritedWidgetOfExactType<FolderViewTheme<T>>();
+    return theme?.data ?? FlutterFolderViewTheme<T>.light();
   }
 
   @override

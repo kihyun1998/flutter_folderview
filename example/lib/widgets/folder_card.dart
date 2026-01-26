@@ -194,8 +194,8 @@ class _FolderCardState extends State<FolderCard> {
                 selectedNodeIds: selectedNodeIds,
                 theme:
                     (Theme.of(context).brightness == Brightness.dark
-                            ? FlutterFolderViewTheme.dark()
-                            : FlutterFolderViewTheme.light())
+                            ? FlutterFolderViewTheme<String>.dark()
+                            : FlutterFolderViewTheme<String>.light())
                         .copyWith(
                           lineTheme: FolderViewLineTheme(
                             lineColor:

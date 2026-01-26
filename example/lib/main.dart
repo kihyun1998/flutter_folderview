@@ -8,6 +8,7 @@ import 'data/government_data.dart';
 import 'data/software_data.dart';
 import 'models/card_config.dart';
 import 'pages/large_dataset_page.dart';
+import 'pages/resolver_demo_page.dart';
 import 'pages/theme_demo_page.dart';
 import 'widgets/folder_card.dart';
 
@@ -49,6 +50,18 @@ class MyHomePage extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_suggest),
+            tooltip: 'Resolver Demo',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ResolverDemoPage(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.dataset_outlined),
             tooltip: 'Large Dataset Test',

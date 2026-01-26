@@ -26,6 +26,17 @@
 - **Interaction Customization**:
   - Added `animationDuration` property to `FlutterFolderViewTheme` for configurable expand/collapse animation speed (default: 200ms)
   - Click interval only applies to child nodes; folder/parent nodes use immediate single-click behavior
+- **Theme Resolver Functions**: Dynamic styling based on node data
+  - Added `widgetResolver` to all node themes for data-driven widget selection
+  - Added `textStyleResolver` to all node themes for data-driven text styling
+  - Added `selectedTextStyleResolver` to `ChildNodeTheme` for dynamic selected state styling
+  - Added `openWidgetResolver` to `FolderNodeTheme` and `ParentNodeTheme` for expanded state customization
+  - Resolver functions receive `Node<T>` and can access `node.data` for conditional styling
+  - If resolver returns `null`, falls back to default theme properties
+- **Generic Type Support**: All theme classes now support generic type parameter `<T>`
+  - `FlutterFolderViewTheme<T>`, `FolderNodeTheme<T>`, `ParentNodeTheme<T>`, `ChildNodeTheme<T>`
+  - Type-safe access to `node.data` in resolver functions
+  - `FolderView<T>` and `FolderViewTheme<T>` support custom data types
 
 ### Examples
 - Completely redesigned Theme Demo page with real-time controls for:
@@ -36,6 +47,11 @@
   - Interaction controls: click interval (100-1000ms) and animation duration (50-800ms)
   - Double-click demonstration with visual feedback
   - Live preview of theme changes
+- New Resolver Demo page demonstrating dynamic theme resolution:
+  - Custom `FileData` class with `enabled` and `isImportant` properties
+  - Icon changes based on node data (disabled = red block icon, important = yellow star icon)
+  - Text style changes based on node data (disabled = grey strikethrough, important = bold blue)
+  - Real-world example of conditional styling using resolver functions
 
 ### Migration Guide
 Replace old theme usage:
@@ -65,6 +81,54 @@ FlutterFolderViewTheme(
   ),
   expandIconTheme: ExpandIconTheme(...),
   animationDuration: 200, // milliseconds for expand/collapse animation
+)
+```
+
+Using theme resolvers for dynamic styling:
+```dart
+// Define custom data type
+class FileData {
+  final bool enabled;
+  final bool isImportant;
+}
+
+// Create theme with resolver functions
+FlutterFolderViewTheme<FileData>(
+  childTheme: ChildNodeTheme<FileData>(
+    widget: Icon(Icons.insert_drive_file, color: Colors.grey),
+    // Widget resolver: change icon based on node data
+    widgetResolver: (node) {
+      if (node.data?.enabled == false) {
+        return Icon(Icons.block, color: Colors.red);
+      }
+      if (node.data?.isImportant == true) {
+        return Icon(Icons.star, color: Colors.amber);
+      }
+      return null; // Use default widget
+    },
+    // Text style resolver: change style based on node data
+    textStyleResolver: (node) {
+      if (node.data?.enabled == false) {
+        return TextStyle(color: Colors.grey, decoration: TextDecoration.lineThrough);
+      }
+      if (node.data?.isImportant == true) {
+        return TextStyle(color: Colors.blue, fontWeight: FontWeight.bold);
+      }
+      return null; // Use default textStyle
+    },
+  ),
+)
+
+// Use with typed nodes
+FolderView<FileData>(
+  data: [
+    Node<FileData>(
+      id: '1',
+      label: 'Important File',
+      type: NodeType.child,
+      data: FileData(enabled: true, isImportant: true),
+    ),
+  ],
 )
 ```
 

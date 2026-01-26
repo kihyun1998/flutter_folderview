@@ -14,7 +14,7 @@ class FolderView<T> extends StatelessWidget {
   final Function(Node<T>)? onDoubleNodeTap;
   final Function(Node<T>, TapDownDetails)? onSecondaryNodeTap;
   final Set<String>? selectedNodeIds;
-  final FlutterFolderViewTheme? theme;
+  final FlutterFolderViewTheme<T>? theme;
 
   const FolderView({
     super.key,
@@ -30,7 +30,7 @@ class FolderView<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Resolve theme: use provided theme, or get from context, or use default
-    final effectiveTheme = theme ?? FolderViewTheme.of(context);
+    final effectiveTheme = theme ?? FolderViewTheme.of<T>(context);
 
     // Filter data based on mode
     List<Node<T>> displayNodes = _getDisplayNodes();

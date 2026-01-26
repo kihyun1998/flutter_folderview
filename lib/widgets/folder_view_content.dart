@@ -28,7 +28,7 @@ class FolderViewContent<T> extends StatefulWidget {
   final Function(Node<T>)? onDoubleNodeTap;
   final Function(Node<T>, TapDownDetails)? onSecondaryNodeTap;
   final Set<String>? selectedNodeIds;
-  final FlutterFolderViewTheme theme;
+  final FlutterFolderViewTheme<T> theme;
 
   const FolderViewContent({
     super.key,
@@ -71,7 +71,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     required double contentWidth,
     required double viewportWidth,
     required bool needsHorizontalScroll,
-    required FlutterFolderViewTheme theme,
+    required FlutterFolderViewTheme<T> theme,
   }) {
     final Widget listView = Column(
       children: [

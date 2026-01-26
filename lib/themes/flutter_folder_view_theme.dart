@@ -15,7 +15,7 @@ import 'parent_node_theme.dart';
 /// This class provides a centralized way to customize the appearance
 /// of FolderView widgets with separate themes for each node type.
 @immutable
-class FlutterFolderViewTheme {
+class FlutterFolderViewTheme<T> {
   /// Theme for connection lines between nodes
   final FolderViewLineTheme lineTheme;
 
@@ -23,13 +23,13 @@ class FlutterFolderViewTheme {
   final FolderViewScrollbarTheme scrollbarTheme;
 
   /// Theme for folder nodes
-  final FolderNodeTheme folderTheme;
+  final FolderNodeTheme<T> folderTheme;
 
   /// Theme for parent nodes
-  final ParentNodeTheme parentTheme;
+  final ParentNodeTheme<T> parentTheme;
 
   /// Theme for child nodes
-  final ChildNodeTheme childTheme;
+  final ChildNodeTheme<T> childTheme;
 
   /// Theme for expand/collapse icon
   final ExpandIconTheme expandIconTheme;
@@ -58,7 +58,7 @@ class FlutterFolderViewTheme {
 
   /// Creates a light theme with sensible defaults
   factory FlutterFolderViewTheme.light() {
-    return FlutterFolderViewTheme(
+    return FlutterFolderViewTheme<T>(
       lineTheme: FolderViewLineTheme(
         lineColor: const Color(0xFF9E9E9E), // Grey 500
         lineWidth: 1.5,
@@ -68,17 +68,17 @@ class FlutterFolderViewTheme {
         thumbColor: Colors.grey.shade600,
         trackColor: Colors.grey.shade200,
       ),
-      folderTheme: FolderNodeTheme(
+      folderTheme: FolderNodeTheme<T>(
         widget: Icon(Icons.folder, color: Colors.grey.shade700, size: 20),
         openWidget:
             Icon(Icons.folder_open, color: Colors.grey.shade700, size: 20),
         textStyle: const TextStyle(color: Colors.black87),
       ),
-      parentTheme: ParentNodeTheme(
+      parentTheme: ParentNodeTheme<T>(
         widget: Icon(Icons.account_tree, color: Colors.grey.shade700, size: 20),
         textStyle: const TextStyle(color: Colors.black87),
       ),
-      childTheme: ChildNodeTheme(
+      childTheme: ChildNodeTheme<T>(
         widget: Icon(Icons.insert_drive_file,
             color: Colors.grey.shade700, size: 20),
         textStyle: const TextStyle(color: Colors.black87),
@@ -95,7 +95,7 @@ class FlutterFolderViewTheme {
 
   /// Creates a dark theme with sensible defaults
   factory FlutterFolderViewTheme.dark() {
-    return FlutterFolderViewTheme(
+    return FlutterFolderViewTheme<T>(
       lineTheme: FolderViewLineTheme(
         lineColor: const Color(0xFF757575), // Grey 600
         lineWidth: 1.5,
@@ -105,17 +105,17 @@ class FlutterFolderViewTheme {
         thumbColor: Colors.grey.shade400,
         trackColor: Colors.grey.shade800,
       ),
-      folderTheme: FolderNodeTheme(
+      folderTheme: FolderNodeTheme<T>(
         widget: Icon(Icons.folder, color: Colors.grey.shade400, size: 20),
         openWidget:
             Icon(Icons.folder_open, color: Colors.grey.shade400, size: 20),
         textStyle: const TextStyle(color: Colors.white70),
       ),
-      parentTheme: ParentNodeTheme(
+      parentTheme: ParentNodeTheme<T>(
         widget: Icon(Icons.account_tree, color: Colors.grey.shade400, size: 20),
         textStyle: const TextStyle(color: Colors.white70),
       ),
-      childTheme: ChildNodeTheme(
+      childTheme: ChildNodeTheme<T>(
         widget: Icon(Icons.insert_drive_file,
             color: Colors.grey.shade400, size: 20),
         textStyle: const TextStyle(color: Colors.white70),
@@ -131,18 +131,18 @@ class FlutterFolderViewTheme {
   }
 
   /// Creates a copy of this theme with the given fields replaced with new values
-  FlutterFolderViewTheme copyWith({
+  FlutterFolderViewTheme<T> copyWith({
     FolderViewLineTheme? lineTheme,
     FolderViewScrollbarTheme? scrollbarTheme,
-    FolderNodeTheme? folderTheme,
-    ParentNodeTheme? parentTheme,
-    ChildNodeTheme? childTheme,
+    FolderNodeTheme<T>? folderTheme,
+    ParentNodeTheme<T>? parentTheme,
+    ChildNodeTheme<T>? childTheme,
     ExpandIconTheme? expandIconTheme,
     FolderViewSpacingTheme? spacingTheme,
     FolderViewNodeStyleTheme? nodeStyleTheme,
     int? animationDuration,
   }) {
-    return FlutterFolderViewTheme(
+    return FlutterFolderViewTheme<T>(
       lineTheme: lineTheme ?? this.lineTheme,
       scrollbarTheme: scrollbarTheme ?? this.scrollbarTheme,
       folderTheme: folderTheme ?? this.folderTheme,
@@ -156,18 +156,18 @@ class FlutterFolderViewTheme {
   }
 
   /// Linearly interpolate between two [FlutterFolderViewTheme]s
-  static FlutterFolderViewTheme lerp(
-    FlutterFolderViewTheme? a,
-    FlutterFolderViewTheme? b,
+  static FlutterFolderViewTheme<T> lerp<T>(
+    FlutterFolderViewTheme<T>? a,
+    FlutterFolderViewTheme<T>? b,
     double t,
   ) {
     if (a == null && b == null) {
-      return FlutterFolderViewTheme.light();
+      return FlutterFolderViewTheme<T>.light();
     }
     if (a == null) return b!;
     if (b == null) return a;
 
-    return FlutterFolderViewTheme(
+    return FlutterFolderViewTheme<T>(
       lineTheme: FolderViewLineTheme.lerp(a.lineTheme, b.lineTheme, t),
       scrollbarTheme: FolderViewScrollbarTheme.lerp(
         a.scrollbarTheme,
@@ -197,7 +197,7 @@ class FlutterFolderViewTheme {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    return other is FlutterFolderViewTheme &&
+    return other is FlutterFolderViewTheme<T> &&
         other.lineTheme == lineTheme &&
         other.scrollbarTheme == scrollbarTheme &&
         other.folderTheme == folderTheme &&
@@ -224,7 +224,7 @@ class FlutterFolderViewTheme {
 
   @override
   String toString() {
-    return 'FlutterFolderViewTheme('
+    return 'FlutterFolderViewTheme<$T>('
         'lineTheme: $lineTheme, '
         'scrollbarTheme: $scrollbarTheme, '
         'folderTheme: $folderTheme, '

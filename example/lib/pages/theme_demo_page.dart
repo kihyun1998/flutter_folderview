@@ -90,7 +90,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             Expanded(
               child: Text(
                 '더블클릭: ${node.label}',
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
@@ -130,33 +133,55 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FlutterFolderViewTheme(
+    final theme = FlutterFolderViewTheme<String>(
       lineTheme: FolderViewLineTheme(
         lineColor: _lineColor,
         lineWidth: _lineWidth,
         lineStyle: _lineStyle,
       ),
-      folderTheme: FolderNodeTheme(
-        widget: Icon(Icons.folder, color: _folderIconColor, size: _folderIconSize),
-        openWidget: Icon(Icons.folder_open, color: _folderIconColor, size: _folderIconSize),
+      folderTheme: FolderNodeTheme<String>(
+        widget: Icon(
+          Icons.folder,
+          color: _folderIconColor,
+          size: _folderIconSize,
+        ),
+        openWidget: Icon(
+          Icons.folder_open,
+          color: _folderIconColor,
+          size: _folderIconSize,
+        ),
         width: _folderIconSize,
         height: _folderIconSize,
         padding: EdgeInsets.all(_folderPadding),
         margin: EdgeInsets.all(_folderMargin),
         iconToTextSpacing: _folderIconSpacing,
-        textStyle: TextStyle(color: _folderTextColor, fontSize: _folderFontSize),
+        textStyle: TextStyle(
+          color: _folderTextColor,
+          fontSize: _folderFontSize,
+        ),
       ),
-      parentTheme: ParentNodeTheme(
-        widget: Icon(Icons.account_tree, color: _parentIconColor, size: _parentIconSize),
+      parentTheme: ParentNodeTheme<String>(
+        widget: Icon(
+          Icons.account_tree,
+          color: _parentIconColor,
+          size: _parentIconSize,
+        ),
         width: _parentIconSize,
         height: _parentIconSize,
         padding: EdgeInsets.all(_parentPadding),
         margin: EdgeInsets.all(_parentMargin),
         iconToTextSpacing: _parentIconSpacing,
-        textStyle: TextStyle(color: _parentTextColor, fontSize: _parentFontSize),
+        textStyle: TextStyle(
+          color: _parentTextColor,
+          fontSize: _parentFontSize,
+        ),
       ),
-      childTheme: ChildNodeTheme(
-        widget: Icon(Icons.insert_drive_file, color: _childIconColor, size: _childIconSize),
+      childTheme: ChildNodeTheme<String>(
+        widget: Icon(
+          Icons.insert_drive_file,
+          color: _childIconColor,
+          size: _childIconSize,
+        ),
         width: _childIconSize,
         height: _childIconSize,
         padding: EdgeInsets.all(_childPadding),
@@ -168,7 +193,11 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         clickInterval: _clickInterval.round(),
       ),
       expandIconTheme: ExpandIconTheme(
-        widget: Icon(Icons.chevron_right, color: _expandIconColor, size: _expandIconSize),
+        widget: Icon(
+          Icons.chevron_right,
+          color: _expandIconColor,
+          size: _expandIconSize,
+        ),
         width: _expandIconSize,
         height: _expandIconSize,
         padding: EdgeInsets.all(_expandPadding),
@@ -186,10 +215,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
       appBar: AppBar(title: const Text('Theme Demo'), centerTitle: true),
       body: Row(
         children: [
-          SizedBox(
-            width: 350,
-            child: _buildControls(),
-          ),
+          SizedBox(width: 350, child: _buildControls()),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -278,7 +304,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('View Mode', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'View Mode',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             SegmentedButton<ViewMode>(
               segments: const [
@@ -302,25 +331,39 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Line', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider('Width', _lineWidth, 0.5, 5, (v) => setState(() => _lineWidth = v)),
-            _colorRow('Color', _lineColor, (c) => setState(() => _lineColor = c)),
+            _slider(
+              'Width',
+              _lineWidth,
+              0.5,
+              5,
+              (v) => setState(() => _lineWidth = v),
+            ),
+            _colorRow(
+              'Color',
+              _lineColor,
+              (c) => setState(() => _lineColor = c),
+            ),
             Wrap(
               spacing: 4,
               children: [
                 ChoiceChip(
                   label: const Text('Connect', style: TextStyle(fontSize: 12)),
                   selected: _lineStyle == LineStyle.connector,
-                  onSelected: (s) => s ? setState(() => _lineStyle = LineStyle.connector) : null,
+                  onSelected: (s) => s
+                      ? setState(() => _lineStyle = LineStyle.connector)
+                      : null,
                 ),
                 ChoiceChip(
                   label: const Text('Scope', style: TextStyle(fontSize: 12)),
                   selected: _lineStyle == LineStyle.scope,
-                  onSelected: (s) => s ? setState(() => _lineStyle = LineStyle.scope) : null,
+                  onSelected: (s) =>
+                      s ? setState(() => _lineStyle = LineStyle.scope) : null,
                 ),
                 ChoiceChip(
                   label: const Text('None', style: TextStyle(fontSize: 12)),
                   selected: _lineStyle == LineStyle.none,
-                  onSelected: (s) => s ? setState(() => _lineStyle = LineStyle.none) : null,
+                  onSelected: (s) =>
+                      s ? setState(() => _lineStyle = LineStyle.none) : null,
                 ),
               ],
             ),
@@ -337,11 +380,36 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Expand Icon', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider('Size', _expandIconSize, 12, 32, (v) => setState(() => _expandIconSize = v)),
-            _colorRow('Color', _expandIconColor, (c) => setState(() => _expandIconColor = c)),
-            _slider('Padding', _expandPadding, 0, 8, (v) => setState(() => _expandPadding = v)),
-            _slider('Margin', _expandMargin, 0, 8, (v) => setState(() => _expandMargin = v)),
+            const Text(
+              'Expand Icon',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            _slider(
+              'Size',
+              _expandIconSize,
+              12,
+              32,
+              (v) => setState(() => _expandIconSize = v),
+            ),
+            _colorRow(
+              'Color',
+              _expandIconColor,
+              (c) => setState(() => _expandIconColor = c),
+            ),
+            _slider(
+              'Padding',
+              _expandPadding,
+              0,
+              8,
+              (v) => setState(() => _expandPadding = v),
+            ),
+            _slider(
+              'Margin',
+              _expandMargin,
+              0,
+              8,
+              (v) => setState(() => _expandMargin = v),
+            ),
           ],
         ),
       ),
@@ -356,13 +424,51 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Folder', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider('Icon Size', _folderIconSize, 12, 32, (v) => setState(() => _folderIconSize = v)),
-            _colorRow('Icon', _folderIconColor, (c) => setState(() => _folderIconColor = c)),
-            _slider('Padding', _folderPadding, 0, 8, (v) => setState(() => _folderPadding = v)),
-            _slider('Margin', _folderMargin, 0, 8, (v) => setState(() => _folderMargin = v)),
-            _slider('Spacing', _folderIconSpacing, 0, 24, (v) => setState(() => _folderIconSpacing = v)),
-            _colorRow('Text', _folderTextColor, (c) => setState(() => _folderTextColor = c)),
-            _slider('Font', _folderFontSize, 10, 24, (v) => setState(() => _folderFontSize = v)),
+            _slider(
+              'Icon Size',
+              _folderIconSize,
+              12,
+              32,
+              (v) => setState(() => _folderIconSize = v),
+            ),
+            _colorRow(
+              'Icon',
+              _folderIconColor,
+              (c) => setState(() => _folderIconColor = c),
+            ),
+            _slider(
+              'Padding',
+              _folderPadding,
+              0,
+              8,
+              (v) => setState(() => _folderPadding = v),
+            ),
+            _slider(
+              'Margin',
+              _folderMargin,
+              0,
+              8,
+              (v) => setState(() => _folderMargin = v),
+            ),
+            _slider(
+              'Spacing',
+              _folderIconSpacing,
+              0,
+              24,
+              (v) => setState(() => _folderIconSpacing = v),
+            ),
+            _colorRow(
+              'Text',
+              _folderTextColor,
+              (c) => setState(() => _folderTextColor = c),
+            ),
+            _slider(
+              'Font',
+              _folderFontSize,
+              10,
+              24,
+              (v) => setState(() => _folderFontSize = v),
+            ),
           ],
         ),
       ),
@@ -377,13 +483,51 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Parent', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider('Icon Size', _parentIconSize, 12, 32, (v) => setState(() => _parentIconSize = v)),
-            _colorRow('Icon', _parentIconColor, (c) => setState(() => _parentIconColor = c)),
-            _slider('Padding', _parentPadding, 0, 8, (v) => setState(() => _parentPadding = v)),
-            _slider('Margin', _parentMargin, 0, 8, (v) => setState(() => _parentMargin = v)),
-            _slider('Spacing', _parentIconSpacing, 0, 24, (v) => setState(() => _parentIconSpacing = v)),
-            _colorRow('Text', _parentTextColor, (c) => setState(() => _parentTextColor = c)),
-            _slider('Font', _parentFontSize, 10, 24, (v) => setState(() => _parentFontSize = v)),
+            _slider(
+              'Icon Size',
+              _parentIconSize,
+              12,
+              32,
+              (v) => setState(() => _parentIconSize = v),
+            ),
+            _colorRow(
+              'Icon',
+              _parentIconColor,
+              (c) => setState(() => _parentIconColor = c),
+            ),
+            _slider(
+              'Padding',
+              _parentPadding,
+              0,
+              8,
+              (v) => setState(() => _parentPadding = v),
+            ),
+            _slider(
+              'Margin',
+              _parentMargin,
+              0,
+              8,
+              (v) => setState(() => _parentMargin = v),
+            ),
+            _slider(
+              'Spacing',
+              _parentIconSpacing,
+              0,
+              24,
+              (v) => setState(() => _parentIconSpacing = v),
+            ),
+            _colorRow(
+              'Text',
+              _parentTextColor,
+              (c) => setState(() => _parentTextColor = c),
+            ),
+            _slider(
+              'Font',
+              _parentFontSize,
+              10,
+              24,
+              (v) => setState(() => _parentFontSize = v),
+            ),
           ],
         ),
       ),
@@ -398,15 +542,57 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Child', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider('Icon Size', _childIconSize, 12, 32, (v) => setState(() => _childIconSize = v)),
-            _colorRow('Icon', _childIconColor, (c) => setState(() => _childIconColor = c)),
-            _slider('Padding', _childPadding, 0, 8, (v) => setState(() => _childPadding = v)),
-            _slider('Margin', _childMargin, 0, 8, (v) => setState(() => _childMargin = v)),
-            _slider('Spacing', _childIconSpacing, 0, 24, (v) => setState(() => _childIconSpacing = v)),
-            _colorRow('Text', _childTextColor, (c) => setState(() => _childTextColor = c)),
-            _slider('Font', _childFontSize, 10, 24, (v) => setState(() => _childFontSize = v)),
+            _slider(
+              'Icon Size',
+              _childIconSize,
+              12,
+              32,
+              (v) => setState(() => _childIconSize = v),
+            ),
+            _colorRow(
+              'Icon',
+              _childIconColor,
+              (c) => setState(() => _childIconColor = c),
+            ),
+            _slider(
+              'Padding',
+              _childPadding,
+              0,
+              8,
+              (v) => setState(() => _childPadding = v),
+            ),
+            _slider(
+              'Margin',
+              _childMargin,
+              0,
+              8,
+              (v) => setState(() => _childMargin = v),
+            ),
+            _slider(
+              'Spacing',
+              _childIconSpacing,
+              0,
+              24,
+              (v) => setState(() => _childIconSpacing = v),
+            ),
+            _colorRow(
+              'Text',
+              _childTextColor,
+              (c) => setState(() => _childTextColor = c),
+            ),
+            _slider(
+              'Font',
+              _childFontSize,
+              10,
+              24,
+              (v) => setState(() => _childFontSize = v),
+            ),
             const Divider(),
-            _colorRow('Selected BG', _childSelectedBg, (c) => setState(() => _childSelectedBg = c)),
+            _colorRow(
+              'Selected BG',
+              _childSelectedBg,
+              (c) => setState(() => _childSelectedBg = c),
+            ),
           ],
         ),
       ),
@@ -420,8 +606,17 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Node Style', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider('Border Radius', _borderRadius, 0, 20, (v) => setState(() => _borderRadius = v)),
+            const Text(
+              'Node Style',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            _slider(
+              'Border Radius',
+              _borderRadius,
+              0,
+              20,
+              (v) => setState(() => _borderRadius = v),
+            ),
           ],
         ),
       ),
@@ -435,21 +630,48 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Interaction', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider('Click Interval (ms)', _clickInterval, 100, 1000, (v) => setState(() => _clickInterval = v)),
+            const Text(
+              'Interaction',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            _slider(
+              'Click Interval (ms)',
+              _clickInterval,
+              100,
+              1000,
+              (v) => setState(() => _clickInterval = v),
+            ),
             const SizedBox(height: 4),
-            Text('Double-click detection time for child nodes', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+            Text(
+              'Double-click detection time for child nodes',
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+            ),
             const SizedBox(height: 12),
-            _slider('Animation Duration (ms)', _animationDuration, 50, 800, (v) => setState(() => _animationDuration = v)),
+            _slider(
+              'Animation Duration (ms)',
+              _animationDuration,
+              50,
+              800,
+              (v) => setState(() => _animationDuration = v),
+            ),
             const SizedBox(height: 4),
-            Text('Expand/collapse animation speed', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+            Text(
+              'Expand/collapse animation speed',
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _slider(String label, double value, double min, double max, ValueChanged<double> onChange) {
+  Widget _slider(
+    String label,
+    double value,
+    double min,
+    double max,
+    ValueChanged<double> onChange,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -466,7 +688,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             ),
             SizedBox(
               width: 40,
-              child: Text(value.toStringAsFixed(1), style: const TextStyle(fontSize: 11)),
+              child: Text(
+                value.toStringAsFixed(1),
+                style: const TextStyle(fontSize: 11),
+              ),
             ),
           ],
         ),
@@ -502,7 +727,9 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                 decoration: BoxDecoration(
                   color: c,
                   border: Border.all(
-                    color: value == c ? Theme.of(context).colorScheme.primary : Colors.grey.shade300,
+                    color: value == c
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey.shade300,
                     width: value == c ? 2 : 1,
                   ),
                   borderRadius: BorderRadius.circular(4),

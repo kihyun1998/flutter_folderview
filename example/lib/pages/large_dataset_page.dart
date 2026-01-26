@@ -129,8 +129,8 @@ class LargeDatasetPage extends ConsumerWidget {
                     selectedNodeIds: viewModel.selectedIds,
                     theme:
                         (Theme.of(context).brightness == Brightness.dark
-                                ? FlutterFolderViewTheme.dark()
-                                : FlutterFolderViewTheme.light())
+                                ? FlutterFolderViewTheme<String>.dark()
+                                : FlutterFolderViewTheme<String>.light())
                             .copyWith(
                               lineTheme: FolderViewLineTheme(
                                 lineColor:
