@@ -82,17 +82,20 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
 
   @override
   Widget build(BuildContext context) {
+    // Calculate line width based on expand icon size
+    final lineWidth = widget.theme.expandIconTheme.width +
+        widget.theme.expandIconTheme.padding.horizontal +
+        widget.theme.expandIconTheme.margin.horizontal;
+
     return Stack(
       children: [
         // 1. Vertical Line (Pipeline)
         Positioned(
-          left: widget.isRoot
-              ? 0
-              : (widget.depth - 1) * widget.theme.iconTheme.iconSize,
+          left: widget.isRoot ? 0 : (widget.depth - 1) * lineWidth,
           top: 0,
           bottom: widget.isLast ? null : 0,
           height: widget.isLast ? _rowHeight / 2 : null,
-          width: widget.theme.iconTheme.iconSize,
+          width: lineWidth,
           child: CustomPaint(
             painter: _LinePainter(
               isLast: widget.isLast,
@@ -115,7 +118,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                   // Spacer for the connector line (Non-clickable)
                   // Indent based on depth
                   SizedBox(
-                    width: widget.depth * widget.theme.iconTheme.iconSize,
+                    width: widget.depth * lineWidth,
                   ),
 
                   // Clickable Content
@@ -156,17 +159,102 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     );
   }
 
+  /// Build expand/collapse icon widget
+  Widget _buildExpandIcon() {
+    final expandTheme = widget.theme.expandIconTheme;
+
+    if (expandTheme.widget == null) {
+      return SizedBox(
+        width: expandTheme.width +
+            expandTheme.padding.horizontal +
+            expandTheme.margin.horizontal,
+      );
+    }
+
+    return Container(
+      margin: expandTheme.margin,
+      padding: expandTheme.padding,
+      child: SizedBox(
+        width: expandTheme.width,
+        height: expandTheme.height,
+        child: expandTheme.widget,
+      ),
+    );
+  }
+
+  /// Build node icon widget based on node type
+  Widget _buildNodeIcon() {
+    Widget? iconWidget;
+    double width;
+    double height;
+    EdgeInsets padding;
+    EdgeInsets margin;
+
+    switch (widget.node.type) {
+      case NodeType.folder:
+        final folderTheme = widget.theme.folderTheme;
+        iconWidget = widget.node.isExpanded
+            ? folderTheme.openWidget ?? folderTheme.widget
+            : folderTheme.widget;
+        width = folderTheme.width;
+        height = folderTheme.height;
+        padding = folderTheme.padding;
+        margin = folderTheme.margin;
+        break;
+      case NodeType.parent:
+        final parentTheme = widget.theme.parentTheme;
+        if (widget.mode == ViewMode.tree) {
+          iconWidget = widget.node.isExpanded
+              ? parentTheme.openWidget ?? parentTheme.widget
+              : parentTheme.widget;
+        } else {
+          iconWidget = parentTheme.widget;
+        }
+        width = parentTheme.width;
+        height = parentTheme.height;
+        padding = parentTheme.padding;
+        margin = parentTheme.margin;
+        break;
+      case NodeType.child:
+        final childTheme = widget.theme.childTheme;
+        iconWidget = childTheme.widget;
+        width = childTheme.width;
+        height = childTheme.height;
+        padding = childTheme.padding;
+        margin = childTheme.margin;
+        break;
+    }
+
+    if (iconWidget == null) {
+      return SizedBox(
+        width: width + padding.horizontal + margin.horizontal,
+      );
+    }
+
+    return Container(
+      margin: margin,
+      padding: padding,
+      child: SizedBox(
+        width: width,
+        height: height,
+        child: iconWidget,
+      ),
+    );
+  }
+
   /// Build content for child nodes (leaf nodes) with CustomInkWell
   Widget _buildChildNodeContent() {
     final isSelected =
         widget.selectedNodeIds?.contains(widget.node.id) ?? false;
+    final childTheme = widget.theme.childTheme;
 
     return CustomInkWell(
       clickInterval: 300,
       borderRadius: widget.theme.nodeStyleTheme.borderRadius,
       isSelected: isSelected,
       backgroundColor: Colors.transparent,
-      selectedColor: Theme.of(context).colorScheme.primaryContainer,
+      selectedColor: childTheme.selectedBackgroundColor ??
+          Theme.of(context).colorScheme.primaryContainer,
       hoverColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
       highlightColor:
@@ -178,16 +266,12 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           : null,
       child: Row(
         children: [
-          // No expand icon for leaf nodes
-          SizedBox(width: widget.theme.iconTheme.iconSize),
+          // No expand icon for leaf nodes - just empty space
+          _buildExpandIcon(),
 
           // Node Icon
-          Icon(
-            _getNodeIcon(),
-            size: widget.theme.iconTheme.iconSize,
-            color: _getIconColor(),
-          ),
-          const SizedBox(width: 8),
+          _buildNodeIcon(),
+          SizedBox(width: childTheme.iconToTextSpacing),
 
           // Label
           Expanded(child: Text(widget.node.label, style: _getTextStyle())),
@@ -219,22 +303,17 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           if (widget.node.canExpand)
             RotationTransition(
               turns: _iconTurns,
-              child: Icon(
-                widget.theme.iconTheme.expandIcon ?? Icons.chevron_right,
-                size: widget.theme.iconTheme.iconSize,
-                color: _getIconColor(),
-              ),
+              child: _buildExpandIcon(),
             )
           else
-            SizedBox(width: widget.theme.iconTheme.iconSize),
+            _buildExpandIcon(),
 
           // Node Icon
-          Icon(
-            _getNodeIcon(),
-            size: widget.theme.iconTheme.iconSize,
-            color: _getIconColor(),
-          ),
-          const SizedBox(width: 8),
+          _buildNodeIcon(),
+          SizedBox(
+              width: widget.node.type == NodeType.folder
+                  ? widget.theme.folderTheme.iconToTextSpacing
+                  : widget.theme.parentTheme.iconToTextSpacing),
 
           // Label
           Expanded(child: Text(widget.node.label, style: _getTextStyle())),
@@ -243,59 +322,25 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     );
   }
 
-  IconData _getNodeIcon() {
-    final iconTheme = widget.theme.iconTheme;
-
-    switch (widget.node.type) {
-      case NodeType.folder:
-        return widget.node.isExpanded
-            ? (iconTheme.folderOpenIcon ?? Icons.folder_open)
-            : (iconTheme.folderIcon ?? Icons.folder);
-      case NodeType.parent:
-        if (widget.mode == ViewMode.tree) {
-          return widget.node.isExpanded
-              ? (iconTheme.parentOpenIcon ??
-                  iconTheme.parentIcon ??
-                  Icons.account_tree)
-              : (iconTheme.parentIcon ?? Icons.account_tree);
-        } else {
-          return iconTheme.parentIcon ?? Icons.description;
-        }
-      case NodeType.child:
-        return iconTheme.childIcon ?? Icons.insert_drive_file;
-    }
-  }
-
-  Color? _getIconColor() {
-    final iconTheme = widget.theme.iconTheme;
-
-    if (widget.selectedNodeIds?.contains(widget.node.id) ?? false) {
-      return iconTheme.selectedIconColor;
-    }
-
-    return iconTheme.iconColor;
-  }
-
   TextStyle? _getTextStyle() {
-    TextStyle? style = widget.theme.textTheme.textStyle;
-
-    if (widget.selectedNodeIds?.contains(widget.node.id) ?? false) {
-      style = style?.merge(widget.theme.textTheme.selectedTextStyle) ??
-          widget.theme.textTheme.selectedTextStyle;
-    }
+    final isSelected =
+        widget.selectedNodeIds?.contains(widget.node.id) ?? false;
+    TextStyle? style;
 
     switch (widget.node.type) {
       case NodeType.folder:
-        style = style?.merge(widget.theme.textTheme.folderTextStyle) ??
-            widget.theme.textTheme.folderTextStyle;
+        style = widget.theme.folderTheme.textStyle;
         break;
       case NodeType.parent:
-        style = style?.merge(widget.theme.textTheme.parentTextStyle) ??
-            widget.theme.textTheme.parentTextStyle;
+        style = widget.theme.parentTheme.textStyle;
         break;
       case NodeType.child:
-        style = style?.merge(widget.theme.textTheme.childTextStyle) ??
-            widget.theme.textTheme.childTextStyle;
+        style = widget.theme.childTheme.textStyle;
+        // Apply selected style only for child nodes
+        if (isSelected) {
+          style = style?.merge(widget.theme.childTheme.selectedTextStyle) ??
+              widget.theme.childTheme.selectedTextStyle;
+        }
         break;
     }
 

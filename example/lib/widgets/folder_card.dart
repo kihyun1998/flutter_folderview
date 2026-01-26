@@ -205,7 +205,6 @@ class _FolderCardState extends State<FolderCard> {
                             lineWidth: 1.5,
                             lineStyle: config.lineStyle,
                           ),
-                          textTheme: config.textTheme,
                         ),
               ),
             ),

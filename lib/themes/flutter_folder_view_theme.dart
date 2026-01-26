@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../models/node.dart';
-import 'folder_view_icon_theme.dart';
+import 'child_node_theme.dart';
+import 'expand_icon_theme.dart';
+import 'folder_node_theme.dart';
 import 'folder_view_line_theme.dart';
 import 'folder_view_node_style_theme.dart';
 import 'folder_view_scrollbar_theme.dart';
 import 'folder_view_spacing_theme.dart';
-import 'folder_view_text_theme.dart';
+import 'parent_node_theme.dart';
 
 /// Master theme class for the entire FolderView component
 ///
 /// This class provides a centralized way to customize the appearance
-/// of FolderView widgets. Currently supports line theming, with the
-/// architecture designed to easily add more theme properties in the future
-/// (e.g., nodeTheme, textTheme, iconTheme, animationTheme, etc.).
+/// of FolderView widgets with separate themes for each node type.
 @immutable
 class FlutterFolderViewTheme {
   /// Theme for connection lines between nodes
@@ -22,11 +22,17 @@ class FlutterFolderViewTheme {
   /// Theme for scrollbars
   final FolderViewScrollbarTheme scrollbarTheme;
 
-  /// Theme for text styles
-  final FolderViewTextTheme textTheme;
+  /// Theme for folder nodes
+  final FolderNodeTheme folderTheme;
 
-  /// Theme for icons
-  final FolderViewIconTheme iconTheme;
+  /// Theme for parent nodes
+  final ParentNodeTheme parentTheme;
+
+  /// Theme for child nodes
+  final ChildNodeTheme childTheme;
+
+  /// Theme for expand/collapse icon
+  final ExpandIconTheme expandIconTheme;
 
   /// Theme for spacing and padding
   final FolderViewSpacingTheme spacingTheme;
@@ -34,15 +40,14 @@ class FlutterFolderViewTheme {
   /// Theme for node visual styling
   final FolderViewNodeStyleTheme nodeStyleTheme;
 
-  // Future theme properties can be added here:
-  // final FolderViewAnimationTheme? animationTheme;
-
   /// Creates a [FlutterFolderViewTheme] with the given properties
   const FlutterFolderViewTheme({
     required this.lineTheme,
     required this.scrollbarTheme,
-    this.textTheme = const FolderViewTextTheme(),
-    this.iconTheme = const FolderViewIconTheme(),
+    this.folderTheme = const FolderNodeTheme(),
+    this.parentTheme = const ParentNodeTheme(),
+    this.childTheme = const ChildNodeTheme(),
+    this.expandIconTheme = const ExpandIconTheme(),
     this.spacingTheme = const FolderViewSpacingTheme(),
     this.nodeStyleTheme = const FolderViewNodeStyleTheme(),
   });
@@ -59,14 +64,26 @@ class FlutterFolderViewTheme {
         thumbColor: Colors.grey.shade600,
         trackColor: Colors.grey.shade200,
       ),
-      textTheme: const FolderViewTextTheme(
-        textStyle: TextStyle(color: Colors.black87),
-        selectedTextStyle: TextStyle(fontWeight: FontWeight.bold),
+      folderTheme: FolderNodeTheme(
+        widget: Icon(Icons.folder, color: Colors.grey.shade700, size: 20),
+        openWidget:
+            Icon(Icons.folder_open, color: Colors.grey.shade700, size: 20),
+        textStyle: const TextStyle(color: Colors.black87),
       ),
-      iconTheme: FolderViewIconTheme(
-        iconSize: 20.0,
-        iconColor: Colors.grey.shade700,
-        selectedIconColor: Colors.blue.shade700,
+      parentTheme: ParentNodeTheme(
+        widget: Icon(Icons.account_tree, color: Colors.grey.shade700, size: 20),
+        textStyle: const TextStyle(color: Colors.black87),
+      ),
+      childTheme: ChildNodeTheme(
+        widget: Icon(Icons.insert_drive_file,
+            color: Colors.grey.shade700, size: 20),
+        textStyle: const TextStyle(color: Colors.black87),
+        selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+        selectedBackgroundColor: Colors.blue.shade50,
+      ),
+      expandIconTheme: ExpandIconTheme(
+        widget:
+            Icon(Icons.chevron_right, color: Colors.grey.shade700, size: 20),
       ),
       spacingTheme: const FolderViewSpacingTheme(),
     );
@@ -84,14 +101,26 @@ class FlutterFolderViewTheme {
         thumbColor: Colors.grey.shade400,
         trackColor: Colors.grey.shade800,
       ),
-      textTheme: const FolderViewTextTheme(
-        textStyle: TextStyle(color: Colors.white70),
-        selectedTextStyle: TextStyle(fontWeight: FontWeight.bold),
+      folderTheme: FolderNodeTheme(
+        widget: Icon(Icons.folder, color: Colors.grey.shade400, size: 20),
+        openWidget:
+            Icon(Icons.folder_open, color: Colors.grey.shade400, size: 20),
+        textStyle: const TextStyle(color: Colors.white70),
       ),
-      iconTheme: FolderViewIconTheme(
-        iconSize: 20.0,
-        iconColor: Colors.grey.shade400,
-        selectedIconColor: Colors.blue.shade300,
+      parentTheme: ParentNodeTheme(
+        widget: Icon(Icons.account_tree, color: Colors.grey.shade400, size: 20),
+        textStyle: const TextStyle(color: Colors.white70),
+      ),
+      childTheme: ChildNodeTheme(
+        widget: Icon(Icons.insert_drive_file,
+            color: Colors.grey.shade400, size: 20),
+        textStyle: const TextStyle(color: Colors.white70),
+        selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+        selectedBackgroundColor: Colors.blue.shade900.withValues(alpha: 0.3),
+      ),
+      expandIconTheme: ExpandIconTheme(
+        widget:
+            Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 20),
       ),
       spacingTheme: const FolderViewSpacingTheme(),
     );
@@ -101,16 +130,20 @@ class FlutterFolderViewTheme {
   FlutterFolderViewTheme copyWith({
     FolderViewLineTheme? lineTheme,
     FolderViewScrollbarTheme? scrollbarTheme,
-    FolderViewTextTheme? textTheme,
-    FolderViewIconTheme? iconTheme,
+    FolderNodeTheme? folderTheme,
+    ParentNodeTheme? parentTheme,
+    ChildNodeTheme? childTheme,
+    ExpandIconTheme? expandIconTheme,
     FolderViewSpacingTheme? spacingTheme,
     FolderViewNodeStyleTheme? nodeStyleTheme,
   }) {
     return FlutterFolderViewTheme(
       lineTheme: lineTheme ?? this.lineTheme,
       scrollbarTheme: scrollbarTheme ?? this.scrollbarTheme,
-      textTheme: textTheme ?? this.textTheme,
-      iconTheme: iconTheme ?? this.iconTheme,
+      folderTheme: folderTheme ?? this.folderTheme,
+      parentTheme: parentTheme ?? this.parentTheme,
+      childTheme: childTheme ?? this.childTheme,
+      expandIconTheme: expandIconTheme ?? this.expandIconTheme,
       spacingTheme: spacingTheme ?? this.spacingTheme,
       nodeStyleTheme: nodeStyleTheme ?? this.nodeStyleTheme,
     );
@@ -135,8 +168,11 @@ class FlutterFolderViewTheme {
         b.scrollbarTheme,
         t,
       ),
-      textTheme: FolderViewTextTheme.lerp(a.textTheme, b.textTheme, t),
-      iconTheme: FolderViewIconTheme.lerp(a.iconTheme, b.iconTheme, t),
+      folderTheme: FolderNodeTheme.lerp(a.folderTheme, b.folderTheme, t),
+      parentTheme: ParentNodeTheme.lerp(a.parentTheme, b.parentTheme, t),
+      childTheme: ChildNodeTheme.lerp(a.childTheme, b.childTheme, t),
+      expandIconTheme:
+          ExpandIconTheme.lerp(a.expandIconTheme, b.expandIconTheme, t),
       spacingTheme: FolderViewSpacingTheme.lerp(
         a.spacingTheme,
         b.spacingTheme,
@@ -157,8 +193,10 @@ class FlutterFolderViewTheme {
     return other is FlutterFolderViewTheme &&
         other.lineTheme == lineTheme &&
         other.scrollbarTheme == scrollbarTheme &&
-        other.textTheme == textTheme &&
-        other.iconTheme == iconTheme &&
+        other.folderTheme == folderTheme &&
+        other.parentTheme == parentTheme &&
+        other.childTheme == childTheme &&
+        other.expandIconTheme == expandIconTheme &&
         other.spacingTheme == spacingTheme &&
         other.nodeStyleTheme == nodeStyleTheme;
   }
@@ -167,8 +205,10 @@ class FlutterFolderViewTheme {
   int get hashCode => Object.hash(
         lineTheme,
         scrollbarTheme,
-        textTheme,
-        iconTheme,
+        folderTheme,
+        parentTheme,
+        childTheme,
+        expandIconTheme,
         spacingTheme,
         nodeStyleTheme,
       );
@@ -178,8 +218,10 @@ class FlutterFolderViewTheme {
     return 'FlutterFolderViewTheme('
         'lineTheme: $lineTheme, '
         'scrollbarTheme: $scrollbarTheme, '
-        'textTheme: $textTheme, '
-        'iconTheme: $iconTheme, '
+        'folderTheme: $folderTheme, '
+        'parentTheme: $parentTheme, '
+        'childTheme: $childTheme, '
+        'expandIconTheme: $expandIconTheme, '
         'spacingTheme: $spacingTheme, '
         'nodeStyleTheme: $nodeStyleTheme'
         ')';

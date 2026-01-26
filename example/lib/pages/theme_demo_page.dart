@@ -11,232 +11,169 @@ class ThemeDemoPage extends StatefulWidget {
 }
 
 class _ThemeDemoPageState extends State<ThemeDemoPage> {
-  // Line Theme State
-  Color _lineColor = const Color(0xFF2196F3); // Blue
+  // Line Theme
+  Color _lineColor = const Color(0xFF2196F3);
   double _lineWidth = 1.5;
   LineStyle _lineStyle = LineStyle.connector;
 
-  // Scrollbar Theme State
-  Color _scrollbarThumbColor = Colors.grey.shade600;
-  Color _scrollbarTrackColor = Colors.grey.shade200;
-  double _scrollbarThickness = 12.0;
-  double _scrollbarRadius = 4.0;
-  double _scrollbarHoverOpacity = 0.8;
-  double _scrollbarTrackWidth = 16.0;
-  double _scrollbarTrackRadius = 8.0;
-  bool _scrollbarAlwaysVisible = false;
-
-  // Text Theme State
-  Color _textColor = Colors.black87;
-  double _fontSize = 14.0;
+  // Folder Theme
+  double _folderIconSize = 20.0;
+  Color _folderIconColor = const Color(0xFF616161);
+  double _folderPadding = 0.0;
+  double _folderMargin = 0.0;
+  double _folderIconSpacing = 8.0;
   Color _folderTextColor = Colors.black87;
+  double _folderFontSize = 14.0;
+
+  // Parent Theme
+  double _parentIconSize = 20.0;
+  Color _parentIconColor = const Color(0xFF616161);
+  double _parentPadding = 0.0;
+  double _parentMargin = 0.0;
+  double _parentIconSpacing = 8.0;
   Color _parentTextColor = Colors.black87;
+  double _parentFontSize = 14.0;
+
+  // Child Theme
+  double _childIconSize = 20.0;
+  Color _childIconColor = const Color(0xFF616161);
+  double _childPadding = 0.0;
+  double _childMargin = 0.0;
+  double _childIconSpacing = 8.0;
   Color _childTextColor = Colors.black87;
+  double _childFontSize = 14.0;
+  Color _childSelectedBg = const Color(0xFFE3F2FD);
 
-  // Icon Theme State
-  double _iconSize = 20.0;
-  Color _iconColor = Colors.grey.shade700;
-  Color _selectedIconColor = Colors.blue.shade700;
+  // Expand Icon
+  double _expandIconSize = 20.0;
+  Color _expandIconColor = const Color(0xFF616161);
+  double _expandPadding = 0.0;
+  double _expandMargin = 0.0;
 
-  // View Mode State
+  // Other
   ViewMode _viewMode = ViewMode.folder;
+  double _borderRadius = 8.0;
 
-  // Spacing Theme State
-  double _contentPaddingLeft = 0.0;
-  double _contentPaddingRight = 0.0;
-  double _contentPaddingTop = 0.0;
-  double _contentPaddingBottom = 0.0;
-
-  // Node Style Theme State
-  double _nodeBorderRadius = 8.0;
-
-  // FolderView State
-  late List<Node<String>> _treeData;
-  Set<String> _selectedNodeIds = {};
+  late List<Node<String>> _data;
+  Set<String> _selectedIds = {};
 
   @override
   void initState() {
     super.initState();
-    _treeData = getThemeDemoData();
+    _data = getThemeDemoData();
   }
 
-  void _handleNodeTap(Node<String> node) {
+  void _handleTap(Node<String> node) {
     setState(() {
       if (node.type == NodeType.child) {
-        // Toggle selection for child nodes
-        if (_selectedNodeIds.contains(node.id)) {
-          _selectedNodeIds.remove(node.id);
-        } else {
-          _selectedNodeIds.add(node.id);
-        }
+        _selectedIds.contains(node.id)
+            ? _selectedIds.remove(node.id)
+            : _selectedIds.add(node.id);
       } else if (node.canExpand) {
-        // Toggle expansion for parent and folder nodes
-        _treeData = _toggleNodeRecursive(_treeData, node.id);
+        _data = _toggle(_data, node.id);
       }
     });
   }
 
-  void _handleSecondaryTap(Node<String> node, TapDownDetails details) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('우클릭: ${node.label} (${node.type.name})'),
-        duration: const Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(
-          bottom:
-              MediaQuery.of(context).size.height -
-              details.globalPosition.dy -
-              50,
-          left: 10,
-          right: 10,
-        ),
-      ),
-    );
-  }
-
-  void _handleDoubleTap(Node<String> node) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('더블클릭: ${node.label} (${node.type.name})'),
-        duration: const Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  List<Node<String>> _toggleNodeRecursive(
-    List<Node<String>> nodes,
-    String targetId,
-  ) {
-    return nodes.map((node) {
-      if (node.id == targetId) {
+  List<Node<String>> _toggle(List<Node<String>> nodes, String id) {
+    return nodes.map((n) {
+      if (n.id == id) {
         return Node<String>(
-          id: node.id,
-          label: node.label,
-          type: node.type,
-          data: node.data,
-          children: node.children,
-          isExpanded: !node.isExpanded,
+          id: n.id,
+          label: n.label,
+          type: n.type,
+          data: n.data,
+          children: n.children,
+          isExpanded: !n.isExpanded,
         );
-      } else if (node.children.isNotEmpty) {
+      } else if (n.children.isNotEmpty) {
         return Node<String>(
-          id: node.id,
-          label: node.label,
-          type: node.type,
-          data: node.data,
-          children: _toggleNodeRecursive(node.children, targetId),
-          isExpanded: node.isExpanded,
+          id: n.id,
+          label: n.label,
+          type: n.type,
+          data: n.data,
+          children: _toggle(n.children, id),
+          isExpanded: n.isExpanded,
         );
       }
-      return node;
+      return n;
     }).toList();
   }
 
-  // Predefined colors for quick selection
-  final List<Color> _presetColors = [
-    const Color(0xFF2196F3), // Blue
-    const Color(0xFF4CAF50), // Green
-    const Color(0xFFFF9800), // Orange
-    const Color(0xFFF44336), // Red
-    const Color(0xFF9C27B0), // Purple
-    const Color(0xFF607D88), // Grey
-  ];
-
   @override
   Widget build(BuildContext context) {
-    // Build the theme from current state
     final theme = FlutterFolderViewTheme(
       lineTheme: FolderViewLineTheme(
         lineColor: _lineColor,
         lineWidth: _lineWidth,
         lineStyle: _lineStyle,
       ),
+      folderTheme: FolderNodeTheme(
+        widget: Icon(Icons.folder, color: _folderIconColor, size: _folderIconSize),
+        openWidget: Icon(Icons.folder_open, color: _folderIconColor, size: _folderIconSize),
+        width: _folderIconSize,
+        height: _folderIconSize,
+        padding: EdgeInsets.all(_folderPadding),
+        margin: EdgeInsets.all(_folderMargin),
+        iconToTextSpacing: _folderIconSpacing,
+        textStyle: TextStyle(color: _folderTextColor, fontSize: _folderFontSize),
+      ),
+      parentTheme: ParentNodeTheme(
+        widget: Icon(Icons.account_tree, color: _parentIconColor, size: _parentIconSize),
+        width: _parentIconSize,
+        height: _parentIconSize,
+        padding: EdgeInsets.all(_parentPadding),
+        margin: EdgeInsets.all(_parentMargin),
+        iconToTextSpacing: _parentIconSpacing,
+        textStyle: TextStyle(color: _parentTextColor, fontSize: _parentFontSize),
+      ),
+      childTheme: ChildNodeTheme(
+        widget: Icon(Icons.insert_drive_file, color: _childIconColor, size: _childIconSize),
+        width: _childIconSize,
+        height: _childIconSize,
+        padding: EdgeInsets.all(_childPadding),
+        margin: EdgeInsets.all(_childMargin),
+        iconToTextSpacing: _childIconSpacing,
+        textStyle: TextStyle(color: _childTextColor, fontSize: _childFontSize),
+        selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+        selectedBackgroundColor: _childSelectedBg,
+      ),
+      expandIconTheme: ExpandIconTheme(
+        widget: Icon(Icons.chevron_right, color: _expandIconColor, size: _expandIconSize),
+        width: _expandIconSize,
+        height: _expandIconSize,
+        padding: EdgeInsets.all(_expandPadding),
+        margin: EdgeInsets.all(_expandMargin),
+      ),
       scrollbarTheme: FolderViewScrollbarTheme(
-        thumbColor: _scrollbarThumbColor,
-        trackColor: _scrollbarTrackColor,
-        thickness: _scrollbarThickness,
-        radius: _scrollbarRadius,
-        hoverOpacity: _scrollbarHoverOpacity,
-        trackWidth: _scrollbarTrackWidth,
-        trackRadius: _scrollbarTrackRadius,
-        nonHoverOpacity: _scrollbarAlwaysVisible ? 1.0 : 0.0,
+        thumbColor: Colors.grey.shade600,
+        trackColor: Colors.grey.shade200,
       ),
-      textTheme: FolderViewTextTheme(
-        textStyle: TextStyle(color: _textColor, fontSize: _fontSize),
-        folderTextStyle: TextStyle(color: _folderTextColor),
-        parentTextStyle: TextStyle(color: _parentTextColor),
-        childTextStyle: TextStyle(color: _childTextColor),
-      ),
-      iconTheme: FolderViewIconTheme(
-        iconSize: _iconSize,
-        iconColor: _iconColor,
-        selectedIconColor: _selectedIconColor,
-      ),
-      spacingTheme: FolderViewSpacingTheme(
-        contentPadding: EdgeInsets.only(
-          left: _contentPaddingLeft,
-          right: _contentPaddingRight,
-          top: _contentPaddingTop,
-          bottom: _contentPaddingBottom,
-        ),
-      ),
-      nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _nodeBorderRadius),
+      nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _borderRadius),
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Theme Customization Demo'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Theme Demo'), centerTitle: true),
       body: Row(
         children: [
-          // Left side: Control Panel
-          Container(
+          SizedBox(
             width: 350,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              border: Border(
-                right: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                  width: 1,
-                ),
-              ),
-            ),
-            child: _buildControlPanel(),
+            child: _buildControls(),
           ),
-
-          // Right side: Live Preview
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Live Preview',
-                    style: Theme.of(context).textTheme.headlineSmall,
+              padding: const EdgeInsets.all(24),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: FolderView<String>(
+                    data: _data,
+                    mode: _viewMode,
+                    onNodeTap: _handleTap,
+                    selectedNodeIds: _selectedIds,
+                    theme: theme,
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: Card(
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: FolderView<String>(
-                          data: _treeData,
-                          mode: _viewMode,
-                          onNodeTap: _handleNodeTap,
-                          onDoubleNodeTap: _handleDoubleTap,
-                          onSecondaryNodeTap: _handleSecondaryTap,
-                          selectedNodeIds: _selectedNodeIds,
-                          theme: theme,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -245,805 +182,281 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _buildControlPanel() {
+  Widget _buildControls() {
     return ListView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       children: [
-        // View Mode Section
-        ExpansionTile(
-          initiallyExpanded: true,
-          title: Text(
-            'View Mode',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  SegmentedButton<ViewMode>(
-                    segments: const [
-                      ButtonSegment<ViewMode>(
-                        value: ViewMode.folder,
-                        label: Text('Folder Mode'),
-                        icon: Icon(Icons.folder_outlined),
-                      ),
-                      ButtonSegment<ViewMode>(
-                        value: ViewMode.tree,
-                        label: Text('Tree Mode'),
-                        icon: Icon(Icons.account_tree_outlined),
-                      ),
-                    ],
-                    selected: {_viewMode},
-                    onSelectionChanged: (Set<ViewMode> newSelection) {
-                      setState(() => _viewMode = newSelection.first);
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _viewMode == ViewMode.folder
-                        ? 'Folder > Parent > Child'
-                        : 'Parent > Child only',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-
-        // Line Theme Section
-        ExpansionTile(
-          title: Text(
-            'Line Theme',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Line Color
-                  _buildSection(
-                    title: 'Line Color',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _presetColors.map((color) {
-                            final isSelected = _lineColor == color;
-                            return InkWell(
-                              onTap: () => setState(() => _lineColor = color),
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Colors.transparent,
-                                    width: 3,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Color: #${_lineColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Line Width
-                  _buildSection(
-                    title: 'Line Width',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _lineWidth,
-                          min: 0.5,
-                          max: 5.0,
-                          divisions: 18,
-                          label: _lineWidth.toStringAsFixed(1),
-                          onChanged: (value) =>
-                              setState(() => _lineWidth = value),
-                        ),
-                        Text(
-                          'Width: ${_lineWidth.toStringAsFixed(1)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Line Style
-                  _buildSection(
-                    title: 'Line Style',
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        ChoiceChip(
-                          label: const Text('Connector'),
-                          selected: _lineStyle == LineStyle.connector,
-                          onSelected: (selected) {
-                            if (selected) {
-                              setState(() => _lineStyle = LineStyle.connector);
-                            }
-                          },
-                        ),
-                        ChoiceChip(
-                          label: const Text('Scope'),
-                          selected: _lineStyle == LineStyle.scope,
-                          onSelected: (selected) {
-                            if (selected) {
-                              setState(() => _lineStyle = LineStyle.scope);
-                            }
-                          },
-                        ),
-                        ChoiceChip(
-                          label: const Text('None'),
-                          selected: _lineStyle == LineStyle.none,
-                          onSelected: (selected) {
-                            if (selected) {
-                              setState(() => _lineStyle = LineStyle.none);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-
-        // Scrollbar Theme Section
-        ExpansionTile(
-          title: Text(
-            'Scrollbar Theme',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Scrollbar Thumb Color
-                  _buildSection(
-                    title: 'Thumb Color',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _presetColors.map((color) {
-                            final isSelected = _scrollbarThumbColor == color;
-                            return InkWell(
-                              onTap: () =>
-                                  setState(() => _scrollbarThumbColor = color),
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Colors.transparent,
-                                    width: 3,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Color: #${_scrollbarThumbColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Scrollbar Track Color
-                  _buildSection(
-                    title: 'Track Color',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children:
-                              [
-                                Colors.grey.shade200,
-                                Colors.grey.shade300,
-                                Colors.blue.shade100,
-                                Colors.green.shade100,
-                                Colors.orange.shade100,
-                                Colors.purple.shade100,
-                              ].map((color) {
-                                final isSelected =
-                                    _scrollbarTrackColor == color;
-                                return InkWell(
-                                  onTap: () => setState(
-                                    () => _scrollbarTrackColor = color,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: color,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: isSelected
-                                            ? Theme.of(
-                                                context,
-                                              ).colorScheme.primary
-                                            : Colors.transparent,
-                                        width: 3,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Color: #${_scrollbarTrackColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Scrollbar Thickness
-                  _buildSection(
-                    title: 'Thumb Thickness',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _scrollbarThickness,
-                          min: 8.0,
-                          max: 20.0,
-                          divisions: 12,
-                          label: _scrollbarThickness.toStringAsFixed(0),
-                          onChanged: (value) =>
-                              setState(() => _scrollbarThickness = value),
-                        ),
-                        Text(
-                          'Thickness: ${_scrollbarThickness.toStringAsFixed(0)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Scrollbar Radius
-                  _buildSection(
-                    title: 'Thumb Radius',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _scrollbarRadius,
-                          min: 0.0,
-                          max: 10.0,
-                          divisions: 20,
-                          label: _scrollbarRadius.toStringAsFixed(1),
-                          onChanged: (value) =>
-                              setState(() => _scrollbarRadius = value),
-                        ),
-                        Text(
-                          'Radius: ${_scrollbarRadius.toStringAsFixed(1)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Hover Opacity
-                  _buildSection(
-                    title: 'Hover Opacity',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _scrollbarHoverOpacity,
-                          min: 0.0,
-                          max: 1.0,
-                          divisions: 20,
-                          label: _scrollbarHoverOpacity.toStringAsFixed(2),
-                          onChanged: (value) =>
-                              setState(() => _scrollbarHoverOpacity = value),
-                        ),
-                        Text(
-                          'Opacity: ${_scrollbarHoverOpacity.toStringAsFixed(2)}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Track Width
-                  _buildSection(
-                    title: 'Track Width',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _scrollbarTrackWidth,
-                          min: 12.0,
-                          max: 24.0,
-                          divisions: 12,
-                          label: _scrollbarTrackWidth.toStringAsFixed(0),
-                          onChanged: (value) =>
-                              setState(() => _scrollbarTrackWidth = value),
-                        ),
-                        Text(
-                          'Width: ${_scrollbarTrackWidth.toStringAsFixed(0)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Track Radius
-                  _buildSection(
-                    title: 'Track Radius',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _scrollbarTrackRadius,
-                          min: 0.0,
-                          max: 12.0,
-                          divisions: 24,
-                          label: _scrollbarTrackRadius.toStringAsFixed(1),
-                          onChanged: (value) =>
-                              setState(() => _scrollbarTrackRadius = value),
-                        ),
-                        Text(
-                          'Radius: ${_scrollbarTrackRadius.toStringAsFixed(1)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Always Visible Toggle
-                  _buildSection(
-                    title: 'Always Visible',
-                    child: SwitchListTile(
-                      title: const Text('Show scrollbar without hover'),
-                      subtitle: const Text(
-                        'Keep scrollbar visible at all times',
-                      ),
-                      value: _scrollbarAlwaysVisible,
-                      onChanged: (value) =>
-                          setState(() => _scrollbarAlwaysVisible = value),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-
-        // Text Theme Section
-        ExpansionTile(
-          title: Text(
-            'Text Theme',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Font Size
-                  _buildSection(
-                    title: 'Font Size',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _fontSize,
-                          min: 10.0,
-                          max: 24.0,
-                          divisions: 14,
-                          label: _fontSize.toStringAsFixed(1),
-                          onChanged: (value) =>
-                              setState(() => _fontSize = value),
-                        ),
-                        Text(
-                          'Size: ${_fontSize.toStringAsFixed(1)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Folder Text Color
-                  _buildSection(
-                    title: 'Folder Text Color',
-                    child: _buildColorPicker(
-                      _folderTextColor,
-                      (color) => setState(() => _folderTextColor = color),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Parent Text Color
-                  _buildSection(
-                    title: 'Parent Text Color',
-                    child: _buildColorPicker(
-                      _parentTextColor,
-                      (color) => setState(() => _parentTextColor = color),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Child Text Color
-                  _buildSection(
-                    title: 'Child Text Color',
-                    child: _buildColorPicker(
-                      _childTextColor,
-                      (color) => setState(() => _childTextColor = color),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-
-        // Icon Theme Section
-        ExpansionTile(
-          title: Text(
-            'Icon Theme',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Icon Size
-                  _buildSection(
-                    title: 'Icon Size',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _iconSize,
-                          min: 12.0,
-                          max: 32.0,
-                          divisions: 20,
-                          label: _iconSize.toStringAsFixed(1),
-                          onChanged: (value) =>
-                              setState(() => _iconSize = value),
-                        ),
-                        Text(
-                          'Size: ${_iconSize.toStringAsFixed(1)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Icon Color
-                  _buildSection(
-                    title: 'Icon Color',
-                    child: _buildColorPicker(
-                      _iconColor,
-                      (color) => setState(() => _iconColor = color),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Selected Icon Color
-                  _buildSection(
-                    title: 'Selected Icon Color',
-                    child: _buildColorPicker(
-                      _selectedIconColor,
-                      (color) => setState(() => _selectedIconColor = color),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 24),
-
-        // Spacing Theme
-        ExpansionTile(
-          initiallyExpanded: false,
-          title: Text(
-            'Spacing Theme',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Left Padding
-                  _buildSection(
-                    title: 'Left Padding',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _contentPaddingLeft,
-                          min: 0.0,
-                          max: 48.0,
-                          divisions: 48,
-                          label: _contentPaddingLeft.toStringAsFixed(0),
-                          onChanged: (value) =>
-                              setState(() => _contentPaddingLeft = value),
-                        ),
-                        Text(
-                          'Padding: ${_contentPaddingLeft.toStringAsFixed(0)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Right Padding
-                  _buildSection(
-                    title: 'Right Padding',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _contentPaddingRight,
-                          min: 0.0,
-                          max: 48.0,
-                          divisions: 48,
-                          label: _contentPaddingRight.toStringAsFixed(0),
-                          onChanged: (value) =>
-                              setState(() => _contentPaddingRight = value),
-                        ),
-                        Text(
-                          'Padding: ${_contentPaddingRight.toStringAsFixed(0)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Top Padding
-                  _buildSection(
-                    title: 'Top Padding',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _contentPaddingTop,
-                          min: 0.0,
-                          max: 48.0,
-                          divisions: 48,
-                          label: _contentPaddingTop.toStringAsFixed(0),
-                          onChanged: (value) =>
-                              setState(() => _contentPaddingTop = value),
-                        ),
-                        Text(
-                          'Padding: ${_contentPaddingTop.toStringAsFixed(0)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Bottom Padding
-                  _buildSection(
-                    title: 'Bottom Padding',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _contentPaddingBottom,
-                          min: 0.0,
-                          max: 48.0,
-                          divisions: 48,
-                          label: _contentPaddingBottom.toStringAsFixed(0),
-                          onChanged: (value) =>
-                              setState(() => _contentPaddingBottom = value),
-                        ),
-                        Text(
-                          'Padding: ${_contentPaddingBottom.toStringAsFixed(0)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-
-        // Node Style Theme
-        ExpansionTile(
-          initiallyExpanded: false,
-          title: Text(
-            'Node Style Theme',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Border Radius
-                  _buildSection(
-                    title: 'Border Radius',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Slider(
-                          value: _nodeBorderRadius,
-                          min: 0.0,
-                          max: 20.0,
-                          divisions: 40,
-                          label: _nodeBorderRadius.toStringAsFixed(1),
-                          onChanged: (value) =>
-                              setState(() => _nodeBorderRadius = value),
-                        ),
-                        Text(
-                          'Radius: ${_nodeBorderRadius.toStringAsFixed(1)}px',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-
-        // Reset Button
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FilledButton.icon(
-            onPressed: _resetToDefaults,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Reset to Default'),
-          ),
+        _buildViewMode(),
+        _buildLineControls(),
+        _buildExpandIconControls(),
+        _buildFolderControls(),
+        _buildParentControls(),
+        _buildChildControls(),
+        _buildNodeStyleControls(),
+        const SizedBox(height: 16),
+        FilledButton.icon(
+          onPressed: () => setState(() {
+            _lineColor = const Color(0xFF2196F3);
+            _lineWidth = 1.5;
+            _lineStyle = LineStyle.connector;
+            _folderIconSize = 20.0;
+            _folderIconColor = const Color(0xFF616161);
+            _folderPadding = 0.0;
+            _folderMargin = 0.0;
+            _folderIconSpacing = 8.0;
+            _folderTextColor = Colors.black87;
+            _folderFontSize = 14.0;
+            _parentIconSize = 20.0;
+            _parentIconColor = const Color(0xFF616161);
+            _parentPadding = 0.0;
+            _parentMargin = 0.0;
+            _parentIconSpacing = 8.0;
+            _parentTextColor = Colors.black87;
+            _parentFontSize = 14.0;
+            _childIconSize = 20.0;
+            _childIconColor = const Color(0xFF616161);
+            _childPadding = 0.0;
+            _childMargin = 0.0;
+            _childIconSpacing = 8.0;
+            _childTextColor = Colors.black87;
+            _childFontSize = 14.0;
+            _childSelectedBg = const Color(0xFFE3F2FD);
+            _expandIconSize = 20.0;
+            _expandIconColor = const Color(0xFF616161);
+            _expandPadding = 0.0;
+            _expandMargin = 0.0;
+            _viewMode = ViewMode.folder;
+            _borderRadius = 8.0;
+            _data = getThemeDemoData();
+            _selectedIds = {};
+          }),
+          icon: const Icon(Icons.refresh),
+          label: const Text('Reset'),
         ),
       ],
     );
   }
 
-  Widget _buildSection({required String title, required Widget child}) {
+  Widget _buildViewMode() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('View Mode', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            SegmentedButton<ViewMode>(
+              segments: const [
+                ButtonSegment(value: ViewMode.folder, label: Text('Folder')),
+                ButtonSegment(value: ViewMode.tree, label: Text('Tree')),
+              ],
+              selected: {_viewMode},
+              onSelectionChanged: (s) => setState(() => _viewMode = s.first),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLineControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Line', style: TextStyle(fontWeight: FontWeight.bold)),
+            _slider('Width', _lineWidth, 0.5, 5, (v) => setState(() => _lineWidth = v)),
+            _colorRow('Color', _lineColor, (c) => setState(() => _lineColor = c)),
+            Wrap(
+              spacing: 4,
+              children: [
+                ChoiceChip(
+                  label: const Text('Connect', style: TextStyle(fontSize: 12)),
+                  selected: _lineStyle == LineStyle.connector,
+                  onSelected: (s) => s ? setState(() => _lineStyle = LineStyle.connector) : null,
+                ),
+                ChoiceChip(
+                  label: const Text('Scope', style: TextStyle(fontSize: 12)),
+                  selected: _lineStyle == LineStyle.scope,
+                  onSelected: (s) => s ? setState(() => _lineStyle = LineStyle.scope) : null,
+                ),
+                ChoiceChip(
+                  label: const Text('None', style: TextStyle(fontSize: 12)),
+                  selected: _lineStyle == LineStyle.none,
+                  onSelected: (s) => s ? setState(() => _lineStyle = LineStyle.none) : null,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpandIconControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Expand Icon', style: TextStyle(fontWeight: FontWeight.bold)),
+            _slider('Size', _expandIconSize, 12, 32, (v) => setState(() => _expandIconSize = v)),
+            _colorRow('Color', _expandIconColor, (c) => setState(() => _expandIconColor = c)),
+            _slider('Padding', _expandPadding, 0, 8, (v) => setState(() => _expandPadding = v)),
+            _slider('Margin', _expandMargin, 0, 8, (v) => setState(() => _expandMargin = v)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFolderControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Folder', style: TextStyle(fontWeight: FontWeight.bold)),
+            _slider('Icon Size', _folderIconSize, 12, 32, (v) => setState(() => _folderIconSize = v)),
+            _colorRow('Icon', _folderIconColor, (c) => setState(() => _folderIconColor = c)),
+            _slider('Padding', _folderPadding, 0, 8, (v) => setState(() => _folderPadding = v)),
+            _slider('Margin', _folderMargin, 0, 8, (v) => setState(() => _folderMargin = v)),
+            _slider('Spacing', _folderIconSpacing, 0, 24, (v) => setState(() => _folderIconSpacing = v)),
+            _colorRow('Text', _folderTextColor, (c) => setState(() => _folderTextColor = c)),
+            _slider('Font', _folderFontSize, 10, 24, (v) => setState(() => _folderFontSize = v)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParentControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Parent', style: TextStyle(fontWeight: FontWeight.bold)),
+            _slider('Icon Size', _parentIconSize, 12, 32, (v) => setState(() => _parentIconSize = v)),
+            _colorRow('Icon', _parentIconColor, (c) => setState(() => _parentIconColor = c)),
+            _slider('Padding', _parentPadding, 0, 8, (v) => setState(() => _parentPadding = v)),
+            _slider('Margin', _parentMargin, 0, 8, (v) => setState(() => _parentMargin = v)),
+            _slider('Spacing', _parentIconSpacing, 0, 24, (v) => setState(() => _parentIconSpacing = v)),
+            _colorRow('Text', _parentTextColor, (c) => setState(() => _parentTextColor = c)),
+            _slider('Font', _parentFontSize, 10, 24, (v) => setState(() => _parentFontSize = v)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChildControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Child', style: TextStyle(fontWeight: FontWeight.bold)),
+            _slider('Icon Size', _childIconSize, 12, 32, (v) => setState(() => _childIconSize = v)),
+            _colorRow('Icon', _childIconColor, (c) => setState(() => _childIconColor = c)),
+            _slider('Padding', _childPadding, 0, 8, (v) => setState(() => _childPadding = v)),
+            _slider('Margin', _childMargin, 0, 8, (v) => setState(() => _childMargin = v)),
+            _slider('Spacing', _childIconSpacing, 0, 24, (v) => setState(() => _childIconSpacing = v)),
+            _colorRow('Text', _childTextColor, (c) => setState(() => _childTextColor = c)),
+            _slider('Font', _childFontSize, 10, 24, (v) => setState(() => _childFontSize = v)),
+            const Divider(),
+            _colorRow('Selected BG', _childSelectedBg, (c) => setState(() => _childSelectedBg = c)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNodeStyleControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Node Style', style: TextStyle(fontWeight: FontWeight.bold)),
+            _slider('Border Radius', _borderRadius, 0, 20, (v) => setState(() => _borderRadius = v)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _slider(String label, double value, double min, double max, ValueChanged<double> onChange) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 8),
-        child,
+        Text(label, style: const TextStyle(fontSize: 12)),
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                value: value,
+                min: min,
+                max: max,
+                onChanged: onChange,
+              ),
+            ),
+            SizedBox(
+              width: 40,
+              child: Text(value.toStringAsFixed(1), style: const TextStyle(fontSize: 11)),
+            ),
+          ],
+        ),
       ],
     );
   }
 
-  void _resetToDefaults() {
-    setState(() {
-      _lineColor = const Color(0xFF2196F3);
-      _lineWidth = 1.5;
-      _lineStyle = LineStyle.connector;
-      _scrollbarThumbColor = Colors.grey.shade600;
-      _scrollbarTrackColor = Colors.grey.shade200;
-      _scrollbarThickness = 12.0;
-      _scrollbarRadius = 4.0;
-      _scrollbarHoverOpacity = 0.8;
-      _scrollbarTrackWidth = 16.0;
-      _scrollbarTrackRadius = 8.0;
-      _scrollbarAlwaysVisible = false;
-      _textColor = Colors.black87;
-      _fontSize = 14.0;
-      _folderTextColor = Colors.black87;
-      _parentTextColor = Colors.black87;
-      _childTextColor = Colors.black87;
-      _iconSize = 20.0;
-      _iconColor = Colors.grey.shade700;
-      _selectedIconColor = Colors.blue.shade700;
-      _viewMode = ViewMode.folder;
-      _contentPaddingLeft = 0.0;
-      _contentPaddingRight = 0.0;
-      _contentPaddingTop = 0.0;
-      _contentPaddingBottom = 0.0;
-      _nodeBorderRadius = 8.0;
-      _treeData = getThemeDemoData();
-      _selectedNodeIds = {};
-    });
-  }
+  Widget _colorRow(String label, Color value, ValueChanged<Color> onChange) {
+    final colors = [
+      const Color(0xFF2196F3),
+      const Color(0xFF4CAF50),
+      const Color(0xFFFF9800),
+      const Color(0xFFF44336),
+      const Color(0xFF9C27B0),
+      const Color(0xFF616161),
+      Colors.black87,
+    ];
 
-  Widget _buildColorPicker(
-    Color currentColor,
-    ValueChanged<Color> onColorChanged,
-  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(label, style: const TextStyle(fontSize: 12)),
+        const SizedBox(height: 4),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [..._presetColors, Colors.black87, Colors.white].map((
-            color,
-          ) {
-            final isSelected = currentColor == color;
+          spacing: 4,
+          runSpacing: 4,
+          children: colors.map((c) {
             return InkWell(
-              onTap: () => onColorChanged(color),
-              borderRadius: BorderRadius.circular(8),
+              onTap: () => onChange(c),
               child: Container(
-                width: 48,
-                height: 48,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(8),
+                  color: c,
                   border: Border.all(
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.grey.shade300,
-                    width: 3,
+                    color: value == c ? Theme.of(context).colorScheme.primary : Colors.grey.shade300,
+                    width: value == c ? 2 : 1,
                   ),
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
             );
           }).toList(),
         ),
         const SizedBox(height: 8),
-        Text(
-          'Color: #${currentColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
       ],
     );
   }

@@ -128,18 +128,6 @@ class MyHomePage extends StatelessWidget {
                     lineStyle: LineStyle.scope,
                     primaryColor: Colors.purple,
                     data: getSoftwareComponentData(),
-                    textTheme: const FolderViewTextTheme(
-                      textStyle: TextStyle(fontSize: 14),
-                      folderTextStyle: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        color: Colors.purple,
-                      ),
-                      parentTextStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
-                      ),
-                      childTextStyle: TextStyle(color: Colors.purpleAccent),
-                    ),
                   ),
                 ),
               ],

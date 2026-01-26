@@ -1,30 +1,39 @@
 import 'package:flutter/material.dart';
 
 import '../models/node.dart';
-import '../themes/folder_view_text_theme.dart';
+import '../themes/child_node_theme.dart';
+import '../themes/expand_icon_theme.dart';
+import '../themes/folder_node_theme.dart';
+import '../themes/parent_node_theme.dart';
 
 class SizeService {
   /// Calculate the total content width of all nodes
   static double calculateContentWidth<T>({
     required List<Node<T>> nodes,
-    required FolderViewTextTheme textTheme,
-    double linePaintWidth = 20.0,
-    double iconSize = 20.0,
-    double spacing = 8.0,
+    required FolderNodeTheme folderTheme,
+    required ParentNodeTheme parentTheme,
+    required ChildNodeTheme childTheme,
+    required ExpandIconTheme expandIconTheme,
     double leftPadding = 0.0,
     double rightPadding = 16.0,
     double maxWidth = double.infinity,
   }) {
+    // Calculate line width based on expand icon size
+    final linePaintWidth = expandIconTheme.width +
+        expandIconTheme.padding.horizontal +
+        expandIconTheme.margin.horizontal;
+
     double maxNodeWidth = 0.0;
 
     for (var node in nodes) {
       final nodeWidth = _calculateNodeWidth(
         node: node,
-        textTheme: textTheme,
+        folderTheme: folderTheme,
+        parentTheme: parentTheme,
+        childTheme: childTheme,
+        expandIconTheme: expandIconTheme,
         depth: 0,
         linePaintWidth: linePaintWidth,
-        iconSize: iconSize,
-        spacing: spacing,
         rightPadding: rightPadding,
       );
       if (nodeWidth > maxNodeWidth) {
@@ -35,10 +44,10 @@ class SizeService {
       if (node.isExpanded && node.children.isNotEmpty) {
         final childrenWidth = calculateContentWidth(
           nodes: node.children,
-          textTheme: textTheme,
-          linePaintWidth: linePaintWidth,
-          iconSize: iconSize,
-          spacing: spacing,
+          folderTheme: folderTheme,
+          parentTheme: parentTheme,
+          childTheme: childTheme,
+          expandIconTheme: expandIconTheme,
           leftPadding: 0.0, // Children don't need extra left padding
           rightPadding: rightPadding,
           maxWidth: maxWidth,
@@ -59,42 +68,57 @@ class SizeService {
   /// Calculate the width of a single node
   static double _calculateNodeWidth<T>({
     required Node<T> node,
-    required FolderViewTextTheme textTheme,
+    required FolderNodeTheme folderTheme,
+    required ParentNodeTheme parentTheme,
+    required ChildNodeTheme childTheme,
+    required ExpandIconTheme expandIconTheme,
     required int depth,
     required double linePaintWidth,
-    required double iconSize,
-    required double spacing,
     required double rightPadding,
   }) {
     // Base indent (pipeline spacing)
     double width = linePaintWidth;
 
     // Expand/collapse icon (or space)
-    width += iconSize;
+    width += expandIconTheme.width +
+        expandIconTheme.padding.horizontal +
+        expandIconTheme.margin.horizontal;
 
-    // Node icon
-    width += iconSize;
+    // Node icon and spacing based on node type
+    double iconWidth;
+    double iconToTextSpacing;
+    TextStyle? textStyle;
 
-    // Spacing after icon
-    width += spacing;
-
-    // Resolve style
-    TextStyle style = textTheme.textStyle ?? const TextStyle(fontSize: 14);
     switch (node.type) {
       case NodeType.folder:
-        style = style.merge(textTheme.folderTextStyle);
+        iconWidth = folderTheme.width +
+            folderTheme.padding.horizontal +
+            folderTheme.margin.horizontal;
+        iconToTextSpacing = folderTheme.iconToTextSpacing;
+        textStyle = folderTheme.textStyle ?? const TextStyle(fontSize: 14);
         break;
       case NodeType.parent:
-        style = style.merge(textTheme.parentTextStyle);
+        iconWidth = parentTheme.width +
+            parentTheme.padding.horizontal +
+            parentTheme.margin.horizontal;
+        iconToTextSpacing = parentTheme.iconToTextSpacing;
+        textStyle = parentTheme.textStyle ?? const TextStyle(fontSize: 14);
         break;
       case NodeType.child:
-        style = style.merge(textTheme.childTextStyle);
+        iconWidth = childTheme.width +
+            childTheme.padding.horizontal +
+            childTheme.margin.horizontal;
+        iconToTextSpacing = childTheme.iconToTextSpacing;
+        textStyle = childTheme.textStyle ?? const TextStyle(fontSize: 14);
         break;
     }
 
+    width += iconWidth;
+    width += iconToTextSpacing;
+
     // Text width
     final textPainter = TextPainter(
-      text: TextSpan(text: node.label, style: style),
+      text: TextSpan(text: node.label, style: textStyle),
       textDirection: TextDirection.ltr,
       maxLines: 1,
     )..layout();
