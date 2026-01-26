@@ -175,10 +175,11 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   }
 
   /// Build expand/collapse icon widget
-  Widget _buildExpandIcon() {
+  Widget _buildExpandIcon({bool isChild = false}) {
     final expandTheme = widget.theme.expandIconTheme;
 
-    if (expandTheme.widget == null) {
+    // For child nodes, always return empty space
+    if (isChild || expandTheme.widget == null) {
       return SizedBox(
         width: expandTheme.width +
             expandTheme.padding.horizontal +
@@ -364,8 +365,8 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           : null,
       child: Row(
         children: [
-          // No expand icon for leaf nodes - just empty space
-          // _buildExpandIcon(),
+          // Empty space for expand icon to maintain alignment
+          _buildExpandIcon(isChild: true),
 
           // Node Icon
           _buildNodeIcon(),

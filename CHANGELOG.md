@@ -1,3 +1,12 @@
+## 0.2.2
+
+### Refactoring
+
+* **Node Layout Alignment**: Unified expand icon logic to ensure consistent alignment.
+* Added `isChild` parameter to `_buildExpandIcon` to return a placeholder `SizedBox` for child nodes.
+* Replaced manual spacing in `_buildChildNodeContent` with the unified icon builder.
+* Ensured child nodes maintain the same horizontal indentation as parent nodes.
+
 ## 0.2.1
 
 ### Features
