@@ -42,8 +42,6 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   late Animation<double> _iconTurns;
   late Animation<double> _heightFactor;
 
-  static const double _rowHeight = 40.0;
-
   @override
   void initState() {
     super.initState();
@@ -95,7 +93,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           left: widget.isRoot ? 0 : (widget.depth - 1) * lineWidth,
           top: 0,
           bottom: widget.isLast ? null : 0,
-          height: widget.isLast ? _rowHeight / 2 : null,
+          height: widget.isLast ? widget.theme.rowHeight / 2 : null,
           width: lineWidth,
           child: CustomPaint(
             painter: _LinePainter(
@@ -112,7 +110,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           children: [
             // Header
             SizedBox(
-              height: _rowHeight,
+              height: widget.theme.rowHeight,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -358,7 +356,11 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
 
           // Label with tooltip
           _wrapWithTooltip(
-            Text(widget.node.label, style: _getTextStyle()),
+            Text(
+              widget.node.label,
+              style: _getTextStyle(),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
@@ -406,7 +408,11 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
 
           // Label with tooltip
           _wrapWithTooltip(
-            Text(widget.node.label, style: _getTextStyle()),
+            Text(
+              widget.node.label,
+              style: _getTextStyle(),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

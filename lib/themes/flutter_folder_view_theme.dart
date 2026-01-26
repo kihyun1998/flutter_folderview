@@ -43,6 +43,9 @@ class FlutterFolderViewTheme<T> {
   /// Animation duration for expand/collapse animations in milliseconds
   final int animationDuration;
 
+  /// Height of each row/node in pixels
+  final double rowHeight;
+
   /// Creates a [FlutterFolderViewTheme] with the given properties
   const FlutterFolderViewTheme({
     required this.lineTheme,
@@ -54,6 +57,7 @@ class FlutterFolderViewTheme<T> {
     this.spacingTheme = const FolderViewSpacingTheme(),
     this.nodeStyleTheme = const FolderViewNodeStyleTheme(),
     this.animationDuration = 200,
+    this.rowHeight = 40.0,
   });
 
   /// Creates a light theme with sensible defaults
@@ -159,6 +163,7 @@ class FlutterFolderViewTheme<T> {
     FolderViewSpacingTheme? spacingTheme,
     FolderViewNodeStyleTheme? nodeStyleTheme,
     int? animationDuration,
+    double? rowHeight,
   }) {
     return FlutterFolderViewTheme<T>(
       lineTheme: lineTheme ?? this.lineTheme,
@@ -170,6 +175,7 @@ class FlutterFolderViewTheme<T> {
       spacingTheme: spacingTheme ?? this.spacingTheme,
       nodeStyleTheme: nodeStyleTheme ?? this.nodeStyleTheme,
       animationDuration: animationDuration ?? this.animationDuration,
+      rowHeight: rowHeight ?? this.rowHeight,
     );
   }
 
@@ -208,6 +214,7 @@ class FlutterFolderViewTheme<T> {
         t,
       ),
       animationDuration: t < 0.5 ? a.animationDuration : b.animationDuration,
+      rowHeight: t < 0.5 ? a.rowHeight : b.rowHeight,
     );
   }
 
@@ -224,7 +231,8 @@ class FlutterFolderViewTheme<T> {
         other.expandIconTheme == expandIconTheme &&
         other.spacingTheme == spacingTheme &&
         other.nodeStyleTheme == nodeStyleTheme &&
-        other.animationDuration == animationDuration;
+        other.animationDuration == animationDuration &&
+        other.rowHeight == rowHeight;
   }
 
   @override
@@ -238,6 +246,7 @@ class FlutterFolderViewTheme<T> {
         spacingTheme,
         nodeStyleTheme,
         animationDuration,
+        rowHeight,
       );
 
   @override
@@ -251,7 +260,8 @@ class FlutterFolderViewTheme<T> {
         'expandIconTheme: $expandIconTheme, '
         'spacingTheme: $spacingTheme, '
         'nodeStyleTheme: $nodeStyleTheme, '
-        'animationDuration: $animationDuration'
+        'animationDuration: $animationDuration, '
+        'rowHeight: $rowHeight'
         ')';
   }
 }

@@ -11,6 +11,10 @@
   - Support for both static messages and rich formatted content via `richMessage`
   - Dynamic tooltip content through `richMessageResolver` function based on node data
   - Customizable positioning (top/bottom), colors, margins, and wait duration
+- **Configurable Row Height**: Added `rowHeight` property to `FlutterFolderViewTheme`
+  - Centralized row height configuration (default: 40.0)
+  - Replaces hardcoded height values in `NodeWidget` and `SizeService`
+  - Consistent height calculation across all components
 
 ### Refactoring
 - **Simplified Spacing Control**: Removed `iconToTextSpacing` property from all node themes
