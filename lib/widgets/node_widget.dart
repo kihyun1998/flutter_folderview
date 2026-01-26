@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TooltipTheme;
 import 'package:flutter_folderview/widgets/custom_ink_well.dart';
 
 import '../models/node.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import '../themes/folder_view_line_theme.dart';
+import '../themes/node_tooltip_theme.dart';
 
 class NodeWidget<T> extends StatefulWidget {
   final Node<T> node;
@@ -257,6 +258,72 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     );
   }
 
+  /// Wraps a widget with tooltip based on node type theme
+  Widget _wrapWithTooltip(Widget child) {
+    NodeTooltipTheme<T>? tooltipTheme;
+
+    // Get tooltip theme based on node type
+    switch (widget.node.type) {
+      case NodeType.folder:
+        tooltipTheme = widget.theme.folderTheme.tooltipTheme;
+        break;
+      case NodeType.parent:
+        tooltipTheme = widget.theme.parentTheme.tooltipTheme;
+        break;
+      case NodeType.child:
+        tooltipTheme = widget.theme.childTheme.tooltipTheme;
+        break;
+    }
+
+    // If tooltip is not enabled or theme is null, return child as-is
+    if (tooltipTheme == null || !tooltipTheme.useTooltip) {
+      return child;
+    }
+
+    // Resolve rich message
+    InlineSpan? richMessage;
+    if (tooltipTheme.richMessageResolver != null) {
+      richMessage = tooltipTheme.richMessageResolver?.call(widget.node);
+    }
+    richMessage ??= tooltipTheme.richMessage;
+
+    // Resolve message
+    String? message = tooltipTheme.message;
+
+    // If no message and no rich message, return child as-is
+    if ((message == null || message.isEmpty) && richMessage == null) {
+      return child;
+    }
+
+    // Wrap with tooltip
+    return Tooltip(
+      margin: tooltipTheme.margin ?? const EdgeInsets.symmetric(horizontal: 30),
+      textStyle:
+          richMessage == null ? tooltipTheme.textStyle : tooltipTheme.textStyle,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      preferBelow: tooltipTheme.position == TooltipPosition.bottom,
+      verticalOffset: tooltipTheme.verticalOffset,
+      decoration: BoxDecoration(
+        color: tooltipTheme.backgroundColor ?? Colors.grey[800],
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: tooltipTheme.boxShadow ??
+            [
+              BoxShadow(
+                blurRadius: 3,
+                color: Colors.black.withValues(alpha: 0.3),
+              ),
+            ],
+      ),
+      waitDuration:
+          tooltipTheme.waitDuration ?? const Duration(milliseconds: 300),
+      exitDuration: Duration.zero,
+      showDuration: Duration.zero,
+      message: message,
+      richMessage: richMessage,
+      child: child,
+    );
+  }
+
   /// Build content for child nodes (leaf nodes) with CustomInkWell
   Widget _buildChildNodeContent() {
     final isSelected =
@@ -289,8 +356,10 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           // Node Icon
           _buildNodeIcon(),
 
-          // Label
-          Expanded(child: Text(widget.node.label, style: _getTextStyle())),
+          // Label with tooltip
+          _wrapWithTooltip(
+            Text(widget.node.label, style: _getTextStyle()),
+          ),
         ],
       ),
     );
@@ -335,8 +404,10 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           // Node Icon
           _buildNodeIcon(),
 
-          // Label
-          Expanded(child: Text(widget.node.label, style: _getTextStyle())),
+          // Label with tooltip
+          _wrapWithTooltip(
+            Text(widget.node.label, style: _getTextStyle()),
+          ),
         ],
       ),
     );

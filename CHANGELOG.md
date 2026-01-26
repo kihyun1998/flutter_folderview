@@ -5,6 +5,12 @@
   - `FolderNodeTheme`, `ParentNodeTheme`, and `ChildNodeTheme` now support customizable interaction colors
   - Colors fall back to Material theme defaults when not specified
   - Theme demo updated with interactive color pickers for all interaction colors
+- **Tooltip Support**: Added comprehensive tooltip theming for all node types
+  - New `NodeTooltipTheme` class with configurable position, style, and behavior
+  - Added `tooltipTheme` property to `FolderNodeTheme`, `ParentNodeTheme`, and `ChildNodeTheme`
+  - Support for both static messages and rich formatted content via `richMessage`
+  - Dynamic tooltip content through `richMessageResolver` function based on node data
+  - Customizable positioning (top/bottom), colors, margins, and wait duration
 
 ### Refactoring
 - **Simplified Spacing Control**: Removed `iconToTextSpacing` property from all node themes

@@ -3,6 +3,7 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/widgets.dart';
 
 import '../models/node.dart';
+import 'node_tooltip_theme.dart';
 
 /// Theme data for child node styling in FolderView
 @immutable
@@ -56,6 +57,9 @@ class ChildNodeTheme<T> {
   /// Only applies to child nodes (leaf nodes)
   final int clickInterval;
 
+  /// Tooltip theme for child nodes
+  final NodeTooltipTheme<T>? tooltipTheme;
+
   /// Creates a [ChildNodeTheme]
   const ChildNodeTheme({
     this.widget,
@@ -73,6 +77,7 @@ class ChildNodeTheme<T> {
     this.splashColor,
     this.highlightColor,
     this.clickInterval = 300,
+    this.tooltipTheme,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -92,6 +97,7 @@ class ChildNodeTheme<T> {
     Color? splashColor,
     Color? highlightColor,
     int? clickInterval,
+    NodeTooltipTheme<T>? tooltipTheme,
   }) {
     return ChildNodeTheme<T>(
       widget: widget ?? this.widget,
@@ -111,6 +117,7 @@ class ChildNodeTheme<T> {
       splashColor: splashColor ?? this.splashColor,
       highlightColor: highlightColor ?? this.highlightColor,
       clickInterval: clickInterval ?? this.clickInterval,
+      tooltipTheme: tooltipTheme ?? this.tooltipTheme,
     );
   }
 
@@ -148,6 +155,7 @@ class ChildNodeTheme<T> {
                   a.clickInterval.toDouble(), b.clickInterval.toDouble(), t) ??
               300)
           .round(),
+      tooltipTheme: NodeTooltipTheme.lerp(a.tooltipTheme, b.tooltipTheme, t),
     );
   }
 }

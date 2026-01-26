@@ -3,6 +3,7 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/widgets.dart';
 
 import '../models/node.dart';
+import 'node_tooltip_theme.dart';
 
 /// Theme data for parent node styling in FolderView
 @immutable
@@ -49,6 +50,9 @@ class ParentNodeTheme<T> {
   /// Highlight color for tap feedback
   final Color? highlightColor;
 
+  /// Tooltip theme for parent nodes
+  final NodeTooltipTheme<T>? tooltipTheme;
+
   /// Creates a [ParentNodeTheme]
   const ParentNodeTheme({
     this.widget,
@@ -64,6 +68,7 @@ class ParentNodeTheme<T> {
     this.hoverColor,
     this.splashColor,
     this.highlightColor,
+    this.tooltipTheme,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -81,6 +86,7 @@ class ParentNodeTheme<T> {
     Color? hoverColor,
     Color? splashColor,
     Color? highlightColor,
+    NodeTooltipTheme<T>? tooltipTheme,
   }) {
     return ParentNodeTheme<T>(
       widget: widget ?? this.widget,
@@ -96,6 +102,7 @@ class ParentNodeTheme<T> {
       hoverColor: hoverColor ?? this.hoverColor,
       splashColor: splashColor ?? this.splashColor,
       highlightColor: highlightColor ?? this.highlightColor,
+      tooltipTheme: tooltipTheme ?? this.tooltipTheme,
     );
   }
 
@@ -125,6 +132,7 @@ class ParentNodeTheme<T> {
       hoverColor: Color.lerp(a.hoverColor, b.hoverColor, t),
       splashColor: Color.lerp(a.splashColor, b.splashColor, t),
       highlightColor: Color.lerp(a.highlightColor, b.highlightColor, t),
+      tooltipTheme: NodeTooltipTheme.lerp(a.tooltipTheme, b.tooltipTheme, t),
     );
   }
 }

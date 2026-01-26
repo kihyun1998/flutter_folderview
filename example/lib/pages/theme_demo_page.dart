@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TooltipTheme;
 import 'package:flutter_folderview/flutter_folderview.dart';
 
 import '../data/theme_demo_data.dart';
@@ -72,6 +72,14 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
   // Interaction
   double _clickInterval = 300.0;
   double _animationDuration = 200.0;
+
+  // Tooltip
+  bool _folderTooltipEnabled = true;
+  Color _folderTooltipBgColor = const Color(0xFF424242);
+  bool _parentTooltipEnabled = true;
+  Color _parentTooltipBgColor = const Color(0xFF424242);
+  bool _childTooltipEnabled = true;
+  Color _childTooltipBgColor = const Color(0xFF424242);
 
   late List<Node<String>> _data;
   Set<String> _selectedIds = {};
@@ -177,6 +185,11 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         hoverColor: _folderHoverColor,
         splashColor: _folderSplashColor,
         highlightColor: _folderHighlightColor,
+        tooltipTheme: NodeTooltipTheme<String>(
+          useTooltip: _folderTooltipEnabled,
+          message: 'Folder node',
+          backgroundColor: _folderTooltipBgColor,
+        ),
       ),
       parentTheme: ParentNodeTheme<String>(
         widget: Icon(
@@ -196,6 +209,11 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         hoverColor: _parentHoverColor,
         splashColor: _parentSplashColor,
         highlightColor: _parentHighlightColor,
+        tooltipTheme: NodeTooltipTheme<String>(
+          useTooltip: _parentTooltipEnabled,
+          message: 'Parent node',
+          backgroundColor: _parentTooltipBgColor,
+        ),
       ),
       childTheme: ChildNodeTheme<String>(
         widget: Icon(
@@ -215,6 +233,40 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         splashColor: _childSplashColor,
         highlightColor: _childHighlightColor,
         clickInterval: _clickInterval.round(),
+        tooltipTheme: NodeTooltipTheme<String>(
+          useTooltip: _childTooltipEnabled,
+          richMessage: TextSpan(
+            children: [
+              const TextSpan(
+                text: 'Child: ',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              TextSpan(
+                text: 'Click to select',
+                style: TextStyle(color: Colors.grey.shade300),
+              ),
+            ],
+          ),
+          richMessageResolver: (node) => TextSpan(
+            children: [
+              const TextSpan(
+                text: 'Child: ',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              TextSpan(
+                text: node.label,
+                style: TextStyle(color: Colors.grey.shade300),
+              ),
+            ],
+          ),
+          backgroundColor: _childTooltipBgColor,
+        ),
       ),
       expandIconTheme: ExpandIconTheme(
         widget: Icon(
@@ -273,6 +325,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         _buildFolderControls(),
         _buildParentControls(),
         _buildChildControls(),
+        _buildTooltipControls(),
         _buildNodeStyleControls(),
         _buildInteractionControls(),
         const SizedBox(height: 16),
@@ -320,6 +373,12 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _borderRadius = 8.0;
             _clickInterval = 300.0;
             _animationDuration = 200.0;
+            _folderTooltipEnabled = true;
+            _folderTooltipBgColor = const Color(0xFF424242);
+            _parentTooltipEnabled = true;
+            _parentTooltipBgColor = const Color(0xFF424242);
+            _childTooltipEnabled = true;
+            _childTooltipBgColor = const Color(0xFF424242);
             _data = getThemeDemoData();
             _selectedIds = {};
           }),
@@ -670,6 +729,88 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               'Highlight',
               _childHighlightColor,
               (c) => setState(() => _childHighlightColor = c),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTooltipControls() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Tooltip',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            SwitchListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: const Text(
+                'Folder Tooltip',
+                style: TextStyle(fontSize: 12),
+              ),
+              value: _folderTooltipEnabled,
+              onChanged: (v) => setState(() => _folderTooltipEnabled = v),
+            ),
+            if (_folderTooltipEnabled)
+              Padding(
+                padding: const EdgeInsets.only(left: 16, bottom: 8),
+                child: _colorRow(
+                  'BG Color',
+                  _folderTooltipBgColor,
+                  (c) => setState(() => _folderTooltipBgColor = c),
+                ),
+              ),
+            const Divider(),
+            SwitchListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: const Text(
+                'Parent Tooltip',
+                style: TextStyle(fontSize: 12),
+              ),
+              value: _parentTooltipEnabled,
+              onChanged: (v) => setState(() => _parentTooltipEnabled = v),
+            ),
+            if (_parentTooltipEnabled)
+              Padding(
+                padding: const EdgeInsets.only(left: 16, bottom: 8),
+                child: _colorRow(
+                  'BG Color',
+                  _parentTooltipBgColor,
+                  (c) => setState(() => _parentTooltipBgColor = c),
+                ),
+              ),
+            const Divider(),
+            SwitchListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: const Text(
+                'Child Tooltip (Rich)',
+                style: TextStyle(fontSize: 12),
+              ),
+              value: _childTooltipEnabled,
+              onChanged: (v) => setState(() => _childTooltipEnabled = v),
+            ),
+            if (_childTooltipEnabled)
+              Padding(
+                padding: const EdgeInsets.only(left: 16, bottom: 8),
+                child: _colorRow(
+                  'BG Color',
+                  _childTooltipBgColor,
+                  (c) => setState(() => _childTooltipBgColor = c),
+                ),
+              ),
+            const SizedBox(height: 4),
+            Text(
+              'Hover over nodes to see tooltips',
+              style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
             ),
           ],
         ),
