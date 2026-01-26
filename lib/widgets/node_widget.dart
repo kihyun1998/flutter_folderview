@@ -371,11 +371,13 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           _buildNodeIcon(),
 
           // Label with tooltip
-          _wrapWithTooltip(
-            Text(
-              widget.node.label,
-              style: _getTextStyle(),
-              overflow: TextOverflow.ellipsis,
+          Flexible(
+            child: _wrapWithTooltip(
+              Text(
+                widget.node.label,
+                style: _getTextStyle(),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
         ],
@@ -423,11 +425,13 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           _buildNodeIcon(),
 
           // Label with tooltip
-          _wrapWithTooltip(
-            Text(
-              widget.node.label,
-              style: _getTextStyle(),
-              overflow: TextOverflow.ellipsis,
+          Flexible(
+            child: _wrapWithTooltip(
+              Text(
+                widget.node.label,
+                style: _getTextStyle(),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
         ],
