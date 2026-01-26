@@ -858,10 +858,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Layout',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            const Text('Layout', style: TextStyle(fontWeight: FontWeight.bold)),
             _slider(
               'Row Height',
               _rowHeight,
