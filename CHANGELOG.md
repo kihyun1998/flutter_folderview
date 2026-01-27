@@ -1,12 +1,11 @@
+## 0.4.0
+
+- **feat**: Add `labelResolver` to `FolderNodeTheme`, `ParentNodeTheme`, `ChildNodeTheme` for dynamic label resolution based on `node.data` (falls back to `node.label` if resolver returns `null`)
+- **fix**: Update animation controller duration in `didUpdateWidget` when theme `animationDuration` changes at runtime
+
 ## 0.2.4
 
-### Features
-
-- **Label Resolver**: Added `labelResolver` property to all node themes
-  - `FolderNodeTheme`, `ParentNodeTheme`, and `ChildNodeTheme` now support dynamic label resolution
-  - Resolver function receives `Node<T>` and can return custom label based on `node.data`
-  - If resolver returns `null`, falls back to `node.label`
-  - Enables displaying different data fields conditionally (e.g., `node.data.displayName` vs `node.data.fullPath`)
+- **feat**: Add `labelResolver` to all node themes for dynamic label display
 
 ## 0.2.3
 

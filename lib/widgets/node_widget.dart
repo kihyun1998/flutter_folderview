@@ -69,7 +69,8 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
 
     // Update animation duration if theme changed
     if (oldWidget.theme.animationDuration != widget.theme.animationDuration) {
-      _controller.duration = Duration(milliseconds: widget.theme.animationDuration);
+      _controller.duration =
+          Duration(milliseconds: widget.theme.animationDuration);
     }
 
     if (widget.node.isExpanded != oldWidget.node.isExpanded) {
