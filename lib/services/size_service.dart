@@ -10,6 +10,7 @@ class SizeService {
   /// Calculate the total content width of all nodes
   static double calculateContentWidth<T>({
     required List<Node<T>> nodes,
+    Set<String>? expandedNodeIds,
     required FolderNodeTheme folderTheme,
     required ParentNodeTheme parentTheme,
     required ChildNodeTheme childTheme,
@@ -41,9 +42,11 @@ class SizeService {
       }
 
       // Recursively check children if expanded
-      if (node.isExpanded && node.children.isNotEmpty) {
+      final isExpanded = expandedNodeIds?.contains(node.id) ?? false;
+      if (isExpanded && node.children.isNotEmpty) {
         final childrenWidth = calculateContentWidth(
           nodes: node.children,
+          expandedNodeIds: expandedNodeIds,
           folderTheme: folderTheme,
           parentTheme: parentTheme,
           childTheme: childTheme,
@@ -133,6 +136,7 @@ class SizeService {
   /// Calculate the total content height of all visible nodes
   static double calculateContentHeight<T>({
     required List<Node<T>> nodes,
+    Set<String>? expandedNodeIds,
     double rowHeight = 40.0,
     double rowSpacing = 0.0,
     double topPadding = 0.0,
@@ -152,7 +156,8 @@ class SizeService {
       }
 
       // If expanded, add children's height recursively
-      if (node.isExpanded && node.children.isNotEmpty) {
+      final isExpanded = expandedNodeIds?.contains(node.id) ?? false;
+      if (isExpanded && node.children.isNotEmpty) {
         // Add spacing before children
         if (node.children.isNotEmpty) {
           height += rowSpacing;
@@ -160,6 +165,7 @@ class SizeService {
 
         height += calculateContentHeight(
           nodes: node.children,
+          expandedNodeIds: expandedNodeIds,
           rowHeight: rowHeight,
           rowSpacing: rowSpacing,
           // Children don't need extra padding

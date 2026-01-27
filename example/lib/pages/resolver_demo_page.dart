@@ -15,6 +15,7 @@ class ResolverDemoPage extends StatefulWidget {
 class _ResolverDemoPageState extends State<ResolverDemoPage> {
   late List<Node<FileData>> _data;
   final Set<String> _selectedIds = {};
+  Set<String> _expandedIds = {'folder1', 'parent1', 'folder2', 'parent3'};
 
   @override
   void initState() {
@@ -29,34 +30,15 @@ class _ResolverDemoPageState extends State<ResolverDemoPage> {
             ? _selectedIds.remove(node.id)
             : _selectedIds.add(node.id);
       } else if (node.canExpand) {
-        _data = _toggle(_data, node.id);
+        final newSet = Set<String>.from(_expandedIds);
+        if (newSet.contains(node.id)) {
+          newSet.remove(node.id);
+        } else {
+          newSet.add(node.id);
+        }
+        _expandedIds = newSet;
       }
     });
-  }
-
-  List<Node<FileData>> _toggle(List<Node<FileData>> nodes, String id) {
-    return nodes.map((n) {
-      if (n.id == id) {
-        return Node<FileData>(
-          id: n.id,
-          label: n.label,
-          type: n.type,
-          data: n.data,
-          children: n.children,
-          isExpanded: !n.isExpanded,
-        );
-      } else if (n.children.isNotEmpty) {
-        return Node<FileData>(
-          id: n.id,
-          label: n.label,
-          type: n.type,
-          data: n.data,
-          children: _toggle(n.children, id),
-          isExpanded: n.isExpanded,
-        );
-      }
-      return n;
-    }).toList();
   }
 
   @override
@@ -177,6 +159,7 @@ class _ResolverDemoPageState extends State<ResolverDemoPage> {
                 mode: ViewMode.folder,
                 onNodeTap: _handleTap,
                 selectedNodeIds: _selectedIds,
+                expandedNodeIds: _expandedIds,
                 theme: theme,
               ),
             ),
@@ -193,13 +176,13 @@ class _ResolverDemoPageState extends State<ResolverDemoPage> {
         id: 'folder1',
         label: 'Project Files',
         type: NodeType.folder,
-        isExpanded: true,
+
         children: [
           Node<FileData>(
             id: 'parent1',
             label: 'src',
             type: NodeType.parent,
-            isExpanded: true,
+    
             children: [
               Node<FileData>(
                 id: 'child1',
@@ -225,7 +208,7 @@ class _ResolverDemoPageState extends State<ResolverDemoPage> {
             id: 'parent2',
             label: 'test',
             type: NodeType.parent,
-            isExpanded: false,
+
             children: [
               Node<FileData>(
                 id: 'child4',
@@ -247,13 +230,13 @@ class _ResolverDemoPageState extends State<ResolverDemoPage> {
         id: 'folder2',
         label: 'Documentation',
         type: NodeType.folder,
-        isExpanded: true,
+
         children: [
           Node<FileData>(
             id: 'parent3',
             label: 'docs',
             type: NodeType.parent,
-            isExpanded: true,
+    
             children: [
               Node<FileData>(
                 id: 'child6',

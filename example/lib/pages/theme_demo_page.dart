@@ -88,6 +88,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
 
   late List<Node<String>> _data;
   Set<String> _selectedIds = {};
+  Set<String> _expandedIds = {'1', '1-1', '2', '2-1', '2-2', '3'};
 
   @override
   void initState() {
@@ -102,7 +103,13 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             ? _selectedIds.remove(node.id)
             : _selectedIds.add(node.id);
       } else if (node.canExpand) {
-        _data = _toggle(_data, node.id);
+        final newSet = Set<String>.from(_expandedIds);
+        if (newSet.contains(node.id)) {
+          newSet.remove(node.id);
+        } else {
+          newSet.add(node.id);
+        }
+        _expandedIds = newSet;
       }
     });
   }
@@ -132,31 +139,6 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
-  }
-
-  List<Node<String>> _toggle(List<Node<String>> nodes, String id) {
-    return nodes.map((n) {
-      if (n.id == id) {
-        return Node<String>(
-          id: n.id,
-          label: n.label,
-          type: n.type,
-          data: n.data,
-          children: n.children,
-          isExpanded: !n.isExpanded,
-        );
-      } else if (n.children.isNotEmpty) {
-        return Node<String>(
-          id: n.id,
-          label: n.label,
-          type: n.type,
-          data: n.data,
-          children: _toggle(n.children, id),
-          isExpanded: n.isExpanded,
-        );
-      }
-      return n;
-    }).toList();
   }
 
   @override
@@ -309,6 +291,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                     onNodeTap: _handleTap,
                     onDoubleNodeTap: _handleDoubleTap,
                     selectedNodeIds: _selectedIds,
+                    expandedNodeIds: _expandedIds,
                     theme: theme,
                   ),
                 ),
@@ -390,6 +373,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             _childTooltipBgColor = const Color(0xFF424242);
             _data = getThemeDemoData();
             _selectedIds = {};
+            _expandedIds = {'1', '1-1', '2', '2-1', '2-2', '3'};
           }),
           icon: const Icon(Icons.refresh),
           label: const Text('Reset'),

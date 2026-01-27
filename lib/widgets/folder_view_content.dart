@@ -28,6 +28,7 @@ class FolderViewContent<T> extends StatefulWidget {
   final Function(Node<T>)? onDoubleNodeTap;
   final Function(Node<T>, TapDownDetails)? onSecondaryNodeTap;
   final Set<String>? selectedNodeIds;
+  final Set<String>? expandedNodeIds;
   final FlutterFolderViewTheme<T> theme;
 
   const FolderViewContent({
@@ -47,6 +48,7 @@ class FolderViewContent<T> extends StatefulWidget {
     this.onDoubleNodeTap,
     this.onSecondaryNodeTap,
     required this.selectedNodeIds,
+    this.expandedNodeIds,
     required this.theme,
   });
 
@@ -66,6 +68,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     required Function(Node<T>)? onDoubleNodeTap,
     required Function(Node<T>, TapDownDetails)? onSecondaryNodeTap,
     required Set<String>? selectedNodeIds,
+    required Set<String>? expandedNodeIds,
     required ScrollController horizontalController,
     required ScrollController verticalController,
     required double contentWidth,
@@ -95,6 +98,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                       isFirst: index == 0,
                       isRoot: true,
                       selectedNodeIds: selectedNodeIds,
+                      expandedNodeIds: expandedNodeIds,
                       theme: theme,
                     );
                   },
@@ -115,6 +119,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                       isFirst: index == 0,
                       isRoot: true,
                       selectedNodeIds: selectedNodeIds,
+                      expandedNodeIds: expandedNodeIds,
                       theme: theme,
                     );
                   },
@@ -156,6 +161,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
               onDoubleNodeTap: widget.onDoubleNodeTap,
               onSecondaryNodeTap: widget.onSecondaryNodeTap,
               selectedNodeIds: widget.selectedNodeIds,
+              expandedNodeIds: widget.expandedNodeIds,
               horizontalController: widget.horizontalController,
               verticalController: widget.verticalController,
               contentWidth: widget.contentWidth,

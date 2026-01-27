@@ -17,6 +17,7 @@ class NodeWidget<T> extends StatefulWidget {
   final bool isRoot;
   final int depth;
   final Set<String>? selectedNodeIds;
+  final Set<String>? expandedNodeIds;
   final FlutterFolderViewTheme<T> theme;
 
   const NodeWidget({
@@ -31,6 +32,7 @@ class NodeWidget<T> extends StatefulWidget {
     this.isRoot = false,
     this.depth = 0,
     this.selectedNodeIds,
+    this.expandedNodeIds,
     required this.theme,
   });
 
@@ -43,6 +45,9 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
   late AnimationController _controller;
   late Animation<double> _iconTurns;
   late Animation<double> _heightFactor;
+
+  bool get _isExpanded =>
+      widget.expandedNodeIds?.contains(widget.node.id) ?? false;
 
   @override
   void initState() {
@@ -58,7 +63,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
     _heightFactor = _controller.view;
 
     // Initialize state
-    if (widget.node.isExpanded) {
+    if (_isExpanded) {
       _controller.value = 1.0;
     }
   }
@@ -73,8 +78,10 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
           Duration(milliseconds: widget.theme.animationDuration);
     }
 
-    if (widget.node.isExpanded != oldWidget.node.isExpanded) {
-      if (widget.node.isExpanded) {
+    final wasExpanded =
+        oldWidget.expandedNodeIds?.contains(widget.node.id) ?? false;
+    if (_isExpanded != wasExpanded) {
+      if (_isExpanded) {
         _controller.forward();
       } else {
         _controller.reverse();
@@ -165,6 +172,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
                         isRoot: false,
                         depth: widget.depth + 1,
                         selectedNodeIds: widget.selectedNodeIds,
+                        expandedNodeIds: widget.expandedNodeIds,
                         theme: widget.theme,
                       ),
                       if (i < widget.node.children.length - 1 &&
@@ -218,7 +226,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       case NodeType.folder:
         final folderTheme = widget.theme.folderTheme;
         // Try resolver first
-        if (widget.node.isExpanded) {
+        if (_isExpanded) {
           resolvedWidget = folderTheme.openWidgetResolver?.call(widget.node);
           iconWidget =
               resolvedWidget ?? folderTheme.openWidget ?? folderTheme.widget;
@@ -234,7 +242,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
       case NodeType.parent:
         final parentTheme = widget.theme.parentTheme;
         if (widget.mode == ViewMode.tree) {
-          if (widget.node.isExpanded) {
+          if (_isExpanded) {
             resolvedWidget = parentTheme.openWidgetResolver?.call(widget.node);
             iconWidget =
                 resolvedWidget ?? parentTheme.openWidget ?? parentTheme.widget;
@@ -424,7 +432,7 @@ class _NodeWidgetState<T> extends State<NodeWidget<T>>
               turns: _iconTurns,
               child: IconTheme(
                 data: IconThemeData(
-                  color: widget.node.isExpanded
+                  color: _isExpanded
                       ? (expandTheme.expandedColor ?? expandTheme.color)
                       : expandTheme.color,
                 ),

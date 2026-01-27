@@ -14,6 +14,7 @@ class FolderView<T> extends StatelessWidget {
   final Function(Node<T>)? onDoubleNodeTap;
   final Function(Node<T>, TapDownDetails)? onSecondaryNodeTap;
   final Set<String>? selectedNodeIds;
+  final Set<String>? expandedNodeIds;
   final FlutterFolderViewTheme<T>? theme;
 
   const FolderView({
@@ -24,6 +25,7 @@ class FolderView<T> extends StatelessWidget {
     this.onDoubleNodeTap,
     this.onSecondaryNodeTap,
     this.selectedNodeIds,
+    this.expandedNodeIds,
     this.theme,
   });
 
@@ -43,6 +45,7 @@ class FolderView<T> extends StatelessWidget {
         // Calculate content dimensions
         final contentWidth = SizeService.calculateContentWidth(
           nodes: displayNodes,
+          expandedNodeIds: expandedNodeIds,
           folderTheme: effectiveTheme.folderTheme,
           parentTheme: effectiveTheme.parentTheme,
           childTheme: effectiveTheme.childTheme,
@@ -54,6 +57,7 @@ class FolderView<T> extends StatelessWidget {
 
         final contentHeight = SizeService.calculateContentHeight(
           nodes: displayNodes,
+          expandedNodeIds: expandedNodeIds,
           rowHeight: effectiveTheme.rowHeight,
           rowSpacing: effectiveTheme.rowSpacing,
           topPadding: effectiveTheme.spacingTheme.contentPadding.top,
@@ -79,6 +83,7 @@ class FolderView<T> extends StatelessWidget {
               onDoubleNodeTap: onDoubleNodeTap,
               onSecondaryNodeTap: onSecondaryNodeTap,
               selectedNodeIds: selectedNodeIds,
+              expandedNodeIds: expandedNodeIds,
               contentWidth: contentWidth,
               contentHeight: contentHeight,
               viewportWidth: availableWidth,
