@@ -49,6 +49,14 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   /// Snapshot of mode used for cache invalidation.
   ViewMode? _cachedMode;
 
+  /// Index of the node that was expanded/collapsed (in the old flat list).
+  /// -1 means no pending adjustment.
+  int _pendingScrollChangedIndex = -1;
+
+  /// Number of items inserted (positive) or removed (negative) by the
+  /// last incremental expand/collapse.
+  int _pendingScrollDeltaItems = 0;
+
   /// Lazily observed maximum content width (monotonically increasing).
   /// Grows as wider nodes are scrolled into view; never shrinks.
   double _observedMaxWidth = 0.0;
@@ -104,6 +112,10 @@ class _FolderViewState<T> extends State<FolderView<T>> {
       final changedId = _singleDiff(_cachedExpandedIds!, expandedIds);
       if (changedId != null) {
         final isExpand = expandedIds.contains(changedId);
+        final previousLength = _cachedFlatNodes.length;
+        // Find the index of the changed node before mutation
+        final changedIdx =
+            _cachedFlatNodes.indexWhere((fn) => fn.node.id == changedId);
         final result = isExpand
             ? FlattenService.expandNode<T>(
                 currentList: _cachedFlatNodes,
@@ -115,6 +127,12 @@ class _FolderViewState<T> extends State<FolderView<T>> {
                 nodeId: changedId,
               );
         if (result != null) {
+          // Record the item count delta at this index so the content
+          // widget can adjust the scroll offset when the change happened
+          // above the current viewport.
+          _pendingScrollDeltaItems = result.length - previousLength;
+          _pendingScrollChangedIndex = changedIdx;
+
           _cachedFlatNodes = result;
           _cachedExpandedIds = Set<String>.of(expandedIds);
           return _cachedFlatNodes;
@@ -202,6 +220,12 @@ class _FolderViewState<T> extends State<FolderView<T>> {
             horizontalController,
             horizontalScrollbarController,
           ) {
+            // Consume pending scroll adjustment info
+            final scrollChangedIndex = _pendingScrollChangedIndex;
+            final scrollDeltaItems = _pendingScrollDeltaItems;
+            _pendingScrollChangedIndex = -1;
+            _pendingScrollDeltaItems = 0;
+
             return FolderViewContent<T>(
               flatNodes: flatNodes,
               mode: widget.mode,
@@ -221,6 +245,8 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               verticalBarController: verticalScrollbarController!,
               theme: effectiveTheme,
               onNodeWidthMeasured: _onNodeWidthMeasured,
+              scrollChangedIndex: scrollChangedIndex,
+              scrollDeltaItems: scrollDeltaItems,
             );
           },
         );

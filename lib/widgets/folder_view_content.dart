@@ -37,6 +37,13 @@ class FolderViewContent<T> extends StatefulWidget {
   /// The parent uses this to track the observed max content width.
   final ValueChanged<double>? onNodeWidthMeasured;
 
+  /// Index (in the previous flat list) of the node that was expanded/collapsed.
+  /// -1 means no adjustment needed.
+  final int scrollChangedIndex;
+
+  /// Number of items inserted (positive) or removed (negative).
+  final int scrollDeltaItems;
+
   const FolderViewContent({
     super.key,
     required this.horizontalController,
@@ -57,6 +64,8 @@ class FolderViewContent<T> extends StatefulWidget {
     this.expandedNodeIds,
     required this.theme,
     this.onNodeWidthMeasured,
+    this.scrollChangedIndex = -1,
+    this.scrollDeltaItems = 0,
   });
 
   @override
@@ -82,6 +91,36 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     if (oldWidget.horizontalController != widget.horizontalController) {
       oldWidget.horizontalController.removeListener(_onHorizontalScroll);
       widget.horizontalController.addListener(_onHorizontalScroll);
+    }
+
+    // Adjust vertical scroll offset when items were inserted/removed above
+    // the current viewport due to expand/collapse.
+    _applyScrollAdjustment();
+  }
+
+  void _applyScrollAdjustment() {
+    final changedIndex = widget.scrollChangedIndex;
+    final deltaItems = widget.scrollDeltaItems;
+    if (changedIndex < 0 || deltaItems == 0) return;
+
+    final controller = widget.verticalController;
+    if (!controller.hasClients) return;
+
+    final itemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
+    final topPadding = widget.theme.spacingTheme.contentPadding.top;
+
+    // The pixel position where inserted/removed items begin
+    // (right after the changed node).
+    final changePixel = topPadding + (changedIndex + 1) * itemExtent;
+
+    // Only adjust if the change happened above (or at) the current scroll offset.
+    if (changePixel <= controller.offset) {
+      final delta = deltaItems * itemExtent;
+      final newOffset = (controller.offset + delta).clamp(
+        controller.position.minScrollExtent,
+        controller.position.maxScrollExtent,
+      );
+      controller.jumpTo(newOffset);
     }
   }
 
