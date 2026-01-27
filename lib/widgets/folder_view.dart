@@ -9,7 +9,7 @@ import '../themes/folder_view_theme.dart';
 import 'folder_view_content.dart';
 import 'synced_scroll_controllers.dart';
 
-class FolderView<T> extends StatelessWidget {
+class FolderView<T> extends StatefulWidget {
   final List<Node<T>> data;
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
@@ -32,18 +32,72 @@ class FolderView<T> extends StatelessWidget {
   });
 
   @override
+  State<FolderView<T>> createState() => _FolderViewState<T>();
+}
+
+class _FolderViewState<T> extends State<FolderView<T>> {
+  /// Cached flatten result
+  List<FlatNode<T>> _cachedFlatNodes = [];
+
+  /// Snapshot of expandedNodeIds used to produce the cached result.
+  /// We compare by length + content to detect changes.
+  Set<String>? _cachedExpandedIds;
+
+  /// Snapshot of data identity used for cache invalidation.
+  List<Node<T>>? _cachedData;
+
+  /// Snapshot of mode used for cache invalidation.
+  ViewMode? _cachedMode;
+
+  @override
+  void didUpdateWidget(covariant FolderView<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Cache is lazily invalidated in build via _getFlatNodes()
+  }
+
+  /// Returns cached flat nodes, recomputing only when inputs change.
+  List<FlatNode<T>> _getFlatNodes(List<Node<T>> displayNodes) {
+    final expandedIds = widget.expandedNodeIds;
+
+    // Check if we can reuse the cache
+    if (identical(_cachedData, widget.data) &&
+        _cachedMode == widget.mode &&
+        _expandedIdsEqual(_cachedExpandedIds, expandedIds) &&
+        _cachedFlatNodes.isNotEmpty) {
+      return _cachedFlatNodes;
+    }
+
+    // Recompute
+    _cachedFlatNodes = FlattenService.flatten<T>(
+      nodes: displayNodes,
+      expandedNodeIds: expandedIds,
+    );
+    _cachedData = widget.data;
+    _cachedMode = widget.mode;
+    _cachedExpandedIds =
+        expandedIds != null ? Set<String>.of(expandedIds) : null;
+    return _cachedFlatNodes;
+  }
+
+  /// Efficient Set equality check: same length and same elements.
+  static bool _expandedIdsEqual(Set<String>? a, Set<String>? b) {
+    if (identical(a, b)) return true;
+    if (a == null || b == null) return false;
+    if (a.length != b.length) return false;
+    return a.containsAll(b);
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Resolve theme: use provided theme, or get from context, or use default
-    final effectiveTheme = theme ?? FolderViewTheme.of<T>(context);
+    final effectiveTheme =
+        widget.theme ?? FolderViewTheme.of<T>(context);
 
     // Filter data based on mode
     List<Node<T>> displayNodes = _getDisplayNodes();
 
-    // Flatten tree into visible flat list
-    final List<FlatNode<T>> flatNodes = FlattenService.flatten<T>(
-      nodes: displayNodes,
-      expandedNodeIds: expandedNodeIds,
-    );
+    // Flatten tree into visible flat list (memoized)
+    final List<FlatNode<T>> flatNodes = _getFlatNodes(displayNodes);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -74,7 +128,7 @@ class FolderView<T> extends StatelessWidget {
         final needsVerticalScroll = contentHeight > availableHeight;
 
         return SyncedScrollControllers(
-          key: ValueKey(mode),
+          key: ValueKey(widget.mode),
           builder: (
             context,
             verticalController,
@@ -84,12 +138,12 @@ class FolderView<T> extends StatelessWidget {
           ) {
             return FolderViewContent<T>(
               flatNodes: flatNodes,
-              mode: mode,
-              onNodeTap: onNodeTap,
-              onDoubleNodeTap: onDoubleNodeTap,
-              onSecondaryNodeTap: onSecondaryNodeTap,
-              selectedNodeIds: selectedNodeIds,
-              expandedNodeIds: expandedNodeIds,
+              mode: widget.mode,
+              onNodeTap: widget.onNodeTap,
+              onDoubleNodeTap: widget.onDoubleNodeTap,
+              onSecondaryNodeTap: widget.onSecondaryNodeTap,
+              selectedNodeIds: widget.selectedNodeIds,
+              expandedNodeIds: widget.expandedNodeIds,
               contentWidth: contentWidth,
               contentHeight: contentHeight,
               viewportWidth: availableWidth,
@@ -108,12 +162,12 @@ class FolderView<T> extends StatelessWidget {
   }
 
   List<Node<T>> _getDisplayNodes() {
-    if (mode == ViewMode.tree) {
+    if (widget.mode == ViewMode.tree) {
       // In Tree Mode, we only show Parent nodes at the root level
       // If data contains Folders, we need to extract Parents from within them
       List<Node<T>> parents = [];
 
-      for (var node in data) {
+      for (var node in widget.data) {
         if (node.type == NodeType.parent) {
           // Direct parent node
           parents.add(node);
@@ -129,7 +183,7 @@ class FolderView<T> extends StatelessWidget {
     } else {
       // In Folder Mode, we show Folders and Parents at the root level.
       // "Folder mode: Folder > Parent > Child. Parent of Parent is Folder."
-      return data
+      return widget.data
           .where((n) => n.type == NodeType.folder || n.type == NodeType.parent)
           .toList();
     }

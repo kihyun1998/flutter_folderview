@@ -8,6 +8,15 @@ import '../themes/folder_node_theme.dart';
 import '../themes/parent_node_theme.dart';
 
 class SizeService {
+  /// Cache for measured text widths to avoid repeated TextPainter layouts.
+  /// Key: "label\0fontSize\0fontWeight" — Value: measured pixel width.
+  static final Map<String, double> _textWidthCache = {};
+
+  /// Clears the text width cache. Call when theme changes.
+  static void clearTextWidthCache() {
+    _textWidthCache.clear();
+  }
+
   /// Calculate the total content width from visible flat nodes.
   ///
   /// Iterates through the already-flattened visible nodes to find the widest one.
@@ -94,14 +103,19 @@ class SizeService {
 
     width += iconWidth;
 
-    // Text width
-    final textPainter = TextPainter(
-      text: TextSpan(text: node.label, style: textStyle),
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-    )..layout();
+    // Text width (cached)
+    final cacheKey =
+        '${node.label}\x00${textStyle!.fontSize}\x00${textStyle.fontWeight}';
+    final textWidth = _textWidthCache[cacheKey] ??= () {
+      final tp = TextPainter(
+        text: TextSpan(text: node.label, style: textStyle),
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+      )..layout();
+      return tp.width;
+    }();
 
-    width += textPainter.width;
+    width += textWidth;
     width += rightPadding;
 
     return width;
