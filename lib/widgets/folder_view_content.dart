@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../models/flat_node.dart';
 import '../models/node.dart';
+import '../services/size_service.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import 'folder_view_horizontal_scrollbar.dart';
 import 'folder_view_vertical_scrollbar.dart';
@@ -32,6 +33,10 @@ class FolderViewContent<T> extends StatefulWidget {
   final Set<String>? expandedNodeIds;
   final FlutterFolderViewTheme<T> theme;
 
+  /// Called when a rendered node's width is measured.
+  /// The parent uses this to track the observed max content width.
+  final ValueChanged<double>? onNodeWidthMeasured;
+
   const FolderViewContent({
     super.key,
     required this.horizontalController,
@@ -51,6 +56,7 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.selectedNodeIds,
     this.expandedNodeIds,
     required this.theme,
+    this.onNodeWidthMeasured,
   });
 
   @override
@@ -81,6 +87,22 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       final flatNode = flatNodes[index];
       final isExpanded =
           expandedNodeIds?.contains(flatNode.node.id) ?? false;
+
+      // Report this node's intrinsic width for lazy max-width tracking
+      if (widget.onNodeWidthMeasured != null) {
+        final nodeWidth = SizeService.calculateSingleNodeWidth(
+          node: flatNode.node,
+          depth: flatNode.depth,
+          folderTheme: theme.folderTheme,
+          parentTheme: theme.parentTheme,
+          childTheme: theme.childTheme,
+          expandIconTheme: theme.expandIconTheme,
+          leftPadding: theme.spacingTheme.contentPadding.left,
+          rightPadding: theme.spacingTheme.contentPadding.right,
+        );
+        widget.onNodeWidthMeasured!(nodeWidth);
+      }
+
       return NodeWidget<T>(
         flatNode: flatNode,
         mode: mode,

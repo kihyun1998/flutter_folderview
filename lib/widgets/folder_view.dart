@@ -49,10 +49,36 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   /// Snapshot of mode used for cache invalidation.
   ViewMode? _cachedMode;
 
+  /// Lazily observed maximum content width (monotonically increasing).
+  /// Grows as wider nodes are scrolled into view; never shrinks.
+  double _observedMaxWidth = 0.0;
+
+  /// Tracks whether a width-triggered rebuild is already scheduled.
+  bool _widthUpdateScheduled = false;
+
   @override
   void didUpdateWidget(covariant FolderView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Cache is lazily invalidated in build via _getFlatNodes()
+    // Reset observed width when data or expanded set changes structurally,
+    // because the set of visible nodes may have changed entirely.
+    if (!identical(oldWidget.data, widget.data)) {
+      _observedMaxWidth = 0.0;
+    }
+  }
+
+  /// Called by FolderViewContent for each rendered node's width.
+  void _onNodeWidthMeasured(double width) {
+    if (width > _observedMaxWidth) {
+      _observedMaxWidth = width;
+      // Batch into a single rebuild per frame to avoid excessive setState calls
+      if (!_widthUpdateScheduled) {
+        _widthUpdateScheduled = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _widthUpdateScheduled = false;
+          if (mounted) setState(() {});
+        });
+      }
+    }
   }
 
   /// Returns cached flat nodes, recomputing only when inputs change.
@@ -151,17 +177,10 @@ class _FolderViewState<T> extends State<FolderView<T>> {
         final double availableHeight = constraints.maxHeight;
         final double availableWidth = constraints.maxWidth;
 
-        // Calculate content dimensions from flat list
-        final contentWidth = SizeService.calculateContentWidth(
-          flatNodes: flatNodes,
-          folderTheme: effectiveTheme.folderTheme,
-          parentTheme: effectiveTheme.parentTheme,
-          childTheme: effectiveTheme.childTheme,
-          expandIconTheme: effectiveTheme.expandIconTheme,
-          leftPadding: effectiveTheme.spacingTheme.contentPadding.left,
-          rightPadding: effectiveTheme.spacingTheme.contentPadding.right,
-          maxWidth: availableWidth * 3, // Allow up to 3x viewport width
-        );
+        // Content width is lazily observed from rendered nodes (monotonic).
+        // Clamp to a reasonable max (3x viewport).
+        final maxAllowed = availableWidth * 3;
+        final contentWidth = _observedMaxWidth.clamp(0.0, maxAllowed);
 
         final contentHeight = SizeService.calculateContentHeight(
           itemCount: flatNodes.length,
@@ -201,6 +220,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               horizontalBarController: horizontalScrollbarController!,
               verticalBarController: verticalScrollbarController!,
               theme: effectiveTheme,
+              onNodeWidthMeasured: _onNodeWidthMeasured,
             );
           },
         );
