@@ -113,9 +113,6 @@ class _FolderViewState<T> extends State<FolderView<T>> {
       if (changedId != null) {
         final isExpand = expandedIds.contains(changedId);
         final previousLength = _cachedFlatNodes.length;
-        // Find the index of the changed node before mutation
-        final changedIdx =
-            _cachedFlatNodes.indexWhere((fn) => fn.node.id == changedId);
         final result = isExpand
             ? FlattenService.expandNode<T>(
                 currentList: _cachedFlatNodes,
@@ -130,10 +127,10 @@ class _FolderViewState<T> extends State<FolderView<T>> {
           // Record the item count delta at this index so the content
           // widget can adjust the scroll offset when the change happened
           // above the current viewport.
-          _pendingScrollDeltaItems = result.length - previousLength;
-          _pendingScrollChangedIndex = changedIdx;
+          _pendingScrollDeltaItems = result.list.length - previousLength;
+          _pendingScrollChangedIndex = result.index;
 
-          _cachedFlatNodes = result;
+          _cachedFlatNodes = result.list;
           _cachedExpandedIds = Set<String>.of(expandedIds);
           return _cachedFlatNodes;
         }

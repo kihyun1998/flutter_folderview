@@ -48,9 +48,9 @@ class FlattenService {
   }
 
   /// Incrementally expand a node: insert its flattened subtree right after it.
-  /// Returns a new list with the children inserted, or null if the node
-  /// was not found (caller should fall back to full rebuild).
-  static List<FlatNode<T>>? expandNode<T>({
+  /// Returns the new list and the index of the expanded node, or null if the
+  /// node was not found (caller should fall back to full rebuild).
+  static ({List<FlatNode<T>> list, int index})? expandNode<T>({
     required List<FlatNode<T>> currentList,
     required String nodeId,
     required Set<String>? expandedNodeIds,
@@ -61,7 +61,7 @@ class FlattenService {
 
     final flatNode = currentList[idx];
     final node = flatNode.node;
-    if (node.children.isEmpty) return currentList;
+    if (node.children.isEmpty) return (list: currentList, index: idx);
 
     // Flatten only this node's children subtree
     final childFlags = [...flatNode.ancestorIsLastFlags, flatNode.isLast];
@@ -76,13 +76,13 @@ class FlattenService {
     // Insert after the node
     final result = List<FlatNode<T>>.of(currentList);
     result.insertAll(idx + 1, subtree);
-    return result;
+    return (list: result, index: idx);
   }
 
   /// Incrementally collapse a node: remove all descendants that follow it.
-  /// Returns a new list with descendants removed, or null if the node
-  /// was not found (caller should fall back to full rebuild).
-  static List<FlatNode<T>>? collapseNode<T>({
+  /// Returns the new list and the index of the collapsed node, or null if the
+  /// node was not found (caller should fall back to full rebuild).
+  static ({List<FlatNode<T>> list, int index})? collapseNode<T>({
     required List<FlatNode<T>> currentList,
     required String nodeId,
   }) {
@@ -98,10 +98,10 @@ class FlattenService {
       endIdx++;
     }
 
-    if (endIdx == idx + 1) return currentList; // Nothing to remove
+    if (endIdx == idx + 1) return (list: currentList, index: idx); // Nothing to remove
 
     final result = List<FlatNode<T>>.of(currentList);
     result.removeRange(idx + 1, endIdx);
-    return result;
+    return (list: result, index: idx);
   }
 }
