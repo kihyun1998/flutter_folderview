@@ -3,12 +3,12 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 List<Node<String>> getGovernmentData() {
   // Ministry of Interior
   final policeTasks = [
-    Node<String>(
+    const Node<String>(
       id: 'gov_police_1',
       label: 'Public Safety Initiative',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'gov_police_2',
       label: 'Traffic Management',
       type: NodeType.child,
@@ -23,7 +23,7 @@ List<Node<String>> getGovernmentData() {
   );
 
   final fireTasks = [
-    Node<String>(
+    const Node<String>(
       id: 'gov_fire_1',
       label: 'Emergency Response',
       type: NodeType.child,
@@ -46,12 +46,12 @@ List<Node<String>> getGovernmentData() {
 
   // Ministry of Education
   final educationTasks = [
-    Node<String>(
+    const Node<String>(
       id: 'gov_edu_1',
       label: 'Curriculum Reform',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'gov_edu_2',
       label: 'Digital Learning',
       type: NodeType.child,
@@ -74,12 +74,12 @@ List<Node<String>> getGovernmentData() {
 
   // Ministry of Health
   final healthTasks = [
-    Node<String>(
+    const Node<String>(
       id: 'gov_health_1',
       label: 'Vaccination Program',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'gov_health_2',
       label: 'Healthcare Reform',
       type: NodeType.child,

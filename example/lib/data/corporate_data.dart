@@ -3,18 +3,18 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 List<Node<String>> getCorporateData() {
   // Engineering Department - Backend Team
   final authTeamMembers = [
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_auth_member_1',
       label: 'Kihyun Kim - Senior Authentication Systems Engineer (Team Lead)',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_auth_member_2',
       label:
           'Sarah Johnson - OAuth 2.0 Security Specialist and Implementation Engineer',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_auth_member_3',
       label: 'Michael Chen - JWT Token Architecture Developer',
       type: NodeType.child,
@@ -29,13 +29,13 @@ List<Node<String>> getCorporateData() {
   );
 
   final dbTeamMembers = [
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_db_member_1',
       label:
           'Emily Rodriguez - Database Architecture and Performance Optimization Lead',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_db_member_2',
       label: 'David Park - Migration Strategy and Schema Design Specialist',
       type: NodeType.child,
@@ -58,19 +58,19 @@ List<Node<String>> getCorporateData() {
 
   // Engineering Department - Frontend Team
   final dashboardTeamMembers = [
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_dash_member_1',
       label:
           'Jessica Williams - Senior UI/UX Developer and Design Systems Lead',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_dash_member_2',
       label:
           'Robert Taylor - Real-time Analytics and Data Visualization Engineer',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_dash_member_3',
       label: 'Lisa Anderson - Frontend Performance Optimization Specialist',
       type: NodeType.child,
@@ -85,13 +85,13 @@ List<Node<String>> getCorporateData() {
   );
 
   final mobileTeamMembers = [
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_mobile_member_1',
       label:
           'Christopher Lee - Mobile-First Design and Responsive Layout Expert',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'corp_eng_mobile_member_2',
       label: 'Amanda Martinez - Cross-Platform Flutter Development Specialist',
       type: NodeType.child,
@@ -122,13 +122,13 @@ List<Node<String>> getCorporateData() {
 
   // Marketing Department
   final campaignTeamMembers = [
-    Node<String>(
+    const Node<String>(
       id: 'corp_marketing_campaign_member_1',
       label:
           'Jennifer Thompson - Social Media Strategy and Content Marketing Director',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'corp_marketing_campaign_member_2',
       label:
           'Daniel White - Digital Campaign Analytics and ROI Optimization Manager',
@@ -145,7 +145,7 @@ List<Node<String>> getCorporateData() {
   );
 
   final brandTeamMembers = [
-    Node<String>(
+    const Node<String>(
       id: 'corp_marketing_brand_member_1',
       label:
           'Sophia Garcia - Creative Director and Brand Identity Design Specialist',
@@ -177,13 +177,13 @@ List<Node<String>> getCorporateData() {
 
   // HR Department
   final recruitmentTeamMembers = [
-    Node<String>(
+    const Node<String>(
       id: 'corp_hr_recruit_member_1',
       label:
           'Matthew Brown - Talent Acquisition Manager and Recruitment Pipeline Coordinator',
       type: NodeType.child,
     ),
-    Node<String>(
+    const Node<String>(
       id: 'corp_hr_recruit_member_2',
       label:
           'Olivia Davis - Employee Onboarding and Training Program Development Specialist',
@@ -200,7 +200,7 @@ List<Node<String>> getCorporateData() {
   );
 
   final performanceTeamMembers = [
-    Node<String>(
+    const Node<String>(
       id: 'corp_hr_perf_member_1',
       label:
           'William Wilson - Performance Review System Administrator and HR Analytics Lead',

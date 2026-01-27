@@ -132,7 +132,7 @@ class SizeService {
 
     // Text width (cached)
     final cacheKey =
-        '${node.label}\x00${textStyle!.fontSize}\x00${textStyle.fontWeight}';
+        '${node.label}\x00${textStyle.fontSize}\x00${textStyle.fontWeight}';
     final textWidth = _textWidthCache[cacheKey] ??= () {
       final tp = TextPainter(
         text: TextSpan(text: node.label, style: textStyle),

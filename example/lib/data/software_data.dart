@@ -2,7 +2,7 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 
 List<Node<String>> getSoftwareComponentData() {
   // Frontend
-  final frontend = Node<String>(
+  const frontend = Node<String>(
     id: 'sw_frontend',
     label: 'Frontend Layer',
     type: NodeType.parent,
@@ -18,7 +18,7 @@ List<Node<String>> getSoftwareComponentData() {
   );
 
   // Backend
-  final backend = Node<String>(
+  const backend = Node<String>(
     id: 'sw_backend',
     label: 'Backend Services',
     type: NodeType.parent,
@@ -38,7 +38,7 @@ List<Node<String>> getSoftwareComponentData() {
   );
 
   // Data Layer
-  final data = Node<String>(
+  const data = Node<String>(
     id: 'sw_data',
     label: 'Data Layer',
     type: NodeType.parent,
@@ -53,7 +53,7 @@ List<Node<String>> getSoftwareComponentData() {
   );
 
   // Utilities
-  final utils = Node<String>(
+  const utils = Node<String>(
     id: 'sw_utils',
     label: 'Utilities',
     type: NodeType.parent,

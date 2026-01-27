@@ -2,7 +2,7 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 
 List<Node<String>> getFileSystemData() {
   // Documents
-  final documents = Node<String>(
+  const documents = Node<String>(
     id: 'fs_documents',
     label: 'Documents',
     type: NodeType.parent,
@@ -22,7 +22,7 @@ List<Node<String>> getFileSystemData() {
   );
 
   // Pictures
-  final pictures = Node<String>(
+  const pictures = Node<String>(
     id: 'fs_pictures',
     label: 'Pictures',
     type: NodeType.parent,
@@ -33,7 +33,7 @@ List<Node<String>> getFileSystemData() {
   );
 
   // Downloads
-  final downloads = Node<String>(
+  const downloads = Node<String>(
     id: 'fs_downloads',
     label: 'Downloads',
     type: NodeType.parent,
@@ -45,7 +45,7 @@ List<Node<String>> getFileSystemData() {
   );
 
   // Projects
-  final projects = Node<String>(
+  const projects = Node<String>(
     id: 'fs_projects',
     label: 'Projects',
     type: NodeType.parent,

@@ -182,7 +182,7 @@ class _ResolverDemoPageState extends State<ResolverDemoPage> {
             id: 'parent1',
             label: 'src',
             type: NodeType.parent,
-    
+
             children: [
               Node<FileData>(
                 id: 'child1',
@@ -236,7 +236,7 @@ class _ResolverDemoPageState extends State<ResolverDemoPage> {
             id: 'parent3',
             label: 'docs',
             type: NodeType.parent,
-    
+
             children: [
               Node<FileData>(
                 id: 'child6',

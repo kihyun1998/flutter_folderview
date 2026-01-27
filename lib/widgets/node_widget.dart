@@ -49,8 +49,7 @@ class NodeWidget<T> extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           // 1. Tree lines for this node
-          if (!flatNode.isRoot)
-            _buildTreeLines(lineWidth),
+          if (!flatNode.isRoot) _buildTreeLines(lineWidth),
 
           // 2. Ancestor continuation lines
           for (int d = 0; d < flatNode.ancestorIsLastFlags.length; d++)

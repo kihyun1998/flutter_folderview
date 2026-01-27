@@ -155,8 +155,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     }
     if (newIndex < 0) return;
 
-    final targetOffset =
-        topPadding + newIndex * itemExtent + anchorPixelOffset;
+    final targetOffset = topPadding + newIndex * itemExtent + anchorPixelOffset;
 
     // Compute expected maxScrollExtent for the new list so we can clamp
     // without waiting for layout (avoids one-frame flicker).

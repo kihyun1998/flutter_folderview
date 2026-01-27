@@ -30,8 +30,7 @@ class FlattenService {
       ));
 
       // Recurse into children if expanded
-      final isExpanded =
-          expandedNodeIds?.contains(node.id) ?? false;
+      final isExpanded = expandedNodeIds?.contains(node.id) ?? false;
       if (isExpanded && node.children.isNotEmpty) {
         final childFlags = [...ancestorIsLastFlags, isLast];
         result.addAll(flatten<T>(
@@ -98,7 +97,9 @@ class FlattenService {
       endIdx++;
     }
 
-    if (endIdx == idx + 1) return (list: currentList, index: idx); // Nothing to remove
+    if (endIdx == idx + 1) {
+      return (list: currentList, index: idx); // Nothing to remove
+    }
 
     final result = List<FlatNode<T>>.of(currentList);
     result.removeRange(idx + 1, endIdx);

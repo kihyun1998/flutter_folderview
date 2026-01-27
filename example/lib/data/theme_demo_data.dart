@@ -2,7 +2,7 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 
 List<Node<String>> getThemeDemoData() {
   return [
-    Node<String>(
+    const Node<String>(
       id: '1',
       label: 'Theme System Architecture',
       type: NodeType.folder,
@@ -12,7 +12,7 @@ List<Node<String>> getThemeDemoData() {
           id: '1-1',
           label: 'FlutterFolderViewTheme (Master Class)',
           type: NodeType.parent,
-    
+
           children: [
             Node<String>(
               id: '1-1-1',
@@ -51,7 +51,7 @@ List<Node<String>> getThemeDemoData() {
         ),
       ],
     ),
-    Node<String>(
+    const Node<String>(
       id: '2',
       label: 'Line Theme Properties',
       type: NodeType.folder,
@@ -61,7 +61,7 @@ List<Node<String>> getThemeDemoData() {
           id: '2-1',
           label: 'Visual Properties',
           type: NodeType.parent,
-    
+
           children: [
             Node<String>(
               id: '2-1-1',
@@ -84,7 +84,7 @@ List<Node<String>> getThemeDemoData() {
           id: '2-2',
           label: 'Connection Styles',
           type: NodeType.parent,
-    
+
           children: [
             Node<String>(
               id: '2-2-1',
@@ -105,7 +105,7 @@ List<Node<String>> getThemeDemoData() {
         ),
       ],
     ),
-    Node<String>(
+    const Node<String>(
       id: '3',
       label:
           'Usage Example with really long long long long label to test horizontal scroll',

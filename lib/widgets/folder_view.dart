@@ -178,8 +178,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   @override
   Widget build(BuildContext context) {
     // Resolve theme: use provided theme, or get from context, or use default
-    final effectiveTheme =
-        widget.theme ?? FolderViewTheme.of<T>(context);
+    final effectiveTheme = widget.theme ?? FolderViewTheme.of<T>(context);
 
     // Filter data based on mode
     List<Node<T>> displayNodes = _getDisplayNodes();
