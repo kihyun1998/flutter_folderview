@@ -73,14 +73,18 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
   }
 
   void _jumpToNoCascade(ScrollController master, ScrollController slave) {
-    if (!master.hasClients || !slave.hasClients || slave.position.outOfRange) {
+    if (!master.hasClients || !slave.hasClients) {
       return;
     }
 
     if (_doNotReissueJump[master] == null ||
         _doNotReissueJump[master]! == false) {
       _doNotReissueJump[slave] = true;
-      slave.jumpTo(master.offset);
+      final clampedOffset = master.offset.clamp(
+        slave.position.minScrollExtent,
+        slave.position.maxScrollExtent,
+      );
+      slave.jumpTo(clampedOffset);
     } else {
       _doNotReissueJump[master] = false;
     }
