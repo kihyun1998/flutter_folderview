@@ -6,13 +6,13 @@ List<Node<String>> getThemeDemoData() {
       id: '1',
       label: 'Theme System Architecture',
       type: NodeType.folder,
-      isExpanded: true,
+
       children: [
         Node<String>(
           id: '1-1',
           label: 'FlutterFolderViewTheme (Master Class)',
           type: NodeType.parent,
-          isExpanded: true,
+    
           children: [
             Node<String>(
               id: '1-1-1',
@@ -35,7 +35,7 @@ List<Node<String>> getThemeDemoData() {
           id: '1-2',
           label: 'FolderViewTheme (InheritedWidget)',
           type: NodeType.parent,
-          isExpanded: false,
+
           children: [
             Node<String>(
               id: '1-2-1',
@@ -55,13 +55,13 @@ List<Node<String>> getThemeDemoData() {
       id: '2',
       label: 'Line Theme Properties',
       type: NodeType.folder,
-      isExpanded: true,
+
       children: [
         Node<String>(
           id: '2-1',
           label: 'Visual Properties',
           type: NodeType.parent,
-          isExpanded: true,
+    
           children: [
             Node<String>(
               id: '2-1-1',
@@ -84,7 +84,7 @@ List<Node<String>> getThemeDemoData() {
           id: '2-2',
           label: 'Connection Styles',
           type: NodeType.parent,
-          isExpanded: true,
+    
           children: [
             Node<String>(
               id: '2-2-1',
@@ -110,13 +110,13 @@ List<Node<String>> getThemeDemoData() {
       label:
           'Usage Example with really long long long long label to test horizontal scroll',
       type: NodeType.folder,
-      isExpanded: true,
+
       children: [
         Node<String>(
           id: '3-1',
           label: 'Apply theme to widget tree',
           type: NodeType.parent,
-          isExpanded: false,
+
           children: [
             Node<String>(
               id: '3-1-1',

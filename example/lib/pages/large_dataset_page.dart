@@ -127,6 +127,7 @@ class LargeDatasetPage extends ConsumerWidget {
                       );
                     },
                     selectedNodeIds: viewModel.selectedIds,
+                    expandedNodeIds: viewModel.expandedIds,
                     theme:
                         (Theme.of(context).brightness == Brightness.dark
                                 ? FlutterFolderViewTheme<String>.dark()

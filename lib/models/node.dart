@@ -21,15 +21,13 @@ class Node<T> {
   final NodeType type;
   final T? data;
   final List<Node<T>> children;
-  bool isExpanded;
 
-  Node({
+  const Node({
     required this.id,
     required this.label,
     required this.type,
     this.data,
     this.children = const [],
-    this.isExpanded = false,
   });
 
   /// Helper to check if this node can have children displayed in the current mode

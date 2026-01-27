@@ -9,9 +9,9 @@ class FolderState extends _$FolderState {
   FolderViewModel build() {
     return FolderViewModel(
       mode: ViewMode.folder,
-      // nodes: _generateMockData(),
-      nodes: _generateLargeDataset(), // 대용량 테스트용 500개 데이터
+      nodes: _generateLargeDataset(),
       selectedIds: {},
+      expandedIds: {},
       lineStyle: LineStyle.connector,
     );
   }
@@ -23,8 +23,13 @@ class FolderState extends _$FolderState {
   }
 
   void toggleNode(String nodeId) {
-    final newNodes = _toggleNodeRecursive(state.nodes, nodeId);
-    state = state.copyWith(nodes: newNodes);
+    final newExpanded = Set<String>.from(state.expandedIds);
+    if (newExpanded.contains(nodeId)) {
+      newExpanded.remove(nodeId);
+    } else {
+      newExpanded.add(nodeId);
+    }
+    state = state.copyWith(expandedIds: newExpanded);
   }
 
   void selectNode(String nodeId, bool isMultiSelect) {
@@ -49,59 +54,22 @@ class FolderState extends _$FolderState {
   }
 
   void expandAll() {
-    final newNodes = _setAllNodesExpanded(state.nodes, true);
-    state = state.copyWith(nodes: newNodes);
+    final allIds = <String>{};
+    _collectExpandableIds(state.nodes, allIds);
+    state = state.copyWith(expandedIds: allIds);
   }
 
   void collapseAll() {
-    final newNodes = _setAllNodesExpanded(state.nodes, false);
-    state = state.copyWith(nodes: newNodes);
+    state = state.copyWith(expandedIds: {});
   }
 
-  List<Node<String>> _setAllNodesExpanded(
-    List<Node<String>> nodes,
-    bool isExpanded,
-  ) {
-    return nodes.map((node) {
-      return Node<String>(
-        id: node.id,
-        label: node.label,
-        type: node.type,
-        data: node.data,
-        children: node.children.isNotEmpty
-            ? _setAllNodesExpanded(node.children, isExpanded)
-            : node.children,
-        isExpanded: isExpanded,
-      );
-    }).toList();
-  }
-
-  List<Node<String>> _toggleNodeRecursive(
-    List<Node<String>> nodes,
-    String targetId,
-  ) {
-    return nodes.map((node) {
-      if (node.id == targetId) {
-        return Node<String>(
-          id: node.id,
-          label: node.label,
-          type: node.type,
-          data: node.data,
-          children: node.children,
-          isExpanded: !node.isExpanded,
-        );
-      } else if (node.children.isNotEmpty) {
-        return Node<String>(
-          id: node.id,
-          label: node.label,
-          type: node.type,
-          data: node.data,
-          children: _toggleNodeRecursive(node.children, targetId),
-          isExpanded: node.isExpanded,
-        );
+  void _collectExpandableIds(List<Node<String>> nodes, Set<String> ids) {
+    for (final node in nodes) {
+      if (node.children.isNotEmpty) {
+        ids.add(node.id);
+        _collectExpandableIds(node.children, ids);
       }
-      return node;
-    }).toList();
+    }
   }
 
   /// 대용량 테스트용 데이터 생성 (약 500개 노드)
@@ -157,12 +125,14 @@ class FolderViewModel {
   final ViewMode mode;
   final List<Node<String>> nodes;
   final Set<String> selectedIds;
+  final Set<String> expandedIds;
   final LineStyle lineStyle;
 
   FolderViewModel({
     required this.mode,
     required this.nodes,
     this.selectedIds = const {},
+    this.expandedIds = const {},
     required this.lineStyle,
   });
 
@@ -170,12 +140,14 @@ class FolderViewModel {
     ViewMode? mode,
     List<Node<String>>? nodes,
     Set<String>? selectedIds,
+    Set<String>? expandedIds,
     LineStyle? lineStyle,
   }) {
     return FolderViewModel(
       mode: mode ?? this.mode,
       nodes: nodes ?? this.nodes,
       selectedIds: selectedIds ?? this.selectedIds,
+      expandedIds: expandedIds ?? this.expandedIds,
       lineStyle: lineStyle ?? this.lineStyle,
     );
   }

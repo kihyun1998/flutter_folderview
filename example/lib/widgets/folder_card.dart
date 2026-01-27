@@ -15,6 +15,7 @@ class FolderCard extends StatefulWidget {
 class _FolderCardState extends State<FolderCard> {
   late CardConfig config;
   Set<String> selectedNodeIds = {};
+  Set<String> expandedNodeIds = {};
 
   @override
   void initState() {
@@ -28,9 +29,13 @@ class _FolderCardState extends State<FolderCard> {
         selectedNodeIds = {node.id};
       } else {
         // Toggle expansion for folders/parents
-        config = config.copyWith(
-          data: _toggleNodeRecursive(config.data, node.id),
-        );
+        final newSet = Set<String>.from(expandedNodeIds);
+        if (newSet.contains(node.id)) {
+          newSet.remove(node.id);
+        } else {
+          newSet.add(node.id);
+        }
+        expandedNodeIds = newSet;
       }
     });
   }
@@ -55,34 +60,6 @@ class _FolderCardState extends State<FolderCard> {
         behavior: SnackBarBehavior.floating,
       ),
     );
-  }
-
-  List<Node<String>> _toggleNodeRecursive(
-    List<Node<String>> nodes,
-    String targetId,
-  ) {
-    return nodes.map((node) {
-      if (node.id == targetId) {
-        return Node<String>(
-          id: node.id,
-          label: node.label,
-          type: node.type,
-          data: node.data,
-          children: node.children,
-          isExpanded: !node.isExpanded,
-        );
-      } else if (node.children.isNotEmpty) {
-        return Node<String>(
-          id: node.id,
-          label: node.label,
-          type: node.type,
-          data: node.data,
-          children: _toggleNodeRecursive(node.children, targetId),
-          isExpanded: node.isExpanded,
-        );
-      }
-      return node;
-    }).toList();
   }
 
   List<Node<String>> _getDisplayNodes() {
@@ -192,6 +169,7 @@ class _FolderCardState extends State<FolderCard> {
                 onDoubleNodeTap: _handleDoubleTap,
                 onSecondaryNodeTap: _handleSecondaryTap,
                 selectedNodeIds: selectedNodeIds,
+                expandedNodeIds: expandedNodeIds,
                 theme:
                     (Theme.of(context).brightness == Brightness.dark
                             ? FlutterFolderViewTheme<String>.dark()
