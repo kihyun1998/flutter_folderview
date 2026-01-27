@@ -95,13 +95,36 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
 
     // Adjust vertical scroll offset when items were inserted/removed above
     // the current viewport due to expand/collapse.
-    _applyScrollAdjustment();
+    _applyScrollAdjustment(oldWidget);
   }
 
-  void _applyScrollAdjustment() {
+  void _applyScrollAdjustment(FolderViewContent<T> oldWidget) {
+    // Case 1: Incremental single-node change
     final changedIndex = widget.scrollChangedIndex;
     final deltaItems = widget.scrollDeltaItems;
-    if (changedIndex < 0 || deltaItems == 0) return;
+    if (changedIndex >= 0 && deltaItems != 0) {
+      final controller = widget.verticalController;
+      if (!controller.hasClients) return;
+
+      final itemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
+      final topPadding = widget.theme.spacingTheme.contentPadding.top;
+      final changePixel = topPadding + (changedIndex + 1) * itemExtent;
+
+      if (changePixel <= controller.offset) {
+        final delta = deltaItems * itemExtent;
+        final newOffset = (controller.offset + delta).clamp(
+          controller.position.minScrollExtent,
+          controller.position.maxScrollExtent,
+        );
+        controller.jumpTo(newOffset);
+      }
+      return;
+    }
+
+    // Case 2: Bulk change (e.g., expandAll / collapseAll)
+    // Anchor the viewport to the same node that was at the top.
+    if (identical(oldWidget.flatNodes, widget.flatNodes)) return;
+    if (oldWidget.flatNodes.isEmpty || widget.flatNodes.isEmpty) return;
 
     final controller = widget.verticalController;
     if (!controller.hasClients) return;
@@ -109,18 +132,65 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     final itemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
     final topPadding = widget.theme.spacingTheme.contentPadding.top;
 
-    // The pixel position where inserted/removed items begin
-    // (right after the changed node).
-    final changePixel = topPadding + (changedIndex + 1) * itemExtent;
+    // Identify the node at the top of the viewport in the old list.
+    final scrollOffset = controller.offset;
+    final topIndex = ((scrollOffset - topPadding) / itemExtent)
+        .floor()
+        .clamp(0, oldWidget.flatNodes.length - 1);
 
-    // Only adjust if the change happened above (or at) the current scroll offset.
-    if (changePixel <= controller.offset) {
-      final delta = deltaItems * itemExtent;
-      final newOffset = (controller.offset + delta).clamp(
-        controller.position.minScrollExtent,
-        controller.position.maxScrollExtent,
-      );
-      controller.jumpTo(newOffset);
+    // Find an anchor node that exists in the new list.
+    // Start with the top visible node; if it's gone (e.g., a child removed
+    // by collapseAll), walk backwards to find its nearest ancestor.
+    int newIndex = -1;
+    double anchorPixelOffset =
+        scrollOffset - (topPadding + topIndex * itemExtent);
+    for (int i = topIndex; i >= 0; i--) {
+      newIndex = widget.flatNodes
+          .indexWhere((fn) => fn.node.id == oldWidget.flatNodes[i].node.id);
+      if (newIndex >= 0) {
+        // If we fell back to an ancestor, reset the sub-pixel offset.
+        if (i != topIndex) anchorPixelOffset = 0.0;
+        break;
+      }
+    }
+    if (newIndex < 0) return;
+
+    final targetOffset =
+        topPadding + newIndex * itemExtent + anchorPixelOffset;
+
+    // Compute expected maxScrollExtent for the new list so we can clamp
+    // without waiting for layout (avoids one-frame flicker).
+    final bottomPadding = widget.theme.spacingTheme.contentPadding.bottom;
+    final newContentHeight = SizeService.calculateContentHeight(
+      itemCount: widget.flatNodes.length,
+      rowHeight: widget.theme.rowHeight,
+      rowSpacing: widget.theme.rowSpacing,
+      topPadding: topPadding,
+      bottomPadding: bottomPadding,
+    );
+    final viewportHeight = controller.position.viewportDimension;
+    final newMaxExtent = (newContentHeight - viewportHeight).clamp(
+      0.0,
+      double.infinity,
+    );
+    final clamped = targetOffset.clamp(0.0, newMaxExtent);
+
+    if ((clamped - scrollOffset).abs() > 0.5) {
+      controller.jumpTo(clamped);
+
+      // The scrollbar controller's maxScrollExtent hasn't updated yet,
+      // so the sync listener clamped it to a stale range.
+      // Re-sync after layout when both controllers have correct extents.
+      final barController = widget.verticalBarController;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (controller.hasClients && barController.hasClients) {
+          final target = controller.offset.clamp(
+            barController.position.minScrollExtent,
+            barController.position.maxScrollExtent,
+          );
+          barController.jumpTo(target);
+        }
+      });
     }
   }
 
