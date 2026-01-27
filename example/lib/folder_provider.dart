@@ -79,13 +79,13 @@ class FolderState extends _$FolderState {
   List<Node<String>> _generateLargeDataset() {
     final folders = <Node<String>>[];
 
-    for (int folderIdx = 1; folderIdx <= 10; folderIdx++) {
+    for (int folderIdx = 1; folderIdx <= 100; folderIdx++) {
       final parents = <Node<String>>[];
 
-      for (int parentIdx = 1; parentIdx <= 5; parentIdx++) {
+      for (int parentIdx = 1; parentIdx <= 100; parentIdx++) {
         final children = <Node<String>>[];
 
-        for (int childIdx = 1; childIdx <= 10; childIdx++) {
+        for (int childIdx = 1; childIdx <= 100; childIdx++) {
           children.add(
             Node<String>(
               id: 'folder_${folderIdx}_parent_${parentIdx}_child_$childIdx',
