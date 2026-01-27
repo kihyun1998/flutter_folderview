@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
+import '../models/flat_node.dart';
 import '../models/node.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import 'folder_view_horizontal_scrollbar.dart';
@@ -22,7 +23,7 @@ class FolderViewContent<T> extends StatefulWidget {
   final double contentHeight;
   final double viewportWidth;
 
-  final List<Node<T>> data;
+  final List<FlatNode<T>> flatNodes;
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
   final Function(Node<T>)? onDoubleNodeTap;
@@ -42,7 +43,7 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.contentWidth,
     required this.contentHeight,
     required this.viewportWidth,
-    required this.data,
+    required this.flatNodes,
     required this.mode,
     required this.onNodeTap,
     this.onDoubleNodeTap,
@@ -60,9 +61,9 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   bool _isHover = false;
   final GlobalKey _listViewKey = GlobalKey();
 
-  /// Build the ListView
+  /// Build the ListView from flat nodes
   Widget _buildListView({
-    required List<Node<T>> data,
+    required List<FlatNode<T>> flatNodes,
     required ViewMode mode,
     required Function(Node<T>)? onNodeTap,
     required Function(Node<T>)? onDoubleNodeTap,
@@ -76,6 +77,22 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     required bool needsHorizontalScroll,
     required FlutterFolderViewTheme<T> theme,
   }) {
+    Widget buildItem(int index) {
+      final flatNode = flatNodes[index];
+      final isExpanded =
+          expandedNodeIds?.contains(flatNode.node.id) ?? false;
+      return NodeWidget<T>(
+        flatNode: flatNode,
+        mode: mode,
+        onTap: onNodeTap,
+        onDoubleTap: onDoubleNodeTap,
+        onSecondaryTap: onSecondaryNodeTap,
+        selectedNodeIds: selectedNodeIds,
+        isExpanded: isExpanded,
+        theme: theme,
+      );
+    }
+
     final Widget listView = Column(
       children: [
         Expanded(
@@ -84,45 +101,17 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                   key: _listViewKey,
                   controller: verticalController,
                   padding: theme.spacingTheme.contentPadding,
-                  itemCount: data.length,
+                  itemCount: flatNodes.length,
                   separatorBuilder: (context, index) =>
                       SizedBox(height: theme.rowSpacing),
-                  itemBuilder: (context, index) {
-                    return NodeWidget<T>(
-                      node: data[index],
-                      mode: mode,
-                      onTap: onNodeTap,
-                      onDoubleTap: onDoubleNodeTap,
-                      onSecondaryTap: onSecondaryNodeTap,
-                      isLast: index == data.length - 1,
-                      isFirst: index == 0,
-                      isRoot: true,
-                      selectedNodeIds: selectedNodeIds,
-                      expandedNodeIds: expandedNodeIds,
-                      theme: theme,
-                    );
-                  },
+                  itemBuilder: (context, index) => buildItem(index),
                 )
               : ListView.builder(
                   key: _listViewKey,
                   controller: verticalController,
                   padding: theme.spacingTheme.contentPadding,
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    return NodeWidget<T>(
-                      node: data[index],
-                      mode: mode,
-                      onTap: onNodeTap,
-                      onDoubleTap: onDoubleNodeTap,
-                      onSecondaryTap: onSecondaryNodeTap,
-                      isLast: index == data.length - 1,
-                      isFirst: index == 0,
-                      isRoot: true,
-                      selectedNodeIds: selectedNodeIds,
-                      expandedNodeIds: expandedNodeIds,
-                      theme: theme,
-                    );
-                  },
+                  itemCount: flatNodes.length,
+                  itemBuilder: (context, index) => buildItem(index),
                 ),
         ),
         // Only add spacing when horizontal scrollbar is actually needed
@@ -155,7 +144,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         child: Stack(
           children: [
             _buildListView(
-              data: widget.data,
+              flatNodes: widget.flatNodes,
               mode: widget.mode,
               onNodeTap: widget.onNodeTap,
               onDoubleNodeTap: widget.onDoubleNodeTap,

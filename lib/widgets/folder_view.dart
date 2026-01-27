@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../models/flat_node.dart';
 import '../models/node.dart';
+import '../services/flatten_service.dart';
 import '../services/size_service.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import '../themes/folder_view_theme.dart';
@@ -37,15 +39,20 @@ class FolderView<T> extends StatelessWidget {
     // Filter data based on mode
     List<Node<T>> displayNodes = _getDisplayNodes();
 
+    // Flatten tree into visible flat list
+    final List<FlatNode<T>> flatNodes = FlattenService.flatten<T>(
+      nodes: displayNodes,
+      expandedNodeIds: expandedNodeIds,
+    );
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final double availableHeight = constraints.maxHeight;
         final double availableWidth = constraints.maxWidth;
 
-        // Calculate content dimensions
+        // Calculate content dimensions from flat list
         final contentWidth = SizeService.calculateContentWidth(
-          nodes: displayNodes,
-          expandedNodeIds: expandedNodeIds,
+          flatNodes: flatNodes,
           folderTheme: effectiveTheme.folderTheme,
           parentTheme: effectiveTheme.parentTheme,
           childTheme: effectiveTheme.childTheme,
@@ -56,8 +63,7 @@ class FolderView<T> extends StatelessWidget {
         );
 
         final contentHeight = SizeService.calculateContentHeight(
-          nodes: displayNodes,
-          expandedNodeIds: expandedNodeIds,
+          itemCount: flatNodes.length,
           rowHeight: effectiveTheme.rowHeight,
           rowSpacing: effectiveTheme.rowSpacing,
           topPadding: effectiveTheme.spacingTheme.contentPadding.top,
@@ -77,7 +83,7 @@ class FolderView<T> extends StatelessWidget {
             horizontalScrollbarController,
           ) {
             return FolderViewContent<T>(
-              data: displayNodes,
+              flatNodes: flatNodes,
               mode: mode,
               onNodeTap: onNodeTap,
               onDoubleNodeTap: onDoubleNodeTap,

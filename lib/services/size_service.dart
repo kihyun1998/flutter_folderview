@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/flat_node.dart';
 import '../models/node.dart';
 import '../themes/child_node_theme.dart';
 import '../themes/expand_icon_theme.dart';
@@ -7,10 +8,12 @@ import '../themes/folder_node_theme.dart';
 import '../themes/parent_node_theme.dart';
 
 class SizeService {
-  /// Calculate the total content width of all nodes
+  /// Calculate the total content width from visible flat nodes.
+  ///
+  /// Iterates through the already-flattened visible nodes to find the widest one.
+  /// No recursion needed — the flat list already contains only visible nodes.
   static double calculateContentWidth<T>({
-    required List<Node<T>> nodes,
-    Set<String>? expandedNodeIds,
+    required List<FlatNode<T>> flatNodes,
     required FolderNodeTheme folderTheme,
     required ParentNodeTheme parentTheme,
     required ChildNodeTheme childTheme,
@@ -19,77 +22,53 @@ class SizeService {
     double rightPadding = 16.0,
     double maxWidth = double.infinity,
   }) {
-    // Calculate line width based on expand icon size
     final linePaintWidth = expandIconTheme.width +
         expandIconTheme.padding.horizontal +
         expandIconTheme.margin.horizontal;
 
     double maxNodeWidth = 0.0;
 
-    for (var node in nodes) {
+    for (final flatNode in flatNodes) {
       final nodeWidth = _calculateNodeWidth(
-        node: node,
+        node: flatNode.node,
+        depth: flatNode.depth,
         folderTheme: folderTheme,
         parentTheme: parentTheme,
         childTheme: childTheme,
         expandIconTheme: expandIconTheme,
-        depth: 0,
         linePaintWidth: linePaintWidth,
         rightPadding: rightPadding,
       );
       if (nodeWidth > maxNodeWidth) {
         maxNodeWidth = nodeWidth;
       }
-
-      // Recursively check children if expanded
-      final isExpanded = expandedNodeIds?.contains(node.id) ?? false;
-      if (isExpanded && node.children.isNotEmpty) {
-        final childrenWidth = calculateContentWidth(
-          nodes: node.children,
-          expandedNodeIds: expandedNodeIds,
-          folderTheme: folderTheme,
-          parentTheme: parentTheme,
-          childTheme: childTheme,
-          expandIconTheme: expandIconTheme,
-          leftPadding: 0.0, // Children don't need extra left padding
-          rightPadding: rightPadding,
-          maxWidth: maxWidth,
-        );
-        // Add one level of indentation for children
-        final adjustedChildWidth = childrenWidth + linePaintWidth;
-        if (adjustedChildWidth > maxNodeWidth) {
-          maxNodeWidth = adjustedChildWidth;
-        }
-      }
     }
 
-    // Add left and right padding to the final width
     final totalWidth = leftPadding + maxNodeWidth;
     return totalWidth.clamp(0.0, maxWidth);
   }
 
-  /// Calculate the width of a single node
+  /// Calculate the width of a single node including its depth indentation.
   static double _calculateNodeWidth<T>({
     required Node<T> node,
+    required int depth,
     required FolderNodeTheme folderTheme,
     required ParentNodeTheme parentTheme,
     required ChildNodeTheme childTheme,
     required ExpandIconTheme expandIconTheme,
-    required int depth,
     required double linePaintWidth,
     required double rightPadding,
   }) {
-    // Base indent (pipeline spacing)
-    double width = linePaintWidth;
+    // Indent based on depth
+    double width = depth * linePaintWidth;
 
-    // Expand/collapse icon (or space)
+    // Expand/collapse icon space
     width += expandIconTheme.width +
         expandIconTheme.padding.horizontal +
         expandIconTheme.margin.horizontal;
 
-    // Node icon and spacing based on node type
+    // Node icon and text style based on type
     double iconWidth;
-
     TextStyle? textStyle;
 
     switch (node.type) {
@@ -97,21 +76,18 @@ class SizeService {
         iconWidth = folderTheme.width +
             folderTheme.padding.horizontal +
             folderTheme.margin.horizontal;
-
         textStyle = folderTheme.textStyle ?? const TextStyle(fontSize: 14);
         break;
       case NodeType.parent:
         iconWidth = parentTheme.width +
             parentTheme.padding.horizontal +
             parentTheme.margin.horizontal;
-
         textStyle = parentTheme.textStyle ?? const TextStyle(fontSize: 14);
         break;
       case NodeType.child:
         iconWidth = childTheme.width +
             childTheme.padding.horizontal +
             childTheme.margin.horizontal;
-
         textStyle = childTheme.textStyle ?? const TextStyle(fontSize: 14);
         break;
     }
@@ -126,56 +102,26 @@ class SizeService {
     )..layout();
 
     width += textPainter.width;
-
-    // Right padding
     width += rightPadding;
 
     return width;
   }
 
-  /// Calculate the total content height of all visible nodes
-  static double calculateContentHeight<T>({
-    required List<Node<T>> nodes,
-    Set<String>? expandedNodeIds,
+  /// Calculate the total content height from a flat item count.
+  ///
+  /// Since all rows have the same fixed height, this is O(1).
+  static double calculateContentHeight({
+    required int itemCount,
     double rowHeight = 40.0,
     double rowSpacing = 0.0,
     double topPadding = 0.0,
     double bottomPadding = 0.0,
   }) {
-    double height = 0.0;
+    if (itemCount == 0) return topPadding + bottomPadding;
 
-    for (int i = 0; i < nodes.length; i++) {
-      final node = nodes[i];
+    final totalRowHeight = itemCount * rowHeight;
+    final totalSpacing = (itemCount - 1) * rowSpacing;
 
-      // Add this node's height
-      height += rowHeight;
-
-      // Add spacing after this node (except for the last node)
-      if (i < nodes.length - 1) {
-        height += rowSpacing;
-      }
-
-      // If expanded, add children's height recursively
-      final isExpanded = expandedNodeIds?.contains(node.id) ?? false;
-      if (isExpanded && node.children.isNotEmpty) {
-        // Add spacing before children
-        if (node.children.isNotEmpty) {
-          height += rowSpacing;
-        }
-
-        height += calculateContentHeight(
-          nodes: node.children,
-          expandedNodeIds: expandedNodeIds,
-          rowHeight: rowHeight,
-          rowSpacing: rowSpacing,
-          // Children don't need extra padding
-          topPadding: 0.0,
-          bottomPadding: 0.0,
-        );
-      }
-    }
-
-    // Add top and bottom padding to the total height
-    return height + topPadding + bottomPadding;
+    return totalRowHeight + totalSpacing + topPadding + bottomPadding;
   }
 }
