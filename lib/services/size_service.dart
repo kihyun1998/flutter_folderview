@@ -57,6 +57,33 @@ class SizeService {
     return totalWidth.clamp(0.0, maxWidth);
   }
 
+  /// Calculate the width of a single node (public, for lazy per-item measurement).
+  static double calculateSingleNodeWidth<T>({
+    required Node<T> node,
+    required int depth,
+    required FolderNodeTheme folderTheme,
+    required ParentNodeTheme parentTheme,
+    required ChildNodeTheme childTheme,
+    required ExpandIconTheme expandIconTheme,
+    double leftPadding = 0.0,
+    double rightPadding = 16.0,
+  }) {
+    final linePaintWidth = expandIconTheme.width +
+        expandIconTheme.padding.horizontal +
+        expandIconTheme.margin.horizontal;
+    return leftPadding +
+        _calculateNodeWidth(
+          node: node,
+          depth: depth,
+          folderTheme: folderTheme,
+          parentTheme: parentTheme,
+          childTheme: childTheme,
+          expandIconTheme: expandIconTheme,
+          linePaintWidth: linePaintWidth,
+          rightPadding: rightPadding,
+        );
+  }
+
   /// Calculate the width of a single node including its depth indentation.
   static double _calculateNodeWidth<T>({
     required Node<T> node,
