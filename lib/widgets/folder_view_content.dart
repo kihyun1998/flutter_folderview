@@ -67,97 +67,108 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   bool _isHover = false;
   final GlobalKey _listViewKey = GlobalKey();
 
-  /// Build the ListView from flat nodes
-  Widget _buildListView({
-    required List<FlatNode<T>> flatNodes,
-    required ViewMode mode,
-    required Function(Node<T>)? onNodeTap,
-    required Function(Node<T>)? onDoubleNodeTap,
-    required Function(Node<T>, TapDownDetails)? onSecondaryNodeTap,
-    required Set<String>? selectedNodeIds,
-    required Set<String>? expandedNodeIds,
-    required ScrollController horizontalController,
-    required ScrollController verticalController,
-    required double contentWidth,
-    required double viewportWidth,
-    required bool needsHorizontalScroll,
-    required FlutterFolderViewTheme<T> theme,
-  }) {
-    Widget buildItem(int index) {
-      final flatNode = flatNodes[index];
-      final isExpanded =
-          expandedNodeIds?.contains(flatNode.node.id) ?? false;
+  /// Current horizontal scroll offset, driven by horizontalController.
+  double _horizontalOffset = 0.0;
 
-      // Report this node's intrinsic width for lazy max-width tracking
-      if (widget.onNodeWidthMeasured != null) {
-        final nodeWidth = SizeService.calculateSingleNodeWidth(
-          node: flatNode.node,
-          depth: flatNode.depth,
-          folderTheme: theme.folderTheme,
-          parentTheme: theme.parentTheme,
-          childTheme: theme.childTheme,
-          expandIconTheme: theme.expandIconTheme,
-          leftPadding: theme.spacingTheme.contentPadding.left,
-          rightPadding: theme.spacingTheme.contentPadding.right,
-        );
-        widget.onNodeWidthMeasured!(nodeWidth);
-      }
+  @override
+  void initState() {
+    super.initState();
+    widget.horizontalController.addListener(_onHorizontalScroll);
+  }
 
-      return NodeWidget<T>(
-        flatNode: flatNode,
-        mode: mode,
-        onTap: onNodeTap,
-        onDoubleTap: onDoubleNodeTap,
-        onSecondaryTap: onSecondaryNodeTap,
-        selectedNodeIds: selectedNodeIds,
-        isExpanded: isExpanded,
-        theme: theme,
+  @override
+  void didUpdateWidget(covariant FolderViewContent<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.horizontalController != widget.horizontalController) {
+      oldWidget.horizontalController.removeListener(_onHorizontalScroll);
+      widget.horizontalController.addListener(_onHorizontalScroll);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.horizontalController.removeListener(_onHorizontalScroll);
+    super.dispose();
+  }
+
+  void _onHorizontalScroll() {
+    final offset = widget.horizontalController.offset;
+    if (offset != _horizontalOffset) {
+      setState(() {
+        _horizontalOffset = offset;
+      });
+    }
+  }
+
+  Widget _buildItem(int index) {
+    final flatNode = widget.flatNodes[index];
+    final isExpanded =
+        widget.expandedNodeIds?.contains(flatNode.node.id) ?? false;
+    final theme = widget.theme;
+
+    // Report this node's intrinsic width for lazy max-width tracking
+    if (widget.onNodeWidthMeasured != null) {
+      final nodeWidth = SizeService.calculateSingleNodeWidth(
+        node: flatNode.node,
+        depth: flatNode.depth,
+        folderTheme: theme.folderTheme,
+        parentTheme: theme.parentTheme,
+        childTheme: theme.childTheme,
+        expandIconTheme: theme.expandIconTheme,
+        leftPadding: theme.spacingTheme.contentPadding.left,
+        rightPadding: theme.spacingTheme.contentPadding.right,
       );
+      widget.onNodeWidthMeasured!(nodeWidth);
     }
 
-    final Widget listView = Column(
-      children: [
-        Expanded(
-          child: theme.rowSpacing > 0
-              ? ListView.separated(
-                  key: _listViewKey,
-                  controller: verticalController,
-                  padding: theme.spacingTheme.contentPadding,
-                  itemCount: flatNodes.length,
-                  separatorBuilder: (context, index) =>
-                      SizedBox(height: theme.rowSpacing),
-                  itemBuilder: (context, index) => buildItem(index),
-                )
-              : ListView.builder(
-                  key: _listViewKey,
-                  controller: verticalController,
-                  padding: theme.spacingTheme.contentPadding,
-                  itemCount: flatNodes.length,
-                  itemBuilder: (context, index) => buildItem(index),
-                ),
-        ),
-        // Only add spacing when horizontal scrollbar is actually needed
-        if (needsHorizontalScroll)
-          SizedBox(height: theme.scrollbarTheme.trackWidth),
-      ],
+    final nodeWidget = NodeWidget<T>(
+      flatNode: flatNode,
+      mode: widget.mode,
+      onTap: widget.onNodeTap,
+      onDoubleTap: widget.onDoubleNodeTap,
+      onSecondaryTap: widget.onSecondaryNodeTap,
+      selectedNodeIds: widget.selectedNodeIds,
+      isExpanded: isExpanded,
+      theme: theme,
     );
 
-    // Always wrap in SingleChildScrollView to maintain tree stability
-    return SingleChildScrollView(
-      controller: horizontalController,
-      scrollDirection: Axis.horizontal,
-      physics: needsHorizontalScroll
-          ? const ClampingScrollPhysics()
-          : const NeverScrollableScrollPhysics(),
-      child: SizedBox(
-        width: needsHorizontalScroll ? contentWidth : viewportWidth,
-        child: listView,
-      ),
+    // Apply horizontal offset via Transform.translate instead of
+    // wrapping the entire ListView in a SingleChildScrollView.
+    // This preserves ListView virtualization completely.
+    if (_horizontalOffset == 0.0) return nodeWidget;
+    return Transform.translate(
+      offset: Offset(-_horizontalOffset, 0),
+      child: nodeWidget,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = widget.theme;
+
+    // Fixed item extent enables O(1) scroll offset calculation.
+    // Without it, jumping to the middle of 20k items forces Flutter
+    // to lay out all preceding items to determine their cumulative height.
+    final double itemExtent = theme.rowHeight + theme.rowSpacing;
+
+    final Widget listView = Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            key: _listViewKey,
+            controller: widget.verticalController,
+            padding: theme.spacingTheme.contentPadding,
+            itemCount: widget.flatNodes.length,
+            itemExtent: itemExtent,
+            itemBuilder: (context, index) => _buildItem(index),
+          ),
+        ),
+        // Only add spacing when horizontal scrollbar is actually needed
+        if (widget.needsHorizontalScroll)
+          SizedBox(height: theme.scrollbarTheme.trackWidth),
+      ],
+    );
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHover = true),
       onExit: (_) => setState(() => _isHover = false),
@@ -165,20 +176,22 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
         child: Stack(
           children: [
-            _buildListView(
-              flatNodes: widget.flatNodes,
-              mode: widget.mode,
-              onNodeTap: widget.onNodeTap,
-              onDoubleNodeTap: widget.onDoubleNodeTap,
-              onSecondaryNodeTap: widget.onSecondaryNodeTap,
-              selectedNodeIds: widget.selectedNodeIds,
-              expandedNodeIds: widget.expandedNodeIds,
-              horizontalController: widget.horizontalController,
-              verticalController: widget.verticalController,
-              contentWidth: widget.contentWidth,
-              viewportWidth: widget.viewportWidth,
-              needsHorizontalScroll: widget.needsHorizontalScroll,
-              theme: widget.theme,
+            // ListView directly — no SingleChildScrollView wrapper.
+            // Horizontal offset is applied per-item via Transform.translate.
+            ClipRect(child: listView),
+
+            // Hidden SingleChildScrollView to keep horizontalController
+            // attached to a ScrollPosition (required for synced scrollbar).
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 0,
+              child: SingleChildScrollView(
+                controller: widget.horizontalController,
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(width: widget.contentWidth),
+              ),
             ),
 
             /// Vertical scrollbar
