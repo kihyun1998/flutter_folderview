@@ -146,26 +146,22 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   Widget build(BuildContext context) {
     final theme = widget.theme;
 
+    // Fixed item extent enables O(1) scroll offset calculation.
+    // Without it, jumping to the middle of 20k items forces Flutter
+    // to lay out all preceding items to determine their cumulative height.
+    final double itemExtent = theme.rowHeight + theme.rowSpacing;
+
     final Widget listView = Column(
       children: [
         Expanded(
-          child: theme.rowSpacing > 0
-              ? ListView.separated(
-                  key: _listViewKey,
-                  controller: widget.verticalController,
-                  padding: theme.spacingTheme.contentPadding,
-                  itemCount: widget.flatNodes.length,
-                  separatorBuilder: (context, index) =>
-                      SizedBox(height: theme.rowSpacing),
-                  itemBuilder: (context, index) => _buildItem(index),
-                )
-              : ListView.builder(
-                  key: _listViewKey,
-                  controller: widget.verticalController,
-                  padding: theme.spacingTheme.contentPadding,
-                  itemCount: widget.flatNodes.length,
-                  itemBuilder: (context, index) => _buildItem(index),
-                ),
+          child: ListView.builder(
+            key: _listViewKey,
+            controller: widget.verticalController,
+            padding: theme.spacingTheme.contentPadding,
+            itemCount: widget.flatNodes.length,
+            itemExtent: itemExtent,
+            itemBuilder: (context, index) => _buildItem(index),
+          ),
         ),
         // Only add spacing when horizontal scrollbar is actually needed
         if (widget.needsHorizontalScroll)
