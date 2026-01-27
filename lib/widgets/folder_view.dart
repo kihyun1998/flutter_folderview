@@ -56,6 +56,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   }
 
   /// Returns cached flat nodes, recomputing only when inputs change.
+  /// Uses incremental expand/collapse when exactly one node changed.
   List<FlatNode<T>> _getFlatNodes(List<Node<T>> displayNodes) {
     final expandedIds = widget.expandedNodeIds;
 
@@ -67,7 +68,35 @@ class _FolderViewState<T> extends State<FolderView<T>> {
       return _cachedFlatNodes;
     }
 
-    // Recompute
+    // Try incremental update when only data/mode are unchanged and
+    // exactly one node was expanded or collapsed.
+    if (identical(_cachedData, widget.data) &&
+        _cachedMode == widget.mode &&
+        _cachedFlatNodes.isNotEmpty &&
+        _cachedExpandedIds != null &&
+        expandedIds != null) {
+      final changedId = _singleDiff(_cachedExpandedIds!, expandedIds);
+      if (changedId != null) {
+        final isExpand = expandedIds.contains(changedId);
+        final result = isExpand
+            ? FlattenService.expandNode<T>(
+                currentList: _cachedFlatNodes,
+                nodeId: changedId,
+                expandedNodeIds: expandedIds,
+              )
+            : FlattenService.collapseNode<T>(
+                currentList: _cachedFlatNodes,
+                nodeId: changedId,
+              );
+        if (result != null) {
+          _cachedFlatNodes = result;
+          _cachedExpandedIds = Set<String>.of(expandedIds);
+          return _cachedFlatNodes;
+        }
+      }
+    }
+
+    // Full recompute
     _cachedFlatNodes = FlattenService.flatten<T>(
       nodes: displayNodes,
       expandedNodeIds: expandedIds,
@@ -77,6 +106,24 @@ class _FolderViewState<T> extends State<FolderView<T>> {
     _cachedExpandedIds =
         expandedIds != null ? Set<String>.of(expandedIds) : null;
     return _cachedFlatNodes;
+  }
+
+  /// Returns the single differing element between two sets, or null if
+  /// the sets differ by more than one element.
+  static String? _singleDiff(Set<String> old, Set<String> current) {
+    final diff = old.length - current.length;
+    if (diff == 1) {
+      // One node collapsed: find the element in old but not in current
+      for (final id in old) {
+        if (!current.contains(id)) return id;
+      }
+    } else if (diff == -1) {
+      // One node expanded: find the element in current but not in old
+      for (final id in current) {
+        if (!old.contains(id)) return id;
+      }
+    }
+    return null;
   }
 
   /// Efficient Set equality check: same length and same elements.
