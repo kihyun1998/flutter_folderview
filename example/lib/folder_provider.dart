@@ -94,7 +94,7 @@ class FolderState extends _$FolderState {
       final useLong = rng.nextDouble() < 0.15;
       final label = useLong
           ? longNames[rng.nextInt(longNames.length)]
-          : 'Item ${idCounter} - Document.pdf';
+          : 'Item $idCounter - Document.pdf';
       return Node<String>(
         id: id,
         label: label,
@@ -103,8 +103,11 @@ class FolderState extends _$FolderState {
       );
     }
 
-    List<Node<String>> generateLevel(String prefix, int currentDepth,
-        int maxDepth) {
+    List<Node<String>> generateLevel(
+      String prefix,
+      int currentDepth,
+      int maxDepth,
+    ) {
       final nodes = <Node<String>>[];
       final subFolderCount = rng.nextInt(4) + 1; // 1~4 sub-folders
       final childCount = rng.nextInt(6) + 1; // 1~6 children
@@ -120,16 +123,17 @@ class FolderState extends _$FolderState {
         if (currentDepth < maxDepth) {
           children = generateLevel(id, currentDepth + 1, maxDepth);
         } else {
-          children = List.generate(
-              childCount, (_) => generateChild(id));
+          children = List.generate(childCount, (_) => generateChild(id));
         }
 
-        nodes.add(Node<String>(
-          id: id,
-          label: label,
-          type: NodeType.folder,
-          children: children,
-        ));
+        nodes.add(
+          Node<String>(
+            id: id,
+            label: label,
+            type: NodeType.folder,
+            children: children,
+          ),
+        );
       }
 
       // Add some direct children at this level too
@@ -149,12 +153,14 @@ class FolderState extends _$FolderState {
           ? longNames[rng.nextInt(longNames.length)]
           : 'Department $i - Main Folder';
 
-      roots.add(Node<String>(
-        id: id,
-        label: label,
-        type: NodeType.folder,
-        children: generateLevel(id, 1, maxDepth),
-      ));
+      roots.add(
+        Node<String>(
+          id: id,
+          label: label,
+          type: NodeType.folder,
+          children: generateLevel(id, 1, maxDepth),
+        ),
+      );
     }
 
     return roots;

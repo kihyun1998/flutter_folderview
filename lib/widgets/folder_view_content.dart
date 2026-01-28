@@ -244,9 +244,23 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     // wrapping the entire ListView in a SingleChildScrollView.
     // This preserves ListView virtualization completely.
     if (_horizontalOffset == 0.0) return nodeWidget;
+
+    final overflowWidth =
+        widget.contentWidth > widget.viewportWidth ? widget.contentWidth : null;
+
     return Transform.translate(
       offset: Offset(-_horizontalOffset, 0),
-      child: nodeWidget,
+      child: overflowWidth != null
+          ? OverflowBox(
+              alignment: Alignment.centerLeft,
+              maxWidth: overflowWidth,
+              minWidth: overflowWidth,
+              child: SizedBox(
+                width: overflowWidth,
+                child: nodeWidget,
+              ),
+            )
+          : nodeWidget,
     );
   }
 

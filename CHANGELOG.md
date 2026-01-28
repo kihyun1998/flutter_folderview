@@ -1,3 +1,7 @@
+## 0.5.1
+
+- **fix**: Show full text on horizontal scroll instead of ellipsis-truncated text using `OverflowBox`
+
 ## 0.5.0
 
 - **BREAKING CHANGE**: Remove `isExpanded` property from `Node<T>` model - nodes are now immutable
