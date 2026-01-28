@@ -6,7 +6,7 @@ part of 'folder_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$folderStateHash() => r'7c087f9c237b1bb2167bded8ecb1ad79754794bd';
+String _$folderStateHash() => r'4bef2ba6f35c0d930f705d09f85ac37fb9b954e4';
 
 /// See also [FolderState].
 @ProviderFor(FolderState)

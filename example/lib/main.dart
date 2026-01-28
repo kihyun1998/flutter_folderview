@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'data/corporate_data.dart';
 import 'data/filesystem_data.dart';
@@ -12,7 +15,15 @@ import 'pages/resolver_demo_page.dart';
 import 'pages/theme_demo_page.dart';
 import 'widgets/folder_card.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows) {
+    await windowManager.ensureInitialized();
+    await windowManager.setSize(const Size(800, 600));
+    await windowManager.center();
+  }
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

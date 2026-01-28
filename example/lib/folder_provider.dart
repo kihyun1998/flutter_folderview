@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -72,52 +74,90 @@ class FolderState extends _$FolderState {
     }
   }
 
-  /// 대용량 테스트용 데이터 생성 (약 500개 노드)
-  /// - 10개 Folder
-  /// - 각 Folder당 5개 Parent (총 50개)
-  /// - 각 Parent당 10개 Child (총 500개)
+  /// 대용량 테스트용 데이터 생성
+  /// - 랜덤 깊이의 중첩 폴더 구조
+  /// - 긴 이름을 가진 노드 포함
   List<Node<String>> _generateLargeDataset() {
-    final folders = <Node<String>>[];
+    final rng = Random(42);
+    int idCounter = 0;
 
-    for (int folderIdx = 1; folderIdx <= 100; folderIdx++) {
-      final parents = <Node<String>>[];
+    final longNames = [
+      'This is a very long folder name that should definitely cause text overflow and ellipsis in the UI',
+      'Another extremely long directory name - Project Alpha Release Candidate 2024 Final Review Documentation',
+      'Deep nested folder with ridiculously long name for testing horizontal scroll behavior and text truncation',
+      'Super_Long_File_Name_With_Underscores_Instead_Of_Spaces_Configuration_Settings_Backup_2024_Final_v2.json',
+      'quarterly-financial-report-department-of-engineering-infrastructure-and-cloud-operations-2024-Q4.xlsx',
+    ];
 
-      for (int parentIdx = 1; parentIdx <= 100; parentIdx++) {
-        final children = <Node<String>>[];
-
-        for (int childIdx = 1; childIdx <= 100; childIdx++) {
-          children.add(
-            Node<String>(
-              id: 'folder_${folderIdx}_parent_${parentIdx}_child_$childIdx',
-              label:
-                  'Item $childIdx - Document $folderIdx$parentIdx$childIdx.pdf',
-              type: NodeType.child,
-              data: 'Data for F$folderIdx-P$parentIdx-C$childIdx',
-            ),
-          );
-        }
-
-        parents.add(
-          Node<String>(
-            id: 'folder_${folderIdx}_parent_$parentIdx',
-            label: 'Category $parentIdx - Project Group $folderIdx$parentIdx',
-            type: NodeType.parent,
-            children: children,
-          ),
-        );
-      }
-
-      folders.add(
-        Node<String>(
-          id: 'folder_$folderIdx',
-          label: 'Department $folderIdx - Main Folder',
-          type: NodeType.folder,
-          children: parents,
-        ),
+    Node<String> generateChild(String prefix) {
+      final id = '${prefix}_child_${++idCounter}';
+      final useLong = rng.nextDouble() < 0.15;
+      final label = useLong
+          ? longNames[rng.nextInt(longNames.length)]
+          : 'Item ${idCounter} - Document.pdf';
+      return Node<String>(
+        id: id,
+        label: label,
+        type: NodeType.child,
+        data: 'Data for $id',
       );
     }
 
-    return folders;
+    List<Node<String>> generateLevel(String prefix, int currentDepth,
+        int maxDepth) {
+      final nodes = <Node<String>>[];
+      final subFolderCount = rng.nextInt(4) + 1; // 1~4 sub-folders
+      final childCount = rng.nextInt(6) + 1; // 1~6 children
+
+      for (int i = 1; i <= subFolderCount; i++) {
+        final id = '${prefix}_folder_${++idCounter}';
+        final useLong = rng.nextDouble() < 0.2;
+        final label = useLong
+            ? longNames[rng.nextInt(longNames.length)]
+            : 'Folder $idCounter - Depth $currentDepth';
+
+        List<Node<String>> children;
+        if (currentDepth < maxDepth) {
+          children = generateLevel(id, currentDepth + 1, maxDepth);
+        } else {
+          children = List.generate(
+              childCount, (_) => generateChild(id));
+        }
+
+        nodes.add(Node<String>(
+          id: id,
+          label: label,
+          type: NodeType.folder,
+          children: children,
+        ));
+      }
+
+      // Add some direct children at this level too
+      for (int i = 0; i < rng.nextInt(4); i++) {
+        nodes.add(generateChild(prefix));
+      }
+
+      return nodes;
+    }
+
+    final roots = <Node<String>>[];
+    for (int i = 1; i <= 20; i++) {
+      final id = 'root_$i';
+      final maxDepth = rng.nextInt(5) + 2; // depth 2~6
+      final useLong = rng.nextDouble() < 0.2;
+      final label = useLong
+          ? longNames[rng.nextInt(longNames.length)]
+          : 'Department $i - Main Folder';
+
+      roots.add(Node<String>(
+        id: id,
+        label: label,
+        type: NodeType.folder,
+        children: generateLevel(id, 1, maxDepth),
+      ));
+    }
+
+    return roots;
   }
 }
 
