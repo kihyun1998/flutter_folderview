@@ -1,3 +1,8 @@
+## 0.5.2
+
+- **perf**: Replace `setState` with `ValueNotifier` for horizontal scroll offset and hover state to prevent full widget tree rebuilds
+- **perf**: Eliminate recursive list spreading in `FlattenService.flatten()` by reusing a single mutable list with add/removeLast pattern
+
 ## 0.5.1
 
 - **fix**: Show full text on horizontal scroll instead of ellipsis-truncated text using `OverflowBox`

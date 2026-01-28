@@ -14,7 +14,30 @@ class FlattenService {
     List<bool> ancestorIsLastFlags = const [],
   }) {
     final result = <FlatNode<T>>[];
+    // Use a mutable list for recursion to avoid spreading a new list
+    // at every level. Each FlatNode receives an unmodifiable snapshot.
+    final mutableFlags = List<bool>.of(ancestorIsLastFlags);
+    _flattenInto<T>(
+      result: result,
+      nodes: nodes,
+      expandedNodeIds: expandedNodeIds,
+      depth: depth,
+      isRoot: isRoot,
+      mutableFlags: mutableFlags,
+    );
+    return result;
+  }
 
+  /// Internal recursive helper that appends to [result] in-place
+  /// and reuses [mutableFlags] across sibling/child iterations.
+  static void _flattenInto<T>({
+    required List<FlatNode<T>> result,
+    required List<Node<T>> nodes,
+    required Set<String>? expandedNodeIds,
+    required int depth,
+    required bool isRoot,
+    required List<bool> mutableFlags,
+  }) {
     for (int i = 0; i < nodes.length; i++) {
       final node = nodes[i];
       final isFirst = i == 0;
@@ -26,24 +49,24 @@ class FlattenService {
         isFirst: isFirst,
         isLast: isLast,
         isRoot: isRoot,
-        ancestorIsLastFlags: ancestorIsLastFlags,
+        ancestorIsLastFlags: List<bool>.unmodifiable(mutableFlags),
       ));
 
       // Recurse into children if expanded
       final isExpanded = expandedNodeIds?.contains(node.id) ?? false;
       if (isExpanded && node.children.isNotEmpty) {
-        final childFlags = [...ancestorIsLastFlags, isLast];
-        result.addAll(flatten<T>(
+        mutableFlags.add(isLast);
+        _flattenInto<T>(
+          result: result,
           nodes: node.children,
           expandedNodeIds: expandedNodeIds,
           depth: depth + 1,
           isRoot: false,
-          ancestorIsLastFlags: childFlags,
-        ));
+          mutableFlags: mutableFlags,
+        );
+        mutableFlags.removeLast();
       }
     }
-
-    return result;
   }
 
   /// Incrementally expand a node: insert its flattened subtree right after it.
@@ -63,18 +86,21 @@ class FlattenService {
     if (node.children.isEmpty) return (list: currentList, index: idx);
 
     // Flatten only this node's children subtree
-    final childFlags = [...flatNode.ancestorIsLastFlags, flatNode.isLast];
-    final subtree = flatten<T>(
+    final childFlags = List<bool>.of(flatNode.ancestorIsLastFlags)
+      ..add(flatNode.isLast);
+    final subtree = <FlatNode<T>>[];
+    _flattenInto<T>(
+      result: subtree,
       nodes: node.children,
       expandedNodeIds: expandedNodeIds,
       depth: flatNode.depth + 1,
       isRoot: false,
-      ancestorIsLastFlags: childFlags,
+      mutableFlags: childFlags,
     );
 
-    // Insert after the node
-    final result = List<FlatNode<T>>.of(currentList);
-    result.insertAll(idx + 1, subtree);
+    // Insert after the node — modify in place to avoid full copy
+    final result = List<FlatNode<T>>.of(currentList)
+      ..insertAll(idx + 1, subtree);
     return (list: result, index: idx);
   }
 
@@ -101,8 +127,8 @@ class FlattenService {
       return (list: currentList, index: idx); // Nothing to remove
     }
 
-    final result = List<FlatNode<T>>.of(currentList);
-    result.removeRange(idx + 1, endIdx);
+    final result = List<FlatNode<T>>.of(currentList)
+      ..removeRange(idx + 1, endIdx);
     return (list: result, index: idx);
   }
 }
