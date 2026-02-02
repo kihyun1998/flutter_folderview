@@ -1,227 +1,94 @@
 import 'package:flutter/material.dart' hide TooltipTheme;
 import 'package:flutter_folderview/flutter_folderview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/theme_demo_data.dart';
+import '../providers/theme_demo_provider.dart';
+import 'large_dataset_page.dart';
 
-class ThemeDemoPage extends StatefulWidget {
+class ThemeDemoPage extends ConsumerWidget {
   const ThemeDemoPage({super.key});
 
   @override
-  State<ThemeDemoPage> createState() => _ThemeDemoPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final vm = ref.watch(themeDemoStateProvider);
+    final notifier = ref.read(themeDemoStateProvider.notifier);
 
-class _ThemeDemoPageState extends State<ThemeDemoPage> {
-  // Line Theme
-  Color _lineColor = const Color(0xFF2196F3);
-  double _lineWidth = 1.5;
-  LineStyle _lineStyle = LineStyle.connector;
-
-  // Folder Theme
-  double _folderIconSize = 20.0;
-  Color _folderIconColor = const Color(0xFF616161);
-  double _folderPadding = 0.0;
-  double _folderMargin = 0.0;
-
-  Color _folderTextColor = Colors.black87;
-  double _folderFontSize = 14.0;
-
-  // Folder Interaction Colors
-  Color _folderHoverColor = const Color(0xFFEEEEEE);
-  Color _folderSplashColor = const Color(0x4D2196F3);
-  Color _folderHighlightColor = const Color(0x1A2196F3);
-
-  // Parent Theme
-  double _parentIconSize = 20.0;
-  Color _parentIconColor = const Color(0xFF616161);
-  double _parentPadding = 0.0;
-  double _parentMargin = 0.0;
-
-  Color _parentTextColor = Colors.black87;
-  double _parentFontSize = 14.0;
-
-  // Parent Interaction Colors
-  Color _parentHoverColor = const Color(0xFFEEEEEE);
-  Color _parentSplashColor = const Color(0x4D2196F3);
-  Color _parentHighlightColor = const Color(0x1A2196F3);
-
-  // Child Theme
-  double _childIconSize = 20.0;
-  Color _childIconColor = const Color(0xFF616161);
-  double _childPadding = 0.0;
-  double _childMargin = 0.0;
-
-  Color _childTextColor = Colors.black87;
-  double _childFontSize = 14.0;
-  Color _childSelectedBg = const Color(0xFFE3F2FD);
-
-  // Child Interaction Colors
-  Color _childHoverColor = const Color(0xFFEEEEEE);
-  Color _childSplashColor = const Color(0x4D2196F3);
-  Color _childHighlightColor = const Color(0x1A2196F3);
-
-  // Expand Icon
-  double _expandIconSize = 20.0;
-  Color _expandIconColor = const Color(0xFF616161);
-  Color _expandIconExpandedColor = const Color(0xFF2196F3);
-  double _expandPadding = 0.0;
-  double _expandMargin = 0.0;
-
-  // Other
-  ViewMode _viewMode = ViewMode.folder;
-  double _borderRadius = 8.0;
-
-  // Interaction
-  double _clickInterval = 300.0;
-  double _animationDuration = 200.0;
-
-  // Layout
-  double _rowHeight = 40.0;
-  double _rowSpacing = 0.0;
-
-  // Tooltip
-  bool _folderTooltipEnabled = true;
-  Color _folderTooltipBgColor = const Color(0xFF424242);
-  bool _parentTooltipEnabled = true;
-  Color _parentTooltipBgColor = const Color(0xFF424242);
-  bool _childTooltipEnabled = true;
-  Color _childTooltipBgColor = const Color(0xFF424242);
-
-  late List<Node<String>> _data;
-  Set<String> _selectedIds = {};
-  Set<String> _expandedIds = {'1', '1-1', '2', '2-1', '2-2', '3'};
-
-  @override
-  void initState() {
-    super.initState();
-    _data = getThemeDemoData();
-  }
-
-  void _handleTap(Node<String> node) {
-    setState(() {
-      if (node.type == NodeType.child) {
-        _selectedIds.contains(node.id)
-            ? _selectedIds.remove(node.id)
-            : _selectedIds.add(node.id);
-      } else if (node.canExpand) {
-        final newSet = Set<String>.from(_expandedIds);
-        if (newSet.contains(node.id)) {
-          newSet.remove(node.id);
-        } else {
-          newSet.add(node.id);
-        }
-        _expandedIds = newSet;
-      }
-    });
-  }
-
-  void _handleDoubleTap(Node<String> node) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.mouse, color: Colors.white, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                '더블클릭: ${node.label}',
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.green.shade700,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final theme = FlutterFolderViewTheme<String>(
       lineTheme: FolderViewLineTheme(
-        lineColor: _lineColor,
-        lineWidth: _lineWidth,
-        lineStyle: _lineStyle,
+        lineColor: vm.lineColor,
+        lineWidth: vm.lineWidth,
+        lineStyle: vm.lineStyle,
       ),
       folderTheme: FolderNodeTheme<String>(
         widget: Icon(
           Icons.folder,
-          color: _folderIconColor,
-          size: _folderIconSize,
+          color: vm.folderIconColor,
+          size: vm.folderIconSize,
         ),
         openWidget: Icon(
           Icons.folder_open,
-          color: _folderIconColor,
-          size: _folderIconSize,
+          color: vm.folderIconColor,
+          size: vm.folderIconSize,
         ),
-        width: _folderIconSize,
-        height: _folderIconSize,
-        padding: EdgeInsets.symmetric(horizontal: _folderPadding),
-        margin: EdgeInsets.symmetric(horizontal: _folderMargin),
-
+        width: vm.folderIconSize,
+        height: vm.folderIconSize,
+        padding: EdgeInsets.symmetric(horizontal: vm.folderPadding),
+        margin: EdgeInsets.symmetric(horizontal: vm.folderMargin),
         textStyle: TextStyle(
-          color: _folderTextColor,
-          fontSize: _folderFontSize,
+          color: vm.folderTextColor,
+          fontSize: vm.folderFontSize,
         ),
-        hoverColor: _folderHoverColor,
-        splashColor: _folderSplashColor,
-        highlightColor: _folderHighlightColor,
+        hoverColor: vm.folderHoverColor,
+        splashColor: vm.folderSplashColor,
+        highlightColor: vm.folderHighlightColor,
         tooltipTheme: NodeTooltipTheme<String>(
-          useTooltip: _folderTooltipEnabled,
+          useTooltip: vm.folderTooltipEnabled,
           message: 'Folder node',
-          backgroundColor: _folderTooltipBgColor,
+          backgroundColor: vm.folderTooltipBgColor,
         ),
       ),
       parentTheme: ParentNodeTheme<String>(
         widget: Icon(
           Icons.account_tree,
-          color: _parentIconColor,
-          size: _parentIconSize,
+          color: vm.parentIconColor,
+          size: vm.parentIconSize,
         ),
-        width: _parentIconSize,
-        height: _parentIconSize,
-        padding: EdgeInsets.symmetric(horizontal: _parentPadding),
-        margin: EdgeInsets.symmetric(horizontal: _parentMargin),
-
+        width: vm.parentIconSize,
+        height: vm.parentIconSize,
+        padding: EdgeInsets.symmetric(horizontal: vm.parentPadding),
+        margin: EdgeInsets.symmetric(horizontal: vm.parentMargin),
         textStyle: TextStyle(
-          color: _parentTextColor,
-          fontSize: _parentFontSize,
+          color: vm.parentTextColor,
+          fontSize: vm.parentFontSize,
         ),
-        hoverColor: _parentHoverColor,
-        splashColor: _parentSplashColor,
-        highlightColor: _parentHighlightColor,
+        hoverColor: vm.parentHoverColor,
+        splashColor: vm.parentSplashColor,
+        highlightColor: vm.parentHighlightColor,
         tooltipTheme: NodeTooltipTheme<String>(
-          useTooltip: _parentTooltipEnabled,
+          useTooltip: vm.parentTooltipEnabled,
           message: 'Parent node',
-          backgroundColor: _parentTooltipBgColor,
+          backgroundColor: vm.parentTooltipBgColor,
         ),
       ),
       childTheme: ChildNodeTheme<String>(
         widget: Icon(
           Icons.insert_drive_file,
-          color: _childIconColor,
-          size: _childIconSize,
+          color: vm.childIconColor,
+          size: vm.childIconSize,
         ),
-        width: _childIconSize,
-        height: _childIconSize,
-        padding: EdgeInsets.symmetric(horizontal: _childPadding),
-        margin: EdgeInsets.symmetric(horizontal: _childMargin),
-
-        textStyle: TextStyle(color: _childTextColor, fontSize: _childFontSize),
+        width: vm.childIconSize,
+        height: vm.childIconSize,
+        padding: EdgeInsets.symmetric(horizontal: vm.childPadding),
+        margin: EdgeInsets.symmetric(horizontal: vm.childMargin),
+        textStyle: TextStyle(color: vm.childTextColor, fontSize: vm.childFontSize),
         selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-        selectedBackgroundColor: _childSelectedBg,
-        hoverColor: _childHoverColor,
-        splashColor: _childSplashColor,
-        highlightColor: _childHighlightColor,
-        clickInterval: _clickInterval.round(),
+        selectedBackgroundColor: vm.childSelectedBg,
+        hoverColor: vm.childHoverColor,
+        splashColor: vm.childSplashColor,
+        highlightColor: vm.childHighlightColor,
+        clickInterval: vm.clickInterval.round(),
         tooltipTheme: NodeTooltipTheme<String>(
-          useTooltip: _childTooltipEnabled,
+          useTooltip: vm.childTooltipEnabled,
           richMessage: TextSpan(
             children: [
               const TextSpan(
@@ -252,33 +119,63 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               ),
             ],
           ),
-          backgroundColor: _childTooltipBgColor,
+          backgroundColor: vm.childTooltipBgColor,
         ),
       ),
       expandIconTheme: ExpandIconTheme(
         widget: const Icon(Icons.chevron_right),
-        width: _expandIconSize,
-        height: _expandIconSize,
-        padding: EdgeInsets.only(left: _expandPadding),
-        margin: EdgeInsets.only(left: _expandMargin),
-        color: _expandIconColor,
-        expandedColor: _expandIconExpandedColor,
+        width: vm.expandIconSize,
+        height: vm.expandIconSize,
+        padding: EdgeInsets.only(left: vm.expandPadding),
+        margin: EdgeInsets.only(left: vm.expandMargin),
+        color: vm.expandIconColor,
+        expandedColor: vm.expandIconExpandedColor,
       ),
       scrollbarTheme: FolderViewScrollbarTheme(
         thumbColor: Colors.grey.shade600,
         trackColor: Colors.grey.shade200,
       ),
-      nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _borderRadius),
-      animationDuration: _animationDuration.round(),
-      rowHeight: _rowHeight,
-      rowSpacing: _rowSpacing,
+      nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: vm.borderRadius),
+      animationDuration: vm.animationDuration.round(),
+      rowHeight: vm.rowHeight,
+      rowSpacing: vm.rowSpacing,
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Theme Demo'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Theme Demo'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.unfold_more),
+            tooltip: 'Expand All',
+            onPressed: notifier.expandAll,
+          ),
+          IconButton(
+            icon: const Icon(Icons.unfold_less),
+            tooltip: 'Collapse All',
+            onPressed: notifier.collapseAll,
+          ),
+          IconButton(
+            icon: const Icon(Icons.dataset_outlined),
+            tooltip: 'Large Dataset Test',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LargeDatasetPage(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Row(
         children: [
-          SizedBox(width: 350, child: _buildControls()),
+          SizedBox(
+            width: 350,
+            child: _ThemeControls(vm: vm, notifier: notifier),
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -286,12 +183,44 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: FolderView<String>(
-                    data: _data,
-                    mode: _viewMode,
-                    onNodeTap: _handleTap,
-                    onDoubleNodeTap: _handleDoubleTap,
-                    selectedNodeIds: _selectedIds,
-                    expandedNodeIds: _expandedIds,
+                    data: vm.nodes,
+                    mode: vm.viewMode,
+                    onNodeTap: (node) {
+                      if (node.type == NodeType.child) {
+                        notifier.selectNode(node.id);
+                      } else if (node.canExpand) {
+                        notifier.toggleNode(node.id);
+                      }
+                    },
+                    onDoubleNodeTap: (node) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              const Icon(Icons.mouse, color: Colors.white, size: 20),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  '더블클릭: ${node.label}',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          backgroundColor: Colors.green.shade700,
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      );
+                    },
+                    selectedNodeIds: vm.selectedIds,
+                    expandedNodeIds: vm.expandedIds,
                     theme: theme,
                   ),
                 ),
@@ -302,79 +231,32 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
       ),
     );
   }
+}
 
-  Widget _buildControls() {
+class _ThemeControls extends StatelessWidget {
+  final ThemeDemoViewModel vm;
+  final ThemeDemoState notifier;
+
+  const _ThemeControls({required this.vm, required this.notifier});
+
+  @override
+  Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildViewMode(),
-        _buildLineControls(),
-        _buildExpandIconControls(),
-        _buildFolderControls(),
-        _buildParentControls(),
-        _buildChildControls(),
-        _buildTooltipControls(),
-        _buildNodeStyleControls(),
-        _buildLayoutControls(),
-        _buildInteractionControls(),
+        _buildViewMode(context),
+        _buildLineControls(context),
+        _buildExpandIconControls(context),
+        _buildFolderControls(context),
+        _buildParentControls(context),
+        _buildChildControls(context),
+        _buildTooltipControls(context),
+        _buildNodeStyleControls(context),
+        _buildLayoutControls(context),
+        _buildInteractionControls(context),
         const SizedBox(height: 16),
         FilledButton.icon(
-          onPressed: () => setState(() {
-            _lineColor = const Color(0xFF2196F3);
-            _lineWidth = 1.5;
-            _lineStyle = LineStyle.connector;
-            _folderIconSize = 20.0;
-            _folderIconColor = const Color(0xFF616161);
-            _folderPadding = 0.0;
-            _folderMargin = 0.0;
-
-            _folderTextColor = Colors.black87;
-            _folderFontSize = 14.0;
-            _folderHoverColor = const Color(0xFFEEEEEE);
-            _folderSplashColor = const Color(0x4D2196F3);
-            _folderHighlightColor = const Color(0x1A2196F3);
-            _parentIconSize = 20.0;
-            _parentIconColor = const Color(0xFF616161);
-            _parentPadding = 0.0;
-            _parentMargin = 0.0;
-
-            _parentTextColor = Colors.black87;
-            _parentFontSize = 14.0;
-            _parentHoverColor = const Color(0xFFEEEEEE);
-            _parentSplashColor = const Color(0x4D2196F3);
-            _parentHighlightColor = const Color(0x1A2196F3);
-            _childIconSize = 20.0;
-            _childIconColor = const Color(0xFF616161);
-            _childPadding = 0.0;
-            _childMargin = 0.0;
-
-            _childTextColor = Colors.black87;
-            _childFontSize = 14.0;
-            _childSelectedBg = const Color(0xFFE3F2FD);
-            _childHoverColor = const Color(0xFFEEEEEE);
-            _childSplashColor = const Color(0x4D2196F3);
-            _childHighlightColor = const Color(0x1A2196F3);
-            _expandIconSize = 20.0;
-            _expandIconColor = const Color(0xFF616161);
-            _expandIconExpandedColor = const Color(0xFF2196F3);
-            _expandPadding = 0.0;
-            _expandMargin = 0.0;
-            _viewMode = ViewMode.folder;
-            _borderRadius = 8.0;
-            _clickInterval = 300.0;
-            _animationDuration = 200.0;
-            _rowHeight = 40.0;
-            _rowSpacing = 0.0;
-            _folderTooltipEnabled = true;
-            _folderTooltipBgColor = const Color(0xFF424242);
-            _parentTooltipEnabled = true;
-            _parentTooltipBgColor = const Color(0xFF424242);
-            _childTooltipEnabled = true;
-            _childTooltipBgColor = const Color(0xFF424242);
-            _data = getThemeDemoData();
-            _selectedIds = {};
-            _expandedIds = {'1', '1-1', '2', '2-1', '2-2', '3'};
-          }),
+          onPressed: notifier.reset,
           icon: const Icon(Icons.refresh),
           label: const Text('Reset'),
         ),
@@ -382,7 +264,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _buildViewMode() {
+  Widget _buildViewMode(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -399,8 +281,8 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
                 ButtonSegment(value: ViewMode.folder, label: Text('Folder')),
                 ButtonSegment(value: ViewMode.tree, label: Text('Tree')),
               ],
-              selected: {_viewMode},
-              onSelectionChanged: (s) => setState(() => _viewMode = s.first),
+              selected: {vm.viewMode},
+              onSelectionChanged: (s) => notifier.setViewMode(s.first),
             ),
           ],
         ),
@@ -408,7 +290,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _buildLineControls() {
+  Widget _buildLineControls(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -416,39 +298,28 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Line', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider(
-              'Width',
-              _lineWidth,
-              0.5,
-              5,
-              (v) => setState(() => _lineWidth = v),
-            ),
-            _colorRow(
-              'Color',
-              _lineColor,
-              (c) => setState(() => _lineColor = c),
-            ),
+            _slider('Width', vm.lineWidth, 0.5, 5, notifier.setLineWidth),
+            _colorRow(context, 'Color', vm.lineColor, notifier.setLineColor),
             Wrap(
               spacing: 4,
               children: [
                 ChoiceChip(
                   label: const Text('Connect', style: TextStyle(fontSize: 12)),
-                  selected: _lineStyle == LineStyle.connector,
-                  onSelected: (s) => s
-                      ? setState(() => _lineStyle = LineStyle.connector)
-                      : null,
+                  selected: vm.lineStyle == LineStyle.connector,
+                  onSelected: (s) =>
+                      s ? notifier.setLineStyle(LineStyle.connector) : null,
                 ),
                 ChoiceChip(
                   label: const Text('Scope', style: TextStyle(fontSize: 12)),
-                  selected: _lineStyle == LineStyle.scope,
+                  selected: vm.lineStyle == LineStyle.scope,
                   onSelected: (s) =>
-                      s ? setState(() => _lineStyle = LineStyle.scope) : null,
+                      s ? notifier.setLineStyle(LineStyle.scope) : null,
                 ),
                 ChoiceChip(
                   label: const Text('None', style: TextStyle(fontSize: 12)),
-                  selected: _lineStyle == LineStyle.none,
+                  selected: vm.lineStyle == LineStyle.none,
                   onSelected: (s) =>
-                      s ? setState(() => _lineStyle = LineStyle.none) : null,
+                      s ? notifier.setLineStyle(LineStyle.none) : null,
                 ),
               ],
             ),
@@ -458,7 +329,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _buildExpandIconControls() {
+  Widget _buildExpandIconControls(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -469,44 +340,28 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               'Expand Icon',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            _slider(
-              'Size',
-              _expandIconSize,
-              12,
-              32,
-              (v) => setState(() => _expandIconSize = v),
-            ),
+            _slider('Size', vm.expandIconSize, 12, 32, notifier.setExpandIconSize),
             _colorRow(
+              context,
               'Collapsed Color',
-              _expandIconColor,
-              (c) => setState(() => _expandIconColor = c),
+              vm.expandIconColor,
+              notifier.setExpandIconColor,
             ),
             _colorRow(
+              context,
               'Expanded Color',
-              _expandIconExpandedColor,
-              (c) => setState(() => _expandIconExpandedColor = c),
+              vm.expandIconExpandedColor,
+              notifier.setExpandIconExpandedColor,
             ),
-            _slider(
-              'Padding',
-              _expandPadding,
-              0,
-              8,
-              (v) => setState(() => _expandPadding = v),
-            ),
-            _slider(
-              'Margin',
-              _expandMargin,
-              0,
-              8,
-              (v) => setState(() => _expandMargin = v),
-            ),
+            _slider('Padding', vm.expandPadding, 0, 8, notifier.setExpandPadding),
+            _slider('Margin', vm.expandMargin, 0, 8, notifier.setExpandMargin),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFolderControls() {
+  Widget _buildFolderControls(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -516,43 +371,26 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             const Text('Folder', style: TextStyle(fontWeight: FontWeight.bold)),
             _slider(
               'Icon Size',
-              _folderIconSize,
+              vm.folderIconSize,
               12,
               32,
-              (v) => setState(() => _folderIconSize = v),
+              notifier.setFolderIconSize,
             ),
             _colorRow(
+              context,
               'Icon',
-              _folderIconColor,
-              (c) => setState(() => _folderIconColor = c),
+              vm.folderIconColor,
+              notifier.setFolderIconColor,
             ),
-            _slider(
-              'Padding',
-              _folderPadding,
-              0,
-              8,
-              (v) => setState(() => _folderPadding = v),
-            ),
-            _slider(
-              'Margin',
-              _folderMargin,
-              0,
-              8,
-              (v) => setState(() => _folderMargin = v),
-            ),
-
+            _slider('Padding', vm.folderPadding, 0, 8, notifier.setFolderPadding),
+            _slider('Margin', vm.folderMargin, 0, 8, notifier.setFolderMargin),
             _colorRow(
+              context,
               'Text',
-              _folderTextColor,
-              (c) => setState(() => _folderTextColor = c),
+              vm.folderTextColor,
+              notifier.setFolderTextColor,
             ),
-            _slider(
-              'Font',
-              _folderFontSize,
-              10,
-              24,
-              (v) => setState(() => _folderFontSize = v),
-            ),
+            _slider('Font', vm.folderFontSize, 10, 24, notifier.setFolderFontSize),
             const Divider(),
             const Text(
               'Interaction',
@@ -560,19 +398,22 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             ),
             const SizedBox(height: 4),
             _colorRow(
+              context,
               'Hover',
-              _folderHoverColor,
-              (c) => setState(() => _folderHoverColor = c),
+              vm.folderHoverColor,
+              notifier.setFolderHoverColor,
             ),
             _colorRow(
+              context,
               'Splash',
-              _folderSplashColor,
-              (c) => setState(() => _folderSplashColor = c),
+              vm.folderSplashColor,
+              notifier.setFolderSplashColor,
             ),
             _colorRow(
+              context,
               'Highlight',
-              _folderHighlightColor,
-              (c) => setState(() => _folderHighlightColor = c),
+              vm.folderHighlightColor,
+              notifier.setFolderHighlightColor,
             ),
           ],
         ),
@@ -580,7 +421,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _buildParentControls() {
+  Widget _buildParentControls(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -590,43 +431,26 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             const Text('Parent', style: TextStyle(fontWeight: FontWeight.bold)),
             _slider(
               'Icon Size',
-              _parentIconSize,
+              vm.parentIconSize,
               12,
               32,
-              (v) => setState(() => _parentIconSize = v),
+              notifier.setParentIconSize,
             ),
             _colorRow(
+              context,
               'Icon',
-              _parentIconColor,
-              (c) => setState(() => _parentIconColor = c),
+              vm.parentIconColor,
+              notifier.setParentIconColor,
             ),
-            _slider(
-              'Padding',
-              _parentPadding,
-              0,
-              8,
-              (v) => setState(() => _parentPadding = v),
-            ),
-            _slider(
-              'Margin',
-              _parentMargin,
-              0,
-              8,
-              (v) => setState(() => _parentMargin = v),
-            ),
-
+            _slider('Padding', vm.parentPadding, 0, 8, notifier.setParentPadding),
+            _slider('Margin', vm.parentMargin, 0, 8, notifier.setParentMargin),
             _colorRow(
+              context,
               'Text',
-              _parentTextColor,
-              (c) => setState(() => _parentTextColor = c),
+              vm.parentTextColor,
+              notifier.setParentTextColor,
             ),
-            _slider(
-              'Font',
-              _parentFontSize,
-              10,
-              24,
-              (v) => setState(() => _parentFontSize = v),
-            ),
+            _slider('Font', vm.parentFontSize, 10, 24, notifier.setParentFontSize),
             const Divider(),
             const Text(
               'Interaction',
@@ -634,19 +458,22 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             ),
             const SizedBox(height: 4),
             _colorRow(
+              context,
               'Hover',
-              _parentHoverColor,
-              (c) => setState(() => _parentHoverColor = c),
+              vm.parentHoverColor,
+              notifier.setParentHoverColor,
             ),
             _colorRow(
+              context,
               'Splash',
-              _parentSplashColor,
-              (c) => setState(() => _parentSplashColor = c),
+              vm.parentSplashColor,
+              notifier.setParentSplashColor,
             ),
             _colorRow(
+              context,
               'Highlight',
-              _parentHighlightColor,
-              (c) => setState(() => _parentHighlightColor = c),
+              vm.parentHighlightColor,
+              notifier.setParentHighlightColor,
             ),
           ],
         ),
@@ -654,7 +481,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _buildChildControls() {
+  Widget _buildChildControls(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -664,48 +491,32 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             const Text('Child', style: TextStyle(fontWeight: FontWeight.bold)),
             _slider(
               'Icon Size',
-              _childIconSize,
+              vm.childIconSize,
               12,
               32,
-              (v) => setState(() => _childIconSize = v),
+              notifier.setChildIconSize,
             ),
             _colorRow(
+              context,
               'Icon',
-              _childIconColor,
-              (c) => setState(() => _childIconColor = c),
+              vm.childIconColor,
+              notifier.setChildIconColor,
             ),
-            _slider(
-              'Padding',
-              _childPadding,
-              0,
-              8,
-              (v) => setState(() => _childPadding = v),
-            ),
-            _slider(
-              'Margin',
-              _childMargin,
-              0,
-              8,
-              (v) => setState(() => _childMargin = v),
-            ),
-
+            _slider('Padding', vm.childPadding, 0, 8, notifier.setChildPadding),
+            _slider('Margin', vm.childMargin, 0, 8, notifier.setChildMargin),
             _colorRow(
+              context,
               'Text',
-              _childTextColor,
-              (c) => setState(() => _childTextColor = c),
+              vm.childTextColor,
+              notifier.setChildTextColor,
             ),
-            _slider(
-              'Font',
-              _childFontSize,
-              10,
-              24,
-              (v) => setState(() => _childFontSize = v),
-            ),
+            _slider('Font', vm.childFontSize, 10, 24, notifier.setChildFontSize),
             const Divider(),
             _colorRow(
+              context,
               'Selected BG',
-              _childSelectedBg,
-              (c) => setState(() => _childSelectedBg = c),
+              vm.childSelectedBg,
+              notifier.setChildSelectedBg,
             ),
             const Divider(),
             const Text(
@@ -714,19 +525,22 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             ),
             const SizedBox(height: 4),
             _colorRow(
+              context,
               'Hover',
-              _childHoverColor,
-              (c) => setState(() => _childHoverColor = c),
+              vm.childHoverColor,
+              notifier.setChildHoverColor,
             ),
             _colorRow(
+              context,
               'Splash',
-              _childSplashColor,
-              (c) => setState(() => _childSplashColor = c),
+              vm.childSplashColor,
+              notifier.setChildSplashColor,
             ),
             _colorRow(
+              context,
               'Highlight',
-              _childHighlightColor,
-              (c) => setState(() => _childHighlightColor = c),
+              vm.childHighlightColor,
+              notifier.setChildHighlightColor,
             ),
           ],
         ),
@@ -734,7 +548,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _buildTooltipControls() {
+  Widget _buildTooltipControls(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -749,60 +563,55 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             SwitchListTile(
               dense: true,
               contentPadding: EdgeInsets.zero,
-              title: const Text(
-                'Folder Tooltip',
-                style: TextStyle(fontSize: 12),
-              ),
-              value: _folderTooltipEnabled,
-              onChanged: (v) => setState(() => _folderTooltipEnabled = v),
+              title: const Text('Folder Tooltip', style: TextStyle(fontSize: 12)),
+              value: vm.folderTooltipEnabled,
+              onChanged: notifier.setFolderTooltipEnabled,
             ),
-            if (_folderTooltipEnabled)
+            if (vm.folderTooltipEnabled)
               Padding(
                 padding: const EdgeInsets.only(left: 16, bottom: 8),
                 child: _colorRow(
+                  context,
                   'BG Color',
-                  _folderTooltipBgColor,
-                  (c) => setState(() => _folderTooltipBgColor = c),
+                  vm.folderTooltipBgColor,
+                  notifier.setFolderTooltipBgColor,
                 ),
               ),
             const Divider(),
             SwitchListTile(
               dense: true,
               contentPadding: EdgeInsets.zero,
-              title: const Text(
-                'Parent Tooltip',
-                style: TextStyle(fontSize: 12),
-              ),
-              value: _parentTooltipEnabled,
-              onChanged: (v) => setState(() => _parentTooltipEnabled = v),
+              title: const Text('Parent Tooltip', style: TextStyle(fontSize: 12)),
+              value: vm.parentTooltipEnabled,
+              onChanged: notifier.setParentTooltipEnabled,
             ),
-            if (_parentTooltipEnabled)
+            if (vm.parentTooltipEnabled)
               Padding(
                 padding: const EdgeInsets.only(left: 16, bottom: 8),
                 child: _colorRow(
+                  context,
                   'BG Color',
-                  _parentTooltipBgColor,
-                  (c) => setState(() => _parentTooltipBgColor = c),
+                  vm.parentTooltipBgColor,
+                  notifier.setParentTooltipBgColor,
                 ),
               ),
             const Divider(),
             SwitchListTile(
               dense: true,
               contentPadding: EdgeInsets.zero,
-              title: const Text(
-                'Child Tooltip (Rich)',
-                style: TextStyle(fontSize: 12),
-              ),
-              value: _childTooltipEnabled,
-              onChanged: (v) => setState(() => _childTooltipEnabled = v),
+              title:
+                  const Text('Child Tooltip (Rich)', style: TextStyle(fontSize: 12)),
+              value: vm.childTooltipEnabled,
+              onChanged: notifier.setChildTooltipEnabled,
             ),
-            if (_childTooltipEnabled)
+            if (vm.childTooltipEnabled)
               Padding(
                 padding: const EdgeInsets.only(left: 16, bottom: 8),
                 child: _colorRow(
+                  context,
                   'BG Color',
-                  _childTooltipBgColor,
-                  (c) => setState(() => _childTooltipBgColor = c),
+                  vm.childTooltipBgColor,
+                  notifier.setChildTooltipBgColor,
                 ),
               ),
             const SizedBox(height: 4),
@@ -816,7 +625,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _buildNodeStyleControls() {
+  Widget _buildNodeStyleControls(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -827,20 +636,14 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
               'Node Style',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            _slider(
-              'Border Radius',
-              _borderRadius,
-              0,
-              20,
-              (v) => setState(() => _borderRadius = v),
-            ),
+            _slider('Border Radius', vm.borderRadius, 0, 20, notifier.setBorderRadius),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLayoutControls() {
+  Widget _buildLayoutControls(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -848,26 +651,14 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Layout', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider(
-              'Row Height',
-              _rowHeight,
-              20,
-              80,
-              (v) => setState(() => _rowHeight = v),
-            ),
+            _slider('Row Height', vm.rowHeight, 20, 80, notifier.setRowHeight),
             const SizedBox(height: 4),
             Text(
               'Height of each row/node',
               style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
             ),
             const SizedBox(height: 12),
-            _slider(
-              'Row Spacing',
-              _rowSpacing,
-              0,
-              20,
-              (v) => setState(() => _rowSpacing = v),
-            ),
+            _slider('Row Spacing', vm.rowSpacing, 0, 20, notifier.setRowSpacing),
             const SizedBox(height: 4),
             Text(
               'Vertical spacing between rows',
@@ -879,7 +670,7 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _buildInteractionControls() {
+  Widget _buildInteractionControls(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -892,10 +683,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             ),
             _slider(
               'Click Interval (ms)',
-              _clickInterval,
+              vm.clickInterval,
               100,
               1000,
-              (v) => setState(() => _clickInterval = v),
+              notifier.setClickInterval,
             ),
             const SizedBox(height: 4),
             Text(
@@ -905,10 +696,10 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             const SizedBox(height: 12),
             _slider(
               'Animation Duration (ms)',
-              _animationDuration,
+              vm.animationDuration,
               50,
               800,
-              (v) => setState(() => _animationDuration = v),
+              notifier.setAnimationDuration,
             ),
             const SizedBox(height: 4),
             Text(
@@ -955,7 +746,12 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
     );
   }
 
-  Widget _colorRow(String label, Color value, ValueChanged<Color> onChange) {
+  Widget _colorRow(
+    BuildContext context,
+    String label,
+    Color value,
+    ValueChanged<Color> onChange,
+  ) {
     final colors = [
       const Color(0xFF2196F3),
       const Color(0xFF4CAF50),
