@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -267,6 +269,157 @@ class ThemeDemoState extends _$ThemeDemoState {
       expandedIds: {'1', '1-1', '2', '2-1', '2-2', '3'},
     );
   }
+
+  // Data generation parameters
+  void setGenRootCount(int count) {
+    state = state.copyWith(genRootCount: count);
+  }
+
+  void setGenMaxDepth(int depth) {
+    state = state.copyWith(genMaxDepth: depth);
+  }
+
+  void setGenSubFolderCount(int count) {
+    state = state.copyWith(genSubFolderCount: count);
+  }
+
+  void setGenParentCount(int count) {
+    state = state.copyWith(genParentCount: count);
+  }
+
+  void setGenChildCount(int count) {
+    state = state.copyWith(genChildCount: count);
+  }
+
+  // Load demo data
+  void loadDemoData() {
+    state = state.copyWith(
+      nodes: getThemeDemoData(),
+      selectedIds: {},
+      expandedIds: {'1', '1-1', '2', '2-1', '2-2', '3'},
+      genRootCount: 5,
+      genMaxDepth: 2,
+      genSubFolderCount: 3,
+      genParentCount: 3,
+      genChildCount: 5,
+    );
+  }
+
+  // Generate data based on parameters
+  void generateData() {
+    final nodes = _generateDataset(
+      rootCount: state.genRootCount,
+      maxDepth: state.genMaxDepth,
+      subFolderCount: state.genSubFolderCount,
+      parentCount: state.genParentCount,
+      childCount: state.genChildCount,
+    );
+    state = state.copyWith(nodes: nodes, selectedIds: {}, expandedIds: {});
+  }
+
+  List<Node<String>> _generateDataset({
+    required int rootCount,
+    required int maxDepth,
+    required int subFolderCount,
+    required int parentCount,
+    required int childCount,
+  }) {
+    final rng = Random(42);
+    int idCounter = 0;
+
+    final longNames = [
+      'This is a very long folder name that should cause text overflow',
+      'Another extremely long directory name - Project Alpha Release 2024',
+      'Deep nested folder with ridiculously long name for testing scroll',
+      'Super_Long_File_Name_With_Underscores_Configuration_v2.json',
+      'quarterly-financial-report-infrastructure-operations-2024-Q4.xlsx',
+    ];
+
+    Node<String> generateChild(String prefix) {
+      final id = '${prefix}_child_${++idCounter}';
+      final useLong = rng.nextDouble() < 0.1;
+      final label = useLong
+          ? longNames[rng.nextInt(longNames.length)]
+          : 'Item $idCounter.pdf';
+      return Node<String>(
+        id: id,
+        label: label,
+        type: NodeType.child,
+        data: 'Data for $id',
+      );
+    }
+
+    List<Node<String>> generateParents(String prefix) {
+      final parents = <Node<String>>[];
+      for (int i = 1; i <= parentCount; i++) {
+        final id = '${prefix}_parent_${++idCounter}';
+        final useLong = rng.nextDouble() < 0.1;
+        final label = useLong
+            ? longNames[rng.nextInt(longNames.length)]
+            : 'Category $idCounter';
+
+        parents.add(
+          Node<String>(
+            id: id,
+            label: label,
+            type: NodeType.parent,
+            children: List.generate(childCount, (_) => generateChild(id)),
+          ),
+        );
+      }
+      return parents;
+    }
+
+    List<Node<String>> generateFolderLevel(String prefix, int currentDepth) {
+      final nodes = <Node<String>>[];
+
+      for (int i = 1; i <= subFolderCount; i++) {
+        final id = '${prefix}_folder_${++idCounter}';
+        final useLong = rng.nextDouble() < 0.15;
+        final label = useLong
+            ? longNames[rng.nextInt(longNames.length)]
+            : 'Folder $idCounter - Depth $currentDepth';
+
+        List<Node<String>> children;
+        if (currentDepth < maxDepth) {
+          children = generateFolderLevel(id, currentDepth + 1);
+        } else {
+          children = generateParents(id);
+        }
+
+        nodes.add(
+          Node<String>(
+            id: id,
+            label: label,
+            type: NodeType.folder,
+            children: children,
+          ),
+        );
+      }
+
+      return nodes;
+    }
+
+    final roots = <Node<String>>[];
+    for (int i = 1; i <= rootCount; i++) {
+      final id = 'root_$i';
+      final useLong = rng.nextDouble() < 0.15;
+      final label = useLong
+          ? longNames[rng.nextInt(longNames.length)]
+          : 'Department $i';
+
+      roots.add(
+        Node<String>(
+          id: id,
+          label: label,
+          type: NodeType.folder,
+          children: generateFolderLevel(id, 1),
+        ),
+      );
+    }
+
+    return roots;
+  }
 }
 
 class ThemeDemoViewModel {
@@ -343,6 +496,37 @@ class ThemeDemoViewModel {
   final bool childTooltipEnabled;
   final Color childTooltipBgColor;
 
+  // Data generation parameters
+  final int genRootCount;
+  final int genMaxDepth;
+  final int genSubFolderCount;
+  final int genParentCount;
+  final int genChildCount;
+
+  /// Calculate estimated node count based on current parameters
+  int get estimatedNodeCount {
+    // Folders at each depth level
+    int totalFolders = genRootCount;
+    int foldersAtCurrentDepth = genRootCount;
+    for (int d = 1; d <= genMaxDepth; d++) {
+      foldersAtCurrentDepth *= genSubFolderCount;
+      totalFolders += foldersAtCurrentDepth;
+    }
+    // Leaf folders (at max depth)
+    final leafFolders = genRootCount * _pow(genSubFolderCount, genMaxDepth);
+    final totalParents = leafFolders * genParentCount;
+    final totalChildren = totalParents * genChildCount;
+    return totalFolders + totalParents + totalChildren;
+  }
+
+  static int _pow(int base, int exp) {
+    int result = 1;
+    for (int i = 0; i < exp; i++) {
+      result *= base;
+    }
+    return result;
+  }
+
   ThemeDemoViewModel({
     required this.nodes,
     this.selectedIds = const {},
@@ -404,6 +588,12 @@ class ThemeDemoViewModel {
     this.parentTooltipBgColor = const Color(0xFF424242),
     this.childTooltipEnabled = true,
     this.childTooltipBgColor = const Color(0xFF424242),
+    // Data generation defaults
+    this.genRootCount = 5,
+    this.genMaxDepth = 2,
+    this.genSubFolderCount = 3,
+    this.genParentCount = 3,
+    this.genChildCount = 5,
   });
 
   ThemeDemoViewModel copyWith({
@@ -458,6 +648,11 @@ class ThemeDemoViewModel {
     Color? parentTooltipBgColor,
     bool? childTooltipEnabled,
     Color? childTooltipBgColor,
+    int? genRootCount,
+    int? genMaxDepth,
+    int? genSubFolderCount,
+    int? genParentCount,
+    int? genChildCount,
   }) {
     return ThemeDemoViewModel(
       nodes: nodes ?? this.nodes,
@@ -512,6 +707,11 @@ class ThemeDemoViewModel {
       parentTooltipBgColor: parentTooltipBgColor ?? this.parentTooltipBgColor,
       childTooltipEnabled: childTooltipEnabled ?? this.childTooltipEnabled,
       childTooltipBgColor: childTooltipBgColor ?? this.childTooltipBgColor,
+      genRootCount: genRootCount ?? this.genRootCount,
+      genMaxDepth: genMaxDepth ?? this.genMaxDepth,
+      genSubFolderCount: genSubFolderCount ?? this.genSubFolderCount,
+      genParentCount: genParentCount ?? this.genParentCount,
+      genChildCount: genChildCount ?? this.genChildCount,
     );
   }
 }

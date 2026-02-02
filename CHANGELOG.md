@@ -1,3 +1,7 @@
+## 0.5.3
+
+- **fix**: Recursively collect parent nodes from nested folders in tree mode
+
 ## 0.5.2
 
 - **perf**: Replace `setState` with `ValueNotifier` for horizontal scroll offset and hover state to prevent full widget tree rebuilds

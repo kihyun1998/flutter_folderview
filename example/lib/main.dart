@@ -31,11 +31,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         brightness: Brightness.light,
       ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-        brightness: Brightness.dark,
-      ),
+      themeMode: ThemeMode.light,
       home: const ThemeDemoPage(),
     );
   }

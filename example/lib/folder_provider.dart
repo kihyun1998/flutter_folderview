@@ -103,14 +103,37 @@ class FolderState extends _$FolderState {
       );
     }
 
-    List<Node<String>> generateLevel(
+    /// Generate parent nodes with children (leaf level)
+    List<Node<String>> generateParents(String prefix, int count) {
+      final parents = <Node<String>>[];
+      for (int i = 1; i <= count; i++) {
+        final id = '${prefix}_parent_${++idCounter}';
+        final childCount = rng.nextInt(6) + 1;
+        final useLong = rng.nextDouble() < 0.15;
+        final label = useLong
+            ? longNames[rng.nextInt(longNames.length)]
+            : 'Category $idCounter';
+
+        parents.add(
+          Node<String>(
+            id: id,
+            label: label,
+            type: NodeType.parent,
+            children: List.generate(childCount, (_) => generateChild(id)),
+          ),
+        );
+      }
+      return parents;
+    }
+
+    /// Generate folder hierarchy (Folder > Folder > ... > Parent > Child)
+    List<Node<String>> generateFolderLevel(
       String prefix,
       int currentDepth,
       int maxDepth,
     ) {
       final nodes = <Node<String>>[];
-      final subFolderCount = rng.nextInt(4) + 1; // 1~4 sub-folders
-      final childCount = rng.nextInt(6) + 1; // 1~6 children
+      final subFolderCount = rng.nextInt(3) + 1; // 1~3 sub-folders
 
       for (int i = 1; i <= subFolderCount; i++) {
         final id = '${prefix}_folder_${++idCounter}';
@@ -121,9 +144,12 @@ class FolderState extends _$FolderState {
 
         List<Node<String>> children;
         if (currentDepth < maxDepth) {
-          children = generateLevel(id, currentDepth + 1, maxDepth);
+          // More folder levels
+          children = generateFolderLevel(id, currentDepth + 1, maxDepth);
         } else {
-          children = List.generate(childCount, (_) => generateChild(id));
+          // Leaf level: generate parents with children
+          final parentCount = rng.nextInt(4) + 2; // 2~5 parents
+          children = generateParents(id, parentCount);
         }
 
         nodes.add(
@@ -136,18 +162,13 @@ class FolderState extends _$FolderState {
         );
       }
 
-      // Add some direct children at this level too
-      for (int i = 0; i < rng.nextInt(4); i++) {
-        nodes.add(generateChild(prefix));
-      }
-
       return nodes;
     }
 
     final roots = <Node<String>>[];
-    for (int i = 1; i <= 20; i++) {
+    for (int i = 1; i <= 10; i++) {
       final id = 'root_$i';
-      final maxDepth = rng.nextInt(5) + 2; // depth 2~6
+      final maxDepth = rng.nextInt(3) + 1; // depth 1~3 of folders
       final useLong = rng.nextDouble() < 0.2;
       final label = useLong
           ? longNames[rng.nextInt(longNames.length)]
@@ -158,7 +179,7 @@ class FolderState extends _$FolderState {
           id: id,
           label: label,
           type: NodeType.folder,
-          children: generateLevel(id, 1, maxDepth),
+          children: generateFolderLevel(id, 1, maxDepth),
         ),
       );
     }

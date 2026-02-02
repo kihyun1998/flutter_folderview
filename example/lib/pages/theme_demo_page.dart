@@ -3,7 +3,6 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/theme_demo_provider.dart';
-import 'large_dataset_page.dart';
 
 class ThemeDemoPage extends ConsumerWidget {
   const ThemeDemoPage({super.key});
@@ -80,7 +79,10 @@ class ThemeDemoPage extends ConsumerWidget {
         height: vm.childIconSize,
         padding: EdgeInsets.symmetric(horizontal: vm.childPadding),
         margin: EdgeInsets.symmetric(horizontal: vm.childMargin),
-        textStyle: TextStyle(color: vm.childTextColor, fontSize: vm.childFontSize),
+        textStyle: TextStyle(
+          color: vm.childTextColor,
+          fontSize: vm.childFontSize,
+        ),
         selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         selectedBackgroundColor: vm.childSelectedBg,
         hoverColor: vm.childHoverColor,
@@ -156,18 +158,6 @@ class ThemeDemoPage extends ConsumerWidget {
             tooltip: 'Collapse All',
             onPressed: notifier.collapseAll,
           ),
-          IconButton(
-            icon: const Icon(Icons.dataset_outlined),
-            tooltip: 'Large Dataset Test',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LargeDatasetPage(),
-                ),
-              );
-            },
-          ),
         ],
       ),
       body: Row(
@@ -197,7 +187,11 @@ class ThemeDemoPage extends ConsumerWidget {
                         SnackBar(
                           content: Row(
                             children: [
-                              const Icon(Icons.mouse, color: Colors.white, size: 20),
+                              const Icon(
+                                Icons.mouse,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
@@ -244,6 +238,7 @@ class _ThemeControls extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        _buildDataGenerator(context),
         _buildViewMode(context),
         _buildLineControls(context),
         _buildExpandIconControls(context),
@@ -258,9 +253,25 @@ class _ThemeControls extends StatelessWidget {
         FilledButton.icon(
           onPressed: notifier.reset,
           icon: const Icon(Icons.refresh),
-          label: const Text('Reset'),
+          label: const Text('Reset Theme'),
         ),
       ],
+    );
+  }
+
+  Widget _buildSection({
+    required String title,
+    required List<Widget> children,
+    bool initiallyExpanded = false,
+  }) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        initiallyExpanded: initiallyExpanded,
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        children: children,
+      ),
     );
   }
 
@@ -291,35 +302,481 @@ class _ThemeControls extends StatelessWidget {
   }
 
   Widget _buildLineControls(BuildContext context) {
+    return _buildSection(
+      title: 'Line',
+      children: [
+        _slider('Width', vm.lineWidth, 0.5, 5, notifier.setLineWidth),
+        _colorRow(context, 'Color', vm.lineColor, notifier.setLineColor),
+        Wrap(
+          spacing: 4,
+          children: [
+            ChoiceChip(
+              label: const Text('Connect', style: TextStyle(fontSize: 12)),
+              selected: vm.lineStyle == LineStyle.connector,
+              onSelected: (s) =>
+                  s ? notifier.setLineStyle(LineStyle.connector) : null,
+            ),
+            ChoiceChip(
+              label: const Text('Scope', style: TextStyle(fontSize: 12)),
+              selected: vm.lineStyle == LineStyle.scope,
+              onSelected: (s) =>
+                  s ? notifier.setLineStyle(LineStyle.scope) : null,
+            ),
+            ChoiceChip(
+              label: const Text('None', style: TextStyle(fontSize: 12)),
+              selected: vm.lineStyle == LineStyle.none,
+              onSelected: (s) =>
+                  s ? notifier.setLineStyle(LineStyle.none) : null,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExpandIconControls(BuildContext context) {
+    return _buildSection(
+      title: 'Expand Icon',
+      children: [
+        _slider('Size', vm.expandIconSize, 12, 32, notifier.setExpandIconSize),
+        _colorRow(
+          context,
+          'Collapsed Color',
+          vm.expandIconColor,
+          notifier.setExpandIconColor,
+        ),
+        _colorRow(
+          context,
+          'Expanded Color',
+          vm.expandIconExpandedColor,
+          notifier.setExpandIconExpandedColor,
+        ),
+        _slider('Padding', vm.expandPadding, 0, 8, notifier.setExpandPadding),
+        _slider('Margin', vm.expandMargin, 0, 8, notifier.setExpandMargin),
+      ],
+    );
+  }
+
+  Widget _buildFolderControls(BuildContext context) {
+    return _buildSection(
+      title: 'Folder',
+      children: [
+        _slider(
+          'Icon Size',
+          vm.folderIconSize,
+          12,
+          32,
+          notifier.setFolderIconSize,
+        ),
+        _colorRow(
+          context,
+          'Icon',
+          vm.folderIconColor,
+          notifier.setFolderIconColor,
+        ),
+        _slider('Padding', vm.folderPadding, 0, 8, notifier.setFolderPadding),
+        _slider('Margin', vm.folderMargin, 0, 8, notifier.setFolderMargin),
+        _colorRow(
+          context,
+          'Text',
+          vm.folderTextColor,
+          notifier.setFolderTextColor,
+        ),
+        _slider('Font', vm.folderFontSize, 10, 24, notifier.setFolderFontSize),
+        const Divider(),
+        const Text(
+          'Interaction',
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 4),
+        _colorRow(
+          context,
+          'Hover',
+          vm.folderHoverColor,
+          notifier.setFolderHoverColor,
+        ),
+        _colorRow(
+          context,
+          'Splash',
+          vm.folderSplashColor,
+          notifier.setFolderSplashColor,
+        ),
+        _colorRow(
+          context,
+          'Highlight',
+          vm.folderHighlightColor,
+          notifier.setFolderHighlightColor,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildParentControls(BuildContext context) {
+    return _buildSection(
+      title: 'Parent',
+      children: [
+        _slider(
+          'Icon Size',
+          vm.parentIconSize,
+          12,
+          32,
+          notifier.setParentIconSize,
+        ),
+        _colorRow(
+          context,
+          'Icon',
+          vm.parentIconColor,
+          notifier.setParentIconColor,
+        ),
+        _slider('Padding', vm.parentPadding, 0, 8, notifier.setParentPadding),
+        _slider('Margin', vm.parentMargin, 0, 8, notifier.setParentMargin),
+        _colorRow(
+          context,
+          'Text',
+          vm.parentTextColor,
+          notifier.setParentTextColor,
+        ),
+        _slider('Font', vm.parentFontSize, 10, 24, notifier.setParentFontSize),
+        const Divider(),
+        const Text(
+          'Interaction',
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 4),
+        _colorRow(
+          context,
+          'Hover',
+          vm.parentHoverColor,
+          notifier.setParentHoverColor,
+        ),
+        _colorRow(
+          context,
+          'Splash',
+          vm.parentSplashColor,
+          notifier.setParentSplashColor,
+        ),
+        _colorRow(
+          context,
+          'Highlight',
+          vm.parentHighlightColor,
+          notifier.setParentHighlightColor,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChildControls(BuildContext context) {
+    return _buildSection(
+      title: 'Child',
+      children: [
+        _slider(
+          'Icon Size',
+          vm.childIconSize,
+          12,
+          32,
+          notifier.setChildIconSize,
+        ),
+        _colorRow(
+          context,
+          'Icon',
+          vm.childIconColor,
+          notifier.setChildIconColor,
+        ),
+        _slider('Padding', vm.childPadding, 0, 8, notifier.setChildPadding),
+        _slider('Margin', vm.childMargin, 0, 8, notifier.setChildMargin),
+        _colorRow(
+          context,
+          'Text',
+          vm.childTextColor,
+          notifier.setChildTextColor,
+        ),
+        _slider('Font', vm.childFontSize, 10, 24, notifier.setChildFontSize),
+        const Divider(),
+        _colorRow(
+          context,
+          'Selected BG',
+          vm.childSelectedBg,
+          notifier.setChildSelectedBg,
+        ),
+        const Divider(),
+        const Text(
+          'Interaction',
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 4),
+        _colorRow(
+          context,
+          'Hover',
+          vm.childHoverColor,
+          notifier.setChildHoverColor,
+        ),
+        _colorRow(
+          context,
+          'Splash',
+          vm.childSplashColor,
+          notifier.setChildSplashColor,
+        ),
+        _colorRow(
+          context,
+          'Highlight',
+          vm.childHighlightColor,
+          notifier.setChildHighlightColor,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTooltipControls(BuildContext context) {
+    return _buildSection(
+      title: 'Tooltip',
+      children: [
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Folder Tooltip', style: TextStyle(fontSize: 12)),
+          value: vm.folderTooltipEnabled,
+          onChanged: notifier.setFolderTooltipEnabled,
+        ),
+        if (vm.folderTooltipEnabled)
+          Padding(
+            padding: const EdgeInsets.only(left: 16, bottom: 8),
+            child: _colorRow(
+              context,
+              'BG Color',
+              vm.folderTooltipBgColor,
+              notifier.setFolderTooltipBgColor,
+            ),
+          ),
+        const Divider(),
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Parent Tooltip', style: TextStyle(fontSize: 12)),
+          value: vm.parentTooltipEnabled,
+          onChanged: notifier.setParentTooltipEnabled,
+        ),
+        if (vm.parentTooltipEnabled)
+          Padding(
+            padding: const EdgeInsets.only(left: 16, bottom: 8),
+            child: _colorRow(
+              context,
+              'BG Color',
+              vm.parentTooltipBgColor,
+              notifier.setParentTooltipBgColor,
+            ),
+          ),
+        const Divider(),
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text(
+            'Child Tooltip (Rich)',
+            style: TextStyle(fontSize: 12),
+          ),
+          value: vm.childTooltipEnabled,
+          onChanged: notifier.setChildTooltipEnabled,
+        ),
+        if (vm.childTooltipEnabled)
+          Padding(
+            padding: const EdgeInsets.only(left: 16, bottom: 8),
+            child: _colorRow(
+              context,
+              'BG Color',
+              vm.childTooltipBgColor,
+              notifier.setChildTooltipBgColor,
+            ),
+          ),
+        const SizedBox(height: 4),
+        Text(
+          'Hover over nodes to see tooltips',
+          style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNodeStyleControls(BuildContext context) {
+    return _buildSection(
+      title: 'Node Style',
+      children: [
+        _slider(
+          'Border Radius',
+          vm.borderRadius,
+          0,
+          20,
+          notifier.setBorderRadius,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLayoutControls(BuildContext context) {
+    return _buildSection(
+      title: 'Layout',
+      children: [
+        _slider('Row Height', vm.rowHeight, 20, 80, notifier.setRowHeight),
+        const SizedBox(height: 4),
+        Text(
+          'Height of each row/node',
+          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+        ),
+        const SizedBox(height: 12),
+        _slider('Row Spacing', vm.rowSpacing, 0, 20, notifier.setRowSpacing),
+        const SizedBox(height: 4),
+        Text(
+          'Vertical spacing between rows',
+          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInteractionControls(BuildContext context) {
+    return _buildSection(
+      title: 'Interaction',
+      children: [
+        _slider(
+          'Click Interval (ms)',
+          vm.clickInterval,
+          100,
+          1000,
+          notifier.setClickInterval,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Double-click detection time for child nodes',
+          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+        ),
+        const SizedBox(height: 12),
+        _slider(
+          'Animation Duration (ms)',
+          vm.animationDuration,
+          50,
+          800,
+          notifier.setAnimationDuration,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Expand/collapse animation speed',
+          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDataGenerator(BuildContext context) {
+    String formatNumber(int num) {
+      if (num >= 1000000) {
+        return '${(num / 1000000).toStringAsFixed(1)}M';
+      } else if (num >= 1000) {
+        return '${(num / 1000).toStringAsFixed(1)}K';
+      }
+      return num.toString();
+    }
+
+    final estimated = vm.estimatedNodeCount;
+    final isLarge = estimated > 10000;
+    final isHuge = estimated > 100000;
+
     return Card(
+      color: isHuge
+          ? Colors.red.shade50
+          : isLarge
+          ? Colors.orange.shade50
+          : null,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Line', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider('Width', vm.lineWidth, 0.5, 5, notifier.setLineWidth),
-            _colorRow(context, 'Color', vm.lineColor, notifier.setLineColor),
-            Wrap(
-              spacing: 4,
+            Row(
               children: [
-                ChoiceChip(
-                  label: const Text('Connect', style: TextStyle(fontSize: 12)),
-                  selected: vm.lineStyle == LineStyle.connector,
-                  onSelected: (s) =>
-                      s ? notifier.setLineStyle(LineStyle.connector) : null,
+                const Text(
+                  'Data Generator',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                ChoiceChip(
-                  label: const Text('Scope', style: TextStyle(fontSize: 12)),
-                  selected: vm.lineStyle == LineStyle.scope,
-                  onSelected: (s) =>
-                      s ? notifier.setLineStyle(LineStyle.scope) : null,
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isHuge
+                        ? Colors.red.shade100
+                        : isLarge
+                        ? Colors.orange.shade100
+                        : Colors.blue.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '~${formatNumber(estimated)} nodes',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: isHuge
+                          ? Colors.red.shade700
+                          : isLarge
+                          ? Colors.orange.shade700
+                          : Colors.blue.shade700,
+                    ),
+                  ),
                 ),
-                ChoiceChip(
-                  label: const Text('None', style: TextStyle(fontSize: 12)),
-                  selected: vm.lineStyle == LineStyle.none,
-                  onSelected: (s) =>
-                      s ? notifier.setLineStyle(LineStyle.none) : null,
+              ],
+            ),
+            const SizedBox(height: 8),
+            _intSlider(
+              'Root Folders',
+              vm.genRootCount,
+              1,
+              20,
+              notifier.setGenRootCount,
+            ),
+            _intSlider(
+              'Max Depth',
+              vm.genMaxDepth,
+              1,
+              4,
+              notifier.setGenMaxDepth,
+            ),
+            _intSlider(
+              'Sub Folders',
+              vm.genSubFolderCount,
+              1,
+              5,
+              notifier.setGenSubFolderCount,
+            ),
+            _intSlider(
+              'Parents',
+              vm.genParentCount,
+              1,
+              10,
+              notifier.setGenParentCount,
+            ),
+            _intSlider(
+              'Children',
+              vm.genChildCount,
+              1,
+              15,
+              notifier.setGenChildCount,
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: notifier.loadDemoData,
+                    icon: const Icon(Icons.description, size: 18),
+                    label: const Text('Demo'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: notifier.generateData,
+                    icon: const Icon(Icons.play_arrow, size: 18),
+                    label: const Text('Generate'),
+                  ),
                 ),
               ],
             ),
@@ -329,386 +786,41 @@ class _ThemeControls extends StatelessWidget {
     );
   }
 
-  Widget _buildExpandIconControls(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _intSlider(
+    String label,
+    int value,
+    int min,
+    int max,
+    ValueChanged<int> onChange,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12)),
+        Row(
           children: [
-            const Text(
-              'Expand Icon',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Expanded(
+              child: Slider(
+                value: value.toDouble(),
+                min: min.toDouble(),
+                max: max.toDouble(),
+                divisions: max - min,
+                onChanged: (v) => onChange(v.round()),
+              ),
             ),
-            _slider('Size', vm.expandIconSize, 12, 32, notifier.setExpandIconSize),
-            _colorRow(
-              context,
-              'Collapsed Color',
-              vm.expandIconColor,
-              notifier.setExpandIconColor,
-            ),
-            _colorRow(
-              context,
-              'Expanded Color',
-              vm.expandIconExpandedColor,
-              notifier.setExpandIconExpandedColor,
-            ),
-            _slider('Padding', vm.expandPadding, 0, 8, notifier.setExpandPadding),
-            _slider('Margin', vm.expandMargin, 0, 8, notifier.setExpandMargin),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFolderControls(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Folder', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider(
-              'Icon Size',
-              vm.folderIconSize,
-              12,
-              32,
-              notifier.setFolderIconSize,
-            ),
-            _colorRow(
-              context,
-              'Icon',
-              vm.folderIconColor,
-              notifier.setFolderIconColor,
-            ),
-            _slider('Padding', vm.folderPadding, 0, 8, notifier.setFolderPadding),
-            _slider('Margin', vm.folderMargin, 0, 8, notifier.setFolderMargin),
-            _colorRow(
-              context,
-              'Text',
-              vm.folderTextColor,
-              notifier.setFolderTextColor,
-            ),
-            _slider('Font', vm.folderFontSize, 10, 24, notifier.setFolderFontSize),
-            const Divider(),
-            const Text(
-              'Interaction',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 4),
-            _colorRow(
-              context,
-              'Hover',
-              vm.folderHoverColor,
-              notifier.setFolderHoverColor,
-            ),
-            _colorRow(
-              context,
-              'Splash',
-              vm.folderSplashColor,
-              notifier.setFolderSplashColor,
-            ),
-            _colorRow(
-              context,
-              'Highlight',
-              vm.folderHighlightColor,
-              notifier.setFolderHighlightColor,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildParentControls(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Parent', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider(
-              'Icon Size',
-              vm.parentIconSize,
-              12,
-              32,
-              notifier.setParentIconSize,
-            ),
-            _colorRow(
-              context,
-              'Icon',
-              vm.parentIconColor,
-              notifier.setParentIconColor,
-            ),
-            _slider('Padding', vm.parentPadding, 0, 8, notifier.setParentPadding),
-            _slider('Margin', vm.parentMargin, 0, 8, notifier.setParentMargin),
-            _colorRow(
-              context,
-              'Text',
-              vm.parentTextColor,
-              notifier.setParentTextColor,
-            ),
-            _slider('Font', vm.parentFontSize, 10, 24, notifier.setParentFontSize),
-            const Divider(),
-            const Text(
-              'Interaction',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 4),
-            _colorRow(
-              context,
-              'Hover',
-              vm.parentHoverColor,
-              notifier.setParentHoverColor,
-            ),
-            _colorRow(
-              context,
-              'Splash',
-              vm.parentSplashColor,
-              notifier.setParentSplashColor,
-            ),
-            _colorRow(
-              context,
-              'Highlight',
-              vm.parentHighlightColor,
-              notifier.setParentHighlightColor,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChildControls(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Child', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider(
-              'Icon Size',
-              vm.childIconSize,
-              12,
-              32,
-              notifier.setChildIconSize,
-            ),
-            _colorRow(
-              context,
-              'Icon',
-              vm.childIconColor,
-              notifier.setChildIconColor,
-            ),
-            _slider('Padding', vm.childPadding, 0, 8, notifier.setChildPadding),
-            _slider('Margin', vm.childMargin, 0, 8, notifier.setChildMargin),
-            _colorRow(
-              context,
-              'Text',
-              vm.childTextColor,
-              notifier.setChildTextColor,
-            ),
-            _slider('Font', vm.childFontSize, 10, 24, notifier.setChildFontSize),
-            const Divider(),
-            _colorRow(
-              context,
-              'Selected BG',
-              vm.childSelectedBg,
-              notifier.setChildSelectedBg,
-            ),
-            const Divider(),
-            const Text(
-              'Interaction',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 4),
-            _colorRow(
-              context,
-              'Hover',
-              vm.childHoverColor,
-              notifier.setChildHoverColor,
-            ),
-            _colorRow(
-              context,
-              'Splash',
-              vm.childSplashColor,
-              notifier.setChildSplashColor,
-            ),
-            _colorRow(
-              context,
-              'Highlight',
-              vm.childHighlightColor,
-              notifier.setChildHighlightColor,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTooltipControls(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Tooltip',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            SwitchListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Folder Tooltip', style: TextStyle(fontSize: 12)),
-              value: vm.folderTooltipEnabled,
-              onChanged: notifier.setFolderTooltipEnabled,
-            ),
-            if (vm.folderTooltipEnabled)
-              Padding(
-                padding: const EdgeInsets.only(left: 16, bottom: 8),
-                child: _colorRow(
-                  context,
-                  'BG Color',
-                  vm.folderTooltipBgColor,
-                  notifier.setFolderTooltipBgColor,
+            SizedBox(
+              width: 30,
+              child: Text(
+                value.toString(),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            const Divider(),
-            SwitchListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Parent Tooltip', style: TextStyle(fontSize: 12)),
-              value: vm.parentTooltipEnabled,
-              onChanged: notifier.setParentTooltipEnabled,
-            ),
-            if (vm.parentTooltipEnabled)
-              Padding(
-                padding: const EdgeInsets.only(left: 16, bottom: 8),
-                child: _colorRow(
-                  context,
-                  'BG Color',
-                  vm.parentTooltipBgColor,
-                  notifier.setParentTooltipBgColor,
-                ),
-              ),
-            const Divider(),
-            SwitchListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title:
-                  const Text('Child Tooltip (Rich)', style: TextStyle(fontSize: 12)),
-              value: vm.childTooltipEnabled,
-              onChanged: notifier.setChildTooltipEnabled,
-            ),
-            if (vm.childTooltipEnabled)
-              Padding(
-                padding: const EdgeInsets.only(left: 16, bottom: 8),
-                child: _colorRow(
-                  context,
-                  'BG Color',
-                  vm.childTooltipBgColor,
-                  notifier.setChildTooltipBgColor,
-                ),
-              ),
-            const SizedBox(height: 4),
-            Text(
-              'Hover over nodes to see tooltips',
-              style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildNodeStyleControls(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Node Style',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            _slider('Border Radius', vm.borderRadius, 0, 20, notifier.setBorderRadius),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLayoutControls(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Layout', style: TextStyle(fontWeight: FontWeight.bold)),
-            _slider('Row Height', vm.rowHeight, 20, 80, notifier.setRowHeight),
-            const SizedBox(height: 4),
-            Text(
-              'Height of each row/node',
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 12),
-            _slider('Row Spacing', vm.rowSpacing, 0, 20, notifier.setRowSpacing),
-            const SizedBox(height: 4),
-            Text(
-              'Vertical spacing between rows',
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInteractionControls(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Interaction',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            _slider(
-              'Click Interval (ms)',
-              vm.clickInterval,
-              100,
-              1000,
-              notifier.setClickInterval,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Double-click detection time for child nodes',
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 12),
-            _slider(
-              'Animation Duration (ms)',
-              vm.animationDuration,
-              50,
-              800,
-              notifier.setAnimationDuration,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Expand/collapse animation speed',
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-            ),
-          ],
-        ),
-      ),
+      ],
     );
   }
 

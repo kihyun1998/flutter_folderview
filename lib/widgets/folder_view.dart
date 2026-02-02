@@ -253,21 +253,9 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   List<Node<T>> _getDisplayNodes() {
     if (widget.mode == ViewMode.tree) {
       // In Tree Mode, we only show Parent nodes at the root level
-      // If data contains Folders, we need to extract Parents from within them
+      // If data contains Folders, we need to extract Parents from within them recursively
       List<Node<T>> parents = [];
-
-      for (var node in widget.data) {
-        if (node.type == NodeType.parent) {
-          // Direct parent node
-          parents.add(node);
-        } else if (node.type == NodeType.folder) {
-          // Extract parent nodes from folder
-          parents.addAll(
-            node.children.where((child) => child.type == NodeType.parent),
-          );
-        }
-      }
-
+      _collectParentsFromNodes(widget.data, parents);
       return parents;
     } else {
       // In Folder Mode, we show Folders and Parents at the root level.
@@ -275,6 +263,18 @@ class _FolderViewState<T> extends State<FolderView<T>> {
       return widget.data
           .where((n) => n.type == NodeType.folder || n.type == NodeType.parent)
           .toList();
+    }
+  }
+
+  /// Recursively collect all parent nodes from nested folders
+  void _collectParentsFromNodes(List<Node<T>> nodes, List<Node<T>> parents) {
+    for (var node in nodes) {
+      if (node.type == NodeType.parent) {
+        parents.add(node);
+      } else if (node.type == NodeType.folder) {
+        // Recursively search within folder's children
+        _collectParentsFromNodes(node.children, parents);
+      }
     }
   }
 }
