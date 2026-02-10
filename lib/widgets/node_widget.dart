@@ -287,18 +287,22 @@ class NodeWidget<T> extends StatelessWidget {
       onSecondaryTapDown: onSecondaryTap != null
           ? (details) => onSecondaryTap?.call(node, details)
           : null,
-      child: _wrapWithTooltip(
-        Row(
-          children: [
-            _buildNodeIcon(),
-            Flexible(
-              child: Text(
-                _getLabel(),
-                style: _getTextStyle(),
-                overflow: TextOverflow.ellipsis,
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: _wrapWithTooltip(
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildNodeIcon(),
+              Flexible(
+                child: Text(
+                  _getLabel(),
+                  style: _getTextStyle(),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -354,18 +358,22 @@ class NodeWidget<T> extends StatelessWidget {
 
           // Node Icon + Label with tooltip
           Expanded(
-            child: _wrapWithTooltip(
-              Row(
-                children: [
-                  _buildNodeIcon(),
-                  Flexible(
-                    child: Text(
-                      _getLabel(),
-                      style: _getTextStyle(),
-                      overflow: TextOverflow.ellipsis,
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: _wrapWithTooltip(
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildNodeIcon(),
+                    Flexible(
+                      child: Text(
+                        _getLabel(),
+                        style: _getTextStyle(),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,3 +1,7 @@
+## 0.6.1
+
+- **fix**: Tooltip hover area now limited to icon+label only, no longer triggers on empty row space
+
 ## 0.6.0
 
 - **BREAKING CHANGE**: Migrate tooltip from Flutter `Tooltip` to `just_tooltip` package
