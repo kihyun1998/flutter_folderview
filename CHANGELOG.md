@@ -1,3 +1,17 @@
+## 0.6.0
+
+- **BREAKING CHANGE**: Migrate tooltip from Flutter `Tooltip` to `just_tooltip` package
+- **BREAKING CHANGE**: Remove `TooltipPosition` enum — replaced by `TooltipDirection` (top/bottom/left/right)
+- **BREAKING CHANGE**: Remove `margin`, `verticalOffset`, `waitDuration`, `boxShadow` from `NodeTooltipTheme`
+- **BREAKING CHANGE**: Remove `richMessage` / `richMessageResolver` — replaced by `tooltipBuilder` / `tooltipBuilderResolver` (`WidgetBuilder`)
+- **feat**: Add `direction` (4-directional), `alignment` (start/center/end), `offset`, `crossAxisOffset` properties to `NodeTooltipTheme`
+- **feat**: Add `elevation`, `borderRadius`, `padding` properties to `NodeTooltipTheme`
+- **feat**: Add `controller` (`JustTooltipController`) for programmatic tooltip show/hide
+- **feat**: Add `enableTap`, `enableHover` properties for tooltip trigger control
+- **feat**: Add `animationDuration`, `onShow`, `onHide` properties to `NodeTooltipTheme`
+- **feat**: Tooltip now wraps both node icon and label instead of label only
+- **feat**: Export `TooltipDirection`, `TooltipAlignment`, `JustTooltipController` from barrel file
+
 ## 0.5.3
 
 - **fix**: Recursively collect parent nodes from nested folders in tree mode

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide TooltipTheme;
+import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -44,6 +44,12 @@ class ThemeDemoPage extends ConsumerWidget {
           useTooltip: vm.folderTooltipEnabled,
           message: 'Folder node',
           backgroundColor: vm.folderTooltipBgColor,
+          direction: vm.tooltipDirection,
+          alignment: vm.tooltipAlignment,
+          offset: vm.tooltipOffset,
+          elevation: vm.tooltipElevation,
+          enableTap: vm.tooltipEnableTap,
+          enableHover: vm.tooltipEnableHover,
         ),
       ),
       parentTheme: ParentNodeTheme<String>(
@@ -67,6 +73,12 @@ class ThemeDemoPage extends ConsumerWidget {
           useTooltip: vm.parentTooltipEnabled,
           message: 'Parent node',
           backgroundColor: vm.parentTooltipBgColor,
+          direction: vm.tooltipDirection,
+          alignment: vm.tooltipAlignment,
+          offset: vm.tooltipOffset,
+          elevation: vm.tooltipElevation,
+          enableTap: vm.tooltipEnableTap,
+          enableHover: vm.tooltipEnableHover,
         ),
       ),
       childTheme: ChildNodeTheme<String>(
@@ -91,36 +103,47 @@ class ThemeDemoPage extends ConsumerWidget {
         clickInterval: vm.clickInterval.round(),
         tooltipTheme: NodeTooltipTheme<String>(
           useTooltip: vm.childTooltipEnabled,
-          richMessage: TextSpan(
-            children: [
-              const TextSpan(
-                text: 'Child: ',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          direction: vm.tooltipDirection,
+          alignment: vm.tooltipAlignment,
+          offset: vm.tooltipOffset,
+          elevation: vm.tooltipElevation,
+          enableTap: vm.tooltipEnableTap,
+          enableHover: vm.tooltipEnableHover,
+          tooltipBuilder: (_) => RichText(
+            text: TextSpan(
+              children: [
+                const TextSpan(
+                  text: 'Child: ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                TextSpan(
+                  text: 'Click to select',
+                  style: TextStyle(color: Colors.grey.shade300),
+                ),
+              ],
+            ),
+          ),
+          tooltipBuilderResolver: (node) =>
+              (_) => RichText(
+                text: TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: 'Child: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    TextSpan(
+                      text: node.label,
+                      style: TextStyle(color: Colors.grey.shade300),
+                    ),
+                  ],
                 ),
               ),
-              TextSpan(
-                text: 'Click to select',
-                style: TextStyle(color: Colors.grey.shade300),
-              ),
-            ],
-          ),
-          richMessageResolver: (node) => TextSpan(
-            children: [
-              const TextSpan(
-                text: 'Child: ',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              TextSpan(
-                text: node.label,
-                style: TextStyle(color: Colors.grey.shade300),
-              ),
-            ],
-          ),
           backgroundColor: vm.childTooltipBgColor,
         ),
       ),
@@ -586,6 +609,95 @@ class _ThemeControls extends StatelessWidget {
               notifier.setChildTooltipBgColor,
             ),
           ),
+        const Divider(),
+        const Text(
+          'Common Settings',
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 4),
+        const Text('Direction', style: TextStyle(fontSize: 12)),
+        Wrap(
+          spacing: 4,
+          children: [
+            ChoiceChip(
+              label: const Text('Top', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipDirection == TooltipDirection.top,
+              onSelected: (s) =>
+                  s ? notifier.setTooltipDirection(TooltipDirection.top) : null,
+            ),
+            ChoiceChip(
+              label: const Text('Bottom', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipDirection == TooltipDirection.bottom,
+              onSelected: (s) => s
+                  ? notifier.setTooltipDirection(TooltipDirection.bottom)
+                  : null,
+            ),
+            ChoiceChip(
+              label: const Text('Left', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipDirection == TooltipDirection.left,
+              onSelected: (s) => s
+                  ? notifier.setTooltipDirection(TooltipDirection.left)
+                  : null,
+            ),
+            ChoiceChip(
+              label: const Text('Right', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipDirection == TooltipDirection.right,
+              onSelected: (s) => s
+                  ? notifier.setTooltipDirection(TooltipDirection.right)
+                  : null,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        const Text('Alignment', style: TextStyle(fontSize: 12)),
+        Wrap(
+          spacing: 4,
+          children: [
+            ChoiceChip(
+              label: const Text('Start', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipAlignment == TooltipAlignment.start,
+              onSelected: (s) => s
+                  ? notifier.setTooltipAlignment(TooltipAlignment.start)
+                  : null,
+            ),
+            ChoiceChip(
+              label: const Text('Center', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipAlignment == TooltipAlignment.center,
+              onSelected: (s) => s
+                  ? notifier.setTooltipAlignment(TooltipAlignment.center)
+                  : null,
+            ),
+            ChoiceChip(
+              label: const Text('End', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipAlignment == TooltipAlignment.end,
+              onSelected: (s) =>
+                  s ? notifier.setTooltipAlignment(TooltipAlignment.end) : null,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _slider('Offset', vm.tooltipOffset, 0, 30, notifier.setTooltipOffset),
+        _slider(
+          'Elevation',
+          vm.tooltipElevation,
+          0,
+          20,
+          notifier.setTooltipElevation,
+        ),
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Enable Tap', style: TextStyle(fontSize: 12)),
+          value: vm.tooltipEnableTap,
+          onChanged: (v) => notifier.setTooltipEnableTap(v),
+        ),
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Enable Hover', style: TextStyle(fontSize: 12)),
+          value: vm.tooltipEnableHover,
+          onChanged: (v) => notifier.setTooltipEnableHover(v),
+        ),
         const SizedBox(height: 4),
         Text(
           'Hover over nodes to see tooltips',

@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart' hide TooltipTheme;
+import 'package:flutter/material.dart';
 import 'package:flutter_folderview/widgets/custom_ink_well.dart';
+import 'package:just_tooltip/just_tooltip.dart';
 
 import '../models/flat_node.dart';
 import '../models/node.dart';
@@ -225,42 +226,40 @@ class NodeWidget<T> extends StatelessWidget {
       return child;
     }
 
-    InlineSpan? richMessage;
-    if (tooltipTheme.richMessageResolver != null) {
-      richMessage = tooltipTheme.richMessageResolver?.call(node);
+    // Resolve tooltip content: tooltipBuilderResolver > tooltipBuilder > message
+    WidgetBuilder? resolvedBuilder;
+    if (tooltipTheme.tooltipBuilderResolver != null) {
+      resolvedBuilder = tooltipTheme.tooltipBuilderResolver?.call(node);
     }
-    richMessage ??= tooltipTheme.richMessage;
+    resolvedBuilder ??= tooltipTheme.tooltipBuilder;
 
-    String? message = tooltipTheme.message;
+    final String? message = tooltipTheme.message;
 
-    if ((message == null || message.isEmpty) && richMessage == null) {
+    if (resolvedBuilder == null && (message == null || message.isEmpty)) {
       return child;
     }
 
-    return Tooltip(
-      margin: tooltipTheme.margin ?? const EdgeInsets.symmetric(horizontal: 30),
-      textStyle:
-          richMessage == null ? tooltipTheme.textStyle : tooltipTheme.textStyle,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      preferBelow: tooltipTheme.position == TooltipPosition.bottom,
-      verticalOffset: tooltipTheme.verticalOffset,
-      decoration: BoxDecoration(
-        color: tooltipTheme.backgroundColor ?? Colors.grey[800],
-        borderRadius: BorderRadius.circular(5),
-        boxShadow: tooltipTheme.boxShadow ??
-            [
-              BoxShadow(
-                blurRadius: 3,
-                color: Colors.black.withValues(alpha: 0.3),
-              ),
-            ],
-      ),
-      waitDuration:
-          tooltipTheme.waitDuration ?? const Duration(milliseconds: 300),
-      exitDuration: Duration.zero,
-      showDuration: Duration.zero,
-      message: message,
-      richMessage: richMessage,
+    return JustTooltip(
+      direction: tooltipTheme.direction,
+      alignment: tooltipTheme.alignment,
+      offset: tooltipTheme.offset,
+      crossAxisOffset: tooltipTheme.crossAxisOffset,
+      textStyle: tooltipTheme.textStyle,
+      backgroundColor: tooltipTheme.backgroundColor ?? const Color(0xFF616161),
+      borderRadius: tooltipTheme.borderRadius ??
+          const BorderRadius.all(Radius.circular(6)),
+      padding: tooltipTheme.padding ??
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      elevation: tooltipTheme.elevation ?? 4.0,
+      controller: tooltipTheme.controller,
+      enableTap: tooltipTheme.enableTap ?? false,
+      enableHover: tooltipTheme.enableHover ?? true,
+      animationDuration:
+          tooltipTheme.animationDuration ?? const Duration(milliseconds: 150),
+      onShow: tooltipTheme.onShow,
+      onHide: tooltipTheme.onHide,
+      message: resolvedBuilder == null ? message : null,
+      tooltipBuilder: resolvedBuilder,
       child: child,
     );
   }
@@ -288,19 +287,19 @@ class NodeWidget<T> extends StatelessWidget {
       onSecondaryTapDown: onSecondaryTap != null
           ? (details) => onSecondaryTap?.call(node, details)
           : null,
-      child: Row(
-        children: [
-          _buildNodeIcon(),
-          Flexible(
-            child: _wrapWithTooltip(
-              Text(
+      child: _wrapWithTooltip(
+        Row(
+          children: [
+            _buildNodeIcon(),
+            Flexible(
+              child: Text(
                 _getLabel(),
                 style: _getTextStyle(),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -353,16 +352,20 @@ class NodeWidget<T> extends StatelessWidget {
               child: _buildExpandIcon(),
             ),
 
-          // Node Icon
-          _buildNodeIcon(),
-
-          // Label with tooltip
-          Flexible(
+          // Node Icon + Label with tooltip
+          Expanded(
             child: _wrapWithTooltip(
-              Text(
-                _getLabel(),
-                style: _getTextStyle(),
-                overflow: TextOverflow.ellipsis,
+              Row(
+                children: [
+                  _buildNodeIcon(),
+                  Flexible(
+                    child: Text(
+                      _getLabel(),
+                      style: _getTextStyle(),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

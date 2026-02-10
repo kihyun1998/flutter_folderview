@@ -261,6 +261,30 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(childTooltipBgColor: color);
   }
 
+  void setTooltipDirection(TooltipDirection direction) {
+    state = state.copyWith(tooltipDirection: direction);
+  }
+
+  void setTooltipAlignment(TooltipAlignment alignment) {
+    state = state.copyWith(tooltipAlignment: alignment);
+  }
+
+  void setTooltipOffset(double offset) {
+    state = state.copyWith(tooltipOffset: offset);
+  }
+
+  void setTooltipElevation(double elevation) {
+    state = state.copyWith(tooltipElevation: elevation);
+  }
+
+  void setTooltipEnableTap(bool enabled) {
+    state = state.copyWith(tooltipEnableTap: enabled);
+  }
+
+  void setTooltipEnableHover(bool enabled) {
+    state = state.copyWith(tooltipEnableHover: enabled);
+  }
+
   // Reset
   void reset() {
     state = ThemeDemoViewModel(
@@ -495,6 +519,12 @@ class ThemeDemoViewModel {
   final Color parentTooltipBgColor;
   final bool childTooltipEnabled;
   final Color childTooltipBgColor;
+  final TooltipDirection tooltipDirection;
+  final TooltipAlignment tooltipAlignment;
+  final double tooltipOffset;
+  final double tooltipElevation;
+  final bool tooltipEnableTap;
+  final bool tooltipEnableHover;
 
   // Data generation parameters
   final int genRootCount;
@@ -588,6 +618,12 @@ class ThemeDemoViewModel {
     this.parentTooltipBgColor = const Color(0xFF424242),
     this.childTooltipEnabled = true,
     this.childTooltipBgColor = const Color(0xFF424242),
+    this.tooltipDirection = TooltipDirection.top,
+    this.tooltipAlignment = TooltipAlignment.center,
+    this.tooltipOffset = 8.0,
+    this.tooltipElevation = 4.0,
+    this.tooltipEnableTap = false,
+    this.tooltipEnableHover = true,
     // Data generation defaults
     this.genRootCount = 5,
     this.genMaxDepth = 2,
@@ -648,6 +684,12 @@ class ThemeDemoViewModel {
     Color? parentTooltipBgColor,
     bool? childTooltipEnabled,
     Color? childTooltipBgColor,
+    TooltipDirection? tooltipDirection,
+    TooltipAlignment? tooltipAlignment,
+    double? tooltipOffset,
+    double? tooltipElevation,
+    bool? tooltipEnableTap,
+    bool? tooltipEnableHover,
     int? genRootCount,
     int? genMaxDepth,
     int? genSubFolderCount,
@@ -707,6 +749,12 @@ class ThemeDemoViewModel {
       parentTooltipBgColor: parentTooltipBgColor ?? this.parentTooltipBgColor,
       childTooltipEnabled: childTooltipEnabled ?? this.childTooltipEnabled,
       childTooltipBgColor: childTooltipBgColor ?? this.childTooltipBgColor,
+      tooltipDirection: tooltipDirection ?? this.tooltipDirection,
+      tooltipAlignment: tooltipAlignment ?? this.tooltipAlignment,
+      tooltipOffset: tooltipOffset ?? this.tooltipOffset,
+      tooltipElevation: tooltipElevation ?? this.tooltipElevation,
+      tooltipEnableTap: tooltipEnableTap ?? this.tooltipEnableTap,
+      tooltipEnableHover: tooltipEnableHover ?? this.tooltipEnableHover,
       genRootCount: genRootCount ?? this.genRootCount,
       genMaxDepth: genMaxDepth ?? this.genMaxDepth,
       genSubFolderCount: genSubFolderCount ?? this.genSubFolderCount,
