@@ -297,6 +297,18 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(tooltipShowDuration: ms);
   }
 
+  void setTooltipBoxShadowEnabled(bool enabled) {
+    state = state.copyWith(tooltipBoxShadowEnabled: enabled);
+  }
+
+  void setTooltipBoxShadowBlur(double blur) {
+    state = state.copyWith(tooltipBoxShadowBlur: blur);
+  }
+
+  void setTooltipBoxShadowSpread(double spread) {
+    state = state.copyWith(tooltipBoxShadowSpread: spread);
+  }
+
   // Reset
   void reset() {
     state = ThemeDemoViewModel(
@@ -540,6 +552,9 @@ class ThemeDemoViewModel {
   final bool tooltipInteractive;
   final double tooltipWaitDuration;
   final double tooltipShowDuration;
+  final bool tooltipBoxShadowEnabled;
+  final double tooltipBoxShadowBlur;
+  final double tooltipBoxShadowSpread;
 
   // Data generation parameters
   final int genRootCount;
@@ -642,6 +657,9 @@ class ThemeDemoViewModel {
     this.tooltipInteractive = false,
     this.tooltipWaitDuration = 0.0,
     this.tooltipShowDuration = 0.0,
+    this.tooltipBoxShadowEnabled = false,
+    this.tooltipBoxShadowBlur = 4.0,
+    this.tooltipBoxShadowSpread = 0.0,
     // Data generation defaults
     this.genRootCount = 5,
     this.genMaxDepth = 2,
@@ -711,6 +729,9 @@ class ThemeDemoViewModel {
     bool? tooltipInteractive,
     double? tooltipWaitDuration,
     double? tooltipShowDuration,
+    bool? tooltipBoxShadowEnabled,
+    double? tooltipBoxShadowBlur,
+    double? tooltipBoxShadowSpread,
     int? genRootCount,
     int? genMaxDepth,
     int? genSubFolderCount,
@@ -779,6 +800,11 @@ class ThemeDemoViewModel {
       tooltipInteractive: tooltipInteractive ?? this.tooltipInteractive,
       tooltipWaitDuration: tooltipWaitDuration ?? this.tooltipWaitDuration,
       tooltipShowDuration: tooltipShowDuration ?? this.tooltipShowDuration,
+      tooltipBoxShadowEnabled:
+          tooltipBoxShadowEnabled ?? this.tooltipBoxShadowEnabled,
+      tooltipBoxShadowBlur: tooltipBoxShadowBlur ?? this.tooltipBoxShadowBlur,
+      tooltipBoxShadowSpread:
+          tooltipBoxShadowSpread ?? this.tooltipBoxShadowSpread,
       genRootCount: genRootCount ?? this.genRootCount,
       genMaxDepth: genMaxDepth ?? this.genMaxDepth,
       genSubFolderCount: genSubFolderCount ?? this.genSubFolderCount,

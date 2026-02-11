@@ -251,6 +251,7 @@ class NodeWidget<T> extends StatelessWidget {
       padding: tooltipTheme.padding ??
           const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       elevation: tooltipTheme.elevation ?? 4.0,
+      boxShadow: tooltipTheme.boxShadow,
       controller: tooltipTheme.controller,
       enableTap: tooltipTheme.enableTap ?? false,
       enableHover: tooltipTheme.enableHover ?? true,

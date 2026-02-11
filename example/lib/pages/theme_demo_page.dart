@@ -57,6 +57,15 @@ class ThemeDemoPage extends ConsumerWidget {
           showDuration: vm.tooltipShowDuration > 0
               ? Duration(milliseconds: vm.tooltipShowDuration.round())
               : null,
+          boxShadow: vm.tooltipBoxShadowEnabled
+              ? [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: vm.tooltipBoxShadowBlur,
+                    spreadRadius: vm.tooltipBoxShadowSpread,
+                  ),
+                ]
+              : null,
         ),
       ),
       parentTheme: ParentNodeTheme<String>(
@@ -92,6 +101,15 @@ class ThemeDemoPage extends ConsumerWidget {
               : null,
           showDuration: vm.tooltipShowDuration > 0
               ? Duration(milliseconds: vm.tooltipShowDuration.round())
+              : null,
+          boxShadow: vm.tooltipBoxShadowEnabled
+              ? [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: vm.tooltipBoxShadowBlur,
+                    spreadRadius: vm.tooltipBoxShadowSpread,
+                  ),
+                ]
               : null,
         ),
       ),
@@ -129,6 +147,15 @@ class ThemeDemoPage extends ConsumerWidget {
               : null,
           showDuration: vm.tooltipShowDuration > 0
               ? Duration(milliseconds: vm.tooltipShowDuration.round())
+              : null,
+          boxShadow: vm.tooltipBoxShadowEnabled
+              ? [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: vm.tooltipBoxShadowBlur,
+                    spreadRadius: vm.tooltipBoxShadowSpread,
+                  ),
+                ]
               : null,
           tooltipBuilder: (_) => RichText(
             text: TextSpan(
@@ -744,6 +771,33 @@ class _ThemeControls extends StatelessWidget {
           5000,
           notifier.setTooltipShowDuration,
         ),
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Custom BoxShadow', style: TextStyle(fontSize: 12)),
+          subtitle: const Text(
+            'Override elevation with custom shadow',
+            style: TextStyle(fontSize: 10),
+          ),
+          value: vm.tooltipBoxShadowEnabled,
+          onChanged: (v) => notifier.setTooltipBoxShadowEnabled(v),
+        ),
+        if (vm.tooltipBoxShadowEnabled) ...[
+          _slider(
+            'Shadow Blur',
+            vm.tooltipBoxShadowBlur,
+            0,
+            20,
+            notifier.setTooltipBoxShadowBlur,
+          ),
+          _slider(
+            'Shadow Spread',
+            vm.tooltipBoxShadowSpread,
+            0,
+            10,
+            notifier.setTooltipBoxShadowSpread,
+          ),
+        ],
         const SizedBox(height: 4),
         Text(
           'Hover over nodes to see tooltips',

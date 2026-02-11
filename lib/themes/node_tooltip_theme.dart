@@ -42,6 +42,9 @@ class NodeTooltipTheme<T> {
   /// Elevation (shadow depth) for tooltip
   final double? elevation;
 
+  /// Custom box shadow for tooltip (overrides elevation)
+  final List<BoxShadow>? boxShadow;
+
   /// Border radius for tooltip
   final BorderRadius? borderRadius;
 
@@ -88,6 +91,7 @@ class NodeTooltipTheme<T> {
     this.tooltipBuilderResolver,
     this.backgroundColor,
     this.elevation,
+    this.boxShadow,
     this.borderRadius,
     this.padding,
     this.controller,
@@ -114,6 +118,7 @@ class NodeTooltipTheme<T> {
     WidgetBuilder? Function(Node<T> node)? tooltipBuilderResolver,
     Color? backgroundColor,
     double? elevation,
+    List<BoxShadow>? boxShadow,
     BorderRadius? borderRadius,
     EdgeInsets? padding,
     JustTooltipController? controller,
@@ -139,6 +144,7 @@ class NodeTooltipTheme<T> {
           tooltipBuilderResolver ?? this.tooltipBuilderResolver,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       elevation: elevation ?? this.elevation,
+      boxShadow: boxShadow ?? this.boxShadow,
       borderRadius: borderRadius ?? this.borderRadius,
       padding: padding ?? this.padding,
       controller: controller ?? this.controller,
@@ -179,6 +185,7 @@ class NodeTooltipTheme<T> {
           t < 0.5 ? a.tooltipBuilderResolver : b.tooltipBuilderResolver,
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       elevation: lerpDouble(a.elevation, b.elevation, t),
+      boxShadow: BoxShadow.lerpList(a.boxShadow ?? [], b.boxShadow ?? [], t),
       borderRadius: BorderRadius.lerp(a.borderRadius, b.borderRadius, t),
       padding: EdgeInsets.lerp(a.padding, b.padding, t),
       controller: t < 0.5 ? a.controller : b.controller,

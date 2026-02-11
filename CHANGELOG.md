@@ -1,6 +1,6 @@
 ## 0.6.2
 
-- **feat**: Add `interactive`, `waitDuration`, `showDuration` options to `NodeTooltipTheme` (just_tooltip 0.1.2)
+- **feat**: Add `interactive`, `waitDuration`, `showDuration`, `boxShadow` options to `NodeTooltipTheme` (just_tooltip 0.1.3)
 
 ## 0.6.1
 
