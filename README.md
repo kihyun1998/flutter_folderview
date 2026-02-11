@@ -108,6 +108,56 @@ FolderView(
 )
 ```
 
+## Tooltip
+
+Each node type supports tooltip via `NodeTooltipTheme`:
+
+```dart
+FolderView(
+  data: nodes,
+  expandedNodeIds: expandedIds,
+  theme: FlutterFolderViewTheme(
+    folderTheme: FolderNodeTheme(
+      tooltipTheme: NodeTooltipTheme(
+        useTooltip: true,
+        message: 'Folder node',
+        direction: TooltipDirection.top,
+        alignment: TooltipAlignment.center,
+        interactive: true,
+        waitDuration: Duration(milliseconds: 500),
+        showDuration: Duration(seconds: 3),
+        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8)],
+      ),
+    ),
+  ),
+)
+```
+
+| Property | Type | Description |
+|---|---|---|
+| `useTooltip` | `bool` | Enable tooltip (default: `false`) |
+| `message` | `String?` | Static tooltip text |
+| `tooltipBuilder` | `WidgetBuilder?` | Custom tooltip widget |
+| `tooltipBuilderResolver` | `Function?` | Node-specific tooltip widget resolver |
+| `direction` | `TooltipDirection` | Position: `top`, `bottom`, `left`, `right` |
+| `alignment` | `TooltipAlignment` | Alignment: `start`, `center`, `end` |
+| `offset` | `double` | Distance from widget (default: `8.0`) |
+| `crossAxisOffset` | `double` | Cross-axis offset (default: `0.0`) |
+| `backgroundColor` | `Color?` | Background color |
+| `elevation` | `double?` | Shadow depth |
+| `boxShadow` | `List<BoxShadow>?` | Custom shadow (overrides elevation) |
+| `borderRadius` | `BorderRadius?` | Corner rounding |
+| `padding` | `EdgeInsets?` | Inner padding |
+| `enableTap` | `bool?` | Tap to show (default: `false`) |
+| `enableHover` | `bool?` | Hover to show (default: `true`) |
+| `interactive` | `bool?` | Keep visible on tooltip hover |
+| `waitDuration` | `Duration?` | Delay before showing on hover |
+| `showDuration` | `Duration?` | Auto-hide after duration (resets on re-enter) |
+| `animationDuration` | `Duration?` | Show/hide animation duration |
+| `controller` | `JustTooltipController?` | Programmatic show/hide control |
+| `onShow` | `VoidCallback?` | Callback when shown |
+| `onHide` | `VoidCallback?` | Callback when hidden |
+
 ## Example
 
 See [example/](example/) for complete examples including:
