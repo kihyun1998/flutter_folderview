@@ -285,6 +285,18 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(tooltipEnableHover: enabled);
   }
 
+  void setTooltipInteractive(bool enabled) {
+    state = state.copyWith(tooltipInteractive: enabled);
+  }
+
+  void setTooltipWaitDuration(double ms) {
+    state = state.copyWith(tooltipWaitDuration: ms);
+  }
+
+  void setTooltipShowDuration(double ms) {
+    state = state.copyWith(tooltipShowDuration: ms);
+  }
+
   // Reset
   void reset() {
     state = ThemeDemoViewModel(
@@ -525,6 +537,9 @@ class ThemeDemoViewModel {
   final double tooltipElevation;
   final bool tooltipEnableTap;
   final bool tooltipEnableHover;
+  final bool tooltipInteractive;
+  final double tooltipWaitDuration;
+  final double tooltipShowDuration;
 
   // Data generation parameters
   final int genRootCount;
@@ -624,6 +639,9 @@ class ThemeDemoViewModel {
     this.tooltipElevation = 4.0,
     this.tooltipEnableTap = false,
     this.tooltipEnableHover = true,
+    this.tooltipInteractive = false,
+    this.tooltipWaitDuration = 0.0,
+    this.tooltipShowDuration = 0.0,
     // Data generation defaults
     this.genRootCount = 5,
     this.genMaxDepth = 2,
@@ -690,6 +708,9 @@ class ThemeDemoViewModel {
     double? tooltipElevation,
     bool? tooltipEnableTap,
     bool? tooltipEnableHover,
+    bool? tooltipInteractive,
+    double? tooltipWaitDuration,
+    double? tooltipShowDuration,
     int? genRootCount,
     int? genMaxDepth,
     int? genSubFolderCount,
@@ -755,6 +776,9 @@ class ThemeDemoViewModel {
       tooltipElevation: tooltipElevation ?? this.tooltipElevation,
       tooltipEnableTap: tooltipEnableTap ?? this.tooltipEnableTap,
       tooltipEnableHover: tooltipEnableHover ?? this.tooltipEnableHover,
+      tooltipInteractive: tooltipInteractive ?? this.tooltipInteractive,
+      tooltipWaitDuration: tooltipWaitDuration ?? this.tooltipWaitDuration,
+      tooltipShowDuration: tooltipShowDuration ?? this.tooltipShowDuration,
       genRootCount: genRootCount ?? this.genRootCount,
       genMaxDepth: genMaxDepth ?? this.genMaxDepth,
       genSubFolderCount: genSubFolderCount ?? this.genSubFolderCount,

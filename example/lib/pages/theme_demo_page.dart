@@ -50,6 +50,13 @@ class ThemeDemoPage extends ConsumerWidget {
           elevation: vm.tooltipElevation,
           enableTap: vm.tooltipEnableTap,
           enableHover: vm.tooltipEnableHover,
+          interactive: vm.tooltipInteractive,
+          waitDuration: vm.tooltipWaitDuration > 0
+              ? Duration(milliseconds: vm.tooltipWaitDuration.round())
+              : null,
+          showDuration: vm.tooltipShowDuration > 0
+              ? Duration(milliseconds: vm.tooltipShowDuration.round())
+              : null,
         ),
       ),
       parentTheme: ParentNodeTheme<String>(
@@ -79,6 +86,13 @@ class ThemeDemoPage extends ConsumerWidget {
           elevation: vm.tooltipElevation,
           enableTap: vm.tooltipEnableTap,
           enableHover: vm.tooltipEnableHover,
+          interactive: vm.tooltipInteractive,
+          waitDuration: vm.tooltipWaitDuration > 0
+              ? Duration(milliseconds: vm.tooltipWaitDuration.round())
+              : null,
+          showDuration: vm.tooltipShowDuration > 0
+              ? Duration(milliseconds: vm.tooltipShowDuration.round())
+              : null,
         ),
       ),
       childTheme: ChildNodeTheme<String>(
@@ -109,6 +123,13 @@ class ThemeDemoPage extends ConsumerWidget {
           elevation: vm.tooltipElevation,
           enableTap: vm.tooltipEnableTap,
           enableHover: vm.tooltipEnableHover,
+          interactive: vm.tooltipInteractive,
+          waitDuration: vm.tooltipWaitDuration > 0
+              ? Duration(milliseconds: vm.tooltipWaitDuration.round())
+              : null,
+          showDuration: vm.tooltipShowDuration > 0
+              ? Duration(milliseconds: vm.tooltipShowDuration.round())
+              : null,
           tooltipBuilder: (_) => RichText(
             text: TextSpan(
               children: [
@@ -697,6 +718,31 @@ class _ThemeControls extends StatelessWidget {
           title: const Text('Enable Hover', style: TextStyle(fontSize: 12)),
           value: vm.tooltipEnableHover,
           onChanged: (v) => notifier.setTooltipEnableHover(v),
+        ),
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Interactive', style: TextStyle(fontSize: 12)),
+          subtitle: const Text(
+            'Keep tooltip visible on hover',
+            style: TextStyle(fontSize: 10),
+          ),
+          value: vm.tooltipInteractive,
+          onChanged: (v) => notifier.setTooltipInteractive(v),
+        ),
+        _slider(
+          'Wait Duration (ms)',
+          vm.tooltipWaitDuration,
+          0,
+          2000,
+          notifier.setTooltipWaitDuration,
+        ),
+        _slider(
+          'Show Duration (ms)',
+          vm.tooltipShowDuration,
+          0,
+          5000,
+          notifier.setTooltipShowDuration,
         ),
         const SizedBox(height: 4),
         Text(

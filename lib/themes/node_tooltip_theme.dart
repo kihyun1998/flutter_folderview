@@ -66,6 +66,15 @@ class NodeTooltipTheme<T> {
   /// Callback when tooltip is hidden
   final VoidCallback? onHide;
 
+  /// Whether the tooltip stays visible when hovering over the tooltip itself
+  final bool? interactive;
+
+  /// Duration to wait before showing the tooltip on hover
+  final Duration? waitDuration;
+
+  /// Duration after which the tooltip auto-hides (resets on re-enter)
+  final Duration? showDuration;
+
   /// Creates a [NodeTooltipTheme]
   const NodeTooltipTheme({
     this.useTooltip = false,
@@ -87,6 +96,9 @@ class NodeTooltipTheme<T> {
     this.animationDuration,
     this.onShow,
     this.onHide,
+    this.interactive,
+    this.waitDuration,
+    this.showDuration,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -110,6 +122,9 @@ class NodeTooltipTheme<T> {
     Duration? animationDuration,
     VoidCallback? onShow,
     VoidCallback? onHide,
+    bool? interactive,
+    Duration? waitDuration,
+    Duration? showDuration,
   }) {
     return NodeTooltipTheme<T>(
       useTooltip: useTooltip ?? this.useTooltip,
@@ -132,6 +147,9 @@ class NodeTooltipTheme<T> {
       animationDuration: animationDuration ?? this.animationDuration,
       onShow: onShow ?? this.onShow,
       onHide: onHide ?? this.onHide,
+      interactive: interactive ?? this.interactive,
+      waitDuration: waitDuration ?? this.waitDuration,
+      showDuration: showDuration ?? this.showDuration,
     );
   }
 
@@ -169,6 +187,9 @@ class NodeTooltipTheme<T> {
       animationDuration: t < 0.5 ? a.animationDuration : b.animationDuration,
       onShow: t < 0.5 ? a.onShow : b.onShow,
       onHide: t < 0.5 ? a.onHide : b.onHide,
+      interactive: t < 0.5 ? a.interactive : b.interactive,
+      waitDuration: t < 0.5 ? a.waitDuration : b.waitDuration,
+      showDuration: t < 0.5 ? a.showDuration : b.showDuration,
     );
   }
 }
