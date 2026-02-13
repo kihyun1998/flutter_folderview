@@ -1,3 +1,11 @@
+## 0.6.4
+
+- **feat**: Bump just_tooltip to 0.2.0
+- **feat**: Add `showArrow`, `arrowBaseWidth`, `arrowLength`, `arrowPositionRatio` options to `NodeTooltipTheme`
+- **feat**: Add `borderColor`, `borderWidth` options to `NodeTooltipTheme`
+- **feat**: Add `screenMargin` option to `NodeTooltipTheme`
+- **feat**: Export `JustTooltipTheme` from barrel file
+
 ## 0.6.3
 
 - **fix**: Bump just_tooltip to 0.1.5 (bugfix)

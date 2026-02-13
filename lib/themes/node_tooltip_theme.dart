@@ -78,6 +78,27 @@ class NodeTooltipTheme<T> {
   /// Duration after which the tooltip auto-hides (resets on re-enter)
   final Duration? showDuration;
 
+  /// Border color for tooltip
+  final Color? borderColor;
+
+  /// Border width for tooltip
+  final double? borderWidth;
+
+  /// Whether to show an arrow on the tooltip
+  final bool? showArrow;
+
+  /// Base width of the arrow
+  final double? arrowBaseWidth;
+
+  /// Length of the arrow
+  final double? arrowLength;
+
+  /// Position ratio of the arrow (0.0 to 1.0)
+  final double? arrowPositionRatio;
+
+  /// Minimum margin from screen edges
+  final double? screenMargin;
+
   /// Creates a [NodeTooltipTheme]
   const NodeTooltipTheme({
     this.useTooltip = false,
@@ -103,6 +124,13 @@ class NodeTooltipTheme<T> {
     this.interactive,
     this.waitDuration,
     this.showDuration,
+    this.borderColor,
+    this.borderWidth,
+    this.showArrow,
+    this.arrowBaseWidth,
+    this.arrowLength,
+    this.arrowPositionRatio,
+    this.screenMargin,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -130,6 +158,13 @@ class NodeTooltipTheme<T> {
     bool? interactive,
     Duration? waitDuration,
     Duration? showDuration,
+    Color? borderColor,
+    double? borderWidth,
+    bool? showArrow,
+    double? arrowBaseWidth,
+    double? arrowLength,
+    double? arrowPositionRatio,
+    double? screenMargin,
   }) {
     return NodeTooltipTheme<T>(
       useTooltip: useTooltip ?? this.useTooltip,
@@ -156,6 +191,13 @@ class NodeTooltipTheme<T> {
       interactive: interactive ?? this.interactive,
       waitDuration: waitDuration ?? this.waitDuration,
       showDuration: showDuration ?? this.showDuration,
+      borderColor: borderColor ?? this.borderColor,
+      borderWidth: borderWidth ?? this.borderWidth,
+      showArrow: showArrow ?? this.showArrow,
+      arrowBaseWidth: arrowBaseWidth ?? this.arrowBaseWidth,
+      arrowLength: arrowLength ?? this.arrowLength,
+      arrowPositionRatio: arrowPositionRatio ?? this.arrowPositionRatio,
+      screenMargin: screenMargin ?? this.screenMargin,
     );
   }
 
@@ -197,6 +239,14 @@ class NodeTooltipTheme<T> {
       interactive: t < 0.5 ? a.interactive : b.interactive,
       waitDuration: t < 0.5 ? a.waitDuration : b.waitDuration,
       showDuration: t < 0.5 ? a.showDuration : b.showDuration,
+      borderColor: Color.lerp(a.borderColor, b.borderColor, t),
+      borderWidth: lerpDouble(a.borderWidth, b.borderWidth, t),
+      showArrow: t < 0.5 ? a.showArrow : b.showArrow,
+      arrowBaseWidth: lerpDouble(a.arrowBaseWidth, b.arrowBaseWidth, t),
+      arrowLength: lerpDouble(a.arrowLength, b.arrowLength, t),
+      arrowPositionRatio:
+          lerpDouble(a.arrowPositionRatio, b.arrowPositionRatio, t),
+      screenMargin: lerpDouble(a.screenMargin, b.screenMargin, t),
     );
   }
 }

@@ -1,7 +1,11 @@
 library;
 
 export 'package:just_tooltip/just_tooltip.dart'
-    show TooltipDirection, TooltipAlignment, JustTooltipController;
+    show
+        TooltipDirection,
+        TooltipAlignment,
+        JustTooltipController,
+        JustTooltipTheme;
 
 export 'models/node.dart';
 export 'themes/child_node_theme.dart';

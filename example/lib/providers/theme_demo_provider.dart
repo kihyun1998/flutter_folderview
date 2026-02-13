@@ -309,6 +309,34 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(tooltipBoxShadowSpread: spread);
   }
 
+  void setTooltipShowArrow(bool enabled) {
+    state = state.copyWith(tooltipShowArrow: enabled);
+  }
+
+  void setTooltipArrowBaseWidth(double width) {
+    state = state.copyWith(tooltipArrowBaseWidth: width);
+  }
+
+  void setTooltipArrowLength(double length) {
+    state = state.copyWith(tooltipArrowLength: length);
+  }
+
+  void setTooltipArrowPositionRatio(double ratio) {
+    state = state.copyWith(tooltipArrowPositionRatio: ratio);
+  }
+
+  void setTooltipBorderWidth(double width) {
+    state = state.copyWith(tooltipBorderWidth: width);
+  }
+
+  void setTooltipBorderColor(Color color) {
+    state = state.copyWith(tooltipBorderColor: color);
+  }
+
+  void setTooltipScreenMargin(double margin) {
+    state = state.copyWith(tooltipScreenMargin: margin);
+  }
+
   // Reset
   void reset() {
     state = ThemeDemoViewModel(
@@ -555,6 +583,13 @@ class ThemeDemoViewModel {
   final bool tooltipBoxShadowEnabled;
   final double tooltipBoxShadowBlur;
   final double tooltipBoxShadowSpread;
+  final bool tooltipShowArrow;
+  final double tooltipArrowBaseWidth;
+  final double tooltipArrowLength;
+  final double tooltipArrowPositionRatio;
+  final double tooltipBorderWidth;
+  final Color tooltipBorderColor;
+  final double tooltipScreenMargin;
 
   // Data generation parameters
   final int genRootCount;
@@ -660,6 +695,13 @@ class ThemeDemoViewModel {
     this.tooltipBoxShadowEnabled = false,
     this.tooltipBoxShadowBlur = 4.0,
     this.tooltipBoxShadowSpread = 0.0,
+    this.tooltipShowArrow = false,
+    this.tooltipArrowBaseWidth = 12.0,
+    this.tooltipArrowLength = 6.0,
+    this.tooltipArrowPositionRatio = 0.25,
+    this.tooltipBorderWidth = 0.0,
+    this.tooltipBorderColor = const Color(0xFF616161),
+    this.tooltipScreenMargin = 8.0,
     // Data generation defaults
     this.genRootCount = 5,
     this.genMaxDepth = 2,
@@ -732,6 +774,13 @@ class ThemeDemoViewModel {
     bool? tooltipBoxShadowEnabled,
     double? tooltipBoxShadowBlur,
     double? tooltipBoxShadowSpread,
+    bool? tooltipShowArrow,
+    double? tooltipArrowBaseWidth,
+    double? tooltipArrowLength,
+    double? tooltipArrowPositionRatio,
+    double? tooltipBorderWidth,
+    Color? tooltipBorderColor,
+    double? tooltipScreenMargin,
     int? genRootCount,
     int? genMaxDepth,
     int? genSubFolderCount,
@@ -805,6 +854,15 @@ class ThemeDemoViewModel {
       tooltipBoxShadowBlur: tooltipBoxShadowBlur ?? this.tooltipBoxShadowBlur,
       tooltipBoxShadowSpread:
           tooltipBoxShadowSpread ?? this.tooltipBoxShadowSpread,
+      tooltipShowArrow: tooltipShowArrow ?? this.tooltipShowArrow,
+      tooltipArrowBaseWidth:
+          tooltipArrowBaseWidth ?? this.tooltipArrowBaseWidth,
+      tooltipArrowLength: tooltipArrowLength ?? this.tooltipArrowLength,
+      tooltipArrowPositionRatio:
+          tooltipArrowPositionRatio ?? this.tooltipArrowPositionRatio,
+      tooltipBorderWidth: tooltipBorderWidth ?? this.tooltipBorderWidth,
+      tooltipBorderColor: tooltipBorderColor ?? this.tooltipBorderColor,
+      tooltipScreenMargin: tooltipScreenMargin ?? this.tooltipScreenMargin,
       genRootCount: genRootCount ?? this.genRootCount,
       genMaxDepth: genMaxDepth ?? this.genMaxDepth,
       genSubFolderCount: genSubFolderCount ?? this.genSubFolderCount,

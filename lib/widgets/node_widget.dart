@@ -244,14 +244,24 @@ class NodeWidget<T> extends StatelessWidget {
       alignment: tooltipTheme.alignment,
       offset: tooltipTheme.offset,
       crossAxisOffset: tooltipTheme.crossAxisOffset,
-      textStyle: tooltipTheme.textStyle,
-      backgroundColor: tooltipTheme.backgroundColor ?? const Color(0xFF616161),
-      borderRadius: tooltipTheme.borderRadius ??
-          const BorderRadius.all(Radius.circular(6)),
-      padding: tooltipTheme.padding ??
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      elevation: tooltipTheme.elevation ?? 4.0,
-      boxShadow: tooltipTheme.boxShadow,
+      screenMargin: tooltipTheme.screenMargin ?? 8.0,
+      theme: JustTooltipTheme(
+        textStyle: tooltipTheme.textStyle,
+        backgroundColor:
+            tooltipTheme.backgroundColor ?? const Color(0xFF616161),
+        borderRadius: tooltipTheme.borderRadius ??
+            const BorderRadius.all(Radius.circular(6)),
+        padding: tooltipTheme.padding ??
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        elevation: tooltipTheme.elevation ?? 4.0,
+        boxShadow: tooltipTheme.boxShadow,
+        borderColor: tooltipTheme.borderColor,
+        borderWidth: tooltipTheme.borderWidth ?? 0.0,
+        showArrow: tooltipTheme.showArrow ?? false,
+        arrowBaseWidth: tooltipTheme.arrowBaseWidth ?? 12.0,
+        arrowLength: tooltipTheme.arrowLength ?? 6.0,
+        arrowPositionRatio: tooltipTheme.arrowPositionRatio ?? 0.25,
+      ),
       controller: tooltipTheme.controller,
       enableTap: tooltipTheme.enableTap ?? false,
       enableHover: tooltipTheme.enableHover ?? true,

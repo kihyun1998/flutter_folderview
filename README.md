@@ -157,6 +157,13 @@ FolderView(
 | `controller` | `JustTooltipController?` | Programmatic show/hide control |
 | `onShow` | `VoidCallback?` | Callback when shown |
 | `onHide` | `VoidCallback?` | Callback when hidden |
+| `showArrow` | `bool?` | Show arrow on tooltip (default: `false`) |
+| `arrowBaseWidth` | `double?` | Arrow base width (default: `12.0`) |
+| `arrowLength` | `double?` | Arrow length (default: `6.0`) |
+| `arrowPositionRatio` | `double?` | Arrow position ratio 0.0~1.0 (default: `0.25`) |
+| `borderColor` | `Color?` | Tooltip border color |
+| `borderWidth` | `double?` | Tooltip border width (default: `0.0`) |
+| `screenMargin` | `double?` | Min margin from screen edges (default: `8.0`) |
 
 ## Example
 
