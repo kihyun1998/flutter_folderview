@@ -1,3 +1,10 @@
+## 0.6.5
+
+- **feat**: Bump just_tooltip to 0.2.1
+- **feat**: Add `animation` (`TooltipAnimation`) option to `NodeTooltipTheme` — supports `none`, `fade`, `scale`, `slide`, `fadeScale`, `fadeSlide`, `rotation`
+- **feat**: Add `animationCurve`, `fadeBegin`, `scaleBegin`, `slideOffset`, `rotationBegin` options to `NodeTooltipTheme`
+- **feat**: Export `TooltipAnimation` from barrel file
+
 ## 0.6.4
 
 - **feat**: Bump just_tooltip to 0.2.0
