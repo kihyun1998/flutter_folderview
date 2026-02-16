@@ -337,6 +337,30 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(tooltipScreenMargin: margin);
   }
 
+  void setTooltipAnimation(TooltipAnimation animation) {
+    state = state.copyWith(tooltipAnimation: animation);
+  }
+
+  void setTooltipFadeBegin(double value) {
+    state = state.copyWith(tooltipFadeBegin: value);
+  }
+
+  void setTooltipScaleBegin(double value) {
+    state = state.copyWith(tooltipScaleBegin: value);
+  }
+
+  void setTooltipSlideOffset(double value) {
+    state = state.copyWith(tooltipSlideOffset: value);
+  }
+
+  void setTooltipRotationBegin(double value) {
+    state = state.copyWith(tooltipRotationBegin: value);
+  }
+
+  void setTooltipAnimationDuration(double ms) {
+    state = state.copyWith(tooltipAnimationDuration: ms);
+  }
+
   // Reset
   void reset() {
     state = ThemeDemoViewModel(
@@ -590,6 +614,12 @@ class ThemeDemoViewModel {
   final double tooltipBorderWidth;
   final Color tooltipBorderColor;
   final double tooltipScreenMargin;
+  final TooltipAnimation tooltipAnimation;
+  final double tooltipFadeBegin;
+  final double tooltipScaleBegin;
+  final double tooltipSlideOffset;
+  final double tooltipRotationBegin;
+  final double tooltipAnimationDuration;
 
   // Data generation parameters
   final int genRootCount;
@@ -702,6 +732,12 @@ class ThemeDemoViewModel {
     this.tooltipBorderWidth = 0.0,
     this.tooltipBorderColor = const Color(0xFF616161),
     this.tooltipScreenMargin = 8.0,
+    this.tooltipAnimation = TooltipAnimation.fade,
+    this.tooltipFadeBegin = 0.0,
+    this.tooltipScaleBegin = 0.0,
+    this.tooltipSlideOffset = 0.3,
+    this.tooltipRotationBegin = -0.05,
+    this.tooltipAnimationDuration = 150.0,
     // Data generation defaults
     this.genRootCount = 5,
     this.genMaxDepth = 2,
@@ -781,6 +817,12 @@ class ThemeDemoViewModel {
     double? tooltipBorderWidth,
     Color? tooltipBorderColor,
     double? tooltipScreenMargin,
+    TooltipAnimation? tooltipAnimation,
+    double? tooltipFadeBegin,
+    double? tooltipScaleBegin,
+    double? tooltipSlideOffset,
+    double? tooltipRotationBegin,
+    double? tooltipAnimationDuration,
     int? genRootCount,
     int? genMaxDepth,
     int? genSubFolderCount,
@@ -863,6 +905,13 @@ class ThemeDemoViewModel {
       tooltipBorderWidth: tooltipBorderWidth ?? this.tooltipBorderWidth,
       tooltipBorderColor: tooltipBorderColor ?? this.tooltipBorderColor,
       tooltipScreenMargin: tooltipScreenMargin ?? this.tooltipScreenMargin,
+      tooltipAnimation: tooltipAnimation ?? this.tooltipAnimation,
+      tooltipFadeBegin: tooltipFadeBegin ?? this.tooltipFadeBegin,
+      tooltipScaleBegin: tooltipScaleBegin ?? this.tooltipScaleBegin,
+      tooltipSlideOffset: tooltipSlideOffset ?? this.tooltipSlideOffset,
+      tooltipRotationBegin: tooltipRotationBegin ?? this.tooltipRotationBegin,
+      tooltipAnimationDuration:
+          tooltipAnimationDuration ?? this.tooltipAnimationDuration,
       genRootCount: genRootCount ?? this.genRootCount,
       genMaxDepth: genMaxDepth ?? this.genMaxDepth,
       genSubFolderCount: genSubFolderCount ?? this.genSubFolderCount,

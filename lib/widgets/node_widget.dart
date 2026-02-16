@@ -265,6 +265,12 @@ class NodeWidget<T> extends StatelessWidget {
       controller: tooltipTheme.controller,
       enableTap: tooltipTheme.enableTap ?? false,
       enableHover: tooltipTheme.enableHover ?? true,
+      animation: tooltipTheme.animation ?? TooltipAnimation.fade,
+      animationCurve: tooltipTheme.animationCurve,
+      fadeBegin: tooltipTheme.fadeBegin ?? 0.0,
+      scaleBegin: tooltipTheme.scaleBegin ?? 0.0,
+      slideOffset: tooltipTheme.slideOffset ?? 0.3,
+      rotationBegin: tooltipTheme.rotationBegin ?? -0.05,
       animationDuration:
           tooltipTheme.animationDuration ?? const Duration(milliseconds: 150),
       onShow: tooltipTheme.onShow,

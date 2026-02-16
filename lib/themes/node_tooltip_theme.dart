@@ -99,6 +99,24 @@ class NodeTooltipTheme<T> {
   /// Minimum margin from screen edges
   final double? screenMargin;
 
+  /// Animation type for tooltip show/hide
+  final TooltipAnimation? animation;
+
+  /// Custom curve for the tooltip animation
+  final Curve? animationCurve;
+
+  /// Starting opacity for fade-based animations (0.0 to 1.0)
+  final double? fadeBegin;
+
+  /// Starting scale for scale-based animations
+  final double? scaleBegin;
+
+  /// Slide distance as a fraction of tooltip size
+  final double? slideOffset;
+
+  /// Starting rotation in turns for rotation animation
+  final double? rotationBegin;
+
   /// Creates a [NodeTooltipTheme]
   const NodeTooltipTheme({
     this.useTooltip = false,
@@ -131,6 +149,12 @@ class NodeTooltipTheme<T> {
     this.arrowLength,
     this.arrowPositionRatio,
     this.screenMargin,
+    this.animation,
+    this.animationCurve,
+    this.fadeBegin,
+    this.scaleBegin,
+    this.slideOffset,
+    this.rotationBegin,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -165,6 +189,12 @@ class NodeTooltipTheme<T> {
     double? arrowLength,
     double? arrowPositionRatio,
     double? screenMargin,
+    TooltipAnimation? animation,
+    Curve? animationCurve,
+    double? fadeBegin,
+    double? scaleBegin,
+    double? slideOffset,
+    double? rotationBegin,
   }) {
     return NodeTooltipTheme<T>(
       useTooltip: useTooltip ?? this.useTooltip,
@@ -198,6 +228,12 @@ class NodeTooltipTheme<T> {
       arrowLength: arrowLength ?? this.arrowLength,
       arrowPositionRatio: arrowPositionRatio ?? this.arrowPositionRatio,
       screenMargin: screenMargin ?? this.screenMargin,
+      animation: animation ?? this.animation,
+      animationCurve: animationCurve ?? this.animationCurve,
+      fadeBegin: fadeBegin ?? this.fadeBegin,
+      scaleBegin: scaleBegin ?? this.scaleBegin,
+      slideOffset: slideOffset ?? this.slideOffset,
+      rotationBegin: rotationBegin ?? this.rotationBegin,
     );
   }
 
@@ -247,6 +283,12 @@ class NodeTooltipTheme<T> {
       arrowPositionRatio:
           lerpDouble(a.arrowPositionRatio, b.arrowPositionRatio, t),
       screenMargin: lerpDouble(a.screenMargin, b.screenMargin, t),
+      animation: t < 0.5 ? a.animation : b.animation,
+      animationCurve: t < 0.5 ? a.animationCurve : b.animationCurve,
+      fadeBegin: lerpDouble(a.fadeBegin, b.fadeBegin, t),
+      scaleBegin: lerpDouble(a.scaleBegin, b.scaleBegin, t),
+      slideOffset: lerpDouble(a.slideOffset, b.slideOffset, t),
+      rotationBegin: lerpDouble(a.rotationBegin, b.rotationBegin, t),
     );
   }
 }

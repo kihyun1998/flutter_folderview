@@ -73,6 +73,14 @@ class ThemeDemoPage extends ConsumerWidget {
           borderWidth: vm.tooltipBorderWidth,
           borderColor: vm.tooltipBorderColor,
           screenMargin: vm.tooltipScreenMargin,
+          animation: vm.tooltipAnimation,
+          fadeBegin: vm.tooltipFadeBegin,
+          scaleBegin: vm.tooltipScaleBegin,
+          slideOffset: vm.tooltipSlideOffset,
+          rotationBegin: vm.tooltipRotationBegin,
+          animationDuration: Duration(
+            milliseconds: vm.tooltipAnimationDuration.round(),
+          ),
         ),
       ),
       parentTheme: ParentNodeTheme<String>(
@@ -125,6 +133,14 @@ class ThemeDemoPage extends ConsumerWidget {
           borderWidth: vm.tooltipBorderWidth,
           borderColor: vm.tooltipBorderColor,
           screenMargin: vm.tooltipScreenMargin,
+          animation: vm.tooltipAnimation,
+          fadeBegin: vm.tooltipFadeBegin,
+          scaleBegin: vm.tooltipScaleBegin,
+          slideOffset: vm.tooltipSlideOffset,
+          rotationBegin: vm.tooltipRotationBegin,
+          animationDuration: Duration(
+            milliseconds: vm.tooltipAnimationDuration.round(),
+          ),
         ),
       ),
       childTheme: ChildNodeTheme<String>(
@@ -214,6 +230,14 @@ class ThemeDemoPage extends ConsumerWidget {
           borderWidth: vm.tooltipBorderWidth,
           borderColor: vm.tooltipBorderColor,
           screenMargin: vm.tooltipScreenMargin,
+          animation: vm.tooltipAnimation,
+          fadeBegin: vm.tooltipFadeBegin,
+          scaleBegin: vm.tooltipScaleBegin,
+          slideOffset: vm.tooltipSlideOffset,
+          rotationBegin: vm.tooltipRotationBegin,
+          animationDuration: Duration(
+            milliseconds: vm.tooltipAnimationDuration.round(),
+          ),
         ),
       ),
       expandIconTheme: ExpandIconTheme(
@@ -882,6 +906,60 @@ class _ThemeControls extends StatelessWidget {
           0,
           30,
           notifier.setTooltipScreenMargin,
+        ),
+        const Divider(),
+        const Text(
+          'Animation',
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 4),
+        const Text('Type', style: TextStyle(fontSize: 12)),
+        Wrap(
+          spacing: 4,
+          runSpacing: 4,
+          children: TooltipAnimation.values.map((anim) {
+            return ChoiceChip(
+              label: Text(anim.name, style: const TextStyle(fontSize: 11)),
+              selected: vm.tooltipAnimation == anim,
+              onSelected: (s) => s ? notifier.setTooltipAnimation(anim) : null,
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8),
+        _slider(
+          'Animation Duration (ms)',
+          vm.tooltipAnimationDuration,
+          0,
+          1000,
+          notifier.setTooltipAnimationDuration,
+        ),
+        _slider(
+          'Fade Begin',
+          vm.tooltipFadeBegin,
+          0,
+          1,
+          notifier.setTooltipFadeBegin,
+        ),
+        _slider(
+          'Scale Begin',
+          vm.tooltipScaleBegin,
+          0,
+          1,
+          notifier.setTooltipScaleBegin,
+        ),
+        _slider(
+          'Slide Offset',
+          vm.tooltipSlideOffset,
+          0,
+          1,
+          notifier.setTooltipSlideOffset,
+        ),
+        _slider(
+          'Rotation Begin',
+          vm.tooltipRotationBegin,
+          -0.5,
+          0.5,
+          notifier.setTooltipRotationBegin,
         ),
         const SizedBox(height: 4),
         Text(

@@ -4,6 +4,7 @@ export 'package:just_tooltip/just_tooltip.dart'
     show
         TooltipDirection,
         TooltipAlignment,
+        TooltipAnimation,
         JustTooltipController,
         JustTooltipTheme;
 
