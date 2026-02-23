@@ -1,3 +1,7 @@
+## 0.6.6
+
+- **fix**: Tighten `just_tooltip` constraint to `^0.2.2` to fix pub.dev lower bounds compatibility check
+
 ## 0.6.5
 
 - **feat**: Bump just_tooltip to 0.2.1
