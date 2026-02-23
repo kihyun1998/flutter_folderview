@@ -1,3 +1,7 @@
+## 0.6.7
+
+- **fix**: Bump just_tooltip to 0.2.3 — fix `borderColor` not visible when `showArrow: false`
+
 ## 0.6.6
 
 - **fix**: Tighten `just_tooltip` constraint to `^0.2.2` to fix pub.dev lower bounds compatibility check
