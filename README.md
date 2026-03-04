@@ -6,7 +6,7 @@ A customizable Flutter widget for displaying hierarchical data in tree and folde
 
 ```yaml
 dependencies:
-  flutter_folderview: ^0.6.7
+  flutter_folderview: ^0.6.8
 ```
 
 ## Basic Usage
@@ -140,7 +140,7 @@ FolderView(
 | `tooltipBuilder` | `WidgetBuilder?` | Custom tooltip widget |
 | `tooltipBuilderResolver` | `Function?` | Node-specific tooltip widget resolver |
 | `direction` | `TooltipDirection` | Position: `top`, `bottom`, `left`, `right` |
-| `alignment` | `TooltipAlignment` | Alignment: `start`, `center`, `end` |
+| `alignment` | `TooltipAlignment` | Alignment: `start`, `center`, `end`, `startTargetCenter`, `endTargetCenter` |
 | `offset` | `double` | Distance from widget (default: `8.0`) |
 | `crossAxisOffset` | `double` | Cross-axis offset (default: `0.0`) |
 | `backgroundColor` | `Color?` | Background color |
@@ -170,6 +170,7 @@ FolderView(
 | `scaleBegin` | `double?` | Starting scale for scale animations (default: `0.0`) |
 | `slideOffset` | `double?` | Slide distance as fraction of tooltip size (default: `0.3`) |
 | `rotationBegin` | `double?` | Starting rotation in turns (default: `-0.05`) |
+| `hideOnEmptyMessage` | `bool?` | Suppress tooltip when message is empty (default: `true`) |
 
 ## Example
 

@@ -1,3 +1,9 @@
+## 0.6.8
+
+- **feat**: Bump just_tooltip to 0.2.5
+- **feat**: Add `hideOnEmptyMessage` option to `NodeTooltipTheme` — suppress tooltip when message is empty (default: `true`)
+- **feat**: Support `TooltipAlignment.startTargetCenter` and `endTargetCenter` alignments — arrow dynamically points to the center of the target widget
+
 ## 0.6.7
 
 - **fix**: Bump just_tooltip to 0.2.3 — fix `borderColor` not visible when `showArrow: false`

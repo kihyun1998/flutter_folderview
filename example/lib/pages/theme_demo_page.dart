@@ -81,6 +81,7 @@ class ThemeDemoPage extends ConsumerWidget {
           animationDuration: Duration(
             milliseconds: vm.tooltipAnimationDuration.round(),
           ),
+          hideOnEmptyMessage: vm.tooltipHideOnEmptyMessage,
         ),
       ),
       parentTheme: ParentNodeTheme<String>(
@@ -141,6 +142,7 @@ class ThemeDemoPage extends ConsumerWidget {
           animationDuration: Duration(
             milliseconds: vm.tooltipAnimationDuration.round(),
           ),
+          hideOnEmptyMessage: vm.tooltipHideOnEmptyMessage,
         ),
       ),
       childTheme: ChildNodeTheme<String>(
@@ -238,6 +240,7 @@ class ThemeDemoPage extends ConsumerWidget {
           animationDuration: Duration(
             milliseconds: vm.tooltipAnimationDuration.round(),
           ),
+          hideOnEmptyMessage: vm.tooltipHideOnEmptyMessage,
         ),
       ),
       expandIconTheme: ExpandIconTheme(
@@ -766,6 +769,25 @@ class _ThemeControls extends StatelessWidget {
               onSelected: (s) =>
                   s ? notifier.setTooltipAlignment(TooltipAlignment.end) : null,
             ),
+            ChoiceChip(
+              label: const Text('StartTC', style: TextStyle(fontSize: 12)),
+              selected:
+                  vm.tooltipAlignment == TooltipAlignment.startTargetCenter,
+              onSelected: (s) => s
+                  ? notifier.setTooltipAlignment(
+                      TooltipAlignment.startTargetCenter,
+                    )
+                  : null,
+            ),
+            ChoiceChip(
+              label: const Text('EndTC', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipAlignment == TooltipAlignment.endTargetCenter,
+              onSelected: (s) => s
+                  ? notifier.setTooltipAlignment(
+                      TooltipAlignment.endTargetCenter,
+                    )
+                  : null,
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -801,6 +823,20 @@ class _ThemeControls extends StatelessWidget {
           ),
           value: vm.tooltipInteractive,
           onChanged: (v) => notifier.setTooltipInteractive(v),
+        ),
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text(
+            'Hide On Empty Message',
+            style: TextStyle(fontSize: 12),
+          ),
+          subtitle: const Text(
+            'Suppress tooltip when message is empty',
+            style: TextStyle(fontSize: 10),
+          ),
+          value: vm.tooltipHideOnEmptyMessage,
+          onChanged: (v) => notifier.setTooltipHideOnEmptyMessage(v),
         ),
         _slider(
           'Wait Duration (ms)',

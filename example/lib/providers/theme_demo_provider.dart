@@ -361,6 +361,10 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(tooltipAnimationDuration: ms);
   }
 
+  void setTooltipHideOnEmptyMessage(bool enabled) {
+    state = state.copyWith(tooltipHideOnEmptyMessage: enabled);
+  }
+
   // Reset
   void reset() {
     state = ThemeDemoViewModel(
@@ -620,6 +624,7 @@ class ThemeDemoViewModel {
   final double tooltipSlideOffset;
   final double tooltipRotationBegin;
   final double tooltipAnimationDuration;
+  final bool tooltipHideOnEmptyMessage;
 
   // Data generation parameters
   final int genRootCount;
@@ -738,6 +743,7 @@ class ThemeDemoViewModel {
     this.tooltipSlideOffset = 0.3,
     this.tooltipRotationBegin = -0.05,
     this.tooltipAnimationDuration = 150.0,
+    this.tooltipHideOnEmptyMessage = true,
     // Data generation defaults
     this.genRootCount = 5,
     this.genMaxDepth = 2,
@@ -823,6 +829,7 @@ class ThemeDemoViewModel {
     double? tooltipSlideOffset,
     double? tooltipRotationBegin,
     double? tooltipAnimationDuration,
+    bool? tooltipHideOnEmptyMessage,
     int? genRootCount,
     int? genMaxDepth,
     int? genSubFolderCount,
@@ -912,6 +919,8 @@ class ThemeDemoViewModel {
       tooltipRotationBegin: tooltipRotationBegin ?? this.tooltipRotationBegin,
       tooltipAnimationDuration:
           tooltipAnimationDuration ?? this.tooltipAnimationDuration,
+      tooltipHideOnEmptyMessage:
+          tooltipHideOnEmptyMessage ?? this.tooltipHideOnEmptyMessage,
       genRootCount: genRootCount ?? this.genRootCount,
       genMaxDepth: genMaxDepth ?? this.genMaxDepth,
       genSubFolderCount: genSubFolderCount ?? this.genSubFolderCount,
