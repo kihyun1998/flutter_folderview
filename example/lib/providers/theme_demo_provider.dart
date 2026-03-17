@@ -395,6 +395,18 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(genChildCount: count);
   }
 
+  void setUseLongFolderNames(bool value) {
+    state = state.copyWith(useLongFolderNames: value);
+  }
+
+  void setUseLongParentNames(bool value) {
+    state = state.copyWith(useLongParentNames: value);
+  }
+
+  void setUseLongChildNames(bool value) {
+    state = state.copyWith(useLongChildNames: value);
+  }
+
   // Load demo data
   void loadDemoData() {
     state = state.copyWith(
@@ -417,6 +429,9 @@ class ThemeDemoState extends _$ThemeDemoState {
       subFolderCount: state.genSubFolderCount,
       parentCount: state.genParentCount,
       childCount: state.genChildCount,
+      useLongFolderNames: state.useLongFolderNames,
+      useLongParentNames: state.useLongParentNames,
+      useLongChildNames: state.useLongChildNames,
     );
     state = state.copyWith(nodes: nodes, selectedIds: {}, expandedIds: {});
   }
@@ -427,24 +442,24 @@ class ThemeDemoState extends _$ThemeDemoState {
     required int subFolderCount,
     required int parentCount,
     required int childCount,
+    required bool useLongFolderNames,
+    required bool useLongParentNames,
+    required bool useLongChildNames,
   }) {
     final rng = Random(42);
     int idCounter = 0;
 
-    final longNames = [
-      'This is a very long folder name that should cause text overflow',
-      'Another extremely long directory name - Project Alpha Release 2024',
-      'Deep nested folder with ridiculously long name for testing scroll',
-      'Super_Long_File_Name_With_Underscores_Configuration_v2.json',
-      'quarterly-financial-report-infrastructure-operations-2024-Q4.xlsx',
-    ];
+    const longFolderName =
+        'This is a very long folder name that should cause horizontal scroll to appear';
+    const longParentName =
+        'Parent node with extremely long label for testing horizontal scroll behavior';
+    const longChildName =
+        'Child item with super long file name for scroll test - document_v2_final_revised.pdf';
 
     Node<String> generateChild(String prefix) {
       final id = '${prefix}_child_${++idCounter}';
-      final useLong = rng.nextDouble() < 0.1;
-      final label = useLong
-          ? longNames[rng.nextInt(longNames.length)]
-          : 'Item $idCounter.pdf';
+      final useLong = useLongChildNames || rng.nextDouble() < 0.1;
+      final label = useLong ? longChildName : 'Item $idCounter.pdf';
       return Node<String>(
         id: id,
         label: label,
@@ -457,10 +472,8 @@ class ThemeDemoState extends _$ThemeDemoState {
       final parents = <Node<String>>[];
       for (int i = 1; i <= parentCount; i++) {
         final id = '${prefix}_parent_${++idCounter}';
-        final useLong = rng.nextDouble() < 0.1;
-        final label = useLong
-            ? longNames[rng.nextInt(longNames.length)]
-            : 'Category $idCounter';
+        final useLong = useLongParentNames || rng.nextDouble() < 0.1;
+        final label = useLong ? longParentName : 'Category $idCounter';
 
         parents.add(
           Node<String>(
@@ -479,9 +492,9 @@ class ThemeDemoState extends _$ThemeDemoState {
 
       for (int i = 1; i <= subFolderCount; i++) {
         final id = '${prefix}_folder_${++idCounter}';
-        final useLong = rng.nextDouble() < 0.15;
+        final useLong = useLongFolderNames || rng.nextDouble() < 0.15;
         final label = useLong
-            ? longNames[rng.nextInt(longNames.length)]
+            ? longFolderName
             : 'Folder $idCounter - Depth $currentDepth';
 
         List<Node<String>> children;
@@ -507,10 +520,8 @@ class ThemeDemoState extends _$ThemeDemoState {
     final roots = <Node<String>>[];
     for (int i = 1; i <= rootCount; i++) {
       final id = 'root_$i';
-      final useLong = rng.nextDouble() < 0.15;
-      final label = useLong
-          ? longNames[rng.nextInt(longNames.length)]
-          : 'Department $i';
+      final useLong = useLongFolderNames || rng.nextDouble() < 0.15;
+      final label = useLong ? longFolderName : 'Department $i';
 
       roots.add(
         Node<String>(
@@ -633,6 +644,11 @@ class ThemeDemoViewModel {
   final int genParentCount;
   final int genChildCount;
 
+  // Long name test options
+  final bool useLongFolderNames;
+  final bool useLongParentNames;
+  final bool useLongChildNames;
+
   /// Calculate estimated node count based on current parameters
   int get estimatedNodeCount {
     // Folders at each depth level
@@ -750,6 +766,10 @@ class ThemeDemoViewModel {
     this.genSubFolderCount = 3,
     this.genParentCount = 3,
     this.genChildCount = 5,
+    // Long name test options
+    this.useLongFolderNames = false,
+    this.useLongParentNames = false,
+    this.useLongChildNames = false,
   });
 
   ThemeDemoViewModel copyWith({
@@ -835,6 +855,9 @@ class ThemeDemoViewModel {
     int? genSubFolderCount,
     int? genParentCount,
     int? genChildCount,
+    bool? useLongFolderNames,
+    bool? useLongParentNames,
+    bool? useLongChildNames,
   }) {
     return ThemeDemoViewModel(
       nodes: nodes ?? this.nodes,
@@ -926,6 +949,9 @@ class ThemeDemoViewModel {
       genSubFolderCount: genSubFolderCount ?? this.genSubFolderCount,
       genParentCount: genParentCount ?? this.genParentCount,
       genChildCount: genChildCount ?? this.genChildCount,
+      useLongFolderNames: useLongFolderNames ?? this.useLongFolderNames,
+      useLongParentNames: useLongParentNames ?? this.useLongParentNames,
+      useLongChildNames: useLongChildNames ?? this.useLongChildNames,
     );
   }
 }

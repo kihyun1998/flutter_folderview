@@ -57,35 +57,19 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   /// last incremental expand/collapse.
   int _pendingScrollDeltaItems = 0;
 
-  /// Lazily observed maximum content width (monotonically increasing).
-  /// Grows as wider nodes are scrolled into view; never shrinks.
-  double _observedMaxWidth = 0.0;
+  /// Pre-calculated maximum content width from all nodes (including collapsed).
+  /// Computed once when data changes, ensuring stable width.
+  double _precomputedMaxWidth = 0.0;
 
-  /// Tracks whether a width-triggered rebuild is already scheduled.
-  bool _widthUpdateScheduled = false;
+  /// Whether the width has been computed for the current data.
+  bool _widthComputed = false;
 
   @override
   void didUpdateWidget(covariant FolderView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Reset observed width when data or expanded set changes structurally,
-    // because the set of visible nodes may have changed entirely.
+    // Reset computed width when data changes
     if (!identical(oldWidget.data, widget.data)) {
-      _observedMaxWidth = 0.0;
-    }
-  }
-
-  /// Called by FolderViewContent for each rendered node's width.
-  void _onNodeWidthMeasured(double width) {
-    if (width > _observedMaxWidth) {
-      _observedMaxWidth = width;
-      // Batch into a single rebuild per frame to avoid excessive setState calls
-      if (!_widthUpdateScheduled) {
-        _widthUpdateScheduled = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _widthUpdateScheduled = false;
-          if (mounted) setState(() {});
-        });
-      }
+      _widthComputed = false;
     }
   }
 
@@ -191,10 +175,23 @@ class _FolderViewState<T> extends State<FolderView<T>> {
         final double availableHeight = constraints.maxHeight;
         final double availableWidth = constraints.maxWidth;
 
-        // Content width is lazily observed from rendered nodes (monotonic).
+        // Pre-compute max width from ALL nodes (including collapsed) once per data change.
+        if (!_widthComputed) {
+          _precomputedMaxWidth = SizeService.calculateMaxContentWidth<T>(
+            context: context,
+            nodes: widget.data,
+            folderTheme: effectiveTheme.folderTheme,
+            parentTheme: effectiveTheme.parentTheme,
+            childTheme: effectiveTheme.childTheme,
+            expandIconTheme: effectiveTheme.expandIconTheme,
+            rightPadding: effectiveTheme.spacingTheme.contentPadding.right,
+          );
+          _widthComputed = true;
+        }
+
         // Clamp to a reasonable max (3x viewport).
         final maxAllowed = availableWidth * 3;
-        final contentWidth = _observedMaxWidth.clamp(0.0, maxAllowed);
+        final contentWidth = _precomputedMaxWidth.clamp(0.0, maxAllowed);
 
         final contentHeight = SizeService.calculateContentHeight(
           itemCount: flatNodes.length,
@@ -240,7 +237,6 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               horizontalBarController: horizontalScrollbarController!,
               verticalBarController: verticalScrollbarController!,
               theme: effectiveTheme,
-              onNodeWidthMeasured: _onNodeWidthMeasured,
               scrollChangedIndex: scrollChangedIndex,
               scrollDeltaItems: scrollDeltaItems,
             );

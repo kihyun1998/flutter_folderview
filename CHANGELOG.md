@@ -1,3 +1,10 @@
+## 0.6.9
+
+- **fix**: Pre-compute content width from all nodes (including collapsed) to prevent layout jumps on expand/collapse
+- **fix**: Include `letterSpacing` in text width calculation for accurate horizontal scroll sizing
+- **feat**: Add `calculateMaxContentWidth` method to `SizeService` for upfront width calculation
+- **example**: Add long name test options (Folder/Parent/Child) to data generator for horizontal scroll testing
+
 ## 0.6.8
 
 - **feat**: Bump just_tooltip to 0.2.5

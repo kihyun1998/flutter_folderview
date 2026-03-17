@@ -1172,6 +1172,32 @@ class _ThemeControls extends StatelessWidget {
               notifier.setGenChildCount,
             ),
             const SizedBox(height: 8),
+            const Text(
+              'Long Name Test',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 4,
+              children: [
+                FilterChip(
+                  label: const Text('Folder', style: TextStyle(fontSize: 11)),
+                  selected: vm.useLongFolderNames,
+                  onSelected: notifier.setUseLongFolderNames,
+                ),
+                FilterChip(
+                  label: const Text('Parent', style: TextStyle(fontSize: 11)),
+                  selected: vm.useLongParentNames,
+                  onSelected: notifier.setUseLongParentNames,
+                ),
+                FilterChip(
+                  label: const Text('Child', style: TextStyle(fontSize: 11)),
+                  selected: vm.useLongChildNames,
+                  onSelected: notifier.setUseLongChildNames,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(

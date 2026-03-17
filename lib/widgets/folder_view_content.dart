@@ -33,10 +33,6 @@ class FolderViewContent<T> extends StatefulWidget {
   final Set<String>? expandedNodeIds;
   final FlutterFolderViewTheme<T> theme;
 
-  /// Called when a rendered node's width is measured.
-  /// The parent uses this to track the observed max content width.
-  final ValueChanged<double>? onNodeWidthMeasured;
-
   /// Index (in the previous flat list) of the node that was expanded/collapsed.
   /// -1 means no adjustment needed.
   final int scrollChangedIndex;
@@ -63,7 +59,6 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.selectedNodeIds,
     this.expandedNodeIds,
     required this.theme,
-    this.onNodeWidthMeasured,
     this.scrollChangedIndex = -1,
     this.scrollDeltaItems = 0,
   });
@@ -214,21 +209,6 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         widget.expandedNodeIds?.contains(flatNode.node.id) ?? false;
     final theme = widget.theme;
 
-    // Report this node's intrinsic width for lazy max-width tracking
-    if (widget.onNodeWidthMeasured != null) {
-      final nodeWidth = SizeService.calculateSingleNodeWidth(
-        node: flatNode.node,
-        depth: flatNode.depth,
-        folderTheme: theme.folderTheme,
-        parentTheme: theme.parentTheme,
-        childTheme: theme.childTheme,
-        expandIconTheme: theme.expandIconTheme,
-        leftPadding: theme.spacingTheme.contentPadding.left,
-        rightPadding: theme.spacingTheme.contentPadding.right,
-      );
-      widget.onNodeWidthMeasured!(nodeWidth);
-    }
-
     final nodeWidget = NodeWidget<T>(
       flatNode: flatNode,
       mode: widget.mode,
@@ -245,29 +225,29 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     // This preserves ListView virtualization completely.
     // ValueListenableBuilder ensures only individual items rebuild on scroll,
     // not the entire widget tree.
+    // Apply horizontal offset via Transform.translate instead of
+    // wrapping the entire ListView in a SingleChildScrollView.
+    // This preserves ListView virtualization completely.
+    if (!widget.needsHorizontalScroll) {
+      return nodeWidget;
+    }
+
     return ValueListenableBuilder<double>(
       valueListenable: _horizontalOffset,
-      child: nodeWidget,
+      child: OverflowBox(
+        alignment: Alignment.centerLeft,
+        maxWidth: widget.contentWidth,
+        minWidth: widget.contentWidth,
+        child: SizedBox(
+          width: widget.contentWidth,
+          child: nodeWidget,
+        ),
+      ),
       builder: (context, offset, child) {
         if (offset == 0.0) return child!;
-
-        final overflowWidth = widget.contentWidth > widget.viewportWidth
-            ? widget.contentWidth
-            : null;
-
         return Transform.translate(
           offset: Offset(-offset, 0),
-          child: overflowWidth != null
-              ? OverflowBox(
-                  alignment: Alignment.centerLeft,
-                  maxWidth: overflowWidth,
-                  minWidth: overflowWidth,
-                  child: SizedBox(
-                    width: overflowWidth,
-                    child: child,
-                  ),
-                )
-              : child,
+          child: child,
         );
       },
     );

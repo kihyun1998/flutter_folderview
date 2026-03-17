@@ -17,6 +17,59 @@ class SizeService {
     _textWidthCache.clear();
   }
 
+  /// Calculate the maximum content width from ALL nodes (including collapsed children).
+  ///
+  /// Recursively traverses the entire tree to find the widest node,
+  /// ensuring stable width regardless of expand/collapse state.
+  static double calculateMaxContentWidth<T>({
+    required BuildContext context,
+    required List<Node<T>> nodes,
+    required FolderNodeTheme folderTheme,
+    required ParentNodeTheme parentTheme,
+    required ChildNodeTheme childTheme,
+    required ExpandIconTheme expandIconTheme,
+    double leftPadding = 0.0,
+    double rightPadding = 16.0,
+    double maxWidth = double.infinity,
+  }) {
+    final linePaintWidth = expandIconTheme.width +
+        expandIconTheme.padding.horizontal +
+        expandIconTheme.margin.horizontal;
+
+    // Get the base text style from theme to include letterSpacing etc.
+    final baseTextStyle = Theme.of(context).textTheme.bodyMedium;
+
+    double maxNodeWidth = 0.0;
+
+    void traverse(List<Node<T>> nodeList, int depth) {
+      for (final node in nodeList) {
+        final nodeWidth = _calculateNodeWidth(
+          node: node,
+          depth: depth,
+          folderTheme: folderTheme,
+          parentTheme: parentTheme,
+          childTheme: childTheme,
+          expandIconTheme: expandIconTheme,
+          linePaintWidth: linePaintWidth,
+          rightPadding: rightPadding,
+          baseTextStyle: baseTextStyle,
+        );
+        if (nodeWidth > maxNodeWidth) {
+          maxNodeWidth = nodeWidth;
+        }
+        // Recurse into children regardless of expanded state
+        if (node.children.isNotEmpty) {
+          traverse(node.children, depth + 1);
+        }
+      }
+    }
+
+    traverse(nodes, 0);
+
+    final totalWidth = leftPadding + maxNodeWidth;
+    return totalWidth.clamp(0.0, maxWidth);
+  }
+
   /// Calculate the total content width from visible flat nodes.
   ///
   /// Iterates through the already-flattened visible nodes to find the widest one.
@@ -94,6 +147,7 @@ class SizeService {
     required ExpandIconTheme expandIconTheme,
     required double linePaintWidth,
     required double rightPadding,
+    TextStyle? baseTextStyle,
   }) {
     // Indent based on depth
     double width = depth * linePaintWidth;
@@ -105,34 +159,38 @@ class SizeService {
 
     // Node icon and text style based on type
     double iconWidth;
-    TextStyle? textStyle;
+    TextStyle? themeTextStyle;
 
     switch (node.type) {
       case NodeType.folder:
         iconWidth = folderTheme.width +
             folderTheme.padding.horizontal +
             folderTheme.margin.horizontal;
-        textStyle = folderTheme.textStyle ?? const TextStyle(fontSize: 14);
+        themeTextStyle = folderTheme.textStyle;
         break;
       case NodeType.parent:
         iconWidth = parentTheme.width +
             parentTheme.padding.horizontal +
             parentTheme.margin.horizontal;
-        textStyle = parentTheme.textStyle ?? const TextStyle(fontSize: 14);
+        themeTextStyle = parentTheme.textStyle;
         break;
       case NodeType.child:
         iconWidth = childTheme.width +
             childTheme.padding.horizontal +
             childTheme.margin.horizontal;
-        textStyle = childTheme.textStyle ?? const TextStyle(fontSize: 14);
+        themeTextStyle = childTheme.textStyle;
         break;
     }
 
+    // Merge base style (from Theme) with node-specific style
+    final textStyle =
+        (baseTextStyle ?? const TextStyle(fontSize: 14)).merge(themeTextStyle);
+
     width += iconWidth;
 
-    // Text width (cached)
+    // Text width (cached) - include letterSpacing in cache key
     final cacheKey =
-        '${node.label}\x00${textStyle.fontSize}\x00${textStyle.fontWeight}';
+        '${node.label}\x00${textStyle.fontSize}\x00${textStyle.fontWeight}\x00${textStyle.letterSpacing}';
     final textWidth = _textWidthCache[cacheKey] ??= () {
       final tp = TextPainter(
         text: TextSpan(text: node.label, style: textStyle),
