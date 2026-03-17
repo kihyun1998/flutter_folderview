@@ -236,6 +236,10 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(rowSpacing: spacing);
   }
 
+  void setScale(double scale) {
+    state = state.copyWith(scale: scale.clamp(0.5, 3.0));
+  }
+
   // Tooltip
   void setFolderTooltipEnabled(bool enabled) {
     state = state.copyWith(folderTooltipEnabled: enabled);
@@ -603,6 +607,9 @@ class ThemeDemoViewModel {
   final double rowHeight;
   final double rowSpacing;
 
+  // Scale
+  final double scale;
+
   // Tooltip
   final bool folderTooltipEnabled;
   final Color folderTooltipBgColor;
@@ -727,6 +734,8 @@ class ThemeDemoViewModel {
     // Layout defaults
     this.rowHeight = 40.0,
     this.rowSpacing = 0.0,
+    // Scale default
+    this.scale = 1.0,
     // Tooltip defaults
     this.folderTooltipEnabled = true,
     this.folderTooltipBgColor = const Color(0xFF424242),
@@ -818,6 +827,7 @@ class ThemeDemoViewModel {
     double? animationDuration,
     double? rowHeight,
     double? rowSpacing,
+    double? scale,
     bool? folderTooltipEnabled,
     Color? folderTooltipBgColor,
     bool? parentTooltipEnabled,
@@ -906,6 +916,7 @@ class ThemeDemoViewModel {
       animationDuration: animationDuration ?? this.animationDuration,
       rowHeight: rowHeight ?? this.rowHeight,
       rowSpacing: rowSpacing ?? this.rowSpacing,
+      scale: scale ?? this.scale,
       folderTooltipEnabled: folderTooltipEnabled ?? this.folderTooltipEnabled,
       folderTooltipBgColor: folderTooltipBgColor ?? this.folderTooltipBgColor,
       parentTooltipEnabled: parentTooltipEnabled ?? this.parentTooltipEnabled,

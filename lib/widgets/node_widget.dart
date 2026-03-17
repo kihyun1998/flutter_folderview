@@ -23,6 +23,7 @@ class NodeWidget<T> extends StatelessWidget {
   final Set<String>? selectedNodeIds;
   final bool isExpanded;
   final FlutterFolderViewTheme<T> theme;
+  final double scale;
 
   const NodeWidget({
     super.key,
@@ -34,6 +35,7 @@ class NodeWidget<T> extends StatelessWidget {
     this.selectedNodeIds,
     required this.isExpanded,
     required this.theme,
+    this.scale = 1.0,
   });
 
   Node<T> get node => flatNode.node;
@@ -128,7 +130,9 @@ class NodeWidget<T> extends StatelessWidget {
       child: SizedBox(
         width: expandTheme.width,
         height: expandTheme.height,
-        child: expandTheme.widget,
+        child: scale != 1.0
+            ? FittedBox(child: expandTheme.widget)
+            : expandTheme.widget,
       ),
     );
   }
@@ -201,7 +205,7 @@ class NodeWidget<T> extends StatelessWidget {
       child: SizedBox(
         width: width,
         height: height,
-        child: iconWidget,
+        child: scale != 1.0 ? FittedBox(child: iconWidget) : iconWidget,
       ),
     );
   }

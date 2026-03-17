@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -291,50 +293,61 @@ class ThemeDemoPage extends ConsumerWidget {
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: FolderView<String>(
-                    data: vm.nodes,
-                    mode: vm.viewMode,
-                    onNodeTap: (node) {
-                      if (node.type == NodeType.child) {
-                        notifier.selectNode(node.id);
-                      } else if (node.canExpand) {
-                        notifier.toggleNode(node.id);
+                  child: Listener(
+                    onPointerSignal: (event) {
+                      if (event is PointerScrollEvent &&
+                          (HardwareKeyboard.instance.isControlPressed ||
+                              HardwareKeyboard.instance.isMetaPressed)) {
+                        final delta = event.scrollDelta.dy > 0 ? -0.1 : 0.1;
+                        notifier.setScale(vm.scale + delta);
                       }
                     },
-                    onDoubleNodeTap: (node) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              const Icon(
-                                Icons.mouse,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  '더블클릭: ${node.label}',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
+                    child: FolderView<String>(
+                      data: vm.nodes,
+                      mode: vm.viewMode,
+                      scale: vm.scale,
+                      onNodeTap: (node) {
+                        if (node.type == NodeType.child) {
+                          notifier.selectNode(node.id);
+                        } else if (node.canExpand) {
+                          notifier.toggleNode(node.id);
+                        }
+                      },
+                      onDoubleNodeTap: (node) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(
+                                  Icons.mouse,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    '더블클릭: ${node.label}',
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                            backgroundColor: Colors.green.shade700,
+                            duration: const Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                          backgroundColor: Colors.green.shade700,
-                          duration: const Duration(seconds: 2),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      );
-                    },
-                    selectedNodeIds: vm.selectedIds,
-                    expandedNodeIds: vm.expandedIds,
-                    theme: theme,
+                        );
+                      },
+                      selectedNodeIds: vm.selectedIds,
+                      expandedNodeIds: vm.expandedIds,
+                      theme: theme,
+                    ),
                   ),
                 ),
               ),
@@ -1025,6 +1038,13 @@ class _ThemeControls extends StatelessWidget {
     return _buildSection(
       title: 'Layout',
       children: [
+        _slider('Scale', vm.scale, 0.5, 3.0, notifier.setScale),
+        const SizedBox(height: 4),
+        Text(
+          'Content scale (Ctrl/Cmd + Scroll)',
+          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+        ),
+        const SizedBox(height: 12),
         _slider('Row Height', vm.rowHeight, 20, 80, notifier.setRowHeight),
         const SizedBox(height: 4),
         Text(

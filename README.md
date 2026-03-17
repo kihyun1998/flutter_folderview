@@ -6,7 +6,7 @@ A customizable Flutter widget for displaying hierarchical data in tree and folde
 
 ```yaml
 dependencies:
-  flutter_folderview: ^0.6.9
+  flutter_folderview: ^0.7.0
 ```
 
 ## Basic Usage
@@ -107,6 +107,29 @@ FolderView(
   ),
 )
 ```
+
+## Scale
+
+Scale all content proportionally. Scrollbars are not affected.
+
+```dart
+FolderView(
+  data: nodes,
+  mode: ViewMode.folder,
+  scale: 1.5, // default 1.0
+  expandedNodeIds: expandedIds,
+)
+```
+
+| Scaled | Not Scaled |
+|---|---|
+| Row height, row spacing | Scrollbar thickness, track width |
+| Icon sizes, padding, margin | Scrollbar colors |
+| Text fontSize, letterSpacing | |
+| Line width, indentation | |
+| Content padding, border radius | |
+
+Ctrl/Cmd + scroll wheel is automatically ignored by the internal `ScrollPhysics` to allow zoom-by-scroll without unintended scrolling.
 
 ## Tooltip
 

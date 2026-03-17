@@ -19,6 +19,12 @@ class FolderView<T> extends StatefulWidget {
   final Set<String>? expandedNodeIds;
   final FlutterFolderViewTheme<T>? theme;
 
+  /// Scale factor for the content (default 1.0).
+  ///
+  /// Scales all layout dimensions (row height, icon sizes, text size, spacing,
+  /// line width, indentation) proportionally. Scrollbars are NOT scaled.
+  final double scale;
+
   const FolderView({
     super.key,
     required this.data,
@@ -29,7 +35,8 @@ class FolderView<T> extends StatefulWidget {
     this.selectedNodeIds,
     this.expandedNodeIds,
     this.theme,
-  });
+    this.scale = 1.0,
+  }) : assert(scale > 0, 'scale must be greater than 0');
 
   @override
   State<FolderView<T>> createState() => _FolderViewState<T>();
@@ -67,8 +74,9 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   @override
   void didUpdateWidget(covariant FolderView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Reset computed width when data changes
-    if (!identical(oldWidget.data, widget.data)) {
+    // Reset computed width when data or scale changes
+    if (!identical(oldWidget.data, widget.data) ||
+        oldWidget.scale != widget.scale) {
       _widthComputed = false;
     }
   }
@@ -164,6 +172,9 @@ class _FolderViewState<T> extends State<FolderView<T>> {
     // Resolve theme: use provided theme, or get from context, or use default
     final effectiveTheme = widget.theme ?? FolderViewTheme.of<T>(context);
 
+    // Apply scale to the theme (scrollbar theme is preserved as-is)
+    final scaledTheme = _applyScale(context, effectiveTheme, widget.scale);
+
     // Filter data based on mode
     List<Node<T>> displayNodes = _getDisplayNodes();
 
@@ -175,31 +186,31 @@ class _FolderViewState<T> extends State<FolderView<T>> {
         final double availableHeight = constraints.maxHeight;
         final double availableWidth = constraints.maxWidth;
 
-        // Pre-compute max width from ALL nodes (including collapsed) once per data change.
+        // Pre-compute max width from ALL nodes (including collapsed) once per data/scale change.
         if (!_widthComputed) {
           _precomputedMaxWidth = SizeService.calculateMaxContentWidth<T>(
             context: context,
             nodes: widget.data,
-            folderTheme: effectiveTheme.folderTheme,
-            parentTheme: effectiveTheme.parentTheme,
-            childTheme: effectiveTheme.childTheme,
-            expandIconTheme: effectiveTheme.expandIconTheme,
-            leftPadding: effectiveTheme.spacingTheme.contentPadding.left,
-            rightPadding: effectiveTheme.spacingTheme.contentPadding.right,
+            folderTheme: scaledTheme.folderTheme,
+            parentTheme: scaledTheme.parentTheme,
+            childTheme: scaledTheme.childTheme,
+            expandIconTheme: scaledTheme.expandIconTheme,
+            leftPadding: scaledTheme.spacingTheme.contentPadding.left,
+            rightPadding: scaledTheme.spacingTheme.contentPadding.right,
           );
           _widthComputed = true;
         }
 
-        // Clamp to a reasonable max (3x viewport).
-        final maxAllowed = availableWidth * 3;
+        // Clamp to a reasonable max (3x viewport, scaled).
+        final maxAllowed = availableWidth * 3 * widget.scale;
         final contentWidth = _precomputedMaxWidth.clamp(0.0, maxAllowed);
 
         final contentHeight = SizeService.calculateContentHeight(
           itemCount: flatNodes.length,
-          rowHeight: effectiveTheme.rowHeight,
-          rowSpacing: effectiveTheme.rowSpacing,
-          topPadding: effectiveTheme.spacingTheme.contentPadding.top,
-          bottomPadding: effectiveTheme.spacingTheme.contentPadding.bottom,
+          rowHeight: scaledTheme.rowHeight,
+          rowSpacing: scaledTheme.rowSpacing,
+          topPadding: scaledTheme.spacingTheme.contentPadding.top,
+          bottomPadding: scaledTheme.spacingTheme.contentPadding.bottom,
         );
 
         final needsHorizontalScroll = contentWidth > availableWidth;
@@ -237,13 +248,92 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               verticalController: verticalController!,
               horizontalBarController: horizontalScrollbarController!,
               verticalBarController: verticalScrollbarController!,
-              theme: effectiveTheme,
+              theme: scaledTheme,
+              scale: widget.scale,
               scrollChangedIndex: scrollChangedIndex,
               scrollDeltaItems: scrollDeltaItems,
             );
           },
         );
       },
+    );
+  }
+
+  /// Creates a scaled copy of the theme. Scrollbar theme is NOT scaled.
+  static FlutterFolderViewTheme<T> _applyScale<T>(
+    BuildContext context,
+    FlutterFolderViewTheme<T> theme,
+    double scale,
+  ) {
+    if (scale == 1.0) return theme;
+
+    final defaultFontSize =
+        Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14.0;
+
+    return theme.copyWith(
+      rowHeight: theme.rowHeight * scale,
+      rowSpacing: theme.rowSpacing * scale,
+      lineTheme: theme.lineTheme.copyWith(
+        lineWidth: theme.lineTheme.lineWidth * scale,
+      ),
+      expandIconTheme: theme.expandIconTheme.copyWith(
+        width: theme.expandIconTheme.width * scale,
+        height: theme.expandIconTheme.height * scale,
+        padding: theme.expandIconTheme.padding * scale,
+        margin: theme.expandIconTheme.margin * scale,
+      ),
+      folderTheme: theme.folderTheme.copyWith(
+        width: theme.folderTheme.width * scale,
+        height: theme.folderTheme.height * scale,
+        padding: theme.folderTheme.padding * scale,
+        margin: theme.folderTheme.margin * scale,
+        textStyle: _scaleTextStyle(
+            theme.folderTheme.textStyle, scale, defaultFontSize),
+      ),
+      parentTheme: theme.parentTheme.copyWith(
+        width: theme.parentTheme.width * scale,
+        height: theme.parentTheme.height * scale,
+        padding: theme.parentTheme.padding * scale,
+        margin: theme.parentTheme.margin * scale,
+        textStyle: _scaleTextStyle(
+            theme.parentTheme.textStyle, scale, defaultFontSize),
+      ),
+      childTheme: theme.childTheme.copyWith(
+        width: theme.childTheme.width * scale,
+        height: theme.childTheme.height * scale,
+        padding: theme.childTheme.padding * scale,
+        margin: theme.childTheme.margin * scale,
+        textStyle:
+            _scaleTextStyle(theme.childTheme.textStyle, scale, defaultFontSize),
+        selectedTextStyle: _scaleOptionalTextStyle(
+            theme.childTheme.selectedTextStyle, scale, defaultFontSize),
+      ),
+      spacingTheme: theme.spacingTheme.copyWith(
+        contentPadding: theme.spacingTheme.contentPadding * scale,
+      ),
+      nodeStyleTheme: theme.nodeStyleTheme.copyWith(
+        borderRadius: theme.nodeStyleTheme.borderRadius * scale,
+      ),
+    );
+  }
+
+  static TextStyle _scaleTextStyle(
+      TextStyle? style, double scale, double defaultFontSize) {
+    final base = style ?? TextStyle(fontSize: defaultFontSize);
+    return base.copyWith(
+      fontSize: (base.fontSize ?? defaultFontSize) * scale,
+      letterSpacing:
+          base.letterSpacing != null ? base.letterSpacing! * scale : null,
+    );
+  }
+
+  static TextStyle? _scaleOptionalTextStyle(
+      TextStyle? style, double scale, double defaultFontSize) {
+    if (style == null) return null;
+    return style.copyWith(
+      fontSize: style.fontSize != null ? style.fontSize! * scale : null,
+      letterSpacing:
+          style.letterSpacing != null ? style.letterSpacing! * scale : null,
     );
   }
 

@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/flat_node.dart';
 import '../models/node.dart';
@@ -33,6 +34,9 @@ class FolderViewContent<T> extends StatefulWidget {
   final Set<String>? expandedNodeIds;
   final FlutterFolderViewTheme<T> theme;
 
+  /// Scale factor applied to content dimensions.
+  final double scale;
+
   /// Index (in the previous flat list) of the node that was expanded/collapsed.
   /// -1 means no adjustment needed.
   final int scrollChangedIndex;
@@ -59,6 +63,7 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.selectedNodeIds,
     this.expandedNodeIds,
     required this.theme,
+    this.scale = 1.0,
     this.scrollChangedIndex = -1,
     this.scrollDeltaItems = 0,
   });
@@ -88,9 +93,83 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       widget.horizontalController.addListener(_onHorizontalScroll);
     }
 
+    // Adjust scroll position when scale changes (preserve visible node)
+    _applyScaleAdjustment(oldWidget);
+
     // Adjust vertical scroll offset when items were inserted/removed above
     // the current viewport due to expand/collapse.
     _applyScrollAdjustment(oldWidget);
+  }
+
+  void _applyScaleAdjustment(FolderViewContent<T> oldWidget) {
+    if (oldWidget.scale == widget.scale) return;
+
+    final controller = widget.verticalController;
+    if (!controller.hasClients) return;
+
+    final oldItemExtent =
+        oldWidget.theme.rowHeight + oldWidget.theme.rowSpacing;
+    final newItemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
+    final oldTopPadding = oldWidget.theme.spacingTheme.contentPadding.top;
+    final newTopPadding = widget.theme.spacingTheme.contentPadding.top;
+
+    final scrollOffset = controller.offset;
+
+    // Find which fractional item position is at the top of viewport
+    final topFractionalIndex = oldItemExtent > 0
+        ? (scrollOffset - oldTopPadding) / oldItemExtent
+        : 0.0;
+
+    // Map to new offset preserving the same visible node
+    final newOffset = newTopPadding + topFractionalIndex * newItemExtent;
+
+    final contentHeight = widget.contentHeight;
+
+    // Also compute horizontal adjustment
+    final hController = widget.horizontalController;
+    double? newHOffset;
+    if (hController.hasClients && oldWidget.contentWidth > 0) {
+      final hOffset = hController.offset;
+      final ratio = widget.contentWidth / oldWidget.contentWidth;
+      newHOffset = hOffset * ratio;
+    }
+
+    // Defer all jumpTo calls to after the build phase to avoid
+    // "setState() called during build" from scroll notifications.
+    final barController = widget.verticalBarController;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Vertical adjustment
+      if (controller.hasClients) {
+        final viewportHeight = controller.position.viewportDimension;
+        final newMaxExtent =
+            (contentHeight - viewportHeight).clamp(0.0, double.infinity);
+        final clampedV = newOffset.clamp(0.0, newMaxExtent);
+
+        if ((clampedV - controller.offset).abs() > 0.5) {
+          controller.jumpTo(clampedV);
+        }
+
+        // Re-sync scrollbar controller
+        if (barController.hasClients) {
+          final target = controller.offset.clamp(
+            barController.position.minScrollExtent,
+            barController.position.maxScrollExtent,
+          );
+          barController.jumpTo(target);
+        }
+      }
+
+      // Horizontal adjustment
+      if (newHOffset != null && hController.hasClients) {
+        final clampedH = newHOffset.clamp(
+          hController.position.minScrollExtent,
+          hController.position.maxScrollExtent,
+        );
+        if ((clampedH - hController.offset).abs() > 0.5) {
+          hController.jumpTo(clampedH);
+        }
+      }
+    });
   }
 
   void _applyScrollAdjustment(FolderViewContent<T> oldWidget) {
@@ -218,6 +297,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       selectedNodeIds: widget.selectedNodeIds,
       isExpanded: isExpanded,
       theme: theme,
+      scale: widget.scale,
     );
 
     // Apply horizontal offset via Transform.translate instead of
@@ -268,6 +348,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
           child: ListView.builder(
             key: _listViewKey,
             controller: widget.verticalController,
+            physics: const _ModifierKeyAwareScrollPhysics(),
             padding: theme.spacingTheme.contentPadding,
             itemCount: widget.flatNodes.length,
             itemExtent: itemExtent,
@@ -333,5 +414,26 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         ),
       ),
     );
+  }
+}
+
+/// Scroll physics that ignores scroll events when Ctrl (Windows/Linux)
+/// or Cmd (macOS) is pressed, allowing those events to be used for
+/// zoom/scale instead.
+class _ModifierKeyAwareScrollPhysics extends ScrollPhysics {
+  const _ModifierKeyAwareScrollPhysics({super.parent});
+
+  @override
+  _ModifierKeyAwareScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return _ModifierKeyAwareScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  bool shouldAcceptUserOffset(ScrollMetrics position) {
+    if (HardwareKeyboard.instance.isControlPressed ||
+        HardwareKeyboard.instance.isMetaPressed) {
+      return false;
+    }
+    return super.shouldAcceptUserOffset(position);
   }
 }

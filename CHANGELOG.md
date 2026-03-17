@@ -1,3 +1,14 @@
+## 0.7.0
+
+- **feat**: Add `scale` parameter to `FolderView` for content zoom (default: `1.0`)
+- **feat**: Scale all layout dimensions proportionally — row height, icon sizes, text size, spacing, line width, indentation, content padding, border radius
+- **feat**: Scrollbar appearance (thickness, track width, colors) is NOT affected by scale
+- **feat**: Preserve visible node on scale change with automatic scroll position adjustment
+- **feat**: Ignore scroll events when Ctrl/Cmd is pressed to support zoom-by-scroll without unintended scrolling
+- **fix**: Defer scroll position adjustment to post-frame callback to prevent `setState() called during build` error
+- **fix**: Scale content width clamp limit (`3x viewport * scale`) to prevent text ellipsis at high scale values
+- **example**: Add scale slider to Layout controls and Ctrl/Cmd + mouse wheel zoom support
+
 ## 0.6.9
 
 - **fix**: Pre-compute content width from all nodes (including collapsed) to prevent layout jumps on expand/collapse
