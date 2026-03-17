@@ -184,6 +184,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
             parentTheme: effectiveTheme.parentTheme,
             childTheme: effectiveTheme.childTheme,
             expandIconTheme: effectiveTheme.expandIconTheme,
+            leftPadding: effectiveTheme.spacingTheme.contentPadding.left,
             rightPadding: effectiveTheme.spacingTheme.contentPadding.right,
           );
           _widthComputed = true;
