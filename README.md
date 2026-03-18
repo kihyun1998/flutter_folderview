@@ -6,7 +6,7 @@ A customizable Flutter widget for displaying hierarchical data in tree and folde
 
 ```yaml
 dependencies:
-  flutter_folderview: ^0.7.0
+  flutter_folderview: ^0.7.1
 ```
 
 ## Basic Usage
@@ -129,7 +129,17 @@ FolderView(
 | Line width, indentation | |
 | Content padding, border radius | |
 
-Ctrl/Cmd + scroll wheel is automatically ignored by the internal `ScrollPhysics` to allow zoom-by-scroll without unintended scrolling.
+Ctrl/Cmd + scroll wheel is blocked by default (`blockCtrlScroll: true`) so zoom-by-scroll works without unintended scrolling. Set `blockCtrlScroll: false` to allow normal scrolling while Ctrl/Cmd is held.
+
+```dart
+FolderView(
+  data: nodes,
+  mode: ViewMode.folder,
+  scale: 1.5,
+  blockCtrlScroll: true, // default: true
+  expandedNodeIds: expandedIds,
+)
+```
 
 ## Tooltip
 

@@ -306,6 +306,7 @@ class ThemeDemoPage extends ConsumerWidget {
                       data: vm.nodes,
                       mode: vm.viewMode,
                       scale: vm.scale,
+                      blockCtrlScroll: true,
                       onNodeTap: (node) {
                         if (node.type == NodeType.child) {
                           notifier.selectNode(node.id);

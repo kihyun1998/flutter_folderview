@@ -1,3 +1,7 @@
+## 0.7.1
+
+- **feat**: Add `blockCtrlScroll` parameter to `FolderView` (default: `true`) — optionally disable Ctrl/Cmd + scroll blocking for users who don't need zoom-by-scroll
+
 ## 0.7.0
 
 - **feat**: Add `scale` parameter to `FolderView` for content zoom (default: `1.0`)

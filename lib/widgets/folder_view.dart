@@ -25,6 +25,11 @@ class FolderView<T> extends StatefulWidget {
   /// line width, indentation) proportionally. Scrollbars are NOT scaled.
   final double scale;
 
+  /// When `true`, normal scrolling is blocked while Ctrl (Windows/Linux) or
+  /// Cmd (macOS) is held, so that those scroll events can be used for
+  /// zoom/scale instead.
+  final bool blockCtrlScroll;
+
   const FolderView({
     super.key,
     required this.data,
@@ -36,6 +41,7 @@ class FolderView<T> extends StatefulWidget {
     this.expandedNodeIds,
     this.theme,
     this.scale = 1.0,
+    this.blockCtrlScroll = true,
   }) : assert(scale > 0, 'scale must be greater than 0');
 
   @override
@@ -250,6 +256,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               verticalBarController: verticalScrollbarController!,
               theme: scaledTheme,
               scale: widget.scale,
+              blockCtrlScroll: widget.blockCtrlScroll,
               scrollChangedIndex: scrollChangedIndex,
               scrollDeltaItems: scrollDeltaItems,
             );
