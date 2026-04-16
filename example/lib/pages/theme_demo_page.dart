@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -296,8 +295,7 @@ class ThemeDemoPage extends ConsumerWidget {
                   child: Listener(
                     onPointerSignal: (event) {
                       if (event is PointerScrollEvent &&
-                          (HardwareKeyboard.instance.isControlPressed ||
-                              HardwareKeyboard.instance.isMetaPressed)) {
+                          isScaleModifierPressed()) {
                         final delta = event.scrollDelta.dy > 0 ? -0.1 : 0.1;
                         notifier.setScale(vm.scale + delta);
                       }

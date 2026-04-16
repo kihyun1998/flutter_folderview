@@ -1,3 +1,8 @@
+## 0.7.2
+
+- **fix**: Use platform-aware modifier key check — Ctrl on Windows/Linux, Cmd on macOS — to prevent Windows key from permanently triggering zoom mode
+- **feat**: Export `isScaleModifierPressed()` helper for library consumers implementing custom Ctrl/Cmd + scroll zoom
+
 ## 0.7.1
 
 - **feat**: Add `blockCtrlScroll` parameter to `FolderView` (default: `true`) — optionally disable Ctrl/Cmd + scroll blocking for users who don't need zoom-by-scroll

@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -423,9 +424,23 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   }
 }
 
-/// Scroll physics that ignores scroll events when Ctrl (Windows/Linux)
-/// or Cmd (macOS) is pressed, allowing those events to be used for
-/// zoom/scale instead.
+/// Whether the platform-appropriate modifier key (Ctrl on Windows/Linux,
+/// Cmd on macOS) is currently pressed.
+///
+/// On Windows/Linux only [isControlPressed] is checked — this avoids the
+/// "sticky Windows-key" bug where pressing the Windows key sets
+/// [isMetaPressed] to `true` but the subsequent key-up is never delivered
+/// to the Flutter app, leaving the flag stuck.
+bool isScaleModifierPressed() {
+  if (defaultTargetPlatform == TargetPlatform.macOS) {
+    return HardwareKeyboard.instance.isMetaPressed;
+  }
+  return HardwareKeyboard.instance.isControlPressed;
+}
+
+/// Scroll physics that ignores scroll events when the scale-modifier key
+/// (Ctrl on Windows/Linux, Cmd on macOS) is pressed, allowing those events
+/// to be used for zoom/scale instead.
 class _ModifierKeyAwareScrollPhysics extends ScrollPhysics {
   const _ModifierKeyAwareScrollPhysics({super.parent});
 
@@ -436,10 +451,7 @@ class _ModifierKeyAwareScrollPhysics extends ScrollPhysics {
 
   @override
   bool shouldAcceptUserOffset(ScrollMetrics position) {
-    if (HardwareKeyboard.instance.isControlPressed ||
-        HardwareKeyboard.instance.isMetaPressed) {
-      return false;
-    }
+    if (isScaleModifierPressed()) return false;
     return super.shouldAcceptUserOffset(position);
   }
 }
