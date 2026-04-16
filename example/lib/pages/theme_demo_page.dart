@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -292,61 +291,54 @@ class ThemeDemoPage extends ConsumerWidget {
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Listener(
-                    onPointerSignal: (event) {
-                      if (event is PointerScrollEvent &&
-                          isScaleModifierPressed()) {
-                        final delta = event.scrollDelta.dy > 0 ? -0.1 : 0.1;
-                        notifier.setScale(vm.scale + delta);
+                  child: FolderView<String>(
+                    data: vm.nodes,
+                    mode: vm.viewMode,
+                    scale: vm.scale,
+                    onScaleChanged: (newScale) {
+                      notifier.setScale(newScale.clamp(0.5, 3.0));
+                    },
+                    onNodeTap: (node) {
+                      if (node.type == NodeType.child) {
+                        notifier.selectNode(node.id);
+                      } else if (node.canExpand) {
+                        notifier.toggleNode(node.id);
                       }
                     },
-                    child: FolderView<String>(
-                      data: vm.nodes,
-                      mode: vm.viewMode,
-                      scale: vm.scale,
-                      blockCtrlScroll: true,
-                      onNodeTap: (node) {
-                        if (node.type == NodeType.child) {
-                          notifier.selectNode(node.id);
-                        } else if (node.canExpand) {
-                          notifier.toggleNode(node.id);
-                        }
-                      },
-                      onDoubleNodeTap: (node) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              children: [
-                                const Icon(
-                                  Icons.mouse,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    '더블클릭: ${node.label}',
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                    onDoubleNodeTap: (node) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              const Icon(
+                                Icons.mouse,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  '더블클릭: ${node.label}',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                              ],
-                            ),
-                            backgroundColor: Colors.green.shade700,
-                            duration: const Duration(seconds: 2),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                      selectedNodeIds: vm.selectedIds,
-                      expandedNodeIds: vm.expandedIds,
-                      theme: theme,
-                    ),
+                          backgroundColor: Colors.green.shade700,
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      );
+                    },
+                    selectedNodeIds: vm.selectedIds,
+                    expandedNodeIds: vm.expandedIds,
+                    theme: theme,
                   ),
                 ),
               ),

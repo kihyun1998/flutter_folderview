@@ -1,7 +1,10 @@
-## 0.7.2
+## 0.8.0
 
-- **fix**: Use platform-aware modifier key check — Ctrl on Windows/Linux, Cmd on macOS — to prevent Windows key from permanently triggering zoom mode
-- **feat**: Export `isScaleModifierPressed()` helper for library consumers implementing custom Ctrl/Cmd + scroll zoom
+- **BREAKING**: Rename `blockCtrlScroll` → `blockModifierScroll` to accurately reflect platform-aware behavior (Ctrl on Windows/Linux, Cmd on macOS)
+- **BREAKING**: `blockModifierScroll` is now `bool?` (default `null`) — automatically follows `onScaleChanged` when unset
+- **feat**: Add `onScaleChanged` callback and `scaleStep` parameter for built-in modifier+scroll zoom handling
+- **feat**: Export `isScaleModifierPressed()` helper for library consumers implementing custom zoom logic
+- **fix**: Use platform-aware modifier key check to prevent Windows key from permanently triggering zoom mode
 
 ## 0.7.1
 

@@ -39,7 +39,7 @@ class FolderViewContent<T> extends StatefulWidget {
   final double scale;
 
   /// When `true`, normal scrolling is blocked while Ctrl/Cmd is held.
-  final bool blockCtrlScroll;
+  final bool blockModifierScroll;
 
   /// Index (in the previous flat list) of the node that was expanded/collapsed.
   /// -1 means no adjustment needed.
@@ -68,7 +68,7 @@ class FolderViewContent<T> extends StatefulWidget {
     this.expandedNodeIds,
     required this.theme,
     this.scale = 1.0,
-    this.blockCtrlScroll = true,
+    this.blockModifierScroll = true,
     this.scrollChangedIndex = -1,
     this.scrollDeltaItems = 0,
   });
@@ -353,7 +353,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
           child: ListView.builder(
             key: _listViewKey,
             controller: widget.verticalController,
-            physics: widget.blockCtrlScroll
+            physics: widget.blockModifierScroll
                 ? const _ModifierKeyAwareScrollPhysics()
                 : null,
             padding: theme.spacingTheme.contentPadding,

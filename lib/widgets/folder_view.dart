@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../models/flat_node.dart';
@@ -25,10 +26,33 @@ class FolderView<T> extends StatefulWidget {
   /// line width, indentation) proportionally. Scrollbars are NOT scaled.
   final double scale;
 
-  /// When `true`, normal scrolling is blocked while Ctrl (Windows/Linux) or
+  /// Callback fired when the user Ctrl+scrolls (or Cmd+scrolls on macOS)
+  /// over the view, requesting a scale change.
+  ///
+  /// When non-null, the library intercepts modifier+wheel events internally
+  /// and calls this callback with the proposed new scale value.
+  ///
+  /// The caller should update [scale] in response:
+  /// ```dart
+  /// onScaleChanged: (newScale) {
+  ///   setState(() => _scale = newScale.clamp(0.5, 3.0));
+  /// },
+  /// ```
+  ///
+  /// When null, modifier+wheel events are not intercepted and scroll normally.
+  final ValueChanged<double>? onScaleChanged;
+
+  /// The amount [scale] changes per mouse wheel tick when [onScaleChanged]
+  /// is active. Defaults to `0.05`.
+  final double scaleStep;
+
+  /// Whether to block normal scrolling while Ctrl (Windows/Linux) or
   /// Cmd (macOS) is held, so that those scroll events can be used for
   /// zoom/scale instead.
-  final bool blockCtrlScroll;
+  ///
+  /// Defaults to `null`, which follows [onScaleChanged]: blocking is enabled
+  /// when [onScaleChanged] is non-null, and disabled otherwise.
+  final bool? blockModifierScroll;
 
   const FolderView({
     super.key,
@@ -41,7 +65,9 @@ class FolderView<T> extends StatefulWidget {
     this.expandedNodeIds,
     this.theme,
     this.scale = 1.0,
-    this.blockCtrlScroll = true,
+    this.onScaleChanged,
+    this.scaleStep = 0.05,
+    this.blockModifierScroll,
   }) : assert(scale > 0, 'scale must be greater than 0');
 
   @override
@@ -49,6 +75,10 @@ class FolderView<T> extends StatefulWidget {
 }
 
 class _FolderViewState<T> extends State<FolderView<T>> {
+  /// Whether Ctrl/Cmd+wheel scrolling should be blocked.
+  bool get _blockModifierScroll =>
+      widget.blockModifierScroll ?? (widget.onScaleChanged != null);
+
   /// Cached flatten result
   List<FlatNode<T>> _cachedFlatNodes = [];
 
@@ -237,7 +267,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
             _pendingScrollChangedIndex = -1;
             _pendingScrollDeltaItems = 0;
 
-            return FolderViewContent<T>(
+            final content = FolderViewContent<T>(
               flatNodes: flatNodes,
               mode: widget.mode,
               onNodeTap: widget.onNodeTap,
@@ -256,9 +286,16 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               verticalBarController: verticalScrollbarController!,
               theme: scaledTheme,
               scale: widget.scale,
-              blockCtrlScroll: widget.blockCtrlScroll,
+              blockModifierScroll: _blockModifierScroll,
               scrollChangedIndex: scrollChangedIndex,
               scrollDeltaItems: scrollDeltaItems,
+            );
+
+            if (!_blockModifierScroll) return content;
+
+            return Listener(
+              onPointerSignal: _handlePointerSignalForScale,
+              child: content,
             );
           },
         );
@@ -342,6 +379,17 @@ class _FolderViewState<T> extends State<FolderView<T>> {
       letterSpacing:
           style.letterSpacing != null ? style.letterSpacing! * scale : null,
     );
+  }
+
+  /// Intercept Ctrl+wheel (or Cmd+wheel on macOS) to change scale.
+  void _handlePointerSignalForScale(PointerSignalEvent event) {
+    if (event is PointerScrollEvent && isScaleModifierPressed()) {
+      if (widget.onScaleChanged != null) {
+        final delta =
+            event.scrollDelta.dy > 0 ? -widget.scaleStep : widget.scaleStep;
+        widget.onScaleChanged!(widget.scale + delta);
+      }
+    }
   }
 
   List<Node<T>> _getDisplayNodes() {
