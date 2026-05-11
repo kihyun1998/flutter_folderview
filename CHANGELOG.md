@@ -1,3 +1,7 @@
+## 0.8.1
+
+- **fix**: Explicitly set `SystemMouseCursors.click` as the default `mouseCursor` on node `InkWell` — newer Flutter versions no longer auto-apply the click cursor on hover
+
 ## 0.8.0
 
 - **BREAKING**: Rename `blockCtrlScroll` → `blockModifierScroll` to accurately reflect platform-aware behavior (Ctrl on Windows/Linux, Cmd on macOS)

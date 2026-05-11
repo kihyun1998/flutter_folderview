@@ -118,7 +118,7 @@ class _CustomInkWellState extends State<CustomInkWell> {
             borderRadius: BorderRadius.circular(widget.borderRadius),
           ),
           child: InkWell(
-            mouseCursor: widget.mouseCursor,
+            mouseCursor: widget.mouseCursor ?? SystemMouseCursors.click,
             borderRadius: BorderRadius.circular(widget.borderRadius),
             onTap: widget.onTap != null ? _handleTap : null,
             onSecondaryTapDown: widget.onSecondaryTapDown,

@@ -1332,6 +1332,7 @@ class _ThemeControls extends StatelessWidget {
           runSpacing: 4,
           children: colors.map((c) {
             return InkWell(
+              mouseCursor: SystemMouseCursors.click,
               onTap: () => onChange(c),
               child: Container(
                 width: 32,

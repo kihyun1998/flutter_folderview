@@ -6,7 +6,7 @@ A customizable Flutter widget for displaying hierarchical data in tree and folde
 
 ```yaml
 dependencies:
-  flutter_folderview: ^0.8.0
+  flutter_folderview: ^0.8.1
 ```
 
 ## Basic Usage
