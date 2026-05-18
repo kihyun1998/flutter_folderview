@@ -182,12 +182,9 @@ class FlutterFolderViewTheme<T> {
       lineTheme: lineTheme.scale(factor),
       // scrollbarTheme: deliberately NOT delegated (ADR-0001 — scrollbars
       // are chrome, not content, and must remain physically-sized for input).
-      folderTheme:
-          folderTheme.scale(factor, defaultFontSize: defaultFontSize),
-      parentTheme:
-          parentTheme.scale(factor, defaultFontSize: defaultFontSize),
-      childTheme:
-          childTheme.scale(factor, defaultFontSize: defaultFontSize),
+      folderTheme: folderTheme.scale(factor, defaultFontSize: defaultFontSize),
+      parentTheme: parentTheme.scale(factor, defaultFontSize: defaultFontSize),
+      childTheme: childTheme.scale(factor, defaultFontSize: defaultFontSize),
       expandIconTheme: expandIconTheme.scale(factor),
       spacingTheme: spacingTheme.scale(factor),
       nodeStyleTheme: nodeStyleTheme.scale(factor),

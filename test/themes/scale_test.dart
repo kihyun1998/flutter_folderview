@@ -8,8 +8,7 @@ void main() {
   group('Identity short-circuit (factor == 1.0 returns identical this)', () {
     test('FlutterFolderViewTheme', () {
       final theme = FlutterFolderViewTheme<String>.light();
-      final result =
-          theme.scale(factor: 1.0, defaultFontSize: defaultFontSize);
+      final result = theme.scale(factor: 1.0, defaultFontSize: defaultFontSize);
       expect(identical(result, theme), isTrue,
           reason: 'scale(1.0) must return identical this — no allocation');
     });
@@ -99,8 +98,7 @@ void main() {
         rowHeight: 40.0,
         rowSpacing: 4.0,
       );
-      final scaled =
-          theme.scale(factor: 2.0, defaultFontSize: defaultFontSize);
+      final scaled = theme.scale(factor: 2.0, defaultFontSize: defaultFontSize);
       expect(scaled.rowHeight, 80.0);
       expect(scaled.rowSpacing, 8.0);
     });
@@ -211,8 +209,7 @@ void main() {
       const t = FolderNodeTheme<String>(tooltipTheme: tip);
       final scaled = t.scale(2.0, defaultFontSize: 14.0);
       expect(identical(scaled.tooltipTheme, tip), isTrue,
-          reason:
-              'ADR-0004: tooltipTheme must be pointer-equal pass-through');
+          reason: 'ADR-0004: tooltipTheme must be pointer-equal pass-through');
     });
 
     test('ParentNodeTheme.scale passes tooltipTheme through identical', () {
@@ -234,8 +231,7 @@ void main() {
     test('FlutterFolderViewTheme.scale passes scrollbarTheme through identical',
         () {
       final theme = FlutterFolderViewTheme<String>.light();
-      final scaled =
-          theme.scale(factor: 2.0, defaultFontSize: defaultFontSize);
+      final scaled = theme.scale(factor: 2.0, defaultFontSize: defaultFontSize);
       expect(identical(scaled.scrollbarTheme, theme.scrollbarTheme), isTrue,
           reason:
               'ADR-0001: scrollbarTheme must be pointer-equal pass-through');
@@ -243,8 +239,7 @@ void main() {
 
     test('scrollbarTheme fields literally unchanged across scale', () {
       final theme = FlutterFolderViewTheme<String>.light();
-      final scaled =
-          theme.scale(factor: 3.0, defaultFontSize: defaultFontSize);
+      final scaled = theme.scale(factor: 3.0, defaultFontSize: defaultFontSize);
       expect(scaled.scrollbarTheme.thickness, theme.scrollbarTheme.thickness);
       expect(scaled.scrollbarTheme.trackWidth, theme.scrollbarTheme.trackWidth);
       expect(scaled.scrollbarTheme.radius, theme.scrollbarTheme.radius);
@@ -254,8 +249,7 @@ void main() {
   group('Non-spatial preservation', () {
     test('animationDuration is not scaled (time is not space)', () {
       final theme = FlutterFolderViewTheme<String>.light();
-      final scaled =
-          theme.scale(factor: 2.0, defaultFontSize: defaultFontSize);
+      final scaled = theme.scale(factor: 2.0, defaultFontSize: defaultFontSize);
       expect(scaled.animationDuration, theme.animationDuration);
     });
 
