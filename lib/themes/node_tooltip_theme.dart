@@ -9,6 +9,25 @@ import '_scale_text_style.dart';
 /// Theme data for tooltip styling in FolderView nodes
 @immutable
 class NodeTooltipTheme<T> {
+  /// Default [padding] used by the rendering layer when [padding] is null.
+  /// Exposed as a constant so that [scale] can materialize-and-scale it
+  /// from null inputs, matching what the renderer would otherwise pick.
+  static const EdgeInsets defaultPadding =
+      EdgeInsets.symmetric(horizontal: 12, vertical: 8);
+
+  /// Default [arrowBaseWidth] used by the rendering layer when null.
+  static const double defaultArrowBaseWidth = 12.0;
+
+  /// Default [arrowLength] used by the rendering layer when null.
+  static const double defaultArrowLength = 6.0;
+
+  /// Default [screenMargin] used by the rendering layer when null.
+  static const double defaultScreenMargin = 8.0;
+
+  /// Default [borderRadius] used by the rendering layer when null.
+  static const BorderRadius defaultBorderRadius =
+      BorderRadius.all(Radius.circular(6));
+
   /// Whether to use tooltip for this node type
   final bool useTooltip;
 
@@ -165,11 +184,14 @@ class NodeTooltipTheme<T> {
   /// Returns a scaled copy with all spatial fields multiplied by [factor].
   ///
   /// Scales: [offset], [crossAxisOffset], [padding], [arrowBaseWidth],
-  /// [arrowLength], [screenMargin], [textStyle] (using [defaultFontSize]
-  /// when null). Nullable spatial fields stay null when null.
+  /// [arrowLength], [screenMargin], [borderRadius], [textStyle].
   ///
-  /// Closes the gap formerly flagged in CONTEXT.md where these
-  /// content-spatial properties were not scaled.
+  /// Nullable spatial fields (padding, arrowBaseWidth, arrowLength,
+  /// screenMargin, borderRadius) are **materialized to their rendering
+  /// defaults before scaling** when null on input. Without this, the
+  /// renderer's hardcoded `??` fallbacks would short-circuit Scale at
+  /// scale ≠ 1.0 — see ADR-0001 commentary; the rendering layer reads
+  /// the same `defaultXxx` constants exposed on this class.
   ///
   /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
   NodeTooltipTheme<T> scale(
@@ -181,10 +203,11 @@ class NodeTooltipTheme<T> {
     return copyWith(
       offset: offset * factor,
       crossAxisOffset: crossAxisOffset * factor,
-      padding: padding == null ? null : padding! * factor,
-      arrowBaseWidth: arrowBaseWidth == null ? null : arrowBaseWidth! * factor,
-      arrowLength: arrowLength == null ? null : arrowLength! * factor,
-      screenMargin: screenMargin == null ? null : screenMargin! * factor,
+      padding: (padding ?? defaultPadding) * factor,
+      arrowBaseWidth: (arrowBaseWidth ?? defaultArrowBaseWidth) * factor,
+      arrowLength: (arrowLength ?? defaultArrowLength) * factor,
+      screenMargin: (screenMargin ?? defaultScreenMargin) * factor,
+      borderRadius: (borderRadius ?? defaultBorderRadius) * factor,
       textStyle: scaleOptionalTextStyle(textStyle, factor, defaultFontSize),
     );
   }

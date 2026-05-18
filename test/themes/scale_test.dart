@@ -233,13 +233,29 @@ void main() {
       expect(scaled.screenMargin, 24.0);
     });
 
-    test('NodeTooltipTheme.scale preserves null nullable fields', () {
+    test(
+        'NodeTooltipTheme.scale materializes null nullable spatial fields '
+        'from rendering defaults before scaling (closes default-user gap)',
+        () {
       const t = NodeTooltipTheme<String>();
       final scaled = t.scale(2.0, defaultFontSize: 14.0);
-      expect(scaled.padding, isNull);
-      expect(scaled.arrowBaseWidth, isNull);
-      expect(scaled.arrowLength, isNull);
-      expect(scaled.screenMargin, isNull);
+      // Materialized = default × factor. Without this, the renderer's
+      // hardcoded ?? fallbacks would short-circuit Scale for default users.
+      expect(scaled.padding, NodeTooltipTheme.defaultPadding * 2.0);
+      expect(
+          scaled.arrowBaseWidth, NodeTooltipTheme.defaultArrowBaseWidth * 2.0);
+      expect(scaled.arrowLength, NodeTooltipTheme.defaultArrowLength * 2.0);
+      expect(scaled.screenMargin, NodeTooltipTheme.defaultScreenMargin * 2.0);
+      expect(scaled.borderRadius, NodeTooltipTheme.defaultBorderRadius * 2.0);
+    });
+
+    test('NodeTooltipTheme.scale scales borderRadius (explicit value)', () {
+      const t = NodeTooltipTheme<String>(
+        borderRadius: BorderRadius.all(Radius.circular(8)),
+      );
+      final scaled = t.scale(1.5, defaultFontSize: 14.0);
+      expect(scaled.borderRadius,
+          const BorderRadius.all(Radius.circular(8)) * 1.5);
     });
 
     test('NodeTooltipTheme.scale preserves non-spatial fields unchanged', () {

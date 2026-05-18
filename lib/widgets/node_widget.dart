@@ -248,22 +248,24 @@ class NodeWidget<T> extends StatelessWidget {
       alignment: tooltipTheme.alignment,
       offset: tooltipTheme.offset,
       crossAxisOffset: tooltipTheme.crossAxisOffset,
-      screenMargin: tooltipTheme.screenMargin ?? 8.0,
+      screenMargin:
+          tooltipTheme.screenMargin ?? NodeTooltipTheme.defaultScreenMargin,
       theme: JustTooltipTheme(
         textStyle: tooltipTheme.textStyle,
         backgroundColor:
             tooltipTheme.backgroundColor ?? const Color(0xFF616161),
-        borderRadius: tooltipTheme.borderRadius ??
-            const BorderRadius.all(Radius.circular(6)),
-        padding: tooltipTheme.padding ??
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        borderRadius:
+            tooltipTheme.borderRadius ?? NodeTooltipTheme.defaultBorderRadius,
+        padding: tooltipTheme.padding ?? NodeTooltipTheme.defaultPadding,
         elevation: tooltipTheme.elevation ?? 4.0,
         boxShadow: tooltipTheme.boxShadow,
         borderColor: tooltipTheme.borderColor,
         borderWidth: tooltipTheme.borderWidth ?? 0.0,
         showArrow: tooltipTheme.showArrow ?? false,
-        arrowBaseWidth: tooltipTheme.arrowBaseWidth ?? 12.0,
-        arrowLength: tooltipTheme.arrowLength ?? 6.0,
+        arrowBaseWidth: tooltipTheme.arrowBaseWidth ??
+            NodeTooltipTheme.defaultArrowBaseWidth,
+        arrowLength:
+            tooltipTheme.arrowLength ?? NodeTooltipTheme.defaultArrowLength,
         arrowPositionRatio: tooltipTheme.arrowPositionRatio ?? 0.25,
       ),
       controller: tooltipTheme.controller,
