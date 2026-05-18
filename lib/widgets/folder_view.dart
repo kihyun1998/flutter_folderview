@@ -208,8 +208,9 @@ class _FolderViewState<T> extends State<FolderView<T>> {
     // Resolve theme: use provided theme, or get from context, or use default
     final effectiveTheme = widget.theme ?? FolderViewTheme.of<T>(context);
 
-    // Apply scale to the theme (scrollbar theme is preserved as-is)
-    final scaledTheme = _applyScale(context, effectiveTheme, widget.scale);
+    // Apply scale to the theme. scrollbarTheme is preserved as-is (ADR-0001).
+    // Each Theme owns its own scaling logic — see `Theme.scale(...)` methods.
+    final scaledTheme = effectiveTheme.scaledForContext(context, widget.scale);
 
     // Filter data based on mode
     List<Node<T>> displayNodes = _getDisplayNodes();
@@ -300,84 +301,6 @@ class _FolderViewState<T> extends State<FolderView<T>> {
           },
         );
       },
-    );
-  }
-
-  /// Creates a scaled copy of the theme. Scrollbar theme is NOT scaled.
-  static FlutterFolderViewTheme<T> _applyScale<T>(
-    BuildContext context,
-    FlutterFolderViewTheme<T> theme,
-    double scale,
-  ) {
-    if (scale == 1.0) return theme;
-
-    final defaultFontSize =
-        Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14.0;
-
-    return theme.copyWith(
-      rowHeight: theme.rowHeight * scale,
-      rowSpacing: theme.rowSpacing * scale,
-      lineTheme: theme.lineTheme.copyWith(
-        lineWidth: theme.lineTheme.lineWidth * scale,
-      ),
-      expandIconTheme: theme.expandIconTheme.copyWith(
-        width: theme.expandIconTheme.width * scale,
-        height: theme.expandIconTheme.height * scale,
-        padding: theme.expandIconTheme.padding * scale,
-        margin: theme.expandIconTheme.margin * scale,
-      ),
-      folderTheme: theme.folderTheme.copyWith(
-        width: theme.folderTheme.width * scale,
-        height: theme.folderTheme.height * scale,
-        padding: theme.folderTheme.padding * scale,
-        margin: theme.folderTheme.margin * scale,
-        textStyle: _scaleTextStyle(
-            theme.folderTheme.textStyle, scale, defaultFontSize),
-      ),
-      parentTheme: theme.parentTheme.copyWith(
-        width: theme.parentTheme.width * scale,
-        height: theme.parentTheme.height * scale,
-        padding: theme.parentTheme.padding * scale,
-        margin: theme.parentTheme.margin * scale,
-        textStyle: _scaleTextStyle(
-            theme.parentTheme.textStyle, scale, defaultFontSize),
-      ),
-      childTheme: theme.childTheme.copyWith(
-        width: theme.childTheme.width * scale,
-        height: theme.childTheme.height * scale,
-        padding: theme.childTheme.padding * scale,
-        margin: theme.childTheme.margin * scale,
-        textStyle:
-            _scaleTextStyle(theme.childTheme.textStyle, scale, defaultFontSize),
-        selectedTextStyle: _scaleOptionalTextStyle(
-            theme.childTheme.selectedTextStyle, scale, defaultFontSize),
-      ),
-      spacingTheme: theme.spacingTheme.copyWith(
-        contentPadding: theme.spacingTheme.contentPadding * scale,
-      ),
-      nodeStyleTheme: theme.nodeStyleTheme.copyWith(
-        borderRadius: theme.nodeStyleTheme.borderRadius * scale,
-      ),
-    );
-  }
-
-  static TextStyle _scaleTextStyle(
-      TextStyle? style, double scale, double defaultFontSize) {
-    final base = style ?? TextStyle(fontSize: defaultFontSize);
-    return base.copyWith(
-      fontSize: (base.fontSize ?? defaultFontSize) * scale,
-      letterSpacing:
-          base.letterSpacing != null ? base.letterSpacing! * scale : null,
-    );
-  }
-
-  static TextStyle? _scaleOptionalTextStyle(
-      TextStyle? style, double scale, double defaultFontSize) {
-    if (style == null) return null;
-    return style.copyWith(
-      fontSize: style.fontSize != null ? style.fontSize! * scale : null,
-      letterSpacing:
-          style.letterSpacing != null ? style.letterSpacing! * scale : null,
     );
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:just_tooltip/just_tooltip.dart';
 
 import '../models/node.dart';
+import '_scale_text_style.dart';
 
 /// Theme data for tooltip styling in FolderView nodes
 @immutable
@@ -160,6 +161,33 @@ class NodeTooltipTheme<T> {
     this.rotationBegin,
     this.hideOnEmptyMessage,
   });
+
+  /// Returns a scaled copy with all spatial fields multiplied by [factor].
+  ///
+  /// Scales: [offset], [crossAxisOffset], [padding], [arrowBaseWidth],
+  /// [arrowLength], [screenMargin], [textStyle] (using [defaultFontSize]
+  /// when null). Nullable spatial fields stay null when null.
+  ///
+  /// Closes the gap formerly flagged in CONTEXT.md where these
+  /// content-spatial properties were not scaled.
+  ///
+  /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
+  NodeTooltipTheme<T> scale(
+    double factor, {
+    required double defaultFontSize,
+  }) {
+    assert(factor > 0, 'scale factor must be > 0, got $factor');
+    if (factor == 1.0) return this;
+    return copyWith(
+      offset: offset * factor,
+      crossAxisOffset: crossAxisOffset * factor,
+      padding: padding == null ? null : padding! * factor,
+      arrowBaseWidth: arrowBaseWidth == null ? null : arrowBaseWidth! * factor,
+      arrowLength: arrowLength == null ? null : arrowLength! * factor,
+      screenMargin: screenMargin == null ? null : screenMargin! * factor,
+      textStyle: scaleOptionalTextStyle(textStyle, factor, defaultFontSize),
+    );
+  }
 
   /// Creates a copy of this theme with the given fields replaced with new values
   NodeTooltipTheme<T> copyWith({

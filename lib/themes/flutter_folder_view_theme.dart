@@ -156,6 +156,63 @@ class FlutterFolderViewTheme<T> {
     );
   }
 
+  /// Returns a deeply-scaled copy of this theme.
+  ///
+  /// Delegates to each child theme's `scale` and multiplies top-level
+  /// scalars ([rowHeight], [rowSpacing]).
+  ///
+  /// **Deliberately omitted from delegation** (per ADR-0001):
+  /// [scrollbarTheme] is preserved as-is — scrollbars are chrome, not content.
+  /// [animationDuration] is preserved as-is — time is not a length.
+  ///
+  /// [defaultFontSize] is used to resolve null [TextStyle.fontSize] values
+  /// before scaling. Widget callers should prefer [scaledForContext] which
+  /// extracts this from the ambient [Theme].
+  ///
+  /// Identity: `scale(factor: 1.0, defaultFontSize: …)` returns `this`.
+  FlutterFolderViewTheme<T> scale({
+    required double factor,
+    required double defaultFontSize,
+  }) {
+    assert(factor > 0, 'scale factor must be > 0, got $factor');
+    if (factor == 1.0) return this;
+    return copyWith(
+      rowHeight: rowHeight * factor,
+      rowSpacing: rowSpacing * factor,
+      lineTheme: lineTheme.scale(factor),
+      // scrollbarTheme: deliberately NOT delegated (ADR-0001 — scrollbars
+      // are chrome, not content, and must remain physically-sized for input).
+      folderTheme:
+          folderTheme.scale(factor, defaultFontSize: defaultFontSize),
+      parentTheme:
+          parentTheme.scale(factor, defaultFontSize: defaultFontSize),
+      childTheme:
+          childTheme.scale(factor, defaultFontSize: defaultFontSize),
+      expandIconTheme: expandIconTheme.scale(factor),
+      spacingTheme: spacingTheme.scale(factor),
+      nodeStyleTheme: nodeStyleTheme.scale(factor),
+    );
+  }
+
+  /// Convenience for the dominant call site: extracts the ambient
+  /// `defaultFontSize` from `Theme.of(context).textTheme.bodyMedium` and
+  /// delegates to [scale].
+  ///
+  /// Couples this entry point to the Material text theme. The per-Theme
+  /// `scale` methods remain framework-agnostic and can be tested in pure
+  /// Dart without a widget tree.
+  ///
+  /// Identity: `scaledForContext(context, 1.0)` returns `this`.
+  FlutterFolderViewTheme<T> scaledForContext(
+    BuildContext context,
+    double factor,
+  ) {
+    if (factor == 1.0) return this;
+    final defaultFontSize =
+        Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14.0;
+    return scale(factor: factor, defaultFontSize: defaultFontSize);
+  }
+
   /// Creates a copy of this theme with the given fields replaced with new values
   FlutterFolderViewTheme<T> copyWith({
     FolderViewLineTheme? lineTheme,

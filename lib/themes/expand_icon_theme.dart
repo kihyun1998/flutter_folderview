@@ -37,6 +37,22 @@ class ExpandIconTheme {
     this.expandedColor,
   });
 
+  /// Returns a scaled copy with all spatial fields multiplied by [factor].
+  ///
+  /// Scales: [width], [height], [padding], [margin].
+  /// Leaves untouched: [widget], [color], [expandedColor].
+  /// Identity: `scale(1.0)` returns `this`.
+  ExpandIconTheme scale(double factor) {
+    assert(factor > 0, 'scale factor must be > 0, got $factor');
+    if (factor == 1.0) return this;
+    return copyWith(
+      width: width * factor,
+      height: height * factor,
+      padding: padding * factor,
+      margin: margin * factor,
+    );
+  }
+
   /// Creates a copy of this theme with the given fields replaced with new values
   ExpandIconTheme copyWith({
     Widget? widget,

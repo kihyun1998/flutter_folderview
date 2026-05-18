@@ -16,6 +16,15 @@ class FolderViewSpacingTheme {
   /// Creates a [FolderViewSpacingTheme] with the given properties
   const FolderViewSpacingTheme({this.contentPadding = EdgeInsets.zero});
 
+  /// Returns a scaled copy with [contentPadding] multiplied by [factor].
+  ///
+  /// Identity: `scale(1.0)` returns `this`.
+  FolderViewSpacingTheme scale(double factor) {
+    assert(factor > 0, 'scale factor must be > 0, got $factor');
+    if (factor == 1.0) return this;
+    return copyWith(contentPadding: contentPadding * factor);
+  }
+
   /// Creates a copy of this theme with the given fields replaced
   FolderViewSpacingTheme copyWith({EdgeInsets? contentPadding}) {
     return FolderViewSpacingTheme(

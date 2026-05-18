@@ -3,6 +3,7 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/widgets.dart';
 
 import '../models/node.dart';
+import '_scale_text_style.dart';
 import 'node_tooltip_theme.dart';
 
 /// Theme data for folder node styling in FolderView
@@ -75,6 +76,32 @@ class FolderNodeTheme<T> {
     this.highlightColor,
     this.tooltipTheme,
   });
+
+  /// Returns a scaled copy with all spatial fields and text size multiplied
+  /// by [factor].
+  ///
+  /// Scales: [width], [height], [padding], [margin], [textStyle] (font size +
+  /// letter spacing), [tooltipTheme] (delegated).
+  /// [defaultFontSize] is used to resolve a null [TextStyle.fontSize] before
+  /// scaling — callers should pass `Theme.of(context).textTheme.bodyMedium?.fontSize`.
+  ///
+  /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
+  FolderNodeTheme<T> scale(
+    double factor, {
+    required double defaultFontSize,
+  }) {
+    assert(factor > 0, 'scale factor must be > 0, got $factor');
+    if (factor == 1.0) return this;
+    return copyWith(
+      width: width * factor,
+      height: height * factor,
+      padding: padding * factor,
+      margin: margin * factor,
+      textStyle: scaleTextStyle(textStyle, factor, defaultFontSize),
+      tooltipTheme:
+          tooltipTheme?.scale(factor, defaultFontSize: defaultFontSize),
+    );
+  }
 
   /// Creates a copy of this theme with the given fields replaced with new values
   FolderNodeTheme<T> copyWith({
