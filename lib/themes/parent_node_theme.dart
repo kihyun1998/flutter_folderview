@@ -80,8 +80,8 @@ class ParentNodeTheme<T> {
   /// Returns a scaled copy with all spatial fields and text size multiplied
   /// by [factor]. See [FolderNodeTheme.scale] for shared contract details.
   ///
-  /// Scales: [width], [height], [padding], [margin], [textStyle],
-  /// [tooltipTheme] (delegated).
+  /// Scales: [width], [height], [padding], [margin], [textStyle].
+  /// **Does NOT scale**: [tooltipTheme] — see ADR-0004.
   /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
   ParentNodeTheme<T> scale(
     double factor, {
@@ -95,8 +95,7 @@ class ParentNodeTheme<T> {
       padding: padding * factor,
       margin: margin * factor,
       textStyle: scaleTextStyle(textStyle, factor, defaultFontSize),
-      tooltipTheme:
-          tooltipTheme?.scale(factor, defaultFontSize: defaultFontSize),
+      // tooltipTheme intentionally not delegated — ADR-0004 (chrome).
     );
   }
 

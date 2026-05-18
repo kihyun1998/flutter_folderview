@@ -74,7 +74,7 @@ _Avoid_: Zoom key, ctrl-scroll.
 - **Selection** is tier-bound to the **Child** tier. A **Folder** or **Parent** ID in the **Selected Set** has no defined effect — the library does not model selection of non-**Child** tiers.
 - **Expansion** and **Selection** are independent and apply to disjoint tiers: **Folders** and **Parents** expand; **Children** are selected. A single **Node** is therefore either expandable or selectable, never both.
 - In `tree` **View Mode**, a **Folder**'s membership in the **Expanded Set** has no defined effect — the **Folder** is not rendered in that projection.
-- **Scale** applies uniformly to all content-spatial properties; **scrollbars** are excluded as chrome (see ADR-0001), and non-spatial properties (colors, durations) are excluded by nature.
+- **Scale** applies uniformly to all content-spatial properties. **Scrollbars** (see ADR-0001) and **tooltips** (see ADR-0004) are classified as chrome and excluded. Non-spatial properties (colors, durations) are excluded by nature.
 - When `onScaleChanged` is provided, the library detects **Scale Modifier** + wheel events and proposes a new **Scale** value; the caller applies it. This follows the same caller-controlled-state pattern as the **Expanded Set** and the **Selected Set**.
 - **Scale** is independent of **View Mode**, **Expansion**, and **Selection** — changing **Scale** does not change which **Nodes** are visible or selected.
 - Violations of the tier rules (e.g. a **Child** at the root in `folder` **View Mode**, or a **Folder** nested inside a **Parent**) produce undefined visible behavior — the library does not enforce them at runtime.
@@ -90,4 +90,4 @@ _Avoid_: Zoom key, ctrl-scroll.
 
 - **User-supplied Widget sizing is not scaled.** User-supplied **Widget** instances inside `*NodeTheme.widget` retain their internally-baked sizes (e.g. `Icon(size: 20)` stays size 20 regardless of **Scale**). `NodeWidget` mitigates this at render time by wrapping the widget in a `FittedBox` when `scale != 1.0`, which fits the icon glyph into the scaled `SizedBox` container — visually approximate but not a true per-glyph re-render. This is an inherent limitation of accepting pre-built Flutter `Widget` instances as theme inputs.
 
-_Resolved (was: NodeTooltipTheme spatial fields not scaled) — closed by per-Theme `scale` methods in `themes/*.dart`, which now recursively scale `NodeTooltipTheme` content-spatial fields (offset, padding, arrow dimensions, screen margin). See `lib/themes/node_tooltip_theme.dart`._
+_Previously flagged (NodeTooltipTheme spatial fields not scaled): the architecture review briefly tried to fix this by recursively scaling tooltip fields, but empirical testing showed the just_tooltip package's un-scaled text default made the result visually worse than the un-scaled original. Resolved by classifying tooltips as chrome — see ADR-0004._

@@ -81,7 +81,10 @@ class FolderNodeTheme<T> {
   /// by [factor].
   ///
   /// Scales: [width], [height], [padding], [margin], [textStyle] (font size +
-  /// letter spacing), [tooltipTheme] (delegated).
+  /// letter spacing).
+  /// **Does NOT scale**: [tooltipTheme]. Tooltips are classified as chrome
+  /// and excluded from Scale — see ADR-0004.
+  ///
   /// [defaultFontSize] is used to resolve a null [TextStyle.fontSize] before
   /// scaling — callers should pass `Theme.of(context).textTheme.bodyMedium?.fontSize`.
   ///
@@ -98,8 +101,7 @@ class FolderNodeTheme<T> {
       padding: padding * factor,
       margin: margin * factor,
       textStyle: scaleTextStyle(textStyle, factor, defaultFontSize),
-      tooltipTheme:
-          tooltipTheme?.scale(factor, defaultFontSize: defaultFontSize),
+      // tooltipTheme intentionally not delegated — ADR-0004 (chrome).
     );
   }
 

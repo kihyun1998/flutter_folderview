@@ -90,7 +90,8 @@ class ChildNodeTheme<T> {
   /// by [factor]. See [FolderNodeTheme.scale] for shared contract details.
   ///
   /// Scales: [width], [height], [padding], [margin], [textStyle],
-  /// [selectedTextStyle] (preserves null), [tooltipTheme] (delegated).
+  /// [selectedTextStyle] (preserves null).
+  /// **Does NOT scale**: [tooltipTheme] — see ADR-0004.
   /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
   ChildNodeTheme<T> scale(
     double factor, {
@@ -106,8 +107,7 @@ class ChildNodeTheme<T> {
       textStyle: scaleTextStyle(textStyle, factor, defaultFontSize),
       selectedTextStyle:
           scaleOptionalTextStyle(selectedTextStyle, factor, defaultFontSize),
-      tooltipTheme:
-          tooltipTheme?.scale(factor, defaultFontSize: defaultFontSize),
+      // tooltipTheme intentionally not delegated — ADR-0004 (chrome).
     );
   }
 

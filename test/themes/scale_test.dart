@@ -32,12 +32,6 @@ void main() {
           identical(t.scale(1.0, defaultFontSize: defaultFontSize), t), isTrue);
     });
 
-    test('NodeTooltipTheme', () {
-      const t = NodeTooltipTheme<String>();
-      expect(
-          identical(t.scale(1.0, defaultFontSize: defaultFontSize), t), isTrue);
-    });
-
     test('ExpandIconTheme', () {
       const t = ExpandIconTheme();
       expect(identical(t.scale(1.0), t), isTrue);
@@ -207,82 +201,32 @@ void main() {
     });
   });
 
-  group('NodeTooltipTheme participation (closes the CONTEXT.md gap)', () {
-    test('NodeTooltipTheme.scale scales offset/crossAxisOffset', () {
-      const t = NodeTooltipTheme<String>(
-        offset: 8.0,
-        crossAxisOffset: 4.0,
-      );
-      final scaled = t.scale(2.0, defaultFontSize: 14.0);
-      expect(scaled.offset, 16.0);
-      expect(scaled.crossAxisOffset, 8.0);
-    });
-
-    test('NodeTooltipTheme.scale scales nullable spatial fields when present',
-        () {
-      const t = NodeTooltipTheme<String>(
+  group('Tooltip exclusion (ADR-0004 — tooltips are chrome)', () {
+    test('FolderNodeTheme.scale passes tooltipTheme through identical', () {
+      const tip = NodeTooltipTheme<String>(
+        offset: 10.0,
         padding: EdgeInsets.all(6.0),
         arrowBaseWidth: 12.0,
-        arrowLength: 8.0,
-        screenMargin: 16.0,
       );
-      final scaled = t.scale(1.5, defaultFontSize: 14.0);
-      expect(scaled.padding, const EdgeInsets.all(9.0));
-      expect(scaled.arrowBaseWidth, 18.0);
-      expect(scaled.arrowLength, 12.0);
-      expect(scaled.screenMargin, 24.0);
-    });
-
-    test(
-        'NodeTooltipTheme.scale materializes null nullable spatial fields '
-        'from rendering defaults before scaling (closes default-user gap)',
-        () {
-      const t = NodeTooltipTheme<String>();
+      const t = FolderNodeTheme<String>(tooltipTheme: tip);
       final scaled = t.scale(2.0, defaultFontSize: 14.0);
-      // Materialized = default × factor. Without this, the renderer's
-      // hardcoded ?? fallbacks would short-circuit Scale for default users.
-      expect(scaled.padding, NodeTooltipTheme.defaultPadding * 2.0);
-      expect(
-          scaled.arrowBaseWidth, NodeTooltipTheme.defaultArrowBaseWidth * 2.0);
-      expect(scaled.arrowLength, NodeTooltipTheme.defaultArrowLength * 2.0);
-      expect(scaled.screenMargin, NodeTooltipTheme.defaultScreenMargin * 2.0);
-      expect(scaled.borderRadius, NodeTooltipTheme.defaultBorderRadius * 2.0);
+      expect(identical(scaled.tooltipTheme, tip), isTrue,
+          reason:
+              'ADR-0004: tooltipTheme must be pointer-equal pass-through');
     });
 
-    test('NodeTooltipTheme.scale scales borderRadius (explicit value)', () {
-      const t = NodeTooltipTheme<String>(
-        borderRadius: BorderRadius.all(Radius.circular(8)),
-      );
-      final scaled = t.scale(1.5, defaultFontSize: 14.0);
-      expect(scaled.borderRadius,
-          const BorderRadius.all(Radius.circular(8)) * 1.5);
-    });
-
-    test('NodeTooltipTheme.scale preserves non-spatial fields unchanged', () {
-      const t = NodeTooltipTheme<String>(
-        useTooltip: true,
-        message: 'hello',
-        backgroundColor: Color(0xFF112233),
-        arrowPositionRatio: 0.25,
-        elevation: 4.0,
-      );
+    test('ParentNodeTheme.scale passes tooltipTheme through identical', () {
+      const tip = NodeTooltipTheme<String>(offset: 10.0);
+      const t = ParentNodeTheme<String>(tooltipTheme: tip);
       final scaled = t.scale(2.0, defaultFontSize: 14.0);
-      expect(scaled.useTooltip, true);
-      expect(scaled.message, 'hello');
-      expect(scaled.backgroundColor, const Color(0xFF112233));
-      expect(scaled.arrowPositionRatio, 0.25,
-          reason: 'arrowPositionRatio is a ratio, not a length');
-      expect(scaled.elevation, 4.0,
-          reason: 'elevation is a shadow depth, not a content length');
+      expect(identical(scaled.tooltipTheme, tip), isTrue);
     });
 
-    test('FolderNodeTheme.scale delegates to tooltipTheme.scale', () {
-      const t = FolderNodeTheme<String>(
-        tooltipTheme: NodeTooltipTheme<String>(offset: 10.0),
-      );
+    test('ChildNodeTheme.scale passes tooltipTheme through identical', () {
+      const tip = NodeTooltipTheme<String>(offset: 10.0);
+      const t = ChildNodeTheme<String>(tooltipTheme: tip);
       final scaled = t.scale(2.0, defaultFontSize: 14.0);
-      expect(scaled.tooltipTheme!.offset, 20.0,
-          reason: 'parent theme must recursively scale its tooltip');
+      expect(identical(scaled.tooltipTheme, tip), isTrue);
     });
   });
 

@@ -4,30 +4,15 @@ import 'package:flutter/widgets.dart';
 import 'package:just_tooltip/just_tooltip.dart';
 
 import '../models/node.dart';
-import '_scale_text_style.dart';
 
-/// Theme data for tooltip styling in FolderView nodes
+/// Theme data for tooltip styling in FolderView nodes.
+///
+/// Tooltips are classified as **chrome** rather than content, and are
+/// deliberately excluded from [FlutterFolderViewTheme.scale] — see ADR-0004.
+/// This class therefore exposes no `scale` method; attempting to call one
+/// is a compile error.
 @immutable
 class NodeTooltipTheme<T> {
-  /// Default [padding] used by the rendering layer when [padding] is null.
-  /// Exposed as a constant so that [scale] can materialize-and-scale it
-  /// from null inputs, matching what the renderer would otherwise pick.
-  static const EdgeInsets defaultPadding =
-      EdgeInsets.symmetric(horizontal: 12, vertical: 8);
-
-  /// Default [arrowBaseWidth] used by the rendering layer when null.
-  static const double defaultArrowBaseWidth = 12.0;
-
-  /// Default [arrowLength] used by the rendering layer when null.
-  static const double defaultArrowLength = 6.0;
-
-  /// Default [screenMargin] used by the rendering layer when null.
-  static const double defaultScreenMargin = 8.0;
-
-  /// Default [borderRadius] used by the rendering layer when null.
-  static const BorderRadius defaultBorderRadius =
-      BorderRadius.all(Radius.circular(6));
-
   /// Whether to use tooltip for this node type
   final bool useTooltip;
 
@@ -180,37 +165,6 @@ class NodeTooltipTheme<T> {
     this.rotationBegin,
     this.hideOnEmptyMessage,
   });
-
-  /// Returns a scaled copy with all spatial fields multiplied by [factor].
-  ///
-  /// Scales: [offset], [crossAxisOffset], [padding], [arrowBaseWidth],
-  /// [arrowLength], [screenMargin], [borderRadius], [textStyle].
-  ///
-  /// Nullable spatial fields (padding, arrowBaseWidth, arrowLength,
-  /// screenMargin, borderRadius) are **materialized to their rendering
-  /// defaults before scaling** when null on input. Without this, the
-  /// renderer's hardcoded `??` fallbacks would short-circuit Scale at
-  /// scale ≠ 1.0 — see ADR-0001 commentary; the rendering layer reads
-  /// the same `defaultXxx` constants exposed on this class.
-  ///
-  /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
-  NodeTooltipTheme<T> scale(
-    double factor, {
-    required double defaultFontSize,
-  }) {
-    assert(factor > 0, 'scale factor must be > 0, got $factor');
-    if (factor == 1.0) return this;
-    return copyWith(
-      offset: offset * factor,
-      crossAxisOffset: crossAxisOffset * factor,
-      padding: (padding ?? defaultPadding) * factor,
-      arrowBaseWidth: (arrowBaseWidth ?? defaultArrowBaseWidth) * factor,
-      arrowLength: (arrowLength ?? defaultArrowLength) * factor,
-      screenMargin: (screenMargin ?? defaultScreenMargin) * factor,
-      borderRadius: (borderRadius ?? defaultBorderRadius) * factor,
-      textStyle: scaleOptionalTextStyle(textStyle, factor, defaultFontSize),
-    );
-  }
 
   /// Creates a copy of this theme with the given fields replaced with new values
   NodeTooltipTheme<T> copyWith({
