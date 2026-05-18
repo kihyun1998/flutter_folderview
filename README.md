@@ -6,7 +6,7 @@ A customizable Flutter widget for displaying hierarchical data in tree and folde
 
 ```yaml
 dependencies:
-  flutter_folderview: ^0.8.1
+  flutter_folderview: ^0.9.0
 ```
 
 ## Basic Usage
@@ -110,7 +110,7 @@ FolderView(
 
 ## Scale
 
-Scale all content proportionally. Scrollbars are not affected.
+Scale all content proportionally. **Scrollbars** and **tooltips** are not affected — they are treated as chrome (interactive overlays sized for input devices, not for content density).
 
 ```dart
 FolderView(
@@ -125,9 +125,17 @@ FolderView(
 |---|---|
 | Row height, row spacing | Scrollbar thickness, track width |
 | Icon sizes, padding, margin | Scrollbar colors |
-| Text fontSize, letterSpacing | |
-| Line width, indentation | |
-| Content padding, border radius | |
+| Text fontSize, letterSpacing | Tooltip dimensions (padding, arrow, offset, text) |
+| Line width, indentation | Animation durations, click intervals |
+| Content padding, border radius | Colors |
+
+Each theme class also exposes a `scale()` method directly — useful for callers who need a scaled copy of a theme outside `FolderView` (custom previews, integration tests, etc.):
+
+```dart
+final scaledTheme = myTheme.scaledForContext(context, 1.5);
+// or, without a BuildContext:
+final scaledTheme = myTheme.scale(factor: 1.5, defaultFontSize: 14.0);
+```
 
 Ctrl (Windows/Linux) or Cmd (macOS) + scroll wheel is blocked by default (`blockModifierScroll: true`) so zoom-by-scroll works without unintended scrolling. Set `blockModifierScroll: false` to allow normal scrolling while the modifier key is held.
 

@@ -1,3 +1,10 @@
+## 0.9.0
+
+- **refactor**: Decentralize content scaling — each theme class now exposes its own `scale()` method, replacing the prior centralized `_applyScale` implementation. Existing usage (`FolderView(scale: ...)`) is unaffected.
+- **feat**: Add `FlutterFolderViewTheme.scale({required factor, required defaultFontSize})` and `FlutterFolderViewTheme.scaledForContext(BuildContext, double)` for callers who want a scaled theme outside `FolderView` (custom previews, integration tests, etc.).
+- **docs**: Add `CONTEXT.md` (domain glossary) and ADRs `0001` (scrollbars excluded from scale), `0002` (caller owns interaction state), `0003` (selection tier-bound to child), `0004` (tooltips excluded from scale).
+- **test**: Add 31 unit tests covering the new scale API (identity short-circuit, positivity assertion, chrome exclusion for scrollbars/tooltips, null `fontSize` resolution against `defaultFontSize`).
+
 ## 0.8.1
 
 - **fix**: Explicitly set `SystemMouseCursors.click` as the default `mouseCursor` on node `InkWell` — newer Flutter versions no longer auto-apply the click cursor on hover
