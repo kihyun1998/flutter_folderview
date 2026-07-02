@@ -1,8 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
+import '../input/scale_modifier.dart';
 import '../models/flat_node.dart';
 import '../models/node.dart';
 import '../services/size_service.dart';
@@ -24,7 +23,6 @@ class FolderViewContent<T> extends StatefulWidget {
 
   final double contentWidth;
   final double contentHeight;
-  final double viewportWidth;
 
   final List<FlatNode<T>> flatNodes;
   final ViewMode mode;
@@ -58,7 +56,6 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.needsHorizontalScroll,
     required this.contentWidth,
     required this.contentHeight,
-    required this.viewportWidth,
     required this.flatNodes,
     required this.mode,
     required this.onNodeTap,
@@ -422,20 +419,6 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       ),
     );
   }
-}
-
-/// Whether the platform-appropriate modifier key (Ctrl on Windows/Linux,
-/// Cmd on macOS) is currently pressed.
-///
-/// On Windows/Linux only [isControlPressed] is checked — this avoids the
-/// "sticky Windows-key" bug where pressing the Windows key sets
-/// [isMetaPressed] to `true` but the subsequent key-up is never delivered
-/// to the Flutter app, leaving the flag stuck.
-bool isScaleModifierPressed() {
-  if (defaultTargetPlatform == TargetPlatform.macOS) {
-    return HardwareKeyboard.instance.isMetaPressed;
-  }
-  return HardwareKeyboard.instance.isControlPressed;
 }
 
 /// Scroll physics that ignores scroll events when the scale-modifier key

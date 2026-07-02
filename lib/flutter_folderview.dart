@@ -21,4 +21,4 @@ export 'themes/folder_view_theme.dart';
 export 'themes/parent_node_theme.dart';
 export 'themes/node_tooltip_theme.dart';
 export 'widgets/folder_view.dart';
-export 'widgets/folder_view_content.dart' show isScaleModifierPressed;
+export 'input/scale_modifier.dart' show isScaleModifierPressed;

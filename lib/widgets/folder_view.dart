@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../input/scale_modifier.dart';
 import '../models/flat_node.dart';
 import '../models/node.dart';
 import '../services/flatten_service.dart';
@@ -286,7 +287,6 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               expandedNodeIds: widget.expandedNodeIds,
               contentWidth: contentWidth,
               contentHeight: contentHeight,
-              viewportWidth: availableWidth,
               needsHorizontalScroll: needsHorizontalScroll,
               needsVerticalScroll: needsVerticalScroll,
               horizontalController: horizontalController!,
