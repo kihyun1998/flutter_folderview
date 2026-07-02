@@ -7,6 +7,7 @@ import '../models/node.dart';
 import '../services/flatten_service.dart';
 import '../services/row_metrics.dart';
 import '../services/size_service.dart';
+import '../services/view_mode_projection.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import '../themes/folder_view_theme.dart';
 import 'folder_view_content.dart';
@@ -218,8 +219,11 @@ class _FolderViewState<T> extends State<FolderView<T>> {
     // Each Theme owns its own scaling logic — see `Theme.scale(...)` methods.
     final scaledTheme = effectiveTheme.scaledForContext(context, widget.scale);
 
-    // Filter data based on mode
-    List<Node<T>> displayNodes = _getDisplayNodes();
+    // Project the input onto the root nodes visible in the current View Mode.
+    final List<Node<T>> displayNodes = ViewModeProjection.project<T>(
+      nodes: widget.data,
+      mode: widget.mode,
+    );
 
     // Flatten tree into visible flat list (memoized)
     final List<FlatNode<T>> flatNodes = _getFlatNodes(displayNodes);
@@ -318,31 +322,4 @@ class _FolderViewState<T> extends State<FolderView<T>> {
     }
   }
 
-  List<Node<T>> _getDisplayNodes() {
-    if (widget.mode == ViewMode.tree) {
-      // In Tree Mode, we only show Parent nodes at the root level
-      // If data contains Folders, we need to extract Parents from within them recursively
-      List<Node<T>> parents = [];
-      _collectParentsFromNodes(widget.data, parents);
-      return parents;
-    } else {
-      // In Folder Mode, we show Folders and Parents at the root level.
-      // "Folder mode: Folder > Parent > Child. Parent of Parent is Folder."
-      return widget.data
-          .where((n) => n.type == NodeType.folder || n.type == NodeType.parent)
-          .toList();
-    }
-  }
-
-  /// Recursively collect all parent nodes from nested folders
-  void _collectParentsFromNodes(List<Node<T>> nodes, List<Node<T>> parents) {
-    for (var node in nodes) {
-      if (node.type == NodeType.parent) {
-        parents.add(node);
-      } else if (node.type == NodeType.folder) {
-        // Recursively search within folder's children
-        _collectParentsFromNodes(node.children, parents);
-      }
-    }
-  }
 }
