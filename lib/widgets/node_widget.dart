@@ -335,15 +335,15 @@ class NodeWidget<T> extends StatelessWidget {
 
   /// Build content for folder/parent nodes with CustomInkWell
   Widget _buildFolderParentNodeContent(BuildContext context) {
-    final isSelected = selectedNodeIds?.contains(node.id) ?? false;
     final expandTheme = theme.expandIconTheme;
 
+    // Selection is tier-bound to Child (ADR-0003): Folders and Parents are
+    // containers you open, not items you select. No isSelected/selectedColor
+    // wiring here — a Folder/Parent ID in the Selected Set has no effect.
     return CustomInkWell(
       clickInterval: 0,
       borderRadius: theme.nodeStyleTheme.borderRadius,
-      isSelected: isSelected,
       backgroundColor: Colors.transparent,
-      selectedColor: Theme.of(context).colorScheme.primaryContainer,
       hoverColor: (node.type == NodeType.folder
               ? theme.folderTheme.hoverColor
               : theme.parentTheme.hoverColor) ??
