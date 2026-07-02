@@ -12,9 +12,17 @@ class SizeService {
   /// Key: "label\0fontSize\0fontWeight" — Value: measured pixel width.
   static final Map<String, double> _textWidthCache = {};
 
-  /// Clears the text width cache. Call when theme changes.
-  static void clearTextWidthCache() {
-    _textWidthCache.clear();
+  /// Clamps a measured [contentWidth] to a sane ceiling of 3× the viewport.
+  ///
+  /// [contentWidth] is already expressed in the same (scaled) pixel space as
+  /// [viewportWidth], so the ceiling must NOT be re-multiplied by any scale
+  /// factor — doing so scales the bound a second time.
+  static double clampContentWidth({
+    required double contentWidth,
+    required double viewportWidth,
+  }) {
+    final maxAllowed = viewportWidth * 3;
+    return contentWidth.clamp(0.0, maxAllowed);
   }
 
   /// Calculate the maximum content width from ALL nodes (including collapsed children).

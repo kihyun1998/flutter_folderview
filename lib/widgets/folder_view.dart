@@ -110,9 +110,13 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   @override
   void didUpdateWidget(covariant FolderView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Reset computed width when data or scale changes
+    // Reset computed width when data, scale, or theme changes. Theme feeds
+    // icon sizes, fonts and padding into the width measurement, so a new theme
+    // must invalidate the precomputed width too (a different instance is
+    // enough — callers own the theme and rebuild it deliberately).
     if (!identical(oldWidget.data, widget.data) ||
-        oldWidget.scale != widget.scale) {
+        oldWidget.scale != widget.scale ||
+        !identical(oldWidget.theme, widget.theme)) {
       _widthComputed = false;
     }
   }
@@ -238,9 +242,13 @@ class _FolderViewState<T> extends State<FolderView<T>> {
           _widthComputed = true;
         }
 
-        // Clamp to a reasonable max (3x viewport, scaled).
-        final maxAllowed = availableWidth * 3 * widget.scale;
-        final contentWidth = _precomputedMaxWidth.clamp(0.0, maxAllowed);
+        // Clamp to a reasonable max (3× viewport). _precomputedMaxWidth is
+        // already measured from the scaled theme, so the ceiling must not be
+        // multiplied by scale again.
+        final contentWidth = SizeService.clampContentWidth(
+          contentWidth: _precomputedMaxWidth,
+          viewportWidth: availableWidth,
+        );
 
         final contentHeight = SizeService.calculateContentHeight(
           itemCount: flatNodes.length,
