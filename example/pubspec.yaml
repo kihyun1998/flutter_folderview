@@ -43,6 +43,10 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # integration_test drives the example app on a real device/desktop (or the
+  # headless flutter tester) for on-device integration tests.
+  integration_test:
+    sdk: flutter
   # riverpod
   riverpod_generator: ^2.6.3
   riverpod_lint: ^2.6.3
