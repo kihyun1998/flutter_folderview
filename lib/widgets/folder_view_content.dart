@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../input/scale_modifier.dart';
 import '../models/flat_node.dart';
 import '../models/node.dart';
+import '../services/flattener.dart';
+import '../services/scroll_anchor.dart';
 import '../services/size_service.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import 'folder_view_horizontal_scrollbar.dart';
@@ -39,12 +41,9 @@ class FolderViewContent<T> extends StatefulWidget {
   /// When `true`, normal scrolling is blocked while Ctrl/Cmd is held.
   final bool blockModifierScroll;
 
-  /// Index (in the previous flat list) of the node that was expanded/collapsed.
-  /// -1 means no adjustment needed.
-  final int scrollChangedIndex;
-
-  /// Number of items inserted (positive) or removed (negative).
-  final int scrollDeltaItems;
+  /// Incremental single-node change from the Flattener, or null for a full
+  /// rebuild / no change. Drives the scroll anchor.
+  final FlattenChange? change;
 
   const FolderViewContent({
     super.key,
@@ -66,8 +65,7 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.theme,
     this.scale = 1.0,
     this.blockModifierScroll = true,
-    this.scrollChangedIndex = -1,
-    this.scrollDeltaItems = 0,
+    this.change,
   });
 
   @override
@@ -109,132 +107,85 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     final controller = widget.verticalController;
     if (!controller.hasClients) return;
 
+    final hController = widget.horizontalController;
+    final barController = widget.verticalBarController;
     final oldItemExtent =
         oldWidget.theme.rowHeight + oldWidget.theme.rowSpacing;
     final newItemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
     final oldTopPadding = oldWidget.theme.spacingTheme.contentPadding.top;
     final newTopPadding = widget.theme.spacingTheme.contentPadding.top;
-
-    final scrollOffset = controller.offset;
-
-    // Find which fractional item position is at the top of viewport
-    final topFractionalIndex = oldItemExtent > 0
-        ? (scrollOffset - oldTopPadding) / oldItemExtent
-        : 0.0;
-
-    // Map to new offset preserving the same visible node
-    final newOffset = newTopPadding + topFractionalIndex * newItemExtent;
-
+    final currentV = controller.offset;
+    final currentH = hController.hasClients ? hController.offset : null;
+    final oldContentWidth = oldWidget.contentWidth;
+    final newContentWidth = widget.contentWidth;
     final contentHeight = widget.contentHeight;
 
-    // Also compute horizontal adjustment
-    final hController = widget.horizontalController;
-    double? newHOffset;
-    if (hController.hasClients && oldWidget.contentWidth > 0) {
-      final hOffset = hController.offset;
-      final ratio = widget.contentWidth / oldWidget.contentWidth;
-      newHOffset = hOffset * ratio;
-    }
-
-    // Defer all jumpTo calls to after the build phase to avoid
-    // "setState() called during build" from scroll notifications.
-    final barController = widget.verticalBarController;
+    // Defer jumpTo to after the build phase to avoid setState-during-build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Vertical adjustment
-      if (controller.hasClients) {
-        final viewportHeight = controller.position.viewportDimension;
-        final newMaxExtent =
-            (contentHeight - viewportHeight).clamp(0.0, double.infinity);
-        final clampedV = newOffset.clamp(0.0, newMaxExtent);
+      if (!controller.hasClients) return;
 
-        if ((clampedV - controller.offset).abs() > 0.5) {
-          controller.jumpTo(clampedV);
-        }
+      final result = ScrollAnchor.offsetsForScaleChange(
+        currentVerticalOffset: currentV,
+        oldItemExtent: oldItemExtent,
+        newItemExtent: newItemExtent,
+        oldTopPadding: oldTopPadding,
+        newTopPadding: newTopPadding,
+        newContentHeight: contentHeight,
+        viewportHeight: controller.position.viewportDimension,
+        currentHorizontalOffset: currentH,
+        oldContentWidth: oldContentWidth,
+        newContentWidth: newContentWidth,
+        hMinScrollExtent:
+            hController.hasClients ? hController.position.minScrollExtent : 0.0,
+        hMaxScrollExtent:
+            hController.hasClients ? hController.position.maxScrollExtent : 0.0,
+      );
 
-        // Re-sync scrollbar controller
-        if (barController.hasClients) {
-          final target = controller.offset.clamp(
-            barController.position.minScrollExtent,
-            barController.position.maxScrollExtent,
-          );
-          barController.jumpTo(target);
-        }
+      if (result.vertical != null) {
+        controller.jumpTo(result.vertical!);
+      }
+      // Re-sync the vertical scrollbar even if the offset didn't move — the
+      // scale change altered the scroll extent.
+      if (barController.hasClients) {
+        final target = controller.offset.clamp(
+          barController.position.minScrollExtent,
+          barController.position.maxScrollExtent,
+        );
+        barController.jumpTo(target);
       }
 
-      // Horizontal adjustment
-      if (newHOffset != null && hController.hasClients) {
-        final clampedH = newHOffset.clamp(
-          hController.position.minScrollExtent,
-          hController.position.maxScrollExtent,
-        );
-        if ((clampedH - hController.offset).abs() > 0.5) {
-          hController.jumpTo(clampedH);
-        }
+      if (result.horizontal != null && hController.hasClients) {
+        hController.jumpTo(result.horizontal!);
       }
     });
   }
 
   void _applyScrollAdjustment(FolderViewContent<T> oldWidget) {
-    // Case 1: Incremental single-node change
-    final changedIndex = widget.scrollChangedIndex;
-    final deltaItems = widget.scrollDeltaItems;
-    if (changedIndex >= 0 && deltaItems != 0) {
-      final controller = widget.verticalController;
-      if (!controller.hasClients) return;
-
-      final itemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
-      final topPadding = widget.theme.spacingTheme.contentPadding.top;
-      final changePixel = topPadding + (changedIndex + 1) * itemExtent;
-
-      if (changePixel <= controller.offset) {
-        final delta = deltaItems * itemExtent;
-        final newOffset = (controller.offset + delta).clamp(
-          controller.position.minScrollExtent,
-          controller.position.maxScrollExtent,
-        );
-        controller.jumpTo(newOffset);
-      }
-      return;
-    }
-
-    // Case 2: Bulk change (e.g., expandAll / collapseAll)
-    // Anchor the viewport to the same node that was at the top.
-    if (identical(oldWidget.flatNodes, widget.flatNodes)) return;
-    if (oldWidget.flatNodes.isEmpty || widget.flatNodes.isEmpty) return;
-
     final controller = widget.verticalController;
-    if (!controller.hasClients) return;
-
     final itemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
     final topPadding = widget.theme.spacingTheme.contentPadding.top;
 
-    // Identify the node at the top of the viewport in the old list.
-    final scrollOffset = controller.offset;
-    final topIndex = ((scrollOffset - topPadding) / itemExtent)
-        .floor()
-        .clamp(0, oldWidget.flatNodes.length - 1);
-
-    // Find an anchor node that exists in the new list.
-    // Start with the top visible node; if it's gone (e.g., a child removed
-    // by collapseAll), walk backwards to find its nearest ancestor.
-    int newIndex = -1;
-    double anchorPixelOffset =
-        scrollOffset - (topPadding + topIndex * itemExtent);
-    for (int i = topIndex; i >= 0; i--) {
-      newIndex = widget.flatNodes
-          .indexWhere((fn) => fn.node.id == oldWidget.flatNodes[i].node.id);
-      if (newIndex >= 0) {
-        // If we fell back to an ancestor, reset the sub-pixel offset.
-        if (i != topIndex) anchorPixelOffset = 0.0;
-        break;
-      }
+    // Case 1: incremental single-node change.
+    final change = widget.change;
+    if (change != null && change.deltaItems != 0) {
+      if (!controller.hasClients) return;
+      final newOffset = ScrollAnchor.verticalOffsetForFlattenChange(
+        change: change,
+        currentOffset: controller.offset,
+        itemExtent: itemExtent,
+        topPadding: topPadding,
+        minScrollExtent: controller.position.minScrollExtent,
+        maxScrollExtent: controller.position.maxScrollExtent,
+      );
+      if (newOffset != null) controller.jumpTo(newOffset);
+      return;
     }
-    if (newIndex < 0) return;
 
-    final targetOffset = topPadding + newIndex * itemExtent + anchorPixelOffset;
+    // Case 2: bulk change (e.g., expandAll / collapseAll).
+    if (identical(oldWidget.flatNodes, widget.flatNodes)) return;
+    if (oldWidget.flatNodes.isEmpty || widget.flatNodes.isEmpty) return;
+    if (!controller.hasClients) return;
 
-    // Compute expected maxScrollExtent for the new list so we can clamp
-    // without waiting for layout (avoids one-frame flicker).
     final bottomPadding = widget.theme.spacingTheme.contentPadding.bottom;
     final newContentHeight = SizeService.calculateContentHeight(
       itemCount: widget.flatNodes.length,
@@ -243,19 +194,22 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       topPadding: topPadding,
       bottomPadding: bottomPadding,
     );
-    final viewportHeight = controller.position.viewportDimension;
-    final newMaxExtent = (newContentHeight - viewportHeight).clamp(
-      0.0,
-      double.infinity,
+
+    final newOffset = ScrollAnchor.verticalOffsetForBulkChange<T>(
+      oldList: oldWidget.flatNodes,
+      newList: widget.flatNodes,
+      currentOffset: controller.offset,
+      itemExtent: itemExtent,
+      topPadding: topPadding,
+      newContentHeight: newContentHeight,
+      viewportHeight: controller.position.viewportDimension,
     );
-    final clamped = targetOffset.clamp(0.0, newMaxExtent);
 
-    if ((clamped - scrollOffset).abs() > 0.5) {
-      controller.jumpTo(clamped);
+    if (newOffset != null) {
+      controller.jumpTo(newOffset);
 
-      // The scrollbar controller's maxScrollExtent hasn't updated yet,
-      // so the sync listener clamped it to a stale range.
-      // Re-sync after layout when both controllers have correct extents.
+      // The scrollbar controller's maxScrollExtent hasn't updated yet; re-sync
+      // after layout when both controllers have correct extents.
       final barController = widget.verticalBarController;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (controller.hasClients && barController.hasClients) {
