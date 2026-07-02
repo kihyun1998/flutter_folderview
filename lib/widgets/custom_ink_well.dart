@@ -60,38 +60,37 @@ class _CustomInkWellState extends State<CustomInkWell> {
 
   Timer? _timer;
 
-  /// ctrl을 누른다면 onTap 이벤트가 무조건 발생하도록 설정했다.
+  /// Handles a tap.
+  ///
+  /// Ctrl+tap (either Control key) is treated as an immediate single tap.
+  /// Otherwise the first tap fires [CustomInkWell.onTap] and arms a timer; a
+  /// second tap within [CustomInkWell.clickInterval] fires
+  /// [CustomInkWell.onDoubleTap]. A double tap therefore emits `onTap` (on the
+  /// first tap) followed by `onDoubleTap` (on the second) — this dual emission
+  /// is intentional so that single-tap feedback stays immediate.
   void _handleTap() {
-    if (HardwareKeyboard.instance.isLogicalKeyPressed(
-          LogicalKeyboardKey.controlLeft,
-        ) ||
-        HardwareKeyboard.instance.isLogicalKeyPressed(
-          LogicalKeyboardKey.controlRight,
-        )) {
-      widget.onTap?.call();
+    final ctrlPressed = HardwareKeyboard.instance
+            .isLogicalKeyPressed(LogicalKeyboardKey.controlLeft) ||
+        HardwareKeyboard.instance
+            .isLogicalKeyPressed(LogicalKeyboardKey.controlRight);
+    if (ctrlPressed) {
       _timer?.cancel();
       _resetTapCount();
+      widget.onTap?.call();
+      return;
+    }
+
+    _tapCount++;
+    if (_tapCount == 2) {
+      _timer?.cancel();
+      _resetTapCount();
+      widget.onDoubleTap?.call();
     } else {
-      _tapCount++;
-      if (_tapCount == 2) {
-        _timer?.cancel();
-        widget.onDoubleTap?.call();
-        _resetTapCount();
-      } else {
-        widget.onTap?.call();
-      }
-      if (_tapCount == 1) {
-        _timer = Timer(Duration(milliseconds: widget.clickInterval), () {
-          // if (_tapCount == 1) {
-          //   // widget.onTap?.call();
-          // }
-          _resetTapCount();
-        });
-      } else if (_tapCount == 2) {
-        _timer?.cancel();
-        widget.onDoubleTap?.call();
-        _resetTapCount();
-      }
+      widget.onTap?.call();
+      _timer = Timer(
+        Duration(milliseconds: widget.clickInterval),
+        _resetTapCount,
+      );
     }
   }
 
