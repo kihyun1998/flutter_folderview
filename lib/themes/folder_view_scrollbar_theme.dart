@@ -1,3 +1,5 @@
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/material.dart';
 
 /// Defines the visual appearance of scrollbars in a FolderView
@@ -102,22 +104,17 @@ class FolderViewScrollbarTheme {
     return FolderViewScrollbarTheme(
       thumbColor: Color.lerp(a.thumbColor, b.thumbColor, t)!,
       trackColor: Color.lerp(a.trackColor, b.trackColor, t)!,
-      thickness: lerpDouble(a.thickness, b.thickness, t),
-      radius: lerpDouble(a.radius, b.radius, t),
+      thickness: lerpDouble(a.thickness, b.thickness, t)!,
+      radius: lerpDouble(a.radius, b.radius, t)!,
       thumbVisibility: t < 0.5 ? a.thumbVisibility : b.thumbVisibility,
-      hoverOpacity: lerpDouble(a.hoverOpacity, b.hoverOpacity, t),
-      nonHoverOpacity: lerpDouble(a.nonHoverOpacity, b.nonHoverOpacity, t),
+      hoverOpacity: lerpDouble(a.hoverOpacity, b.hoverOpacity, t)!,
+      nonHoverOpacity: lerpDouble(a.nonHoverOpacity, b.nonHoverOpacity, t)!,
       hoverAnimationDuration:
           t < 0.5 ? a.hoverAnimationDuration : b.hoverAnimationDuration,
-      trackWidth: lerpDouble(a.trackWidth, b.trackWidth, t),
-      trackRadius: lerpDouble(a.trackRadius, b.trackRadius, t),
+      trackWidth: lerpDouble(a.trackWidth, b.trackWidth, t)!,
+      trackRadius: lerpDouble(a.trackRadius, b.trackRadius, t)!,
       trackVisibility: t < 0.5 ? a.trackVisibility : b.trackVisibility,
     );
-  }
-
-  /// Linear interpolation helper for doubles
-  static double lerpDouble(double a, double b, double t) {
-    return a + (b - a) * t;
   }
 
   @override

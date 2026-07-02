@@ -1,4 +1,4 @@
-import 'dart:ui' show Color, StrokeCap;
+import 'dart:ui' show Color, StrokeCap, lerpDouble;
 
 import 'package:flutter/foundation.dart';
 
@@ -62,14 +62,9 @@ class FolderViewLineTheme {
 
     return FolderViewLineTheme(
       lineColor: Color.lerp(a.lineColor, b.lineColor, t)!,
-      lineWidth: lerpDouble(a.lineWidth, b.lineWidth, t),
+      lineWidth: lerpDouble(a.lineWidth, b.lineWidth, t)!,
       lineStyle: t < 0.5 ? a.lineStyle : b.lineStyle,
     );
-  }
-
-  /// Linear interpolation helper for doubles
-  static double lerpDouble(double a, double b, double t) {
-    return a + (b - a) * t;
   }
 
   @override

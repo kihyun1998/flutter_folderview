@@ -1,3 +1,5 @@
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/material.dart';
 
 /// Theme class for node visual styling in FolderView
@@ -58,11 +60,4 @@ class FolderViewNodeStyleTheme {
   String toString() {
     return 'FolderViewNodeStyleTheme(borderRadius: $borderRadius)';
   }
-}
-
-double? lerpDouble(double? a, double? b, double t) {
-  if (a == null && b == null) return null;
-  a ??= 0.0;
-  b ??= 0.0;
-  return a + (b - a) * t;
 }
