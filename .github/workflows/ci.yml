@@ -1,0 +1,64 @@
+name: CI
+
+# Runs the package's static analysis and test suite on every push to main and
+# on every PR targeting main. Integration tests under example/integration_test
+# are intentionally NOT run here: they build and launch a real desktop app,
+# which is slow and flaky on headless CI runners. Run those locally per the
+# command in their commit messages (flutter test integration_test/... -d windows).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref (e.g. rapid pushes to a PR branch).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Analyze & test (package)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Analyze
+        run: flutter analyze
+      - name: Run tests with coverage
+        run: flutter test --coverage
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          if-no-files-found: warn
+      # The repo is public, so Codecov works tokenless. To publish coverage,
+      # uncomment this step (and add a badge to the README):
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v4
+      #   with:
+      #     files: coverage/lcov.info
+
+  example:
+    name: Analyze (example app)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      # example depends on the package via a path dependency (../) and commits
+      # its riverpod .g.dart files, so pub get + analyze needs no codegen step.
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: example
+      - name: Analyze
+        run: flutter analyze
+        working-directory: example
