@@ -5,6 +5,7 @@ import '../input/scale_modifier.dart';
 import '../models/flat_node.dart';
 import '../models/node.dart';
 import '../services/flatten_service.dart';
+import '../services/row_metrics.dart';
 import '../services/size_service.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import '../themes/folder_view_theme.dart';
@@ -230,16 +231,10 @@ class _FolderViewState<T> extends State<FolderView<T>> {
 
         // Pre-compute max width from ALL nodes (including collapsed) once per data/scale change.
         if (!_widthComputed) {
-          _precomputedMaxWidth = SizeService.calculateMaxContentWidth<T>(
-            context: context,
-            nodes: widget.data,
-            folderTheme: scaledTheme.folderTheme,
-            parentTheme: scaledTheme.parentTheme,
-            childTheme: scaledTheme.childTheme,
-            expandIconTheme: scaledTheme.expandIconTheme,
-            leftPadding: scaledTheme.spacingTheme.contentPadding.left,
-            rightPadding: scaledTheme.spacingTheme.contentPadding.right,
-          );
+          _precomputedMaxWidth = RowMetrics<T>(
+            theme: scaledTheme,
+            baseTextStyle: Theme.of(context).textTheme.bodyMedium,
+          ).maxWidth(widget.data);
           _widthComputed = true;
         }
 

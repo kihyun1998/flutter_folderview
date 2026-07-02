@@ -6,6 +6,7 @@ import 'package:just_tooltip/just_tooltip.dart';
 
 import '../models/flat_node.dart';
 import '../models/node.dart';
+import '../services/row_metrics.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import '../themes/node_tooltip_theme.dart';
 import 'tree_lines.dart';
@@ -40,11 +41,13 @@ class NodeWidget<T> extends StatelessWidget {
 
   Node<T> get node => flatNode.node;
 
+  /// Single source of truth for row geometry and text style, shared with the
+  /// width measurement path (see [RowMetrics]).
+  RowMetrics<T> get _metrics => RowMetrics<T>(theme: theme);
+
   @override
   Widget build(BuildContext context) {
-    final lineWidth = theme.expandIconTheme.width +
-        theme.expandIconTheme.padding.horizontal +
-        theme.expandIconTheme.margin.horizontal;
+    final lineWidth = _metrics.expandStripWidth;
 
     return SizedBox(
       height: theme.rowHeight,
@@ -87,11 +90,7 @@ class NodeWidget<T> extends StatelessWidget {
     final expandTheme = theme.expandIconTheme;
 
     if (expandTheme.widget == null) {
-      return SizedBox(
-        width: expandTheme.width +
-            expandTheme.padding.horizontal +
-            expandTheme.margin.horizontal,
-      );
+      return SizedBox(width: _metrics.expandStripWidth);
     }
 
     return Container(
@@ -164,9 +163,7 @@ class NodeWidget<T> extends StatelessWidget {
     }
 
     if (iconWidget == null) {
-      return SizedBox(
-        width: width + padding.horizontal + margin.horizontal,
-      );
+      return SizedBox(width: _metrics.iconBoxWidth(node.type));
     }
 
     return Container(
@@ -396,34 +393,21 @@ class NodeWidget<T> extends StatelessWidget {
   }
 
   TextStyle? _getTextStyle() {
-    final isSelected = selectedNodeIds?.contains(node.id) ?? false;
-    TextStyle? style;
-    TextStyle? resolvedStyle;
+    // Same resolution the measurement path uses (RowMetrics.effectiveTextStyle),
+    // so measured and rendered text stay in sync.
+    var style = _metrics.effectiveTextStyle(node);
 
-    switch (node.type) {
-      case NodeType.folder:
-        final folderTheme = theme.folderTheme;
-        resolvedStyle = folderTheme.textStyleResolver?.call(node);
-        style = resolvedStyle ?? folderTheme.textStyle;
-        break;
-      case NodeType.parent:
-        final parentTheme = theme.parentTheme;
-        resolvedStyle = parentTheme.textStyleResolver?.call(node);
-        style = resolvedStyle ?? parentTheme.textStyle;
-        break;
-      case NodeType.child:
+    // Selection styling is a Child-only render concern layered on top (ADR-0003).
+    if (node.type == NodeType.child) {
+      final isSelected = selectedNodeIds?.contains(node.id) ?? false;
+      if (isSelected) {
         final childTheme = theme.childTheme;
-        resolvedStyle = childTheme.textStyleResolver?.call(node);
-        style = resolvedStyle ?? childTheme.textStyle;
-
-        if (isSelected) {
-          TextStyle? selectedStyle;
-          final resolvedSelectedStyle =
-              childTheme.selectedTextStyleResolver?.call(node);
-          selectedStyle = resolvedSelectedStyle ?? childTheme.selectedTextStyle;
-          style = style?.merge(selectedStyle) ?? selectedStyle;
-        }
-        break;
+        final resolvedSelectedStyle =
+            childTheme.selectedTextStyleResolver?.call(node);
+        final selectedStyle =
+            resolvedSelectedStyle ?? childTheme.selectedTextStyle;
+        style = style?.merge(selectedStyle) ?? selectedStyle;
+      }
     }
 
     return style;
