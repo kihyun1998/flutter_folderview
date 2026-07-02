@@ -4,35 +4,44 @@ import 'package:flutter/widgets.dart';
 
 import '../models/node.dart';
 import '_scale_text_style.dart';
+import 'expandable_node_theme_view.dart';
 import 'node_tooltip_theme.dart';
 
 /// Theme data for folder node styling in FolderView
 @immutable
-class FolderNodeTheme<T> {
+class FolderNodeTheme<T> implements ExpandableNodeThemeView<T> {
   /// Widget to display for folder icon (collapsed state)
+  @override
   final Widget? widget;
 
   /// Resolver function to dynamically determine the widget based on node data
   /// If returns null, falls back to [widget]
+  @override
   final Widget? Function(Node<T> node)? widgetResolver;
 
   /// Widget to display for folder icon (expanded state)
+  @override
   final Widget? openWidget;
 
   /// Resolver function to dynamically determine the open widget based on node data
   /// If returns null, falls back to [openWidget]
+  @override
   final Widget? Function(Node<T> node)? openWidgetResolver;
 
   /// Width of the icon widget
+  @override
   final double width;
 
   /// Height of the icon widget
+  @override
   final double height;
 
   /// Padding around the icon widget
+  @override
   final EdgeInsets padding;
 
   /// Margin around the icon widget
+  @override
   final EdgeInsets margin;
 
   /// Text style for folder nodes
@@ -44,18 +53,23 @@ class FolderNodeTheme<T> {
 
   /// Resolver function to dynamically determine the label text based on node data
   /// If returns null, falls back to [node.label]
+  @override
   final String? Function(Node<T> node)? labelResolver;
 
   /// Hover color when mouse hovers over the node
+  @override
   final Color? hoverColor;
 
   /// Splash color for tap animations
+  @override
   final Color? splashColor;
 
   /// Highlight color for tap feedback
+  @override
   final Color? highlightColor;
 
   /// Tooltip theme for folder nodes
+  @override
   final NodeTooltipTheme<T>? tooltipTheme;
 
   /// Creates a [FolderNodeTheme]
