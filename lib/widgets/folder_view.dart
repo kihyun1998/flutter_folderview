@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import '../input/scale_modifier.dart';
 import '../models/flat_node.dart';
 import '../models/node.dart';
-import '../services/flatten_service.dart';
+import '../services/flattener.dart';
 import '../services/row_metrics.dart';
 import '../services/size_service.dart';
-import '../services/view_mode_projection.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import '../themes/folder_view_theme.dart';
 import 'folder_view_content.dart';
@@ -82,26 +81,10 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   bool get _blockModifierScroll =>
       widget.blockModifierScroll ?? (widget.onScaleChanged != null);
 
-  /// Cached flatten result
-  List<FlatNode<T>> _cachedFlatNodes = [];
-
-  /// Snapshot of expandedNodeIds used to produce the cached result.
-  /// We compare by length + content to detect changes.
-  Set<String>? _cachedExpandedIds;
-
-  /// Snapshot of data identity used for cache invalidation.
-  List<Node<T>>? _cachedData;
-
-  /// Snapshot of mode used for cache invalidation.
-  ViewMode? _cachedMode;
-
-  /// Index of the node that was expanded/collapsed (in the old flat list).
-  /// -1 means no pending adjustment.
-  int _pendingScrollChangedIndex = -1;
-
-  /// Number of items inserted (positive) or removed (negative) by the
-  /// last incremental expand/collapse.
-  int _pendingScrollDeltaItems = 0;
+  /// Owns the flat-list cache, the incremental-vs-rebuild decision, and the
+  /// View Mode projection. Replaces the former widget-internal flatten cache
+  /// and diff helpers.
+  final Flattener<T> _flattener = Flattener<T>();
 
   /// Pre-calculated maximum content width from all nodes (including collapsed).
   /// Computed once when data changes, ensuring stable width.
@@ -124,92 +107,6 @@ class _FolderViewState<T> extends State<FolderView<T>> {
     }
   }
 
-  /// Returns cached flat nodes, recomputing only when inputs change.
-  /// Uses incremental expand/collapse when exactly one node changed.
-  List<FlatNode<T>> _getFlatNodes(List<Node<T>> displayNodes) {
-    final expandedIds = widget.expandedNodeIds;
-
-    // Check if we can reuse the cache
-    if (identical(_cachedData, widget.data) &&
-        _cachedMode == widget.mode &&
-        _expandedIdsEqual(_cachedExpandedIds, expandedIds) &&
-        _cachedFlatNodes.isNotEmpty) {
-      return _cachedFlatNodes;
-    }
-
-    // Try incremental update when only data/mode are unchanged and
-    // exactly one node was expanded or collapsed.
-    if (identical(_cachedData, widget.data) &&
-        _cachedMode == widget.mode &&
-        _cachedFlatNodes.isNotEmpty &&
-        _cachedExpandedIds != null &&
-        expandedIds != null) {
-      final changedId = _singleDiff(_cachedExpandedIds!, expandedIds);
-      if (changedId != null) {
-        final isExpand = expandedIds.contains(changedId);
-        final previousLength = _cachedFlatNodes.length;
-        final result = isExpand
-            ? FlattenService.expandNode<T>(
-                currentList: _cachedFlatNodes,
-                nodeId: changedId,
-                expandedNodeIds: expandedIds,
-              )
-            : FlattenService.collapseNode<T>(
-                currentList: _cachedFlatNodes,
-                nodeId: changedId,
-              );
-        if (result != null) {
-          // Record the item count delta at this index so the content
-          // widget can adjust the scroll offset when the change happened
-          // above the current viewport.
-          _pendingScrollDeltaItems = result.list.length - previousLength;
-          _pendingScrollChangedIndex = result.index;
-
-          _cachedFlatNodes = result.list;
-          _cachedExpandedIds = Set<String>.of(expandedIds);
-          return _cachedFlatNodes;
-        }
-      }
-    }
-
-    // Full recompute
-    _cachedFlatNodes = FlattenService.flatten<T>(
-      nodes: displayNodes,
-      expandedNodeIds: expandedIds,
-    );
-    _cachedData = widget.data;
-    _cachedMode = widget.mode;
-    _cachedExpandedIds =
-        expandedIds != null ? Set<String>.of(expandedIds) : null;
-    return _cachedFlatNodes;
-  }
-
-  /// Returns the single differing element between two sets, or null if
-  /// the sets differ by more than one element.
-  static String? _singleDiff(Set<String> old, Set<String> current) {
-    final diff = old.length - current.length;
-    if (diff == 1) {
-      // One node collapsed: find the element in old but not in current
-      for (final id in old) {
-        if (!current.contains(id)) return id;
-      }
-    } else if (diff == -1) {
-      // One node expanded: find the element in current but not in old
-      for (final id in current) {
-        if (!old.contains(id)) return id;
-      }
-    }
-    return null;
-  }
-
-  /// Efficient Set equality check: same length and same elements.
-  static bool _expandedIdsEqual(Set<String>? a, Set<String>? b) {
-    if (identical(a, b)) return true;
-    if (a == null || b == null) return false;
-    if (a.length != b.length) return false;
-    return a.containsAll(b);
-  }
-
   @override
   Widget build(BuildContext context) {
     // Resolve theme: use provided theme, or get from context, or use default
@@ -219,14 +116,14 @@ class _FolderViewState<T> extends State<FolderView<T>> {
     // Each Theme owns its own scaling logic — see `Theme.scale(...)` methods.
     final scaledTheme = effectiveTheme.scaledForContext(context, widget.scale);
 
-    // Project the input onto the root nodes visible in the current View Mode.
-    final List<Node<T>> displayNodes = ViewModeProjection.project<T>(
-      nodes: widget.data,
+    // Project + flatten (memoized; incremental single-node updates when
+    // possible). The Flattener owns the cache and change detection.
+    final flattenResult = _flattener.update(
+      data: widget.data,
       mode: widget.mode,
+      expandedIds: widget.expandedNodeIds,
     );
-
-    // Flatten tree into visible flat list (memoized)
-    final List<FlatNode<T>> flatNodes = _getFlatNodes(displayNodes);
+    final List<FlatNode<T>> flatNodes = flattenResult.list;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -270,12 +167,6 @@ class _FolderViewState<T> extends State<FolderView<T>> {
             horizontalController,
             horizontalScrollbarController,
           ) {
-            // Consume pending scroll adjustment info
-            final scrollChangedIndex = _pendingScrollChangedIndex;
-            final scrollDeltaItems = _pendingScrollDeltaItems;
-            _pendingScrollChangedIndex = -1;
-            _pendingScrollDeltaItems = 0;
-
             final content = FolderViewContent<T>(
               flatNodes: flatNodes,
               mode: widget.mode,
@@ -295,8 +186,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               theme: scaledTheme,
               scale: widget.scale,
               blockModifierScroll: _blockModifierScroll,
-              scrollChangedIndex: scrollChangedIndex,
-              scrollDeltaItems: scrollDeltaItems,
+              change: flattenResult.change,
             );
 
             if (!_blockModifierScroll) return content;
