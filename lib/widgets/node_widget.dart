@@ -7,8 +7,8 @@ import 'package:just_tooltip/just_tooltip.dart';
 import '../models/flat_node.dart';
 import '../models/node.dart';
 import '../themes/flutter_folder_view_theme.dart';
-import '../themes/folder_view_line_theme.dart';
 import '../themes/node_tooltip_theme.dart';
+import 'tree_lines.dart';
 
 /// A single-row widget for a flattened tree node.
 ///
@@ -51,15 +51,18 @@ class NodeWidget<T> extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // 1. Tree lines for this node
-          if (!flatNode.isRoot) _buildTreeLines(lineWidth),
+          // 1. Tree lines: this node's connector + ancestor continuations.
+          if (theme.lineTheme.lineStyle != LineStyle.none)
+            Positioned.fill(
+              child: TreeLines(
+                flatNode: flatNode,
+                lineTheme: theme.lineTheme,
+                rowHeight: theme.rowHeight,
+                lineWidth: lineWidth,
+              ),
+            ),
 
-          // 2. Ancestor continuation lines
-          for (int d = 0; d < flatNode.ancestorIsLastFlags.length; d++)
-            if (!flatNode.ancestorIsLastFlags[d])
-              _buildContinuationLine(d, lineWidth),
-
-          // 3. Content row
+          // 2. Content row
           Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -75,39 +78,6 @@ class NodeWidget<T> extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  /// Draws the connector line for this node (vertical + horizontal)
-  Widget _buildTreeLines(double lineWidth) {
-    return Positioned(
-      left: (flatNode.depth - 1) * lineWidth,
-      top: 0,
-      bottom: 0,
-      width: lineWidth,
-      child: CustomPaint(
-        painter: _LinePainter(
-          isLast: flatNode.isLast,
-          isRoot: flatNode.isRoot,
-          lineTheme: theme.lineTheme,
-          rowHeight: theme.rowHeight,
-        ),
-      ),
-    );
-  }
-
-  /// Draws a vertical continuation line for a non-last ancestor at the given depth.
-  Widget _buildContinuationLine(int ancestorDepth, double lineWidth) {
-    return Positioned(
-      left: ancestorDepth * lineWidth,
-      top: 0,
-      bottom: 0,
-      width: lineWidth,
-      child: CustomPaint(
-        painter: _ContinuationLinePainter(
-          lineTheme: theme.lineTheme,
-        ),
       ),
     );
   }
@@ -457,103 +427,5 @@ class NodeWidget<T> extends StatelessWidget {
     }
 
     return style;
-  }
-}
-
-/// Paints the connector line for a node (vertical line + horizontal connector)
-class _LinePainter extends CustomPainter {
-  final bool isLast;
-  final bool isRoot;
-  final FolderViewLineTheme lineTheme;
-  final double rowHeight;
-
-  _LinePainter({
-    required this.isLast,
-    required this.isRoot,
-    required this.lineTheme,
-    required this.rowHeight,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (isRoot || lineTheme.lineStyle == LineStyle.none) {
-      return;
-    }
-
-    final paint = Paint()
-      ..color = lineTheme.lineColor
-      ..strokeWidth = lineTheme.lineWidth
-      ..strokeCap = lineTheme.strokeCap
-      ..style = PaintingStyle.stroke;
-
-    final double centerX = size.width / 2;
-
-    switch (lineTheme.lineStyle) {
-      case LineStyle.connector:
-        // Vertical line: from top to middle (if last) or full height
-        canvas.drawLine(
-          Offset(centerX, 0),
-          Offset(centerX, isLast ? rowHeight / 2 : size.height),
-          paint,
-        );
-
-        // Horizontal connector
-        double connectorY = rowHeight / 2;
-        canvas.drawLine(
-          Offset(centerX, connectorY),
-          Offset(size.width, connectorY),
-          paint,
-        );
-        break;
-
-      case LineStyle.scope:
-        canvas.drawLine(
-          Offset(centerX, 0),
-          Offset(centerX, size.height),
-          paint,
-        );
-        break;
-
-      case LineStyle.none:
-        break;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _LinePainter oldDelegate) {
-    return oldDelegate.isLast != isLast ||
-        oldDelegate.isRoot != isRoot ||
-        oldDelegate.lineTheme != lineTheme ||
-        oldDelegate.rowHeight != rowHeight;
-  }
-}
-
-/// Paints a vertical continuation line for a non-last ancestor.
-class _ContinuationLinePainter extends CustomPainter {
-  final FolderViewLineTheme lineTheme;
-
-  _ContinuationLinePainter({required this.lineTheme});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (lineTheme.lineStyle == LineStyle.none) return;
-
-    final paint = Paint()
-      ..color = lineTheme.lineColor
-      ..strokeWidth = lineTheme.lineWidth
-      ..strokeCap = lineTheme.strokeCap
-      ..style = PaintingStyle.stroke;
-
-    final double centerX = size.width / 2;
-    canvas.drawLine(
-      Offset(centerX, 0),
-      Offset(centerX, size.height),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _ContinuationLinePainter oldDelegate) {
-    return oldDelegate.lineTheme != lineTheme;
   }
 }
