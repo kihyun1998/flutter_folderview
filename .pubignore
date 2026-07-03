@@ -1,0 +1,31 @@
+# pub uses this file INSTEAD of .gitignore in the package root, so it must also
+# exclude the build artifacts .gitignore covers — otherwise build/ and
+# .dart_tool/ get bundled into the published archive.
+
+# Build artifacts / generated (mirrors .gitignore)
+.dart_tool/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+/pubspec.lock
+**/doc/api/
+*.log
+
+# IDE / OS junk (mirrors .gitignore)
+*.iml
+*.ipr
+*.iws
+.idea/
+.DS_Store
+
+# Repo- and development-only content that package consumers don't need.
+# Excluding it keeps internal docs/tooling off the pub.dev package page and
+# clears the "rename docs/ to doc/" layout warning (docs/ is internal ADRs and
+# agent-skill instructions, not package documentation).
+.github/
+.claude/
+docs/
+benchmark/
+CLAUDE.md
+CONTEXT.md
