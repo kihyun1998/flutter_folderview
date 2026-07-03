@@ -1,3 +1,11 @@
+## 0.10.0
+
+- **BREAKING**: Bump `just_tooltip` to `^0.3.0`. Its `JustTooltipController` — re-exported here and usable via `NodeTooltipTheme.controller` — is no longer a `ChangeNotifier`: `shouldShow` and `addListener` / `removeListener` / `dispose` are removed. Drive it with `show()` / `hide()` / `toggle()` and observe visibility via the tooltip's `onShow` / `onHide` callbacks. `just_tooltip` also narrowed its exports (`JustTooltipPositionDelegate`, `TooltipShapePainter`, `JustTooltipOverlay` are now internal). No `flutter_folderview` API changed.
+- **perf**: Pack a `FlatNode`'s ancestor tree-line flags into an `int` bitmask instead of a per-node `List<bool>`, removing a heap allocation for every flattened node (the flags are read only for painted rows). Flatten is ~3× faster and the flat-list heap footprint roughly halves on large trees. Tree-line rendering is unchanged; tree depth is capped at 63.
+- **perf**: Apply incremental expand/collapse in place on the cached flat list instead of copying the whole list on every single-node toggle — ~1.7× faster toggles on large trees. Visible rows and scroll anchoring are unchanged.
+- **perf**: In `RowMetrics.maxWidth`, merge the effective text style once per tier instead of once per node, removing the per-node `TextStyle` allocation on every data / scale / theme change (~5.5× faster on the warm measurement path). The returned width is unchanged, so horizontal scroll extent and clipping are identical.
+- **test / ci**: Add widget tests for the `FolderView` interaction, selection, view-mode, and modifier+wheel scale-gesture contracts; add an `integration_test` harness driving the example app end-to-end (boot, expand, select, zoom, view-mode switch); add a GitHub Actions analyze + test workflow; add `benchmark/` microbenchmarks and heap-footprint measurements for the flatten / projection / maxWidth hot paths.
+
 ## 0.9.0
 
 - **refactor**: Decentralize content scaling — each theme class now exposes its own `scale()` method, replacing the prior centralized `_applyScale` implementation. Existing usage (`FolderView(scale: ...)`) is unaffected.
