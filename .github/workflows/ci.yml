@@ -24,7 +24,10 @@ jobs:
       - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          # Pinned (not `channel: stable`) so `dart format` output is
+          # reproducible: the formatter changes between Dart versions, so a
+          # moving `stable` would intermittently fail the formatting gate.
+          flutter-version: 3.41.9
           cache: true
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
@@ -54,7 +57,10 @@ jobs:
       - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          # Pinned (not `channel: stable`) so `dart format` output is
+          # reproducible: the formatter changes between Dart versions, so a
+          # moving `stable` would intermittently fail the formatting gate.
+          flutter-version: 3.41.9
           cache: true
       # example depends on the package via a path dependency (../) and commits
       # its riverpod .g.dart files, so pub get + analyze needs no codegen step.
