@@ -23,6 +23,9 @@ dependencies:
 
 dev_dependencies:
   flutter_lints: ^5.0.0
+  # Microbenchmarks for the hot pure paths (benchmark/). Not run by the default
+  # test suite or CI; invoked explicitly. See benchmark/hot_paths_benchmark.dart.
+  benchmark_harness: ^2.3.1
   flutter_test:
     sdk: flutter
 
