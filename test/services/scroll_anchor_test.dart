@@ -11,7 +11,7 @@ void main() {
         isFirst: false,
         isLast: false,
         isRoot: true,
-        ancestorIsLastFlags: const [],
+        ancestorIsLastMask: 0,
       );
 
   group('ScrollAnchor.verticalOffsetForFlattenChange', () {

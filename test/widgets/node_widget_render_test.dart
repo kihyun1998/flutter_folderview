@@ -22,7 +22,7 @@ void main() {
       isFirst: true,
       isLast: isLast,
       isRoot: isRoot,
-      ancestorIsLastFlags: const [],
+      ancestorIsLastMask: 0,
     );
   }
 

@@ -20,10 +20,18 @@ class FlatNode<T> {
   /// Whether this is a root-level node
   final bool isRoot;
 
-  /// For each ancestor depth level, whether that ancestor is the last child.
-  /// Used to decide whether to draw a vertical continuation line at that depth.
-  /// Index 0 = depth 0 ancestor, index 1 = depth 1 ancestor, etc.
-  final List<bool> ancestorIsLastFlags;
+  /// Bitmask of "is this ancestor the last child?" over ancestor depth levels.
+  /// Bit `d` (for `d` in `0 .. depth-1`) is set when the ancestor at depth `d`
+  /// is the last child of its parent — meaning no vertical continuation line is
+  /// drawn at that depth. Replaces a per-node `List<bool>` to avoid a heap
+  /// allocation for every flattened node (the flags are read only when a row is
+  /// painted, i.e. only for visible rows). Tree depth is therefore capped at
+  /// [maxDepth].
+  final int ancestorIsLastMask;
+
+  /// Maximum tree depth representable in [ancestorIsLastMask] (one bit per
+  /// ancestor level, within a 64-bit int with headroom).
+  static const int maxDepth = 63;
 
   const FlatNode({
     required this.node,
@@ -31,6 +39,6 @@ class FlatNode<T> {
     required this.isFirst,
     required this.isLast,
     required this.isRoot,
-    required this.ancestorIsLastFlags,
+    required this.ancestorIsLastMask,
   });
 }

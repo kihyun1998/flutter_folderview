@@ -43,8 +43,10 @@ class TreeLinePlan {
     required double lineWidth,
   }) {
     final continuationXs = <double>[];
-    for (var d = 0; d < row.ancestorIsLastFlags.length; d++) {
-      if (!row.ancestorIsLastFlags[d]) {
+    for (var d = 0; d < row.depth; d++) {
+      // Bit d clear => the ancestor at depth d still has siblings below, so its
+      // vertical guide continues through this row.
+      if ((row.ancestorIsLastMask >> d) & 1 == 0) {
         continuationXs.add(d * lineWidth + lineWidth / 2);
       }
     }

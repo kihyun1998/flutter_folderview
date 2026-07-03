@@ -11,32 +11,30 @@ class FlattenService {
     required Set<String>? expandedNodeIds,
     int depth = 0,
     bool isRoot = true,
-    List<bool> ancestorIsLastFlags = const [],
+    int ancestorIsLastMask = 0,
   }) {
     final result = <FlatNode<T>>[];
-    // Use a mutable list for recursion to avoid spreading a new list
-    // at every level. Each FlatNode receives an unmodifiable snapshot.
-    final mutableFlags = List<bool>.of(ancestorIsLastFlags);
     _flattenInto<T>(
       result: result,
       nodes: nodes,
       expandedNodeIds: expandedNodeIds,
       depth: depth,
       isRoot: isRoot,
-      mutableFlags: mutableFlags,
+      ancestorIsLastMask: ancestorIsLastMask,
     );
     return result;
   }
 
-  /// Internal recursive helper that appends to [result] in-place
-  /// and reuses [mutableFlags] across sibling/child iterations.
+  /// Internal recursive helper that appends to [result] in-place. The ancestor
+  /// "is last" flags are carried as a plain [int] bitmask threaded by value —
+  /// no per-level list to allocate or unwind.
   static void _flattenInto<T>({
     required List<FlatNode<T>> result,
     required List<Node<T>> nodes,
     required Set<String>? expandedNodeIds,
     required int depth,
     required bool isRoot,
-    required List<bool> mutableFlags,
+    required int ancestorIsLastMask,
   }) {
     for (int i = 0; i < nodes.length; i++) {
       final node = nodes[i];
@@ -49,24 +47,32 @@ class FlattenService {
         isFirst: isFirst,
         isLast: isLast,
         isRoot: isRoot,
-        ancestorIsLastFlags: List<bool>.unmodifiable(mutableFlags),
+        ancestorIsLastMask: ancestorIsLastMask,
       ));
 
       // Recurse into children if expanded
       final isExpanded = expandedNodeIds?.contains(node.id) ?? false;
       if (isExpanded && node.children.isNotEmpty) {
-        mutableFlags.add(isLast);
         _flattenInto<T>(
           result: result,
           nodes: node.children,
           expandedNodeIds: expandedNodeIds,
           depth: depth + 1,
           isRoot: false,
-          mutableFlags: mutableFlags,
+          ancestorIsLastMask: _childAncestorMask(ancestorIsLastMask, depth, isLast),
         );
-        mutableFlags.removeLast();
       }
     }
+  }
+
+  /// The ancestor "is last" bitmask to hand to the children of a node at
+  /// [parentDepth]: the parent becomes the ancestor at index [parentDepth], so
+  /// its bit is set iff [parentIsLast]. Single source of truth for the encoding
+  /// and the depth cap.
+  static int _childAncestorMask(int parentMask, int parentDepth, bool parentIsLast) {
+    assert(parentDepth < FlatNode.maxDepth,
+        'tree depth exceeds FlatNode.maxDepth (${FlatNode.maxDepth})');
+    return parentIsLast ? (parentMask | (1 << parentDepth)) : parentMask;
   }
 
   /// Incrementally expand a node: insert its flattened subtree right after it.
@@ -85,9 +91,8 @@ class FlattenService {
     final node = flatNode.node;
     if (node.children.isEmpty) return (list: currentList, index: idx);
 
-    // Flatten only this node's children subtree
-    final childFlags = List<bool>.of(flatNode.ancestorIsLastFlags)
-      ..add(flatNode.isLast);
+    // Flatten only this node's children subtree. This node is the ancestor at
+    // index [flatNode.depth] for those children.
     final subtree = <FlatNode<T>>[];
     _flattenInto<T>(
       result: subtree,
@@ -95,7 +100,8 @@ class FlattenService {
       expandedNodeIds: expandedNodeIds,
       depth: flatNode.depth + 1,
       isRoot: false,
-      mutableFlags: childFlags,
+      ancestorIsLastMask: _childAncestorMask(
+          flatNode.ancestorIsLastMask, flatNode.depth, flatNode.isLast),
     );
 
     // Insert after the node — modify in place to avoid full copy
