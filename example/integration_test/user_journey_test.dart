@@ -17,8 +17,9 @@ void main() {
   Finder row(String label) =>
       find.descendant(of: folderView, matching: find.text(label));
 
-  testWidgets('example app: expand, select, zoom, and switch view mode',
-      (tester) async {
+  testWidgets('example app: expand, select, zoom, and switch view mode', (
+    tester,
+  ) async {
     // Boot the real example widget tree (no main(); avoids window_manager).
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
     await tester.pumpAndSettle();
@@ -52,7 +53,8 @@ void main() {
         tester.getSize(row('Theme System Architecture')).height;
     final before = labelHeight();
 
-    debugDefaultTargetPlatformOverride = TargetPlatform.windows; // Ctrl modifier
+    debugDefaultTargetPlatformOverride =
+        TargetPlatform.windows; // Ctrl modifier
     await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
     try {
       final center = tester.getCenter(folderView);

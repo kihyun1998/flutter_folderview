@@ -7,8 +7,9 @@ import 'package:integration_test/integration_test.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('example app boots and renders a FolderView with a node row',
-      (tester) async {
+  testWidgets('example app boots and renders a FolderView with a node row', (
+    tester,
+  ) async {
     // Boot the real example widget tree (ProviderScope + MyApp + ThemeDemoPage)
     // directly, rather than calling the example's main(). main() runs the
     // Windows-only window_manager setup, which needs a real platform channel;

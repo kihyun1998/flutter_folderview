@@ -73,8 +73,11 @@ void main() {
     try {
       final scales = <double>[];
       // Non-default step so the expected delta is an independent literal.
-      await pumpFV(tester, nodes: data(), onScaleChanged: scales.add,
-          scale: 1.0, scaleStep: 0.25);
+      await pumpFV(tester,
+          nodes: data(),
+          onScaleChanged: scales.add,
+          scale: 1.0,
+          scaleStep: 0.25);
 
       final center = tester.getCenter(find.byType(FolderView<String>));
       await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
@@ -145,7 +148,9 @@ void main() {
     try {
       final scales = <double>[];
       // Callback present would normally enable blocking; false forces it off.
-      await pumpFV(tester, nodes: data(count: 30), onScaleChanged: scales.add,
+      await pumpFV(tester,
+          nodes: data(count: 30),
+          onScaleChanged: scales.add,
           blockModifierScroll: false);
       final center = tester.getCenter(find.byType(FolderView<String>));
 

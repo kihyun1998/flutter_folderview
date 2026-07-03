@@ -56,8 +56,7 @@ void main() {
         ),
       );
       final metrics = RowMetrics<String>(theme: theme);
-      final child =
-          Node<String>(id: 'c', label: 'c', type: NodeType.child);
+      final child = Node<String>(id: 'c', label: 'c', type: NodeType.child);
       expect(metrics.effectiveTextStyle(child)?.fontSize, 22);
     });
 
@@ -69,8 +68,7 @@ void main() {
         ),
       );
       final metrics = RowMetrics<String>(theme: theme);
-      final child =
-          Node<String>(id: 'c', label: 'c', type: NodeType.child);
+      final child = Node<String>(id: 'c', label: 'c', type: NodeType.child);
       // Render uses resolver ?? textStyle; measurement must resolve the same
       // way, so effectiveTextStyle reflects the resolver.
       expect(metrics.effectiveTextStyle(child)?.fontSize, 99);
@@ -125,22 +123,29 @@ void main() {
       // Repeated labels ('shared'), mixed tiers and depths, so the dedup/hoist
       // path is exercised without changing the result.
       final roots = [
-        Node<String>(id: 'A', label: 'shared', type: NodeType.folder, children: [
-          Node<String>(id: 'p1', label: 'shared', type: NodeType.parent,
-              children: [
-                Node<String>(id: 'c1', label: 'shared', type: NodeType.child),
-                Node<String>(
-                    id: 'c2',
-                    label: 'a considerably wider child label here',
-                    type: NodeType.child),
-              ]),
-          Node<String>(id: 'p2', label: 'another', type: NodeType.parent),
-        ]),
+        Node<String>(
+            id: 'A',
+            label: 'shared',
+            type: NodeType.folder,
+            children: [
+              Node<String>(
+                  id: 'p1',
+                  label: 'shared',
+                  type: NodeType.parent,
+                  children: [
+                    Node<String>(
+                        id: 'c1', label: 'shared', type: NodeType.child),
+                    Node<String>(
+                        id: 'c2',
+                        label: 'a considerably wider child label here',
+                        type: NodeType.child),
+                  ]),
+              Node<String>(id: 'p2', label: 'another', type: NodeType.parent),
+            ]),
         Node<String>(id: 'B', label: 'shared', type: NodeType.folder),
       ];
 
-      expect(metrics.maxWidth(roots),
-          closeTo(referenceMaxWidth(roots), 1e-9));
+      expect(metrics.maxWidth(roots), closeTo(referenceMaxWidth(roots), 1e-9));
     });
   });
 }

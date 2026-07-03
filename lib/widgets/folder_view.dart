@@ -211,5 +211,4 @@ class _FolderViewState<T> extends State<FolderView<T>> {
       }
     }
   }
-
 }

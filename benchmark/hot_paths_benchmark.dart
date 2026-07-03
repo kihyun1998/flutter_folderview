@@ -53,8 +53,8 @@ class _Forest {
   final List<Node<String>> roots = [];
   final Set<String> expandedIds = {};
 
-  int get nodeCount => expandedIds.length +
-      roots.fold<int>(0, (s, f) => s + _leafCount(f));
+  int get nodeCount =>
+      expandedIds.length + roots.fold<int>(0, (s, f) => s + _leafCount(f));
 
   static int _leafCount(Node<String> n) => n.children.isEmpty
       ? 1

@@ -70,7 +70,8 @@ void main() {
   });
 
   group('NodeIconBox', () {
-    testWidgets('renders an empty spacer when the icon is null', (tester) async {
+    testWidgets('renders an empty spacer when the icon is null',
+        (tester) async {
       await pump(
         tester,
         const NodeIconBox(
@@ -87,7 +88,8 @@ void main() {
       expect(find.byIcon(Icons.star), findsNothing);
     });
 
-    testWidgets('renders the icon without a FittedBox at scale 1', (tester) async {
+    testWidgets('renders the icon without a FittedBox at scale 1',
+        (tester) async {
       await pump(
         tester,
         const NodeIconBox(
@@ -104,7 +106,8 @@ void main() {
       expect(find.byType(FittedBox), findsNothing);
     });
 
-    testWidgets('wraps the icon in a FittedBox when scale != 1', (tester) async {
+    testWidgets('wraps the icon in a FittedBox when scale != 1',
+        (tester) async {
       await pump(
         tester,
         const NodeIconBox(

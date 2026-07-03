@@ -51,7 +51,8 @@ void main() {
     expect(find.byType(FolderViewHorizontalScrollbar), findsNothing);
   });
 
-  testWidgets('vertical scrollbar appears when content is tall', (tester) async {
+  testWidgets('vertical scrollbar appears when content is tall',
+      (tester) async {
     // 20 parents * 40px rows >> 160px viewport.
     await pumpFV(tester, nodes: data(count: 20), size: const Size(400, 160));
     expect(find.byType(FolderViewVerticalScrollbar), findsOneWidget);
@@ -82,8 +83,7 @@ void main() {
     // Default light theme: nonHoverOpacity 0.0, hoverOpacity 0.8.
     expect(barOpacity(), 0.0);
 
-    final gesture =
-        await tester.createGesture(kind: PointerDeviceKind.mouse);
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await gesture.addPointer(location: Offset.zero);
     addTearDown(gesture.removePointer);
     await gesture.moveTo(tester.getCenter(find.byType(FolderView<String>)));

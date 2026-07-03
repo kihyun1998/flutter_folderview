@@ -64,8 +64,10 @@ void main() {
     test('== / hashCode', () {
       // Non-const so the instances differ by identity — forces == to evaluate
       // the field comparisons rather than short-circuiting on identical().
-      final a = ExpandIconTheme(width: 10, height: 6, color: const Color(0xFF000001));
-      final b = ExpandIconTheme(width: 10, height: 6, color: const Color(0xFF000001));
+      final a =
+          ExpandIconTheme(width: 10, height: 6, color: const Color(0xFF000001));
+      final b =
+          ExpandIconTheme(width: 10, height: 6, color: const Color(0xFF000001));
       final differHeight = ExpandIconTheme(width: 10, height: 9);
       expect(a, b);
       expect(a.hashCode, b.hashCode);
@@ -85,8 +87,10 @@ void main() {
           const EdgeInsets.all(15));
       expect(FolderViewSpacingTheme.lerp(null, null, 0.5).contentPadding,
           EdgeInsets.zero);
-      final a2 = FolderViewSpacingTheme(contentPadding: const EdgeInsets.all(10));
-      final a3 = FolderViewSpacingTheme(contentPadding: const EdgeInsets.all(10));
+      final a2 =
+          FolderViewSpacingTheme(contentPadding: const EdgeInsets.all(10));
+      final a3 =
+          FolderViewSpacingTheme(contentPadding: const EdgeInsets.all(10));
       expect(a2, a3); // non-const: exercises == field comparison
       expect(a2.hashCode, a3.hashCode);
       expect(a2 == b, isFalse);

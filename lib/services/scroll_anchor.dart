@@ -93,8 +93,7 @@ class ScrollAnchor {
 
     int newIndex = -1;
     for (int i = topIndex; i >= 0; i--) {
-      newIndex =
-          newList.indexWhere((fn) => fn.node.id == oldList[i].node.id);
+      newIndex = newList.indexWhere((fn) => fn.node.id == oldList[i].node.id);
       if (newIndex >= 0) {
         if (i != topIndex) anchorPixelOffset = 0.0;
         break;

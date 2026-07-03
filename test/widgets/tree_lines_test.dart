@@ -30,7 +30,8 @@ void main() {
   // Behaviour net through the public flatten path: builds a real Node tree and
   // asserts the resulting deep row's line geometry. It never names the ancestor
   // representation, so it survives a change to how those flags are stored.
-  test('flatten feeds a deep row the right continuation/connector geometry', () {
+  test('flatten feeds a deep row the right continuation/connector geometry',
+      () {
     //   A (folder, depth 0, NOT last — sibling B follows)
     //     P (parent, depth 1, last child of A)
     //       C0 (child, depth 2)   <- inspected

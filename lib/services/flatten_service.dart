@@ -59,7 +59,8 @@ class FlattenService {
           expandedNodeIds: expandedNodeIds,
           depth: depth + 1,
           isRoot: false,
-          ancestorIsLastMask: _childAncestorMask(ancestorIsLastMask, depth, isLast),
+          ancestorIsLastMask:
+              _childAncestorMask(ancestorIsLastMask, depth, isLast),
         );
       }
     }
@@ -69,7 +70,8 @@ class FlattenService {
   /// [parentDepth]: the parent becomes the ancestor at index [parentDepth], so
   /// its bit is set iff [parentIsLast]. Single source of truth for the encoding
   /// and the depth cap.
-  static int _childAncestorMask(int parentMask, int parentDepth, bool parentIsLast) {
+  static int _childAncestorMask(
+      int parentMask, int parentDepth, bool parentIsLast) {
     assert(parentDepth < FlatNode.maxDepth,
         'tree depth exceeds FlatNode.maxDepth (${FlatNode.maxDepth})');
     return parentIsLast ? (parentMask | (1 << parentDepth)) : parentMask;

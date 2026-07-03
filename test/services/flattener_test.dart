@@ -10,13 +10,21 @@ void main() {
           label: 'f1',
           type: NodeType.folder,
           children: [
-            Node<String>(id: 'p1', label: 'p1', type: NodeType.parent, children: [
-              Node<String>(id: 'c1', label: 'c1', type: NodeType.child),
-              Node<String>(id: 'c2', label: 'c2', type: NodeType.child),
-            ]),
-            Node<String>(id: 'p2', label: 'p2', type: NodeType.parent, children: [
-              Node<String>(id: 'c3', label: 'c3', type: NodeType.child),
-            ]),
+            Node<String>(
+                id: 'p1',
+                label: 'p1',
+                type: NodeType.parent,
+                children: [
+                  Node<String>(id: 'c1', label: 'c1', type: NodeType.child),
+                  Node<String>(id: 'c2', label: 'c2', type: NodeType.child),
+                ]),
+            Node<String>(
+                id: 'p2',
+                label: 'p2',
+                type: NodeType.parent,
+                children: [
+                  Node<String>(id: 'c3', label: 'c3', type: NodeType.child),
+                ]),
           ],
         ),
       ];
@@ -28,7 +36,8 @@ void main() {
     test('first update is a full rebuild with no change metadata', () {
       final data = buildData();
       final f = Flattener<String>();
-      final r = f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1'});
+      final r =
+          f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1'});
       expect(ids(r), ['f1', 'p1', 'p2']);
       expect(r.change, isNull);
     });
@@ -36,10 +45,10 @@ void main() {
     test('identical inputs return the cached list with no change', () {
       final data = buildData();
       final f = Flattener<String>();
-      final first = f.update(
-          data: data, mode: ViewMode.folder, expandedIds: {'f1'});
-      final second = f.update(
-          data: data, mode: ViewMode.folder, expandedIds: {'f1'});
+      final first =
+          f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1'});
+      final second =
+          f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1'});
       expect(identical(second.list, first.list), isTrue);
       expect(second.change, isNull);
     });
@@ -60,8 +69,8 @@ void main() {
       final data = buildData();
       final f = Flattener<String>();
       f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1'});
-      final r =
-          f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1', 'p1'});
+      final r = f
+          .update(data: data, mode: ViewMode.folder, expandedIds: {'f1', 'p1'});
       expect(ids(r), ['f1', 'p1', 'c1', 'c2', 'p2']);
       expect(r.change, isNotNull);
       expect(r.change!.index, 1); // p1's position
@@ -99,8 +108,8 @@ void main() {
       final f = Flattener<String>();
       f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1'});
 
-      final e1 =
-          f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1', 'p1'});
+      final e1 = f
+          .update(data: data, mode: ViewMode.folder, expandedIds: {'f1', 'p1'});
       expect(ids(e1), ['f1', 'p1', 'c1', 'c2', 'p2']);
       expect(e1.change!.deltaItems, 2);
 
@@ -109,8 +118,8 @@ void main() {
       expect(ids(c1), ['f1', 'p1', 'p2']);
       expect(c1.change!.deltaItems, -2);
 
-      final e2 =
-          f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1', 'p2'});
+      final e2 = f
+          .update(data: data, mode: ViewMode.folder, expandedIds: {'f1', 'p2'});
       expect(ids(e2), ['f1', 'p1', 'p2', 'c3']);
       expect(e2.change!.index, 2); // p2's position
       expect(e2.change!.deltaItems, 1);

@@ -41,7 +41,8 @@ class ChildNodeRenderer<T> extends StatelessWidget {
     }
 
     final label = childTheme.labelResolver?.call(node) ?? node.label;
-    final iconWidget = childTheme.widgetResolver?.call(node) ?? childTheme.widget;
+    final iconWidget =
+        childTheme.widgetResolver?.call(node) ?? childTheme.widget;
 
     final iconBox = NodeIconBox(
       iconWidget: iconWidget,

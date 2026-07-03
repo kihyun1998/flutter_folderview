@@ -25,8 +25,8 @@ class ViewModeProjection {
         return parents;
       case ViewMode.folder:
         return nodes
-            .where((n) =>
-                n.type == NodeType.folder || n.type == NodeType.parent)
+            .where(
+                (n) => n.type == NodeType.folder || n.type == NodeType.parent)
             .toList();
     }
   }

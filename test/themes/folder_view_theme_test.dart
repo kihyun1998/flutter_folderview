@@ -11,8 +11,8 @@ void main() {
       final dark = FlutterFolderViewTheme<String>.dark();
       // Identity short-circuit still holds (sanity that they are well-formed).
       expect(
-        identical(light.scale(factor: 1.0, defaultFontSize: defaultFontSize),
-            light),
+        identical(
+            light.scale(factor: 1.0, defaultFontSize: defaultFontSize), light),
         isTrue,
       );
       // The two presets differ somewhere visible (line colour).
@@ -78,7 +78,8 @@ void main() {
       final t2 = FlutterFolderViewTheme<String>.light().copyWith(rowHeight: 20);
       final a = FolderViewTheme<String>(data: t1, child: const SizedBox());
       final same = FolderViewTheme<String>(data: t1, child: const SizedBox());
-      final changed = FolderViewTheme<String>(data: t2, child: const SizedBox());
+      final changed =
+          FolderViewTheme<String>(data: t2, child: const SizedBox());
       expect(a.updateShouldNotify(same), isFalse); // identical data instance
       expect(a.updateShouldNotify(changed), isTrue);
     });

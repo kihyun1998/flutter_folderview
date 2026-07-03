@@ -44,7 +44,8 @@ void main() {
       const t = NodeTooltipTheme<String>(offset: 9);
       expect(NodeTooltipTheme.lerp<String>(null, t, 0.5).offset, 9);
       expect(NodeTooltipTheme.lerp<String>(t, null, 0.5).offset, 9);
-      expect(NodeTooltipTheme.lerp<String>(null, null, 0.5).useTooltip, isFalse);
+      expect(
+          NodeTooltipTheme.lerp<String>(null, null, 0.5).useTooltip, isFalse);
     });
   });
 }

@@ -86,9 +86,11 @@ void main() {
     expect(styleOf(tester, 'Child A')?.fontSize, 14);
   });
 
-  testWidgets('a Folder in the Selected Set gets no selection styling (ADR-0003)',
+  testWidgets(
+      'a Folder in the Selected Set gets no selection styling (ADR-0003)',
       (tester) async {
-    final node = Node<String>(id: 'F', label: 'Folder A', type: NodeType.folder);
+    final node =
+        Node<String>(id: 'F', label: 'Folder A', type: NodeType.folder);
     await tester.pumpWidget(host(NodeWidget<String>(
       flatNode: flat(node),
       mode: ViewMode.folder,
@@ -100,7 +102,8 @@ void main() {
     expect(styleOf(tester, 'Folder A')?.fontSize, 14);
   });
 
-  testWidgets('an expandable node with children shows the expand icon', (tester) async {
+  testWidgets('an expandable node with children shows the expand icon',
+      (tester) async {
     final node = Node<String>(
       id: 'F',
       label: 'Folder A',
