@@ -100,5 +100,47 @@ void main() {
       ];
       expect(metrics.maxWidth(wide) > metrics.maxWidth(narrow), isTrue);
     });
+
+    // Exact-preservation net for the maxWidth optimisation: whatever maxWidth
+    // does internally, it must equal the naive maximum of the per-node
+    // measureNodeWidth over the whole tree (plus the left content padding).
+    // measureNodeWidth stays the canonical per-node formula, so this reference
+    // is independent of maxWidth's internals.
+    double referenceMaxWidth(List<Node<String>> roots) {
+      var widest = 0.0;
+      void visit(List<Node<String>> list, int depth) {
+        for (final node in list) {
+          final w = metrics.measureNodeWidth(node, depth);
+          if (w > widest) widest = w;
+          if (node.children.isNotEmpty) visit(node.children, depth + 1);
+        }
+      }
+
+      visit(roots, 0);
+      return buildTheme().spacingTheme.contentPadding.left + widest;
+    }
+
+    test('maxWidth equals the naive per-node maximum (repeated + mixed tiers)',
+        () {
+      // Repeated labels ('shared'), mixed tiers and depths, so the dedup/hoist
+      // path is exercised without changing the result.
+      final roots = [
+        Node<String>(id: 'A', label: 'shared', type: NodeType.folder, children: [
+          Node<String>(id: 'p1', label: 'shared', type: NodeType.parent,
+              children: [
+                Node<String>(id: 'c1', label: 'shared', type: NodeType.child),
+                Node<String>(
+                    id: 'c2',
+                    label: 'a considerably wider child label here',
+                    type: NodeType.child),
+              ]),
+          Node<String>(id: 'p2', label: 'another', type: NodeType.parent),
+        ]),
+        Node<String>(id: 'B', label: 'shared', type: NodeType.folder),
+      ];
+
+      expect(metrics.maxWidth(roots),
+          closeTo(referenceMaxWidth(roots), 1e-9));
+    });
   });
 }

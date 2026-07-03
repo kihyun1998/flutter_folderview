@@ -69,24 +69,53 @@ class RowMetrics<T> {
   /// Total width of a single row: indent + own expand strip + tier icon box +
   /// measured label + right content padding. Uses [baseTextStyle] merged with
   /// [effectiveTextStyle] so the measured label matches what is rendered.
-  double measureNodeWidth(Node<T> node, int depth) {
-    final style = (baseTextStyle ?? const TextStyle(fontSize: 14))
-        .merge(effectiveTextStyle(node));
-    return indentWidth(depth) +
-        expandStripWidth +
-        iconBoxWidth(node.type) +
-        _measureTextWidth(node.label, style) +
-        theme.spacingTheme.contentPadding.right;
+  double measureNodeWidth(Node<T> node, int depth) =>
+      _rowWidth(node, depth, _mergedStyle(node));
+
+  /// The base-merged effective text style for [node]. Absent a per-node
+  /// `textStyleResolver`, the result depends only on the node's tier, which
+  /// lets [maxWidth] cache it per tier instead of merging per node.
+  TextStyle _mergedStyle(Node<T> node) =>
+      (baseTextStyle ?? const TextStyle(fontSize: 14))
+          .merge(effectiveTextStyle(node));
+
+  /// The single row-width formula shared by the per-node [measureNodeWidth] and
+  /// the batched [maxWidth], so the two can never drift.
+  double _rowWidth(Node<T> node, int depth, TextStyle style) =>
+      indentWidth(depth) +
+      expandStripWidth +
+      iconBoxWidth(node.type) +
+      _measureTextWidth(node.label, style) +
+      theme.spacingTheme.contentPadding.right;
+
+  /// Whether the tier for [type] resolves its text style per node.
+  bool _hasTextStyleResolver(NodeType type) {
+    switch (type) {
+      case NodeType.folder:
+        return theme.folderTheme.textStyleResolver != null;
+      case NodeType.parent:
+        return theme.parentTheme.textStyleResolver != null;
+      case NodeType.child:
+        return theme.childTheme.textStyleResolver != null;
+    }
   }
 
   /// Widest row across the whole tree (all descendants, regardless of expand
   /// state) plus the left content padding — a stable width independent of which
   /// nodes are currently expanded.
   double maxWidth(List<Node<T>> nodes) {
+    // Merge the effective style once per tier when the tier has no per-node
+    // resolver (the common case), instead of allocating a merged TextStyle for
+    // every node. Tiers with a resolver keep resolving per node (exact).
+    final tierStyle = <NodeType, TextStyle>{};
+    TextStyle styleOf(Node<T> node) => _hasTextStyleResolver(node.type)
+        ? _mergedStyle(node)
+        : (tierStyle[node.type] ??= _mergedStyle(node));
+
     var widest = 0.0;
     void visit(List<Node<T>> list, int depth) {
       for (final node in list) {
-        final w = measureNodeWidth(node, depth);
+        final w = _rowWidth(node, depth, styleOf(node));
         if (w > widest) widest = w;
         if (node.children.isNotEmpty) visit(node.children, depth + 1);
       }

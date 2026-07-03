@@ -21,12 +21,17 @@
 //
 // Recorded baseline (Windows dev machine, median of 5 trials; expect wide
 // run-to-run variance from GC/TextPainter):
-//   n=1000  (1012 nodes): COLD ~45-57 ms  | WARM (cache hit) ~1.3 ms
-//   n=10000 (10028 nodes): COLD ~330-405 ms | WARM (cache hit) ~26 ms
-// For contrast, the pure flatten path over the same node counts is ~22 us
-// (1k) / ~275 us (10k) — so cold maxWidth is ~1000x+ the flatten cost and is
-// the dominant per-data-change expense. Even the warm path stays O(nodes)
-// because it builds a cache-key string per node.
+//   #35 baseline (before the maxWidth optimisation):
+//     n=1000  (1012 nodes): COLD ~45-57 ms  | WARM (cache hit) ~1.3 ms
+//     n=10000 (10028 nodes): COLD ~330-405 ms | WARM (cache hit) ~26 ms
+//   #37 (per-tier style hoist; returned width unchanged):
+//     n=1000 : WARM ~0.8 ms | n=10000: WARM ~4.7 ms  (~5.5x on the warm/
+//     overhead path at 10k, from dropping the per-node TextStyle.merge alloc)
+// COLD is dominated by irreducible per-label TextPainter.layout and stays in
+// its noise band — exact measurement of N distinct labels cannot be cut
+// without approximating (which would change the scroll extent). For contrast,
+// the pure flatten path over the same node counts is ~22 us (1k) / ~275 us
+// (10k), so cold maxWidth remains the dominant per-data-change expense.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
