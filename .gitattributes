@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Force LF in the working tree for Dart sources so `dart format` output is
+# stable across platforms (a CRLF working tree can mask formatting differences).
+*.dart text eol=lf
