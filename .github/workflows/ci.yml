@@ -26,6 +26,8 @@ jobs:
         with:
           channel: stable
           cache: true
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
       - name: Install dependencies
         run: flutter pub get
       - name: Analyze
