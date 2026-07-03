@@ -76,8 +76,11 @@ class FlattenService {
   }
 
   /// Incrementally expand a node: insert its flattened subtree right after it.
-  /// Returns the new list and the index of the expanded node, or null if the
-  /// node was not found (caller should fall back to full rebuild).
+  ///
+  /// Mutates [currentList] in place (the caller — the Flattener — owns it) to
+  /// avoid copying the whole list on every toggle, and returns that same list
+  /// with the index of the expanded node. Returns null if the node was not
+  /// found (caller should fall back to a full rebuild).
   static ({List<FlatNode<T>> list, int index})? expandNode<T>({
     required List<FlatNode<T>> currentList,
     required String nodeId,
@@ -104,15 +107,17 @@ class FlattenService {
           flatNode.ancestorIsLastMask, flatNode.depth, flatNode.isLast),
     );
 
-    // Insert after the node — modify in place to avoid full copy
-    final result = List<FlatNode<T>>.of(currentList)
-      ..insertAll(idx + 1, subtree);
-    return (list: result, index: idx);
+    // Insert the subtree after the node, in place.
+    currentList.insertAll(idx + 1, subtree);
+    return (list: currentList, index: idx);
   }
 
   /// Incrementally collapse a node: remove all descendants that follow it.
-  /// Returns the new list and the index of the collapsed node, or null if the
-  /// node was not found (caller should fall back to full rebuild).
+  ///
+  /// Mutates [currentList] in place (caller-owned) to avoid copying the whole
+  /// list, and returns that same list with the index of the collapsed node.
+  /// Returns null if the node was not found (caller should fall back to a full
+  /// rebuild).
   static ({List<FlatNode<T>> list, int index})? collapseNode<T>({
     required List<FlatNode<T>> currentList,
     required String nodeId,
@@ -133,8 +138,8 @@ class FlattenService {
       return (list: currentList, index: idx); // Nothing to remove
     }
 
-    final result = List<FlatNode<T>>.of(currentList)
-      ..removeRange(idx + 1, endIdx);
-    return (list: result, index: idx);
+    // Remove the descendant range in place.
+    currentList.removeRange(idx + 1, endIdx);
+    return (list: currentList, index: idx);
   }
 }

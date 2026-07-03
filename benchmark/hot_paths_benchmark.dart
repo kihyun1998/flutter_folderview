@@ -15,6 +15,7 @@ import 'package:benchmark_harness/benchmark_harness.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_folderview/models/flat_node.dart';
 import 'package:flutter_folderview/services/flatten_service.dart';
+import 'package:flutter_folderview/services/flattener.dart';
 import 'package:flutter_folderview/services/view_mode_projection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -106,23 +107,37 @@ class ProjectTreeBenchmark extends BenchmarkBase {
   }
 }
 
-/// Incremental collapse of a mid-deep Parent (~75% down the flat list): the
-/// per-tap hot path — an indexWhere scan plus a copy-with-removeRange.
-class CollapseNodeBenchmark extends BenchmarkBase {
-  CollapseNodeBenchmark(this.n) : super('collapseNode(n=$n)');
+/// The per-tap incremental path through its real entry point: collapse a
+/// mid-deep node then re-expand it via [Flattener.update]. Each run is a
+/// single-node collapse followed by a single-node expand that nets back to the
+/// fully-expanded state, so the shared Flattener cache is restored every run
+/// (idempotent) and the measurement is a full toggle round-trip.
+class IncrementalToggleBenchmark extends BenchmarkBase {
+  IncrementalToggleBenchmark(this.n) : super('incrementalToggle(n=$n)');
 
   final int n;
-  late final List<FlatNode<String>> _fullyExpanded;
-  late final String _targetId;
+  late final List<Node<String>> _roots;
+  late final Set<String> _fullyExpanded;
+  late final Set<String> _withoutTarget;
+  late final Flattener<String> _flattener;
 
   @override
   void setup() {
     final forest = _Forest(n);
-    _fullyExpanded = FlattenService.flatten<String>(
-      nodes: forest.roots,
-      expandedNodeIds: forest.expandedIds,
+    _roots = forest.roots;
+    _fullyExpanded = forest.expandedIds;
+    final flat = FlattenService.flatten<String>(
+      nodes: _roots,
+      expandedNodeIds: _fullyExpanded,
     );
-    _targetId = _pickExpandableNear(_fullyExpanded, 0.75);
+    final targetId = _pickExpandableNear(flat, 0.75);
+    _withoutTarget = {..._fullyExpanded}..remove(targetId);
+    _flattener = Flattener<String>()
+      ..update(
+        data: _roots,
+        mode: ViewMode.folder,
+        expandedIds: _fullyExpanded,
+      );
   }
 
   @override
@@ -130,50 +145,11 @@ class CollapseNodeBenchmark extends BenchmarkBase {
 
   @override
   void run() {
-    FlattenService.collapseNode<String>(
-      currentList: _fullyExpanded,
-      nodeId: _targetId,
-    );
-  }
-}
-
-/// Incremental expand of the same mid-deep Parent: indexWhere scan, subtree
-/// flatten, then copy-with-insertAll. Driven from a list where the target is
-/// collapsed, so the run reproduces a real "tap to expand".
-class ExpandNodeBenchmark extends BenchmarkBase {
-  ExpandNodeBenchmark(this.n) : super('expandNode(n=$n)');
-
-  final int n;
-  late final List<FlatNode<String>> _targetCollapsed;
-  late final Set<String> _expandedIds;
-  late final String _targetId;
-
-  @override
-  void setup() {
-    final forest = _Forest(n);
-    final full = FlattenService.flatten<String>(
-      nodes: forest.roots,
-      expandedNodeIds: forest.expandedIds,
-    );
-    _targetId = _pickExpandableNear(full, 0.75);
-    _expandedIds = forest.expandedIds;
-    // Flatten with the target collapsed so expandNode has a subtree to insert.
-    _targetCollapsed = FlattenService.flatten<String>(
-      nodes: forest.roots,
-      expandedNodeIds: forest.expandedIds.difference({_targetId}),
-    );
-  }
-
-  @override
-  void exercise() => run();
-
-  @override
-  void run() {
-    FlattenService.expandNode<String>(
-      currentList: _targetCollapsed,
-      nodeId: _targetId,
-      expandedNodeIds: _expandedIds,
-    );
+    // Single-node collapse (target removed) then single-node expand (restored).
+    _flattener.update(
+        data: _roots, mode: ViewMode.folder, expandedIds: _withoutTarget);
+    _flattener.update(
+        data: _roots, mode: ViewMode.folder, expandedIds: _fullyExpanded);
   }
 }
 
@@ -202,8 +178,7 @@ void main() {
       print('--- target n=$n (actual nodes=${_Forest(n).nodeCount}) ---');
       FlattenBenchmark(n).report();
       ProjectTreeBenchmark(n).report();
-      CollapseNodeBenchmark(n).report();
-      ExpandNodeBenchmark(n).report();
+      IncrementalToggleBenchmark(n).report();
     }
   }, timeout: const Timeout(Duration(minutes: 2)));
 }

@@ -90,5 +90,36 @@ void main() {
       expect(ids(r), ['f1', 'p1', 'c1', 'c2', 'p2', 'c3']);
       expect(r.change, isNull);
     });
+
+    test('a sequence of single-node toggles stays correct across updates', () {
+      // Drives several consecutive incremental updates so any corruption from
+      // reusing/aliasing the flat list across mutations would surface as wrong
+      // rows or a wrong change delta on a later step.
+      final data = buildData();
+      final f = Flattener<String>();
+      f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1'});
+
+      final e1 =
+          f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1', 'p1'});
+      expect(ids(e1), ['f1', 'p1', 'c1', 'c2', 'p2']);
+      expect(e1.change!.deltaItems, 2);
+
+      final c1 =
+          f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1'});
+      expect(ids(c1), ['f1', 'p1', 'p2']);
+      expect(c1.change!.deltaItems, -2);
+
+      final e2 =
+          f.update(data: data, mode: ViewMode.folder, expandedIds: {'f1', 'p2'});
+      expect(ids(e2), ['f1', 'p1', 'p2', 'c3']);
+      expect(e2.change!.index, 2); // p2's position
+      expect(e2.change!.deltaItems, 1);
+
+      final e3 = f.update(
+          data: data, mode: ViewMode.folder, expandedIds: {'f1', 'p1', 'p2'});
+      expect(ids(e3), ['f1', 'p1', 'c1', 'c2', 'p2', 'c3']);
+      expect(e3.change!.index, 1); // p1's position
+      expect(e3.change!.deltaItems, 2);
+    });
   });
 }
