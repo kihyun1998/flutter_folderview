@@ -106,26 +106,30 @@ class _CustomInkWellState extends State<CustomInkWell> {
 
   @override
   Widget build(BuildContext context) {
+    // NOTE: This widget intentionally does NOT provide its own [Material].
+    // [Ink]/[InkWell] paint onto the nearest ancestor [Material], which
+    // [FolderViewContent] supplies exactly once above the row list. Keeping a
+    // per-row Material was measurably more expensive under scroll (a shared
+    // ancestor cut jank frames in profiling), so the ink surface is hoisted.
+    // Consequence: a [CustomInkWell] rendered outside a Material ancestor will
+    // assert — that is by design; it is a folderview-internal row primitive.
     return ExcludeFocus(
-      child: Material(
-        color: Colors.transparent,
-        child: Ink(
-          decoration: BoxDecoration(
-            color: widget.isSelected
-                ? widget.selectedColor ?? Colors.transparent
-                : widget.backgroundColor ?? Colors.transparent,
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-          ),
-          child: InkWell(
-            mouseCursor: widget.mouseCursor ?? SystemMouseCursors.click,
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-            onTap: widget.onTap != null ? _handleTap : null,
-            onSecondaryTapDown: widget.onSecondaryTapDown,
-            splashColor: widget.splashColor ?? Colors.transparent,
-            hoverColor: widget.hoverColor ?? Colors.transparent,
-            highlightColor: widget.highlightColor ?? Colors.transparent,
-            child: Padding(padding: widget.childPadding, child: widget.child),
-          ),
+      child: Ink(
+        decoration: BoxDecoration(
+          color: widget.isSelected
+              ? widget.selectedColor ?? Colors.transparent
+              : widget.backgroundColor ?? Colors.transparent,
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+        ),
+        child: InkWell(
+          mouseCursor: widget.mouseCursor ?? SystemMouseCursors.click,
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+          onTap: widget.onTap != null ? _handleTap : null,
+          onSecondaryTapDown: widget.onSecondaryTapDown,
+          splashColor: widget.splashColor ?? Colors.transparent,
+          hoverColor: widget.hoverColor ?? Colors.transparent,
+          highlightColor: widget.highlightColor ?? Colors.transparent,
+          child: Padding(padding: widget.childPadding, child: widget.child),
         ),
       ),
     );
