@@ -1,3 +1,7 @@
+## 0.10.1
+
+- **perf**: Remove the per-row `Material` from node rows. `CustomInkWell` no longer wraps each row in its own `Material > Ink > InkWell`; instead `FolderViewContent` provides a single transparent `Material` once above the row list, and every row's ink (splash / highlight) paints onto that shared surface. Profiling a large tree under fling scroll showed the per-row Material crossed the 16 ms frame budget noticeably more often than the shared-Material variant. Ripple, hover, highlight, and selection are visually unchanged; the public `FolderView` API is unchanged (`CustomInkWell` is an internal row primitive and now requires an ancestor `Material` by design).
+
 ## 0.10.0
 
 - **BREAKING**: Bump `just_tooltip` to `^0.3.0`. Its `JustTooltipController` — re-exported here and usable via `NodeTooltipTheme.controller` — is no longer a `ChangeNotifier`: `shouldShow` and `addListener` / `removeListener` / `dispose` are removed. Drive it with `show()` / `hide()` / `toggle()` and observe visibility via the tooltip's `onShow` / `onHide` callbacks. `just_tooltip` also narrowed its exports (`JustTooltipPositionDelegate`, `TooltipShapePainter`, `JustTooltipOverlay` are now internal). No `flutter_folderview` API changed.
