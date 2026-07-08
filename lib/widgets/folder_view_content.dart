@@ -319,56 +319,67 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       ],
     );
 
-    return MouseRegion(
-      onEnter: (_) => _isHover.value = true,
-      onExit: (_) => _isHover.value = false,
-      child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-        child: Stack(
-          children: [
-            // ListView directly — no SingleChildScrollView wrapper.
-            // Horizontal offset is applied per-item via Transform.translate.
-            ClipRect(child: listView),
+    // The single shared ink surface for every row. Rows (CustomInkWell) no
+    // longer carry their own Material — they paint onto this one ancestor.
+    // Transparent so it contributes no background/elevation of its own; it
+    // exists purely to host InkWell splashes/highlights. This is the other
+    // half of the per-row-Material removal and must not be dropped, or Ink in
+    // the rows will assert for lack of a Material ancestor.
+    return Material(
+      type: MaterialType.transparency,
+      child: MouseRegion(
+        onEnter: (_) => _isHover.value = true,
+        onExit: (_) => _isHover.value = false,
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+          child: Stack(
+            children: [
+              // ListView directly — no SingleChildScrollView wrapper.
+              // Horizontal offset is applied per-item via Transform.translate.
+              ClipRect(child: listView),
 
-            // Hidden SingleChildScrollView to keep horizontalController
-            // attached to a ScrollPosition (required for synced scrollbar).
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: 0,
-              child: SingleChildScrollView(
-                controller: widget.horizontalController,
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(width: widget.contentWidth),
-              ),
-            ),
-
-            /// Vertical scrollbar — only rebuilds when hover state changes
-            if (widget.needsVerticalScroll)
-              ValueListenableBuilder<bool>(
-                valueListenable: _isHover,
-                builder: (context, isHover, _) => FolderViewVerticalScrollbar(
-                  isHover: isHover,
-                  verticalScrollbarController: widget.verticalBarController,
-                  contentHeight: widget.contentHeight,
-                  needsHorizontalScroll: widget.needsHorizontalScroll,
-                  scrollbarTheme: widget.theme.scrollbarTheme,
+              // Hidden SingleChildScrollView to keep horizontalController
+              // attached to a ScrollPosition (required for synced scrollbar).
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 0,
+                child: SingleChildScrollView(
+                  controller: widget.horizontalController,
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(width: widget.contentWidth),
                 ),
               ),
 
-            /// Horizontal scrollbar — only rebuilds when hover state changes
-            if (widget.needsHorizontalScroll)
-              ValueListenableBuilder<bool>(
-                valueListenable: _isHover,
-                builder: (context, isHover, _) => FolderViewHorizontalScrollbar(
-                  isHover: isHover,
-                  horizontalScrollbarController: widget.horizontalBarController,
-                  contentWidth: widget.contentWidth,
-                  scrollbarTheme: widget.theme.scrollbarTheme,
+              /// Vertical scrollbar — only rebuilds when hover state changes
+              if (widget.needsVerticalScroll)
+                ValueListenableBuilder<bool>(
+                  valueListenable: _isHover,
+                  builder: (context, isHover, _) => FolderViewVerticalScrollbar(
+                    isHover: isHover,
+                    verticalScrollbarController: widget.verticalBarController,
+                    contentHeight: widget.contentHeight,
+                    needsHorizontalScroll: widget.needsHorizontalScroll,
+                    scrollbarTheme: widget.theme.scrollbarTheme,
+                  ),
                 ),
-              ),
-          ],
+
+              /// Horizontal scrollbar — only rebuilds when hover state changes
+              if (widget.needsHorizontalScroll)
+                ValueListenableBuilder<bool>(
+                  valueListenable: _isHover,
+                  builder: (context, isHover, _) =>
+                      FolderViewHorizontalScrollbar(
+                    isHover: isHover,
+                    horizontalScrollbarController:
+                        widget.horizontalBarController,
+                    contentWidth: widget.contentWidth,
+                    scrollbarTheme: widget.theme.scrollbarTheme,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
