@@ -135,6 +135,43 @@ void main() {
     );
   });
 
+  // The card is anchored at the pointer, never at the row's rect. A row is as
+  // wide as the tree's content, so its centre leaves the viewport as soon as
+  // the view scrolls horizontally — a card anchored there would be unreachable.
+  group('the card is anchored at the pointer', () {
+    testWidgets('on a row narrower than the viewport', (tester) async {
+      await pump(tester, rowTooltipBuilder: cardForChild);
+
+      final label = tester.getRect(find.text('a.pdf'));
+      expect(label.width, lessThan(400));
+
+      final gesture = await mouse(tester);
+      await gesture.moveTo(Offset(320, label.center.dy));
+      await tester.pumpAndSettle();
+
+      final card = tester.getRect(find.byKey(const Key('card')));
+      expect(card.center.dx, moreOrLessEquals(320, epsilon: 0.5));
+    });
+
+    testWidgets('on a row wider than the viewport', (tester) async {
+      await pump(tester, label: longLabel, rowTooltipBuilder: cardForChild);
+
+      final label = tester.getRect(find.text(longLabel));
+      expect(label.width, greaterThan(400),
+          reason: 'the row really did outgrow its 400px viewport');
+
+      final gesture = await mouse(tester);
+      await gesture.moveTo(Offset(120, label.center.dy));
+      await tester.pumpAndSettle();
+
+      final card = tester.getRect(find.byKey(const Key('card')));
+      expect(card.center.dx, moreOrLessEquals(120, epsilon: 0.5),
+          reason: 'the card follows the cursor');
+      expect(card.center.dx, isNot(moreOrLessEquals(label.center.dx, epsilon: 1)),
+          reason: 'and emphatically not the off-screen centre of the row');
+    });
+  });
+
   // Coexistence. `just_tooltip` suppresses an ancestor tooltip whenever a
   // descendant one contains the pointer, so exactly one is ever visible: the
   // innermost. These tests characterise that, they do not implement it.
