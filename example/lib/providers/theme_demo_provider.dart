@@ -269,6 +269,10 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(tooltipDirection: direction);
   }
 
+  void setTooltipAnchor(TooltipAnchor anchor) {
+    state = state.copyWith(tooltipAnchor: anchor);
+  }
+
   void setTooltipAlignment(TooltipAlignment alignment) {
     state = state.copyWith(tooltipAlignment: alignment);
   }
@@ -618,6 +622,8 @@ class ThemeDemoViewModel {
   final bool childTooltipEnabled;
   final Color childTooltipBgColor;
   final TooltipDirection tooltipDirection;
+
+  final TooltipAnchor tooltipAnchor;
   final TooltipAlignment tooltipAlignment;
   final double tooltipOffset;
   final double tooltipElevation;
@@ -744,6 +750,7 @@ class ThemeDemoViewModel {
     this.childTooltipEnabled = true,
     this.childTooltipBgColor = const Color(0xFF424242),
     this.tooltipDirection = TooltipDirection.top,
+    this.tooltipAnchor = TooltipAnchor.child,
     this.tooltipAlignment = TooltipAlignment.center,
     this.tooltipOffset = 8.0,
     this.tooltipElevation = 4.0,
@@ -835,6 +842,7 @@ class ThemeDemoViewModel {
     bool? childTooltipEnabled,
     Color? childTooltipBgColor,
     TooltipDirection? tooltipDirection,
+    TooltipAnchor? tooltipAnchor,
     TooltipAlignment? tooltipAlignment,
     double? tooltipOffset,
     double? tooltipElevation,
@@ -924,6 +932,7 @@ class ThemeDemoViewModel {
       childTooltipEnabled: childTooltipEnabled ?? this.childTooltipEnabled,
       childTooltipBgColor: childTooltipBgColor ?? this.childTooltipBgColor,
       tooltipDirection: tooltipDirection ?? this.tooltipDirection,
+      tooltipAnchor: tooltipAnchor ?? this.tooltipAnchor,
       tooltipAlignment: tooltipAlignment ?? this.tooltipAlignment,
       tooltipOffset: tooltipOffset ?? this.tooltipOffset,
       tooltipElevation: tooltipElevation ?? this.tooltipElevation,

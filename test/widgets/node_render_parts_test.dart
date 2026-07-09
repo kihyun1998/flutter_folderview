@@ -67,6 +67,57 @@ void main() {
       );
       expect(find.byType(JustTooltip), findsOneWidget);
     });
+
+    testWidgets('anchors to the child rect when anchor is left unset',
+        (tester) async {
+      await pump(
+        tester,
+        wrapWithNodeTooltip<String>(
+          child: const Text('content'),
+          tooltipTheme:
+              const NodeTooltipTheme<String>(useTooltip: true, message: 'hi'),
+          node: node,
+        ),
+      );
+      final tooltip = tester.widget<JustTooltip>(find.byType(JustTooltip));
+      expect(tooltip.anchor, TooltipAnchor.child);
+    });
+
+    testWidgets('forwards anchor to the JustTooltip it builds', (tester) async {
+      await pump(
+        tester,
+        wrapWithNodeTooltip<String>(
+          child: const Text('content'),
+          tooltipTheme: const NodeTooltipTheme<String>(
+            useTooltip: true,
+            message: 'hi',
+            anchor: TooltipAnchor.pointer,
+          ),
+          node: node,
+        ),
+      );
+      final tooltip = tester.widget<JustTooltip>(find.byType(JustTooltip));
+      expect(tooltip.anchor, TooltipAnchor.pointer);
+    });
+
+    testWidgets('forwards anchor on the tooltipBuilder path too',
+        (tester) async {
+      await pump(
+        tester,
+        wrapWithNodeTooltip<String>(
+          child: const Text('content'),
+          tooltipTheme: NodeTooltipTheme<String>(
+            useTooltip: true,
+            anchor: TooltipAnchor.pointer,
+            tooltipBuilder: (context) => const Text('tip'),
+          ),
+          node: node,
+        ),
+      );
+      final tooltip = tester.widget<JustTooltip>(find.byType(JustTooltip));
+      expect(tooltip.anchor, TooltipAnchor.pointer);
+      expect(tooltip.message, isNull);
+    });
   });
 
   group('NodeIconBox', () {

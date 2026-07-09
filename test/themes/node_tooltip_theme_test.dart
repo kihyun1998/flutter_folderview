@@ -2,12 +2,26 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('NodeTooltipTheme.anchor', () {
+    test('defaults to the child rect', () {
+      const theme = NodeTooltipTheme<String>();
+      expect(theme.anchor, TooltipAnchor.child);
+    });
+  });
+
   group('NodeTooltipTheme.copyWith', () {
     test('replaces one field and preserves the rest', () {
       const base = NodeTooltipTheme<String>(useTooltip: true, offset: 8);
       final copy = base.copyWith(offset: 20);
       expect(copy.offset, 20);
       expect(copy.useTooltip, isTrue); // preserved
+    });
+
+    test('replaces anchor and preserves it across a no-arg copy', () {
+      const base = NodeTooltipTheme<String>();
+      final copy = base.copyWith(anchor: TooltipAnchor.pointer);
+      expect(copy.anchor, TooltipAnchor.pointer);
+      expect(copy.copyWith().anchor, TooltipAnchor.pointer);
     });
 
     test('no-arg copyWith preserves values', () {
@@ -38,6 +52,13 @@ void main() {
       expect(NodeTooltipTheme.lerp(a, b, 0.25).message, 'A');
       expect(NodeTooltipTheme.lerp(a, b, 0.75).message, 'B');
       expect(NodeTooltipTheme.lerp(a, b, 0.75).useTooltip, isTrue);
+    });
+
+    test('snaps anchor at the midpoint rather than interpolating', () {
+      const a = NodeTooltipTheme<String>(anchor: TooltipAnchor.child);
+      const b = NodeTooltipTheme<String>(anchor: TooltipAnchor.pointer);
+      expect(NodeTooltipTheme.lerp(a, b, 0.49).anchor, TooltipAnchor.child);
+      expect(NodeTooltipTheme.lerp(a, b, 0.5).anchor, TooltipAnchor.pointer);
     });
 
     test('handles null a / null b / both null', () {
