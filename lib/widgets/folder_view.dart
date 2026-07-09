@@ -56,6 +56,22 @@ class FolderView<T> extends StatefulWidget {
   /// when [onScaleChanged] is non-null, and disabled otherwise.
   final bool? blockModifierScroll;
 
+  /// Builds a card shown while the pointer is anywhere over a Node's rendered
+  /// row. Return `null` for a Node that should not have one.
+  ///
+  /// Distinct from the per-Tier label tooltip on `NodeTooltipTheme`, which
+  /// attaches to the Node's icon-and-label content and explains the label. This
+  /// one attaches to the whole row and explains the Node.
+  ///
+  /// The card is anchored at the pointer: a row is as wide as the tree's
+  /// content, which can exceed the viewport, so anchoring to the row's rect
+  /// would aim at a centre that is off screen once the view scrolls
+  /// horizontally.
+  ///
+  /// The card supplies its own surface, so the tooltip around it draws no
+  /// background, padding, or elevation of its own.
+  final Widget? Function(BuildContext context, Node<T> node)? rowTooltipBuilder;
+
   const FolderView({
     super.key,
     required this.data,
@@ -70,6 +86,7 @@ class FolderView<T> extends StatefulWidget {
     this.onScaleChanged,
     this.scaleStep = 0.05,
     this.blockModifierScroll,
+    this.rowTooltipBuilder,
   }) : assert(scale > 0, 'scale must be greater than 0');
 
   @override
@@ -175,6 +192,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               onSecondaryNodeTap: widget.onSecondaryNodeTap,
               selectedNodeIds: widget.selectedNodeIds,
               expandedNodeIds: widget.expandedNodeIds,
+              rowTooltipBuilder: widget.rowTooltipBuilder,
               contentWidth: contentWidth,
               contentHeight: contentHeight,
               needsHorizontalScroll: needsHorizontalScroll,
