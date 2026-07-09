@@ -22,6 +22,23 @@ class NodeTooltipTheme<T> {
   /// Alignment of the tooltip relative to the anchor (start, center, end)
   final TooltipAlignment alignment;
 
+  /// What the tooltip is anchored to: the child's rect, or the pointer.
+  ///
+  /// The tooltip attaches to the node's icon-and-label content, not to the
+  /// whole rendered row. A label long enough to ellipsize has consumed all the
+  /// width available to it, so its rect spans the row — and a tooltip anchored
+  /// to that rect appears at its centre, which can be far from where the user
+  /// is actually pointing. [TooltipAnchor.pointer] keeps the same hover region
+  /// but places the tooltip at the cursor instead.
+  ///
+  /// The anchor is captured when the tooltip is shown and does not follow the
+  /// pointer, so [interactive] tooltips stay reachable. Tap-triggered tooltips
+  /// anchor at the tap; a [controller]-driven show with no pointer present
+  /// falls back to the child's rect. Against a point there are no target edges
+  /// to align to, so [alignment] then selects which of the tooltip's *own*
+  /// edges lands on the pointer.
+  final TooltipAnchor anchor;
+
   /// Offset from the widget
   final double offset;
 
@@ -130,6 +147,7 @@ class NodeTooltipTheme<T> {
     this.useTooltip = false,
     this.direction = TooltipDirection.top,
     this.alignment = TooltipAlignment.center,
+    this.anchor = TooltipAnchor.child,
     this.offset = 8.0,
     this.crossAxisOffset = 0.0,
     this.message,
@@ -171,6 +189,7 @@ class NodeTooltipTheme<T> {
     bool? useTooltip,
     TooltipDirection? direction,
     TooltipAlignment? alignment,
+    TooltipAnchor? anchor,
     double? offset,
     double? crossAxisOffset,
     String? message,
@@ -210,6 +229,7 @@ class NodeTooltipTheme<T> {
       useTooltip: useTooltip ?? this.useTooltip,
       direction: direction ?? this.direction,
       alignment: alignment ?? this.alignment,
+      anchor: anchor ?? this.anchor,
       offset: offset ?? this.offset,
       crossAxisOffset: crossAxisOffset ?? this.crossAxisOffset,
       message: message ?? this.message,
@@ -264,6 +284,7 @@ class NodeTooltipTheme<T> {
       useTooltip: t < 0.5 ? a.useTooltip : b.useTooltip,
       direction: t < 0.5 ? a.direction : b.direction,
       alignment: t < 0.5 ? a.alignment : b.alignment,
+      anchor: t < 0.5 ? a.anchor : b.anchor,
       offset: lerpDouble(a.offset, b.offset, t) ?? 8.0,
       crossAxisOffset:
           lerpDouble(a.crossAxisOffset, b.crossAxisOffset, t) ?? 0.0,

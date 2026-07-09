@@ -45,6 +45,7 @@ class ThemeDemoPage extends ConsumerWidget {
           message: 'Folder node',
           backgroundColor: vm.folderTooltipBgColor,
           direction: vm.tooltipDirection,
+          anchor: vm.tooltipAnchor,
           alignment: vm.tooltipAlignment,
           offset: vm.tooltipOffset,
           elevation: vm.tooltipElevation,
@@ -106,6 +107,7 @@ class ThemeDemoPage extends ConsumerWidget {
           message: 'Parent node',
           backgroundColor: vm.parentTooltipBgColor,
           direction: vm.tooltipDirection,
+          anchor: vm.tooltipAnchor,
           alignment: vm.tooltipAlignment,
           offset: vm.tooltipOffset,
           elevation: vm.tooltipElevation,
@@ -168,6 +170,7 @@ class ThemeDemoPage extends ConsumerWidget {
         tooltipTheme: NodeTooltipTheme<String>(
           useTooltip: vm.childTooltipEnabled,
           direction: vm.tooltipDirection,
+          anchor: vm.tooltipAnchor,
           alignment: vm.tooltipAlignment,
           offset: vm.tooltipOffset,
           elevation: vm.tooltipElevation,
@@ -745,6 +748,25 @@ class _ThemeControls extends StatelessWidget {
               onSelected: (s) => s
                   ? notifier.setTooltipDirection(TooltipDirection.right)
                   : null,
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        const Text('Anchor', style: TextStyle(fontSize: 12)),
+        Wrap(
+          spacing: 4,
+          children: [
+            ChoiceChip(
+              label: const Text('Child rect', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipAnchor == TooltipAnchor.child,
+              onSelected: (s) =>
+                  s ? notifier.setTooltipAnchor(TooltipAnchor.child) : null,
+            ),
+            ChoiceChip(
+              label: const Text('Pointer', style: TextStyle(fontSize: 12)),
+              selected: vm.tooltipAnchor == TooltipAnchor.pointer,
+              onSelected: (s) =>
+                  s ? notifier.setTooltipAnchor(TooltipAnchor.pointer) : null,
             ),
           ],
         ),

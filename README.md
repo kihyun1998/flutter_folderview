@@ -6,7 +6,7 @@ A customizable Flutter widget for displaying hierarchical data in tree and folde
 
 ```yaml
 dependencies:
-  flutter_folderview: ^0.10.2
+  flutter_folderview: ^0.11.0
 ```
 
 ## Basic Usage
@@ -201,6 +201,7 @@ FolderView(
 | `tooltipBuilderResolver` | `Function?` | Node-specific tooltip widget resolver |
 | `direction` | `TooltipDirection` | Position: `top`, `bottom`, `left`, `right` |
 | `alignment` | `TooltipAlignment` | Alignment: `start`, `center`, `end`, `startTargetCenter`, `endTargetCenter` |
+| `anchor` | `TooltipAnchor` | Anchor the tooltip to the row's rect or the cursor: `child` (default), `pointer` |
 | `offset` | `double` | Distance from widget (default: `8.0`) |
 | `crossAxisOffset` | `double` | Cross-axis offset (default: `0.0`) |
 | `backgroundColor` | `Color?` | Background color |
@@ -231,6 +232,24 @@ FolderView(
 | `slideOffset` | `double?` | Slide distance as fraction of tooltip size (default: `0.3`) |
 | `rotationBegin` | `double?` | Starting rotation in turns (default: `-0.05`) |
 | `hideOnEmptyMessage` | `bool?` | Suppress tooltip when message is empty (default: `true`) |
+
+### Anchoring to the cursor
+
+A node's tooltip attaches to its icon-and-label content, not to the whole rendered row. A label long enough to ellipsize has consumed all the width available to it, so its rect spans the row — and a tooltip anchored to that rect appears at its centre, which can be far from where the user is actually pointing. `TooltipAnchor.pointer` keeps the same hover region but places the tooltip at the cursor:
+
+```dart
+NodeTooltipTheme(
+  useTooltip: true,
+  message: 'Report.pdf',
+  anchor: TooltipAnchor.pointer, // default: TooltipAnchor.child
+)
+```
+
+The anchor is captured when the tooltip is shown and does not follow the pointer, so `interactive` tooltips stay reachable. Tap-triggered tooltips anchor at the tap, and a `controller`-driven show with no pointer present falls back to the label's rect.
+
+Against a point there are no target edges to align to, so under `TooltipAnchor.pointer` the `alignment` field selects which of the tooltip's *own* edges lands on the pointer.
+
+Note that `anchor` does not widen the hover region. A short label occupies only the left part of its row, and the space to its right raises no tooltip under either anchor. Making the whole row hoverable is tracked separately in [#44](https://github.com/kihyun1998/flutter_folderview/issues/44).
 
 ## Example
 

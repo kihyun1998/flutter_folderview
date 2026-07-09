@@ -115,6 +115,7 @@ Widget wrapWithNodeTooltip<T>({
   return JustTooltip(
     direction: tooltipTheme.direction,
     alignment: tooltipTheme.alignment,
+    anchor: tooltipTheme.anchor,
     offset: tooltipTheme.offset,
     crossAxisOffset: tooltipTheme.crossAxisOffset,
     screenMargin: tooltipTheme.screenMargin ?? 8.0,
