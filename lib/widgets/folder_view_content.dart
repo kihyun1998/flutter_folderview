@@ -9,6 +9,7 @@ import '../services/flattener.dart';
 import '../services/scroll_anchor.dart';
 import '../services/size_service.dart';
 import '../themes/flutter_folder_view_theme.dart';
+import '../themes/row_tooltip_theme.dart';
 import 'folder_view_horizontal_scrollbar.dart';
 import 'folder_view_vertical_scrollbar.dart';
 import 'node_widget.dart';
@@ -37,6 +38,9 @@ class FolderViewContent<T> extends StatefulWidget {
 
   /// Builds the row card. See `FolderView.rowTooltipBuilder`.
   final Widget? Function(BuildContext context, Node<T> node)? rowTooltipBuilder;
+
+  /// Styles the row card. See `FolderView.rowTooltipTheme`.
+  final RowTooltipTheme? rowTooltipTheme;
 
   final FlutterFolderViewTheme<T> theme;
 
@@ -68,6 +72,7 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.selectedNodeIds,
     this.expandedNodeIds,
     this.rowTooltipBuilder,
+    this.rowTooltipTheme,
     required this.theme,
     this.scale = 1.0,
     this.blockModifierScroll = true,
@@ -254,17 +259,39 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   /// suppresses an ancestor whenever a descendant tooltip contains the pointer,
   /// so exactly one is visible: the innermost under the cursor.
   ///
-  /// The card draws its own surface, so the tooltip contributes no background,
-  /// padding, or elevation.
+  /// Everything else comes from `FolderView.rowTooltipTheme`, whose surface
+  /// defaults to [JustTooltipTheme.bare] because a card draws its own.
+  ///
+  /// The anchor is the one knob the theme does not expose: it is always the
+  /// pointer, for the reason above.
   Widget _wrapWithRowTooltip(Widget row, Node<T> node) {
     final builder = widget.rowTooltipBuilder;
     if (builder == null) return row;
     final card = builder(context, node);
     if (card == null) return row;
 
+    final t = widget.rowTooltipTheme ?? const RowTooltipTheme();
     return JustTooltip(
       anchor: TooltipAnchor.pointer,
-      theme: const JustTooltipTheme.bare(),
+      direction: t.direction,
+      alignment: t.alignment,
+      offset: t.offset,
+      crossAxisOffset: t.crossAxisOffset,
+      screenMargin: t.screenMargin,
+      theme: t.surface,
+      interactive: t.interactive,
+      waitDuration: t.waitDuration,
+      showDuration: t.showDuration,
+      enableHover: t.enableHover,
+      animation: t.animation,
+      animationCurve: t.animationCurve,
+      animationDuration: t.animationDuration,
+      fadeBegin: t.fadeBegin,
+      scaleBegin: t.scaleBegin,
+      slideOffset: t.slideOffset,
+      rotationBegin: t.rotationBegin,
+      onShow: t.onShow,
+      onHide: t.onHide,
       tooltipBuilder: (_) => card,
       child: row,
     );

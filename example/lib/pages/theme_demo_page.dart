@@ -304,6 +304,11 @@ class ThemeDemoPage extends ConsumerWidget {
                     rowTooltipBuilder: vm.rowTooltipEnabled
                         ? _buildRowCard
                         : null,
+                    // Without a wait, sweeping the mouse across the tree pops a
+                    // card on every row it crosses.
+                    rowTooltipTheme: const RowTooltipTheme(
+                      waitDuration: Duration(milliseconds: 300),
+                    ),
                     onScaleChanged: (newScale) {
                       notifier.setScale(newScale.clamp(0.5, 3.0));
                     },
