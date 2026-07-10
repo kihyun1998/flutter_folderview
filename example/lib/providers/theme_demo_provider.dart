@@ -2,21 +2,34 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/theme_demo_data.dart';
 
-part 'theme_demo_provider.g.dart';
+/// Holds the demo's view model and rebuilds the page when it changes.
+///
+/// A plain [ChangeNotifier], not a state-management package: the example is
+/// what a reader copies from, and `flutter_folderview` needs no such package.
+/// One shipped here would read as a dependency of the widget.
+///
+/// The `state` getter/setter pair exists so the ~60 setters below can keep
+/// writing `state = state.copyWith(...)` — the shape they had as a Riverpod
+/// notifier, and the shape that reads best.
+class ThemeDemoState extends ChangeNotifier {
+  ThemeDemoState()
+    : _state = ThemeDemoViewModel(
+        nodes: getThemeDemoData(),
+        selectedIds: {},
+        expandedIds: {'1', '1-1', '2', '2-1', '2-2', '3'},
+      );
 
-@riverpod
-class ThemeDemoState extends _$ThemeDemoState {
-  @override
-  ThemeDemoViewModel build() {
-    return ThemeDemoViewModel(
-      nodes: getThemeDemoData(),
-      selectedIds: {},
-      expandedIds: {'1', '1-1', '2', '2-1', '2-2', '3'},
-    );
+  ThemeDemoViewModel _state;
+
+  ThemeDemoViewModel get state => _state;
+
+  set state(ThemeDemoViewModel next) {
+    if (identical(next, _state)) return;
+    _state = next;
+    notifyListeners();
   }
 
   // Node interactions

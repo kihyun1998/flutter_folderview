@@ -1,6 +1,5 @@
 import 'package:example/main.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -19,7 +18,7 @@ void main() {
   testWidgets('the demo boots and renders a FolderView with node rows', (
     tester,
   ) async {
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpWidget(const MyApp());
     await tester.pumpAndSettle();
 
     final folderView = find.byType(FolderView<String>);

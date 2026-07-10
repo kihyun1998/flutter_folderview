@@ -2,12 +2,5 @@ include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
-    - missing_provider_scope: false
     - prefer_const_constructors
     - prefer_const_declarations
-
-analyzer:
-  errors:
-    invalid_annotation_target: ignore
-  exclude:
-    - "**/*.g.dart"

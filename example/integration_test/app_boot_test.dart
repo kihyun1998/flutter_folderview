@@ -1,6 +1,5 @@
 import 'package:example/main.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -10,12 +9,12 @@ void main() {
   testWidgets('example app boots and renders a FolderView with a node row', (
     tester,
   ) async {
-    // Boot the real example widget tree (ProviderScope + MyApp + ThemeDemoPage)
+    // Boot the real example widget tree (MyApp + ThemeDemoPage)
     // directly, rather than calling the example's main(). main() runs the
     // Windows-only window_manager setup, which needs a real platform channel;
     // MyApp is the pure MaterialApp + ThemeDemoPage tree with no platform calls,
     // so it boots headlessly under the integration binding.
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpWidget(const MyApp());
     await tester.pumpAndSettle();
 
     final folderView = find.byType(FolderView<String>);

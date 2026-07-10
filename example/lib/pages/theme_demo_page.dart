@@ -1,17 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/theme_demo_provider.dart';
 
-class ThemeDemoPage extends ConsumerWidget {
+class ThemeDemoPage extends StatefulWidget {
   const ThemeDemoPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final vm = ref.watch(themeDemoStateProvider);
-    final notifier = ref.read(themeDemoStateProvider.notifier);
+  State<ThemeDemoPage> createState() => _ThemeDemoPageState();
+}
 
+class _ThemeDemoPageState extends State<ThemeDemoPage> {
+  final ThemeDemoState _notifier = ThemeDemoState();
+
+  @override
+  void dispose() {
+    _notifier.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: _notifier,
+      builder: (context, _) => _build(context, _notifier.state, _notifier),
+    );
+  }
+
+  Widget _build(
+    BuildContext context,
+    ThemeDemoViewModel vm,
+    ThemeDemoState notifier,
+  ) {
     final theme = FlutterFolderViewTheme<String>(
       lineTheme: FolderViewLineTheme(
         lineColor: vm.lineColor,
