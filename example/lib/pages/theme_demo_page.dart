@@ -1215,29 +1215,34 @@ class _ThemeControls extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isHuge
-                        ? Colors.red.shade100
-                        : isLarge
-                        ? Colors.orange.shade100
-                        : Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '~${formatNumber(estimated)} nodes',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                // The panel is a fixed 350px wide, so a long node count (e.g.
+                // "~1,000,000 nodes") overflows this Row. Let the badge shrink.
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
                       color: isHuge
-                          ? Colors.red.shade700
+                          ? Colors.red.shade100
                           : isLarge
-                          ? Colors.orange.shade700
-                          : Colors.blue.shade700,
+                          ? Colors.orange.shade100
+                          : Colors.blue.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '~${formatNumber(estimated)} nodes',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: isHuge
+                            ? Colors.red.shade700
+                            : isLarge
+                            ? Colors.orange.shade700
+                            : Colors.blue.shade700,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),

@@ -1,30 +1,38 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:example/main.dart';
+import 'package:flutter_folderview/flutter_folderview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:example/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  // Replaces the `flutter create` counter smoke test, which asserted a counter
+  // this app has never had and had therefore failed since the example was
+  // added. Nobody saw it: CI's example job runs `flutter analyze`, never
+  // `flutter test`.
+  //
+  // `integration_test/app_boot_test.dart` asserts the same thing against a real
+  // desktop build. This is the cheap gate — it runs under `flutter test` in
+  // seconds and guards the widget tree rather than the platform.
+  //
+  // MyApp is the pure MaterialApp + ThemeDemoPage tree. The example's `main()`
+  // additionally runs the Windows-only window_manager setup, which needs a real
+  // platform channel and cannot be pumped here.
+  testWidgets('the demo boots and renders a FolderView with node rows', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpAndSettle();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    final folderView = find.byType(FolderView<String>);
+    expect(folderView, findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // The seeded demo data's first root folder. Proves a row actually rendered,
+    // rather than the view being present but empty.
+    expect(
+      find.descendant(
+        of: folderView,
+        matching: find.text('Theme System Architecture'),
+      ),
+      findsOneWidget,
+    );
   });
 }

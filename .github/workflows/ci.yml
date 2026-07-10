@@ -71,3 +71,11 @@ jobs:
       - name: Analyze
         run: flutter analyze
         working-directory: example
+      # Runs example/test only. integration_test/ is excluded here (see the
+      # note at the top of this file): it builds and launches a real desktop
+      # app. Without this step the example's widget test can fail unnoticed --
+      # its `flutter create` counter smoke test was red from the day the
+      # example landed.
+      - name: Test
+        run: flutter test
+        working-directory: example
