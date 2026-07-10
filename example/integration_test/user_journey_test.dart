@@ -4,7 +4,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -21,7 +20,7 @@ void main() {
     tester,
   ) async {
     // Boot the real example widget tree (no main(); avoids window_manager).
-    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpWidget(const MyApp());
     await tester.pumpAndSettle();
     expect(folderView, findsOneWidget);
     expect(row('Theme System Architecture'), findsOneWidget);
