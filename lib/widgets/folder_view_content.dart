@@ -264,11 +264,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
 
     return JustTooltip(
       anchor: TooltipAnchor.pointer,
-      theme: const JustTooltipTheme(
-        padding: EdgeInsets.zero,
-        backgroundColor: Color(0x00000000),
-        elevation: 0.0,
-      ),
+      theme: const JustTooltipTheme.bare(),
       tooltipBuilder: (_) => card,
       child: row,
     );

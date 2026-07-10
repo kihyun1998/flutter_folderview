@@ -8,19 +8,23 @@ import 'package:flutter_test/flutter_test.dart';
 /// icon-and-label content. A row is laid out at the tree's content width, not
 /// the viewport's, and `Flexible` grows each label to fill its row. So the
 /// longest label's rect is the row's, and when the tree scrolls horizontally
-/// that rect, and its centre, run past the visible view.
+/// that rect runs past the visible view.
 ///
-/// Ellipsis is not the trigger, and does not happen here: the content width
-/// adapts to the longest label (up to 3x the viewport), so the label is laid
-/// out at full intrinsic width and merely scrolled out of sight. The condition
-/// is simply `contentWidth > viewportWidth`.
+/// Ellipsis is not involved, and does not happen here: the content width adapts
+/// to the longest label (up to 3x the viewport), so the label is laid out at
+/// full intrinsic width and merely scrolled out of sight.
 ///
-/// With the default [TooltipAnchor.child] the tooltip is therefore aimed at a
-/// centre outside the [FolderView], and drawn there. `screenMargin` does not
-/// save it: that clamps against the enclosing `Overlay`, which is the app's,
-/// not this view's box.
+/// This used to place the tooltip outside the [FolderView] (#47): the target
+/// was the label's whole rect, so [TooltipAnchor.child] aimed at a centre
+/// nobody could see, and `screenMargin` did not object because it clamps
+/// against the enclosing `Overlay` — the app's, not this view's box.
 ///
-/// See #47. Harness constraints are documented in
+/// `just_tooltip 0.4.2` targets the *visible* part of a clipped child, so the
+/// tooltip now lands inside the view. These tests hold that fixed. The exact
+/// coordinate is not asserted: the real clip is narrower than the view's box
+/// (a scrollbar gutter), and that width is not this test's concern.
+///
+/// Harness constraints are documented in
 /// `node_tooltip_anchor_placement_test.dart`.
 void main() {
   const double viewWidth = 400;
@@ -114,7 +118,7 @@ void main() {
         reason: 'the label is laid out at full intrinsic width, not truncated');
   });
 
-  testWidgets('with the default anchor the tooltip is painted outside the view',
+  testWidgets('the default anchor targets the visible part of the label',
       (tester) async {
     await pump(tester);
     final label = tester.getRect(find.text(longLabel));
@@ -122,9 +126,18 @@ void main() {
     await hoverInsideView(tester, label);
 
     final tip = tester.getRect(find.byKey(const Key('tip')));
-    expect(tip.left, greaterThan(view.right),
-        reason: 'the whole tooltip sits beyond the right edge of the '
-            'FolderView, over whatever the host app draws beside it');
+
+    expect(view.contains(tip.center), isTrue,
+        reason: 'the tooltip is drawn inside the FolderView, not over whatever '
+            'the host app renders beside it');
+    expect(tip.left, greaterThanOrEqualTo(view.left));
+    expect(tip.right, lessThanOrEqualTo(view.right));
+    expect(tip.center.dx, greaterThan(label.left),
+        reason: 'and it is aimed within the part of the label on screen');
+    expect(tip.center.dx, lessThan(view.right));
+    expect(tip.center.dx, isNot(moreOrLessEquals(label.center.dx, epsilon: 1)),
+        reason: 'the whole label rect, whose centre is off screen, is no '
+            'longer the target');
   });
 
   testWidgets('TooltipAnchor.pointer keeps the tooltip inside the view',
