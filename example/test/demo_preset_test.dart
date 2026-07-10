@@ -64,10 +64,14 @@ void main() {
       expect(bare.tooltipShowArrow, isFalse);
     });
 
+    // Characterization, not red→green: `copyWith` preserves what it is not
+    // given, so this passed the moment `bare` existed. It is kept because it
+    // pins the behaviour against a future `bare` written as "reset to a fresh
+    // view model". Confirmed to be a real guard: adding `genMaxDepth: 2` to
+    // `bare` kills this test and leaves the switch test above green.
     test('leaves the generated tree alone', () {
       // The node count is not what makes a demo bare, and a tree with nothing
-      // in it can demonstrate nothing. A `bare` implemented as "reset to a
-      // fresh view model" would pass the switch assertions above and fail here.
+      // in it can demonstrate nothing.
       final tuned = ThemeDemoViewModel(
         nodes: [
           const Node<String>(id: 'f1', label: 'Folder', type: NodeType.folder),
