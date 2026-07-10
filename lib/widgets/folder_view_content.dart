@@ -256,8 +256,11 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   /// screen once the view scrolls horizontally.
   ///
   /// A Node's label tooltip, if any, is nested inside this one. `just_tooltip`
-  /// suppresses an ancestor whenever a descendant tooltip contains the pointer,
-  /// so exactly one is visible: the innermost under the cursor.
+  /// suppresses an ancestor whenever a descendant tooltip that has something to
+  /// draw contains the pointer, so exactly one is visible: the innermost under
+  /// the cursor. Neither of ours is ever empty — a Node with no label tooltip
+  /// content is not wrapped at all, and nor is a row whose builder returns
+  /// `null` — so the innermost under the cursor is simply the innermost.
   ///
   /// Everything else comes from `FolderView.rowTooltipTheme`, whose surface
   /// defaults to [JustTooltipTheme.bare] because a card draws its own.
