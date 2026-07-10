@@ -27,8 +27,7 @@ void main() {
               label: 'parent-p',
               type: NodeType.parent,
               children: [
-                Node<String>(
-                    id: 'c0', label: childLabel, type: NodeType.child),
+                Node<String>(id: 'c0', label: childLabel, type: NodeType.child),
               ],
             ),
           ],
@@ -83,9 +82,10 @@ void main() {
     ));
   }
 
-  Widget? cardForChild(BuildContext context, Node<String> node) => node.id == 'c0'
-      ? const SizedBox(key: Key('card'), width: 100, height: 40)
-      : null;
+  Widget? cardForChild(BuildContext context, Node<String> node) =>
+      node.id == 'c0'
+          ? const SizedBox(key: Key('card'), width: 100, height: 40)
+          : null;
 
   Future<TestGesture> mouse(WidgetTester tester) async {
     final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
@@ -167,7 +167,8 @@ void main() {
       final card = tester.getRect(find.byKey(const Key('card')));
       expect(card.center.dx, moreOrLessEquals(120, epsilon: 0.5),
           reason: 'the card follows the cursor');
-      expect(card.center.dx, isNot(moreOrLessEquals(label.center.dx, epsilon: 1)),
+      expect(
+          card.center.dx, isNot(moreOrLessEquals(label.center.dx, epsilon: 1)),
           reason: 'and emphatically not the off-screen centre of the row');
     });
   });

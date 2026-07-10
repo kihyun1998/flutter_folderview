@@ -301,8 +301,9 @@ class ThemeDemoPage extends ConsumerWidget {
                     // The row card is declared once for the whole view, unlike
                     // the per-Tier label tooltips above. It draws its own
                     // surface, so it gets a real Card rather than bare text.
-                    rowTooltipBuilder:
-                        vm.rowTooltipEnabled ? _buildRowCard : null,
+                    rowTooltipBuilder: vm.rowTooltipEnabled
+                        ? _buildRowCard
+                        : null,
                     onScaleChanged: (newScale) {
                       notifier.setScale(newScale.clamp(0.5, 3.0));
                     },
@@ -377,15 +378,21 @@ class ThemeDemoPage extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(node.label,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              node.label,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
             Text('id: ${node.id}', style: const TextStyle(fontSize: 11)),
-            Text('tier: ${node.type.name}',
-                style: const TextStyle(fontSize: 11)),
+            Text(
+              'tier: ${node.type.name}',
+              style: const TextStyle(fontSize: 11),
+            ),
             if (node.children.isNotEmpty)
-              Text('children: ${node.children.length}',
-                  style: const TextStyle(fontSize: 11)),
+              Text(
+                'children: ${node.children.length}',
+                style: const TextStyle(fontSize: 11),
+              ),
           ],
         ),
       ),
@@ -701,8 +708,10 @@ class _ThemeControls extends StatelessWidget {
         SwitchListTile(
           dense: true,
           contentPadding: EdgeInsets.zero,
-          title: const Text('Row Tooltip (card)',
-              style: TextStyle(fontSize: 12)),
+          title: const Text(
+            'Row Tooltip (card)',
+            style: TextStyle(fontSize: 12),
+          ),
           subtitle: const Text(
             'Hover anywhere on a row. A Tier whose label tooltip is on will '
             'suppress it over the label.',
