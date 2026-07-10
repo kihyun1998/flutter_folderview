@@ -34,7 +34,10 @@ void main() {
         ),
       ];
 
-  /// A Child label long enough to ellipsize: its rect then spans the whole row.
+  /// A Child label long enough to make its row the widest in the tree. The row
+  /// is sized to it, and `Flexible` grows the label to fill the row — so this
+  /// label's rect *is* the row's. It is not truncated: inside a FolderView the
+  /// content width adapts to the longest label (up to 3x the viewport).
   const String longLabel =
       'a_very_long_report_filename_that_will_certainly_be_ellipsized.pdf';
 
@@ -213,11 +216,11 @@ void main() {
           reason: 'the pointer is outside the label, so only the row remains');
     });
 
-    // The trap. An ellipsized label consumed all the width available to it, so
-    // its rect spans the row. There is then no point on the row where the label
-    // tooltip does not contain the pointer — and it is the innermost. The row
-    // card is unreachable for that Node.
-    testWidgets('an ellipsized label leaves the row card nowhere to appear',
+    // The trap. The widest row is sized to its own label, and the label grows
+    // to fill it, so the label's rect spans the row. There is then no point on
+    // the row where the label tooltip does not contain the pointer — and it is
+    // the innermost. The row card is unreachable for that Node.
+    testWidgets('a row-spanning label leaves the row card nowhere to appear',
         (tester) async {
       await pump(
         tester,
