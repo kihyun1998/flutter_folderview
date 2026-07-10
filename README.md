@@ -172,12 +172,12 @@ FolderView(
 
 There are two, and they differ by where you declare them and what they explain.
 
-| | Declared on | Attaches to | Explains |
-|---|---|---|---|
-| **Label tooltip** | `NodeTooltipTheme`, per node type | The node's icon and label | The label — hover truncated text to read the rest |
-| **Row tooltip** | `FolderView.rowTooltipBuilder`, once | The whole rendered row | The node — a card of its details |
+| | Declared on | Styled by | Attaches to | Explains |
+|---|---|---|---|---|
+| **Label tooltip** | `NodeTooltipTheme`, per node type | the same object | The label's glyphs | The label — hover truncated text to read the rest |
+| **Row tooltip** | `FolderView.rowTooltipBuilder`, once | `FolderView.rowTooltipTheme` | The rest of the row | The node — a card of its details |
 
-Both can be enabled at once. Only one is ever visible: the innermost under the pointer. See [Row tooltip](#row-tooltip) for what that implies.
+**Enable both.** Only one is ever visible — the innermost under the pointer — and the label tooltip claims exactly the glyphs it explains, so the row card gets the indent, the icon, the expand chevron, and the space beside a short label. See [Row tooltip](#row-tooltip).
 
 ### Label tooltip
 

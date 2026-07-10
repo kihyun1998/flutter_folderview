@@ -6,7 +6,7 @@ import 'package:just_tooltip/just_tooltip.dart';
 /// Presentation and behaviour for the row card raised by
 /// `FolderView.rowTooltipBuilder`.
 ///
-/// Distinct from [NodeTooltipTheme], which styles a Tier's label tooltip.
+/// Distinct from `NodeTooltipTheme`, which styles a Tier's label tooltip.
 /// The two describe different things (see `FolderView.rowTooltipBuilder`) and
 /// deliberately do not share fields — see ADR-0005.
 ///
@@ -55,6 +55,10 @@ class RowTooltipTheme {
   /// Defaults to `true`. The card is anchored at the pointer, so it is drawn
   /// right beside the cursor and a small movement enters it; and a card is the
   /// kind of thing whose contents a user may want to reach.
+  ///
+  /// `NodeTooltipTheme.interactive` defaults to the opposite, and should: a
+  /// label tooltip explains text you read and then leave. Do not "fix" the
+  /// inconsistency — the two describe different things.
   final bool interactive;
 
   /// Delay before the card appears on hover. Null shows it immediately.

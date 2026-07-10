@@ -64,19 +64,23 @@ class FolderView<T> extends StatefulWidget {
   /// attaches to the Node's icon-and-label content and explains the label. This
   /// one attaches to the whole row and explains the Node.
   ///
-  /// The card is anchored at the pointer: a row is as wide as the tree's
-  /// content, which can exceed the viewport, so anchoring to the row's rect
-  /// would aim at a centre that is off screen once the view scrolls
-  /// horizontally.
+  /// The card is anchored at the pointer, and that is the one thing
+  /// [rowTooltipTheme] cannot change: a row is as wide as the tree's content,
+  /// which can exceed the viewport, so anchoring to the row's rect would aim at
+  /// a centre that is off screen once the view scrolls horizontally.
   ///
-  /// The card supplies its own surface, so the tooltip around it draws no
-  /// background, padding, or elevation of its own.
+  /// By default the tooltip draws no surface of its own — no background,
+  /// padding, or elevation — because a card draws one. Return a `Card`, not a
+  /// bare `Text`, or give [rowTooltipTheme] a `surface`.
   final Widget? Function(BuildContext context, Node<T> node)? rowTooltipBuilder;
 
-  /// Presentation and behaviour for the card built by [rowTooltipBuilder].
+  /// Presentation and behaviour for the card built by [rowTooltipBuilder]:
+  /// when it appears, whether the cursor may enter it, where it sits relative
+  /// to the pointer, how it animates, and whether the tooltip draws a surface
+  /// around it.
   ///
-  /// Null uses the defaults: shown immediately on hover, interactive, and
-  /// drawing no surface of its own.
+  /// Null means [RowTooltipTheme]'s defaults — shown immediately on hover,
+  /// interactive, and drawing no surface of its own.
   final RowTooltipTheme? rowTooltipTheme;
 
   const FolderView({
