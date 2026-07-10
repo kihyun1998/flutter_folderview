@@ -298,6 +298,11 @@ class ThemeDemoPage extends ConsumerWidget {
                     data: vm.nodes,
                     mode: vm.viewMode,
                     scale: vm.scale,
+                    // The row card is declared once for the whole view, unlike
+                    // the per-Tier label tooltips above. It draws its own
+                    // surface, so it gets a real Card rather than bare text.
+                    rowTooltipBuilder:
+                        vm.rowTooltipEnabled ? _buildRowCard : null,
                     onScaleChanged: (newScale) {
                       notifier.setScale(newScale.clamp(0.5, 3.0));
                     },
@@ -348,6 +353,41 @@ class ThemeDemoPage extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// The row card. Hovering anywhere on a row raises it — including the indent,
+  /// the chevron, and the empty space beside a short label.
+  ///
+  /// Returning null for a Node opts it out; here, Folders get no card.
+  ///
+  /// Note: a Tier whose label tooltip is enabled will suppress this card
+  /// wherever the label sits, because the innermost tooltip under the pointer
+  /// wins. An ellipsized label spans the whole row, so its Tier's card becomes
+  /// unreachable. Turn "Child Tooltip (Rich)" off to see the card on Children.
+  Widget? _buildRowCard(BuildContext context, Node<String> node) {
+    if (node.type == NodeType.folder) return null;
+    return Card(
+      margin: EdgeInsets.zero,
+      elevation: 6,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(node.label,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text('id: ${node.id}', style: const TextStyle(fontSize: 11)),
+            Text('tier: ${node.type.name}',
+                style: const TextStyle(fontSize: 11)),
+            if (node.children.isNotEmpty)
+              Text('children: ${node.children.length}',
+                  style: const TextStyle(fontSize: 11)),
+          ],
+        ),
       ),
     );
   }
@@ -656,6 +696,27 @@ class _ThemeControls extends StatelessWidget {
     return _buildSection(
       title: 'Tooltip',
       children: [
+        // Declared once for the whole view, so it sits above the per-Tier
+        // switches rather than among them.
+        SwitchListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Row Tooltip (card)',
+              style: TextStyle(fontSize: 12)),
+          subtitle: const Text(
+            'Hover anywhere on a row. A Tier whose label tooltip is on will '
+            'suppress it over the label.',
+            style: TextStyle(fontSize: 10),
+          ),
+          isThreeLine: true,
+          value: vm.rowTooltipEnabled,
+          onChanged: notifier.setRowTooltipEnabled,
+        ),
+        const Divider(),
+        const Text(
+          'Per-Tier label tooltips',
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        ),
         SwitchListTile(
           dense: true,
           contentPadding: EdgeInsets.zero,
