@@ -14,7 +14,7 @@ topics:
 
 # Raised from Dart 3.0.0 / Flutter 3.10.0 by just_tooltip 0.4.2, whose ancestor
 # clip walk reads `RenderObject.parent`. That was `AbstractNode?` — a type with
-# no `describeApproximatePaintClip` — until Flutter 3.13. Unchanged by 0.4.3.
+# no `describeApproximatePaintClip` — until Flutter 3.13. Unchanged by 0.4.4.
 environment:
   sdk: ">=3.1.0 <4.0.0"
   flutter: ">=3.13.0"
