@@ -83,6 +83,36 @@ void main() {
         reason: 'a card holds widgets the user may want to reach');
   });
 
+  // just_tooltip 0.4.2 armed a 100ms "hover bridge" when the cursor left the
+  // tooltip body, and re-entering the child did not cancel it: the bridge fired
+  // unseen, faded the card out, and a pointer already inside the child sends no
+  // further onEnter to revive it. The card vanished ~250ms after the cursor came
+  // home, a quarter second removed from its cause. An interactive,
+  // pointer-anchored card — ours — is drawn beside the cursor, so the round trip
+  // is easy to make by accident. Fixed upstream in 0.4.3.
+  testWidgets('the card survives the cursor returning from it to the row',
+      (tester) async {
+    await pump(tester);
+    final row = tester.getRect(find.text('folder-f'));
+    final onRow = Offset(300, row.center.dy);
+    final g = await mouse(tester);
+
+    await g.moveTo(onRow);
+    await tester.pumpAndSettle();
+    await g.moveTo(tester.getRect(find.byKey(const Key('card'))).center);
+    await tester.pumpAndSettle();
+
+    await g.moveTo(onRow);
+    await tester.pump();
+    expect(shown(), isTrue, reason: 'still on screen; the bridge is pending');
+
+    // Long enough for the bridge (100ms) and the fade (150ms) to have run.
+    await tester.pump(const Duration(milliseconds: 450));
+    await tester.pumpAndSettle();
+    expect(shown(), isTrue,
+        reason: 'the pointer is over the row, so the card belongs on screen');
+  });
+
   testWidgets('interactive: false — the card leaves with the pointer',
       (tester) async {
     await pump(
