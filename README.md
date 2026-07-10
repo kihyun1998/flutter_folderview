@@ -262,7 +262,7 @@ Against a point there are no target edges to align to, so under `TooltipAnchor.p
 
 Note that `anchor` does not widen the hover region. A short label occupies only the left part of its row, and the space to its right raises no tooltip under either anchor. To make the whole row hoverable, use the row tooltip below.
 
-**Known issue.** When a tree is wide enough to scroll horizontally, a long label's rect extends past the visible `FolderView`, and so does its centre. Under the default `TooltipAnchor.child` the tooltip is aimed there and drawn outside the view — over whatever your app renders beside it. Use `TooltipAnchor.pointer`, whose anchor is the cursor and therefore always inside the view. Tracked in [#47](https://github.com/kihyun1998/flutter_folderview/issues/47).
+When a tree is wide enough to scroll horizontally, a long label's rect extends past the visible `FolderView`. `TooltipAnchor.child` aims at the centre of the part still on screen, so the tooltip stays inside the view.
 
 ## Row tooltip
 
