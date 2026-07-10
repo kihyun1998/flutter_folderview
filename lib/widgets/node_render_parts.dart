@@ -45,8 +45,9 @@ class NodeIconBox extends StatelessWidget {
   }
 }
 
-/// The shared "icon + label" content, left-aligned and wrapped in the tier's
-/// tooltip. Used by both the Child and Expandable renderers.
+/// The shared "icon + label" content, left-aligned. The tier's label tooltip
+/// wraps the glyphs alone — see [build]. Used by the Child and Expandable
+/// renderers.
 class NodeLabel<T> extends StatelessWidget {
   final Widget iconBox;
   final String label;
@@ -67,22 +68,27 @@ class NodeLabel<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: AlignmentDirectional.centerStart,
-      child: wrapWithNodeTooltip<T>(
-        tooltipTheme: tooltipTheme,
-        node: node,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            iconBox,
-            Flexible(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          iconBox,
+          Flexible(
+            // The tooltip wraps the glyphs, not the icon and not the box
+            // [Flexible] grows to fill. A label tooltip explains the label, so
+            // the label is its hover region; everything else on the row is left
+            // free for `FolderView.rowTooltipBuilder`, which nests outside this
+            // one and is suppressed wherever this one contains the pointer.
+            child: wrapWithNodeTooltip<T>(
+              tooltipTheme: tooltipTheme,
+              node: node,
               child: Text(
                 label,
                 style: style,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

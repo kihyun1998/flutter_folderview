@@ -91,7 +91,7 @@ void main() {
         reason: 'and emphatically not on the ellipsized label');
   });
 
-  testWidgets('TooltipAnchor.child paints the tooltip at the label rect centre',
+  testWidgets('TooltipAnchor.child paints the tooltip at the glyphs\' centre',
       (tester) async {
     await tester.pumpWidget(wideRowApp(TooltipAnchor.child));
     final gesture = await mouse(tester);
@@ -101,8 +101,14 @@ void main() {
 
     final tip = tester.getRect(find.byKey(const Key('tip')));
     final row = tester.getRect(find.byKey(const Key('row')));
+    final glyphs = tester.getRect(find.text(longLabel));
 
-    expect(tip.center.dx, moreOrLessEquals(row.center.dx, epsilon: 1),
-        reason: 'the default anchor ignores the pointer');
+    expect(tip.center.dx, moreOrLessEquals(glyphs.center.dx, epsilon: 1),
+        reason: 'the default anchor ignores the pointer and targets the '
+            'glyphs — not the icon beside them, and not the row');
+    expect(tip.center.dx, isNot(moreOrLessEquals(row.center.dx, epsilon: 1)),
+        reason: 'the icon box is outside the target, so the glyphs\' centre '
+            'sits right of the row\'s');
+    expect(tip.center.dx, greaterThan(pointer.dx));
   });
 }
