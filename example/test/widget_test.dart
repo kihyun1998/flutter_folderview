@@ -16,8 +16,9 @@ void main() {
   // MyApp is the pure MaterialApp + ThemeDemoPage tree. The example's `main()`
   // additionally runs the Windows-only window_manager setup, which needs a real
   // platform channel and cannot be pumped here.
-  testWidgets('the demo boots and renders a FolderView with node rows',
-      (tester) async {
+  testWidgets('the demo boots and renders a FolderView with node rows', (
+    tester,
+  ) async {
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
     await tester.pumpAndSettle();
 
