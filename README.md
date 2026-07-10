@@ -282,9 +282,45 @@ FolderView(
 )
 ```
 
-The card supplies its own surface, so the tooltip around it draws no background, padding, or elevation. Give it a `Card`, not a bare `Text`.
+The card supplies its own surface, so by default the tooltip around it draws no background, padding, or elevation. Give it a `Card`, not a bare `Text`.
 
-It is anchored at the pointer, and that is not configurable. A row is laid out at the tree's content width rather than the viewport's, so anchoring to the row's rect would aim at a centre that leaves the screen the moment the view scrolls horizontally.
+It is anchored at the pointer, and that is the one knob you cannot change. A row is laid out at the tree's content width rather than the viewport's, so anchoring to the row's rect would aim at a centre that leaves the screen the moment the view scrolls horizontally.
+
+### Styling the card
+
+Everything else is `rowTooltipTheme`:
+
+```dart
+FolderView(
+  data: nodes,
+  expandedNodeIds: expandedIds,
+  rowTooltipBuilder: (context, node) => Card(child: Text(node.label)),
+  rowTooltipTheme: RowTooltipTheme(
+    waitDuration: Duration(milliseconds: 400), // don't flash on a quick sweep
+    interactive: true,                         // default: reach into the card
+    direction: TooltipDirection.bottom,
+    offset: 12,
+  ),
+)
+```
+
+| Property | Type | Description |
+|---|---|---|
+| `interactive` | `bool` | Card stays while the cursor is over it (default: `true`) |
+| `waitDuration` | `Duration?` | Delay before showing. Null shows immediately |
+| `showDuration` | `Duration?` | Auto-hide after this long |
+| `enableHover` | `bool` | Whether hovering raises the card at all (default: `true`) |
+| `direction` | `TooltipDirection` | Side of the pointer; flips when there is no room |
+| `alignment` | `TooltipAlignment` | Which of the card's own edges lands on the pointer |
+| `offset` | `double` | Distance from the pointer (default: `8.0`) |
+| `crossAxisOffset` | `double` | Offset along the cross-axis of `direction` |
+| `screenMargin` | `double` | Minimum distance from the `Overlay`'s edges |
+| `surface` | `JustTooltipTheme` | The tooltip's own chrome. Defaults to `JustTooltipTheme.bare()` — nothing drawn |
+| `animation`, `animationCurve`, `animationDuration` | | Show/hide animation |
+| `fadeBegin`, `scaleBegin`, `slideOffset`, `rotationBegin` | `double` | Animation start values |
+| `onShow`, `onHide` | `VoidCallback?` | Shown / hidden callbacks |
+
+If your builder returns unadorned content rather than a `Card`, give `surface` a real `JustTooltipTheme` and let the tooltip draw the box.
 
 ### Enabling both
 

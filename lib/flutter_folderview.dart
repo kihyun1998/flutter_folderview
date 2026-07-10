@@ -21,5 +21,6 @@ export 'themes/folder_view_spacing_theme.dart';
 export 'themes/folder_view_theme.dart';
 export 'themes/parent_node_theme.dart';
 export 'themes/node_tooltip_theme.dart';
+export 'themes/row_tooltip_theme.dart';
 export 'widgets/folder_view.dart';
 export 'input/scale_modifier.dart' show isScaleModifierPressed;

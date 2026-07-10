@@ -9,6 +9,7 @@ import '../services/row_metrics.dart';
 import '../services/size_service.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import '../themes/folder_view_theme.dart';
+import '../themes/row_tooltip_theme.dart';
 import 'folder_view_content.dart';
 import 'synced_scroll_controllers.dart';
 
@@ -72,6 +73,12 @@ class FolderView<T> extends StatefulWidget {
   /// background, padding, or elevation of its own.
   final Widget? Function(BuildContext context, Node<T> node)? rowTooltipBuilder;
 
+  /// Presentation and behaviour for the card built by [rowTooltipBuilder].
+  ///
+  /// Null uses the defaults: shown immediately on hover, interactive, and
+  /// drawing no surface of its own.
+  final RowTooltipTheme? rowTooltipTheme;
+
   const FolderView({
     super.key,
     required this.data,
@@ -87,6 +94,7 @@ class FolderView<T> extends StatefulWidget {
     this.scaleStep = 0.05,
     this.blockModifierScroll,
     this.rowTooltipBuilder,
+    this.rowTooltipTheme,
   }) : assert(scale > 0, 'scale must be greater than 0');
 
   @override
@@ -193,6 +201,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
               selectedNodeIds: widget.selectedNodeIds,
               expandedNodeIds: widget.expandedNodeIds,
               rowTooltipBuilder: widget.rowTooltipBuilder,
+              rowTooltipTheme: widget.rowTooltipTheme,
               contentWidth: contentWidth,
               contentHeight: contentHeight,
               needsHorizontalScroll: needsHorizontalScroll,
