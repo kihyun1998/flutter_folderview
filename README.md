@@ -288,11 +288,11 @@ It is anchored at the pointer, and that is not configurable. A row is laid out a
 
 ### Enabling both
 
-Only one tooltip is visible at a time — the innermost under the pointer. So a node type whose label tooltip is enabled will hide the row card wherever its label sits.
+Enable both. They divide the row between them.
 
-This bites harder than it sounds. A row is as wide as the tree's longest label, and each label grows to fill its row — so on the widest row the label's rect *is* the row, and that node's card is unreachable at every point along it. **To show a row card on a node type, leave that type's `useTooltip` off.**
+Only one tooltip is visible at a time — the innermost under the pointer — and the label tooltip claims exactly the glyphs it explains. Hover the label text and you get the label tooltip; hover anywhere else on the row (the indent, the icon, the expand chevron, the space beside a short label) and you get the row card.
 
-The pairing that works is a label tooltip on the types whose text gets truncated, and a row card on the rest.
+The one place the card cannot appear is over the glyphs themselves. On the tree's widest row the label runs the length of the row, so there the card is reachable over the indent and the icon only. That is the geometry, not a setting.
 
 ## Example
 

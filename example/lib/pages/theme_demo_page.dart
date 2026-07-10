@@ -363,10 +363,10 @@ class ThemeDemoPage extends ConsumerWidget {
   ///
   /// Returning null for a Node opts it out; here, Folders get no card.
   ///
-  /// Note: a Tier whose label tooltip is enabled will suppress this card
-  /// wherever the label sits, because the innermost tooltip under the pointer
-  /// wins. An ellipsized label spans the whole row, so its Tier's card becomes
-  /// unreachable. Turn "Child Tooltip (Rich)" off to see the card on Children.
+  /// Coexists with the per-Tier label tooltips: the innermost tooltip under the
+  /// pointer wins, and a label tooltip claims only the glyphs it explains. So
+  /// the label text keeps its own tooltip and the rest of the row keeps this
+  /// card. Leave both on.
   Widget? _buildRowCard(BuildContext context, Node<String> node) {
     if (node.type == NodeType.folder) return null;
     return Card(
@@ -713,8 +713,8 @@ class _ThemeControls extends StatelessWidget {
             style: TextStyle(fontSize: 12),
           ),
           subtitle: const Text(
-            'Hover anywhere on a row. A Tier whose label tooltip is on will '
-            'suppress it over the label.',
+            'Hover anywhere on a row except the label text, which keeps its '
+            'own tooltip. Leave both on.',
             style: TextStyle(fontSize: 10),
           ),
           isThreeLine: true,
