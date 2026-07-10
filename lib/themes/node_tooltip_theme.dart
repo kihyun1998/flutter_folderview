@@ -25,11 +25,15 @@ class NodeTooltipTheme<T> {
   /// What the tooltip is anchored to: the child's rect, or the pointer.
   ///
   /// The tooltip attaches to the node's icon-and-label content, not to the
-  /// whole rendered row. A label long enough to ellipsize has consumed all the
-  /// width available to it, so its rect spans the row — and a tooltip anchored
-  /// to that rect appears at its centre, which can be far from where the user
-  /// is actually pointing. [TooltipAnchor.pointer] keeps the same hover region
-  /// but places the tooltip at the cursor instead.
+  /// whole rendered row. But a row is as wide as the tree's longest label, and
+  /// each label grows to fill its row — so a long label's rect spans the row,
+  /// and a tooltip anchored to that rect appears at the row's centre, far from
+  /// where the user is actually pointing. Worse, once the tree is wide enough
+  /// to scroll horizontally that centre leaves the view, and the tooltip is
+  /// drawn outside it (see issue #47).
+  ///
+  /// [TooltipAnchor.pointer] keeps the same hover region but places the tooltip
+  /// at the cursor, which is inside the view by construction.
   ///
   /// The anchor is captured when the tooltip is shown and does not follow the
   /// pointer, so [interactive] tooltips stay reachable. Tap-triggered tooltips

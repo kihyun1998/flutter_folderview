@@ -246,7 +246,7 @@ FolderView(
 
 ### Anchoring to the cursor
 
-A node's tooltip attaches to its icon-and-label content, not to the whole rendered row. A label long enough to ellipsize has consumed all the width available to it, so its rect spans the row — and a tooltip anchored to that rect appears at its centre, which can be far from where the user is actually pointing. `TooltipAnchor.pointer` keeps the same hover region but places the tooltip at the cursor:
+A node's tooltip attaches to its icon-and-label content, not to the whole rendered row. But a row is as wide as the tree's longest label, and each label grows to fill its row — so a long label's rect spans the row, and a tooltip anchored to that rect appears at the row's centre, far from where the user is actually pointing. `TooltipAnchor.pointer` keeps the same hover region but places the tooltip at the cursor:
 
 ```dart
 NodeTooltipTheme(
@@ -261,6 +261,8 @@ The anchor is captured when the tooltip is shown and does not follow the pointer
 Against a point there are no target edges to align to, so under `TooltipAnchor.pointer` the `alignment` field selects which of the tooltip's *own* edges lands on the pointer.
 
 Note that `anchor` does not widen the hover region. A short label occupies only the left part of its row, and the space to its right raises no tooltip under either anchor. To make the whole row hoverable, use the row tooltip below.
+
+**Known issue.** When a tree is wide enough to scroll horizontally, a long label's rect extends past the visible `FolderView`, and so does its centre. Under the default `TooltipAnchor.child` the tooltip is aimed there and drawn outside the view — over whatever your app renders beside it. Use `TooltipAnchor.pointer`, whose anchor is the cursor and therefore always inside the view. Tracked in [#47](https://github.com/kihyun1998/flutter_folderview/issues/47).
 
 ## Row tooltip
 
@@ -288,7 +290,7 @@ It is anchored at the pointer, and that is not configurable. A row is laid out a
 
 Only one tooltip is visible at a time — the innermost under the pointer. So a node type whose label tooltip is enabled will hide the row card wherever its label sits.
 
-This bites harder than it sounds. A label long enough to ellipsize has consumed all the width available to it, so its rect spans the entire row, and the card for that node becomes unreachable. **To show a row card on a node type, leave that type's `useTooltip` off.**
+This bites harder than it sounds. A row is as wide as the tree's longest label, and each label grows to fill its row — so on the widest row the label's rect *is* the row, and that node's card is unreachable at every point along it. **To show a row card on a node type, leave that type's `useTooltip` off.**
 
 The pairing that works is a label tooltip on the types whose text gets truncated, and a row card on the rest.
 
