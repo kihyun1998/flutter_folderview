@@ -257,8 +257,11 @@ void main() {
   });
 
   // Coexistence. `just_tooltip` suppresses an ancestor tooltip whenever a
-  // descendant one contains the pointer, so exactly one is ever visible: the
-  // innermost. These tests characterise that, they do not implement it.
+  // descendant one that has something to draw contains the pointer, so exactly
+  // one is ever visible: the innermost. The qualifier never bites here, because
+  // an empty tooltip is never built: see the guards in `wrapWithNodeTooltip`
+  // and `_wrapWithRowTooltip`. These tests characterise that, they do not
+  // implement it.
   group('label tooltip nested inside the row card', () {
     testWidgets('hovering the glyphs of a short label shows the label tooltip',
         (tester) async {
