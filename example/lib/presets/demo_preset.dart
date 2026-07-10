@@ -5,6 +5,19 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 
 import '../providers/theme_demo_provider.dart';
 
+/// Every Node that can be expanded, at any depth.
+///
+/// An interaction preset expands the tree it generates: a preset about Child
+/// labels that leaves every Parent collapsed puts no Child on screen, and
+/// demonstrates nothing. Expansion is the caller's to hold (ADR-0002), so the
+/// preset hands back the set rather than asking the view to open anything.
+Set<String> _expandableIds(List<Node<String>> nodes) => {
+  for (final node in nodes) ...{
+    if (node.canExpand) node.id,
+    ..._expandableIds(node.children),
+  },
+};
+
 /// A named set of settings, applied to the demo in one click.
 ///
 /// Applying a preset is a pure function of the view model, so what a preset
@@ -102,19 +115,20 @@ class DemoPreset {
         tooltipEnableHover: true,
         useLongChildNames: true,
       );
+      final nodes = generateDataset(
+        rootCount: next.genRootCount,
+        maxDepth: next.genMaxDepth,
+        subFolderCount: next.genSubFolderCount,
+        parentCount: next.genParentCount,
+        childCount: next.genChildCount,
+        useLongFolderNames: next.useLongFolderNames,
+        useLongParentNames: next.useLongParentNames,
+        useLongChildNames: next.useLongChildNames,
+      );
       return next.copyWith(
-        nodes: generateDataset(
-          rootCount: next.genRootCount,
-          maxDepth: next.genMaxDepth,
-          subFolderCount: next.genSubFolderCount,
-          parentCount: next.genParentCount,
-          childCount: next.genChildCount,
-          useLongFolderNames: next.useLongFolderNames,
-          useLongParentNames: next.useLongParentNames,
-          useLongChildNames: next.useLongChildNames,
-        ),
+        nodes: nodes,
         selectedIds: {},
-        expandedIds: {},
+        expandedIds: _expandableIds(nodes),
       );
     },
   );
@@ -129,19 +143,20 @@ class DemoPreset {
         'and hides the Folders that contained them.',
     apply: (vm) {
       final next = vm.copyWith(viewMode: ViewMode.tree, genMaxDepth: 3);
+      final nodes = generateDataset(
+        rootCount: next.genRootCount,
+        maxDepth: next.genMaxDepth,
+        subFolderCount: next.genSubFolderCount,
+        parentCount: next.genParentCount,
+        childCount: next.genChildCount,
+        useLongFolderNames: next.useLongFolderNames,
+        useLongParentNames: next.useLongParentNames,
+        useLongChildNames: next.useLongChildNames,
+      );
       return next.copyWith(
-        nodes: generateDataset(
-          rootCount: next.genRootCount,
-          maxDepth: next.genMaxDepth,
-          subFolderCount: next.genSubFolderCount,
-          parentCount: next.genParentCount,
-          childCount: next.genChildCount,
-          useLongFolderNames: next.useLongFolderNames,
-          useLongParentNames: next.useLongParentNames,
-          useLongChildNames: next.useLongChildNames,
-        ),
+        nodes: nodes,
         selectedIds: {},
-        expandedIds: {},
+        expandedIds: _expandableIds(nodes),
       );
     },
   );
