@@ -25,7 +25,7 @@ Single-context layout: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/ag
     just_tooltip:
       path: ../just_tooltip
   ```
-  **가장 강한 증거는 우리가 버그를 기대값으로 박제해둔 테스트가 *깨지는* 것이다.** 실증(just_tooltip#34): `test/widgets/tooltip_offscreen_test.dart` 의 `"with the default anchor the tooltip is painted outside the view"` 가 `Expected: > 400.0 / Actual: 170.0` 으로 죽었고 나머지 148 개는 통과 = 회귀 없음. 검증이 끝나면 `pubspec_overrides.yaml` 을 **반드시 지운다** — `.gitignore` 에도 `.pubignore` 에도 없어 그대로 커밋되고 그대로 발행된다.
+  **가장 강한 증거는 우리가 버그를 기대값으로 박제해둔 테스트가 *깨지는* 것이다** — 우리가 독립적으로 관찰해 고정한 증상이 사라졌다는 뜻이니까. 실증(just_tooltip#34): `tooltip_offscreen_test.dart` 의 `"with the default anchor the tooltip is painted outside the view"` 가 `Expected: > 400.0 / Actual: 170.0` 으로 죽었고 나머지 148 개는 통과 = 회귀 없음. 그 테스트는 지금 `"the default anchor targets the visible part of the label"` 이다 — **깨진 테스트를 뒤집는 것까지가 회수**다(아래). 검증이 끝나면 `pubspec_overrides.yaml` 을 **반드시 지운다** — `.gitignore` 에도 `.pubignore` 에도 없어 그대로 커밋되고 그대로 발행된다.
 - **상류가 고쳐지면 우회를 회수한다.** 발행에서 끝내면 상류를 고쳐놓고도 하류는 영원히 우회를 들고 있는다. 제약을 올리고, 손수 중화한 테마 값과 버그를 피하려 고른 옵션을 지우고, 버그를 기대값으로 박제한 테스트를 뒤집는다. **하한도 같이 본다** — 실증(`0.11.0`): `just_tooltip 0.4.2` 를 받으면서 Flutter 하한을 `3.10.0` → `3.13.0` 으로 올려야 했다. `flutter analyze` 도 pub.dev 도 안 잡아준다.
 - **우회가 *여전히 옳은* 곳은 남기되 이유를 그 자리 주석에 적는다.** 안 적으면 다음 사람이 우회인 줄 알고 지운다. 실증: `folder_view_content.dart` 의 `_wrapWithRowTooltip` 은 행 툴팁 앵커를 `pointer` 로 못 박고 그 근거를 dartdoc 에 남겼다.
 

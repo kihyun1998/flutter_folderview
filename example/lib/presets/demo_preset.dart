@@ -7,10 +7,23 @@ import '../providers/theme_demo_provider.dart';
 ///
 /// Applying a preset is a pure function of the view model, so what a preset
 /// does is asserted without pumping a widget.
+///
+/// A preset is named for the interaction it demonstrates, not for the features
+/// it enables. `Row card` would say nothing a switch does not; `Row card over a
+/// long label` answers which tooltip wins where the pointer is.
 class DemoPreset {
-  const DemoPreset({required this.title, required this.apply});
+  const DemoPreset({
+    required this.title,
+    required this.whatToLookFor,
+    required this.apply,
+  });
 
   final String title;
+
+  /// One line telling the reader where to point the mouse once this preset is
+  /// applied. A preset that demonstrates an interaction is useless if nobody
+  /// knows where the interaction happens.
+  final String whatToLookFor;
 
   /// Returns the view model this preset describes, given the current one.
   final ThemeDemoViewModel Function(ThemeDemoViewModel) apply;
@@ -24,6 +37,7 @@ class DemoPreset {
   /// is not what makes a demo bare.
   static final DemoPreset bare = DemoPreset(
     title: 'Bare',
+    whatToLookFor: 'Nothing but the tree. Add one feature at a time from here.',
     apply: (vm) => vm.copyWith(
       rowTooltipEnabled: false,
       folderTooltipEnabled: false,
@@ -42,6 +56,7 @@ class DemoPreset {
   /// once, for when that is what you want to see.
   static final DemoPreset everything = DemoPreset(
     title: 'Everything',
+    whatToLookFor: 'The whole surface at once. Every switch is on.',
     apply: (vm) => vm.copyWith(
       rowTooltipEnabled: true,
       folderTooltipEnabled: true,
@@ -54,5 +69,40 @@ class DemoPreset {
       tooltipBoxShadowEnabled: true,
       tooltipShowArrow: true,
     ),
+  );
+
+  /// The row card and the Child label tooltip, both live, over labels long
+  /// enough that the label claims most of the row.
+  ///
+  /// The tree is regenerated: a preset named for long labels that leaves the
+  /// tree full of short ones demonstrates nothing.
+  static final DemoPreset rowCardOverLongLabel = DemoPreset(
+    title: 'Row card over a long label',
+    whatToLookFor:
+        'Hover the label text, then the empty space beside it. The innermost '
+        'tooltip under the pointer wins, so the label keeps its own and the '
+        'rest of the row raises the card.',
+    apply: (vm) {
+      final next = vm.copyWith(
+        rowTooltipEnabled: true,
+        childTooltipEnabled: true,
+        tooltipEnableHover: true,
+        useLongChildNames: true,
+      );
+      return next.copyWith(
+        nodes: generateDataset(
+          rootCount: next.genRootCount,
+          maxDepth: next.genMaxDepth,
+          subFolderCount: next.genSubFolderCount,
+          parentCount: next.genParentCount,
+          childCount: next.genChildCount,
+          useLongFolderNames: next.useLongFolderNames,
+          useLongParentNames: next.useLongParentNames,
+          useLongChildNames: next.useLongChildNames,
+        ),
+        selectedIds: {},
+        expandedIds: {},
+      );
+    },
   );
 }

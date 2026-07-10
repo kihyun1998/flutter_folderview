@@ -43,6 +43,15 @@ ThemeDemoViewModel _allSwitchesOff() => ThemeDemoViewModel(
   tooltipShowArrow: false,
 );
 
+/// Every Child label in the tree, at any depth.
+List<String> _childLabels(List<Node<String>> nodes) => [
+  for (final node in nodes)
+    if (node.type == NodeType.child)
+      node.label
+    else
+      ..._childLabels(node.children),
+];
+
 void main() {
   // Applying a preset is a pure function over the view model, so it is asserted
   // here rather than by pumping the demo. The expected values come from #61,
@@ -93,6 +102,36 @@ void main() {
       expect(bare.genChildCount, 9);
       expect(bare.useLongChildNames, isTrue);
       expect(bare.nodes, same(tuned.nodes));
+    });
+  });
+
+  group('Row card over a long label', () {
+    test('turns on both tooltips that compete for the pointer', () {
+      final vm = DemoPreset.rowCardOverLongLabel.apply(_allSwitchesOff());
+
+      // The interaction is which tooltip wins where. Both have to be on for
+      // there to be a contest at all.
+      expect(vm.rowTooltipEnabled, isTrue);
+      expect(vm.childTooltipEnabled, isTrue);
+      expect(vm.tooltipEnableHover, isTrue);
+    });
+
+    test('produces the long labels its name promises', () {
+      // A preset named for an interaction must reproduce the condition. Naming
+      // it and leaving the tree full of short labels demonstrates nothing.
+      final vm = DemoPreset.rowCardOverLongLabel.apply(_allSwitchesOff());
+
+      expect(vm.useLongChildNames, isTrue);
+      expect(_childLabels(vm.nodes), isNotEmpty);
+      expect(
+        _childLabels(vm.nodes).every((label) => label.length > 60),
+        isTrue,
+        reason: 'every Child carries a long label, not just the random 10%',
+      );
+    });
+
+    test('says what to look for', () {
+      expect(DemoPreset.rowCardOverLongLabel.whatToLookFor, isNotEmpty);
     });
   });
 
