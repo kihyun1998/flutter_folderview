@@ -59,11 +59,24 @@ void main() {
         ),
       );
 
+  /// Gives the Expandable rows a real chevron. The theme's `widget` is
+  /// caller-supplied and null by default, which renders an empty spacer.
+  FlutterFolderViewTheme<String> themeWithChevron() =>
+      const FlutterFolderViewTheme<String>(
+        lineTheme: FolderViewLineTheme(lineColor: Color(0xFF000000)),
+        scrollbarTheme: FolderViewScrollbarTheme(
+          thumbColor: Color(0xFF000000),
+          trackColor: Color(0xFF000000),
+        ),
+        expandIconTheme: ExpandIconTheme(widget: Icon(Icons.chevron_right)),
+      );
+
   Future<void> pump(
     WidgetTester tester, {
     Widget? Function(BuildContext, Node<String>)? rowTooltipBuilder,
     String label = 'a.pdf',
     FlutterFolderViewTheme<String>? theme,
+    void Function(Node<String>)? onNodeTap,
   }) async {
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(
@@ -77,6 +90,7 @@ void main() {
               mode: ViewMode.folder,
               expandedNodeIds: const {'f', 'p'},
               theme: theme,
+              onNodeTap: onNodeTap,
               rowTooltipBuilder: rowTooltipBuilder,
             ),
           ),
@@ -173,6 +187,72 @@ void main() {
       expect(
           card.center.dx, isNot(moreOrLessEquals(label.center.dx, epsilon: 1)),
           reason: 'and emphatically not the off-screen centre of the row');
+    });
+  });
+
+  group('the row card and the row s gestures', () {
+    // A smoke guard, not a strong one. An ancestor cannot steal a descendant's
+    // tap — hit testing is depth-first, so CustomInkWell's recogniser enters
+    // the gesture arena before any wrapper's and wins the sweep. Wrapping the
+    // row in a GestureDetector, opaque or not, was verified not to break this.
+    // What this test would catch is an AbsorbPointer or IgnorePointer.
+    testWidgets('tapping a row wrapped in a card still fires onNodeTap',
+        (tester) async {
+      final tapped = <Node<String>>[];
+      await pump(tester,
+          rowTooltipBuilder: cardForChild, onNodeTap: tapped.add);
+
+      await tester.tap(find.text('a.pdf'));
+      await tester.pump(const Duration(milliseconds: 400)); // click timer
+
+      expect(tapped, hasLength(1));
+      expect(tapped.single.id, 'c0');
+    });
+
+    // Deliberately absent: a test that the card is hover-only. `enableTap` on
+    // the wrapper is a no-op here — it adds a GestureDetector whose onTap never
+    // fires, because CustomInkWell wins the arena. Setting it changes nothing
+    // observable, so no test can hold it fixed. Verified, not assumed.
+  });
+
+  // The Expandable renderer puts the chevron beside the label part, so the
+  // chevron sits inside the row card's hover region and outside the label
+  // tooltip's. The Child renderer has no chevron at all.
+  group('the row card covers an Expandable row s chevron', () {
+    testWidgets('hovering the chevron shows the card', (tester) async {
+      await pump(
+        tester,
+        theme: themeWithChevron(),
+        rowTooltipBuilder: (context, node) => node.id == 'f'
+            ? const SizedBox(key: Key('card'), width: 100, height: 40)
+            : null,
+      );
+
+      final chevron = tester.getRect(find.byIcon(Icons.chevron_right).first);
+      final gesture = await mouse(tester);
+      await gesture.moveTo(chevron.center);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('card')), findsOneWidget);
+    });
+
+    testWidgets('tapping the chevron still fires onNodeTap', (tester) async {
+      final tapped = <Node<String>>[];
+      await pump(
+        tester,
+        theme: themeWithChevron(),
+        rowTooltipBuilder: (context, node) =>
+            const SizedBox(key: Key('card'), width: 100, height: 40),
+        onNodeTap: tapped.add,
+      );
+
+      await tester.tap(find.byIcon(Icons.chevron_right).first);
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(tapped, hasLength(1));
+      expect(tapped.single.id, 'f',
+          reason: 'Expansion is caller-driven (ADR-0002): the card must leave '
+              'the chevron tap reaching onNodeTap');
     });
   });
 
