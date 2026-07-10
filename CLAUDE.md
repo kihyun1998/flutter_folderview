@@ -1,7 +1,3 @@
-# CLAUDE.md
-
-Project-level guidance for Claude Code when working in this repo.
-
 ## Agent skills
 
 ### Issue tracker
@@ -15,6 +11,23 @@ Canonical label strings (`needs-triage`, `needs-info`, `ready-for-agent`, `ready
 ### Domain docs
 
 Single-context layout: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+## 우회 금지 (근본 층에서 고쳐라)
+
+증상이 여기서 보인다고 원인도 여기 있는 건 아니다. 이 패키지는 `just_tooltip` 의 **소비처**이고, 결함 상당수는 상류에 있다. 상류 결함을 여기서 *덮지 마라*. 우회는 ① 상류 버그를 가려 고칠 압력을 없애고, ② 같은 지식을 두 층에 복제해 divergence 씨앗이 되고, ③ 상류의 잘못된 기본값을 영원히 기본값으로 남긴다. **우회하고 싶은 충동 = 멈추고 사용자에게 온다** — 무슨 상황인지 설명하고("상류가 X 라서 여기서 Y 해야 통과, 근본은 상류 문제") 상류를 고칠지 *묻는다*. 혼자 우회하지도, 혼자 상류 이슈만 파고 넘어가지도 마라.
+
+- **우회는 공개 API 로 굳는다. 그 다음엔 못 지운다.** 실증(#42/#47): 라벨 툴팁이 뷰 밖에 그려지는 문제에 `NodeTooltipTheme.anchor` 라는 knob 을 냈고, `0.11.0` CHANGELOG 는 `TooltipAnchor.pointer` 를 *"outside the view entirely once the tree scrolls horizontally"* 의 답으로 팔았다. 진짜 원인은 상류가 클립된 child 의 **보이는 부분**을 타깃하지 않는 것이었고 `just_tooltip 0.4.2` 가 고쳤다. 근본을 안 고쳤다면 `anchor` 는 영원히 "버그 피하는 법" 으로 dartdoc 에 남았을 것이다 — 지금 그것은 "커서 옆을 가리킨다" 는 독립된 기능이다.
+- **둘 이상의 소비처가 *독립적으로 같은 우회*에 도달했다면, 그건 상류 기본값이 함정이라는 증거다.** 실증(just_tooltip#33): 이 repo 와 `flutter_table_plus` 가 각각 `TooltipAnchor.pointer` 를 하드코딩하고(table_plus 는 테마 dartdoc 에 *"긴 ellipsized 셀엔 pointer 를 써라"* 라고 적기까지 했다) **그 사이 아무도 상류 이슈를 열지 않았다.** 사람들이 올바른 옵션을 발견한 게 아니라 버그를 발견하고 돌아간 것이다. 자매 패키지를 볼 때(1단계) "같은 답" 인지 "같은 우회" 인지 구분한다.
+- **상류 수정은 여기서 실검증한다.** 합성 재현이 통과하는 건 "내가 상상한 시나리오에서 동작한다" 일 뿐이다. 로컬 경로를 물려 **전체 스위트**를 돌린다.
+  ```yaml
+  # pubspec_overrides.yaml — pubspec.yaml 은 안 건드린다
+  dependency_overrides:
+    just_tooltip:
+      path: ../just_tooltip
+  ```
+  **가장 강한 증거는 우리가 버그를 기대값으로 박제해둔 테스트가 *깨지는* 것이다** — 우리가 독립적으로 관찰해 고정한 증상이 사라졌다는 뜻이니까. 실증(just_tooltip#34): `tooltip_offscreen_test.dart` 의 `"with the default anchor the tooltip is painted outside the view"` 가 `Expected: > 400.0 / Actual: 170.0` 으로 죽었고 나머지 148 개는 통과 = 회귀 없음. 그 테스트는 지금 `"the default anchor targets the visible part of the label"` 이다 — **깨진 테스트를 뒤집는 것까지가 회수**다(아래). 검증이 끝나면 `pubspec_overrides.yaml` 을 **반드시 지운다** — `.gitignore` 에도 `.pubignore` 에도 없어 그대로 커밋되고 그대로 발행된다.
+- **상류가 고쳐지면 우회를 회수한다.** 발행에서 끝내면 상류를 고쳐놓고도 하류는 영원히 우회를 들고 있는다. 제약을 올리고, 손수 중화한 테마 값과 버그를 피하려 고른 옵션을 지우고, 버그를 기대값으로 박제한 테스트를 뒤집는다. **하한도 같이 본다** — 실증(`0.11.0`): `just_tooltip 0.4.2` 를 받으면서 Flutter 하한을 `3.10.0` → `3.13.0` 으로 올려야 했다. `flutter analyze` 도 pub.dev 도 안 잡아준다.
+- **우회가 *여전히 옳은* 곳은 남기되 이유를 그 자리 주석에 적는다.** 안 적으면 다음 사람이 우회인 줄 알고 지운다. 실증: `folder_view_content.dart` 의 `_wrapWithRowTooltip` 은 행 툴팁 앵커를 `pointer` 로 못 박고 그 근거를 dartdoc 에 남겼다.
 
 ## 작업 flow
 
@@ -112,17 +125,18 @@ flutter test --coverage
 flutter pub get
 dart format --output=none --set-exit-if-changed .
 flutter analyze
+flutter test
 ```
 
 - **`flutter analyze` 통과 ≠ CI 통과.** `dart format --set-exit-if-changed` 는 **별개 게이트**다 — analyze 는 lint 규칙을, format 은 서식 정규형을 본다. 실증(#48): 손으로 줄바꿈한 파일 둘 때문에 두 잡이 모두 떨어졌다. 로컬에서 푸시 전에 돌린다:
   ```
   dart format lib test benchmark && (cd example && dart format .)
   flutter analyze && (cd example && flutter analyze)
-  flutter test
+  flutter test && (cd example && flutter test)
   ```
 - **포맷 검사는 `pub get` 뒤여야 한다.** `dart format` 은 `.dart_tool/package_config.json` 에서 언어 버전을 읽는다. CI 의 주석이 그 이유를 적어두고 있다.
-- **example 잡은 `flutter test` 를 돌리지 않는다.** 실증: `example/test/widget_test.dart` 는 `flutter create` 의 "Counter increments smoke test" 이고, 이 앱에 카운터가 없어 `e5f6353 add example` 이후 **한 번도 통과한 적이 없다.** 아무도 몰랐다.
-- **통합 테스트는 CI 에 없다.** 실제 데스크톱 앱을 띄운다. 로컬에서 `flutter test integration_test/<file>.dart -d windows`. 한 세션에서 둘을 연달아 돌리면 두 번째가 `Error waiting for a debug connection` 으로 죽는다 — **하나씩** 돌린다.
+- **example 도 테스트 게이트다** — 잡 이름은 아직 `Analyze (example app)` 이지만 `flutter test` 를 돌린다. 실증(#57): 그 스텝이 없던 시절 `example/test/widget_test.dart` 는 `flutter create` 의 "Counter increments smoke test" 였고, 이 앱에 카운터가 없어 `e5f6353 add example` 이후 **한 번도 통과한 적이 없다.** 아무도 몰랐다 — CI 가 안 돌렸으니까. 지금은 부팅 테스트로 갈아끼우고 스텝을 추가했다.
+- **통합 테스트는 CI 에 없다.** 실제 데스크톱 앱을 띄운다. `example/integration_test/` 에만 있으므로 **`cd example` 후** `flutter test integration_test/<file>.dart -d windows`. 한 세션에서 둘을 연달아 돌리면 두 번째가 `Error waiting for a debug connection` 으로 죽는다 — **하나씩** 돌린다.
 - **`git status` 의 `M` 이 항상 내용 변경은 아니다.** 실증: `example/*/flutter/generated_plugin_registrant.*` 은 `flutter analyze` 가 재생성하며 EOL 만 바뀐다. `git diff` 는 비어 있다. 커밋 전에 `git diff --ignore-all-space --stat` 로 걸러내고 `git restore` 한다.
 - **되돌릴 수 없는 것은 사용자가 실행한다.**
   - `dart pub publish` — pub.dev 는 버전 삭제가 없다(7 일 내 retract 만). 에이전트가 실행하지 않는다. `dart pub publish --dry-run` 이 경고 0 개인지만 확인하고 넘긴다.

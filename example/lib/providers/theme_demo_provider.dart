@@ -448,7 +448,7 @@ class ThemeDemoState extends ChangeNotifier {
 
   // Generate data based on parameters
   void generateData() {
-    final nodes = _generateDataset(
+    final nodes = generateDataset(
       rootCount: state.genRootCount,
       maxDepth: state.genMaxDepth,
       subFolderCount: state.genSubFolderCount,
@@ -460,106 +460,111 @@ class ThemeDemoState extends ChangeNotifier {
     );
     state = state.copyWith(nodes: nodes, selectedIds: {}, expandedIds: {});
   }
+}
 
-  List<Node<String>> _generateDataset({
-    required int rootCount,
-    required int maxDepth,
-    required int subFolderCount,
-    required int parentCount,
-    required int childCount,
-    required bool useLongFolderNames,
-    required bool useLongParentNames,
-    required bool useLongChildNames,
-  }) {
-    final rng = Random(42);
-    int idCounter = 0;
+/// Builds a synthetic tree of the given shape.
+///
+/// Pure and deterministic — the RNG is seeded — so a preset can produce its own
+/// dataset without reaching for [ThemeDemoState]. Lifted out of that class
+/// unchanged; it never referenced `this`.
+List<Node<String>> generateDataset({
+  required int rootCount,
+  required int maxDepth,
+  required int subFolderCount,
+  required int parentCount,
+  required int childCount,
+  required bool useLongFolderNames,
+  required bool useLongParentNames,
+  required bool useLongChildNames,
+}) {
+  final rng = Random(42);
+  int idCounter = 0;
 
-    const longFolderName =
-        'This is a very long folder name that should cause horizontal scroll to appear';
-    const longParentName =
-        'Parent node with extremely long label for testing horizontal scroll behavior';
-    const longChildName =
-        'Child item with super long file name for scroll test - document_v2_final_revised.pdf';
+  const longFolderName =
+      'This is a very long folder name that should cause horizontal scroll to appear';
+  const longParentName =
+      'Parent node with extremely long label for testing horizontal scroll behavior';
+  const longChildName =
+      'Child item with super long file name for scroll test - document_v2_final_revised.pdf';
 
-    Node<String> generateChild(String prefix) {
-      final id = '${prefix}_child_${++idCounter}';
-      final useLong = useLongChildNames || rng.nextDouble() < 0.1;
-      final label = useLong ? longChildName : 'Item $idCounter.pdf';
-      return Node<String>(
-        id: id,
-        label: label,
-        type: NodeType.child,
-        data: 'Data for $id',
+  Node<String> generateChild(String prefix) {
+    final id = '${prefix}_child_${++idCounter}';
+    final useLong = useLongChildNames || rng.nextDouble() < 0.1;
+    final label = useLong ? longChildName : 'Item $idCounter.pdf';
+    return Node<String>(
+      id: id,
+      label: label,
+      type: NodeType.child,
+      data: 'Data for $id',
+    );
+  }
+
+  List<Node<String>> generateParents(String prefix) {
+    final parents = <Node<String>>[];
+    for (int i = 1; i <= parentCount; i++) {
+      final id = '${prefix}_parent_${++idCounter}';
+      final useLong = useLongParentNames || rng.nextDouble() < 0.1;
+      final label = useLong ? longParentName : 'Category $idCounter';
+
+      parents.add(
+        Node<String>(
+          id: id,
+          label: label,
+          type: NodeType.parent,
+          children: List.generate(childCount, (_) => generateChild(id)),
+        ),
       );
     }
+    return parents;
+  }
 
-    List<Node<String>> generateParents(String prefix) {
-      final parents = <Node<String>>[];
-      for (int i = 1; i <= parentCount; i++) {
-        final id = '${prefix}_parent_${++idCounter}';
-        final useLong = useLongParentNames || rng.nextDouble() < 0.1;
-        final label = useLong ? longParentName : 'Category $idCounter';
+  List<Node<String>> generateFolderLevel(String prefix, int currentDepth) {
+    final nodes = <Node<String>>[];
 
-        parents.add(
-          Node<String>(
-            id: id,
-            label: label,
-            type: NodeType.parent,
-            children: List.generate(childCount, (_) => generateChild(id)),
-          ),
-        );
-      }
-      return parents;
-    }
-
-    List<Node<String>> generateFolderLevel(String prefix, int currentDepth) {
-      final nodes = <Node<String>>[];
-
-      for (int i = 1; i <= subFolderCount; i++) {
-        final id = '${prefix}_folder_${++idCounter}';
-        final useLong = useLongFolderNames || rng.nextDouble() < 0.15;
-        final label = useLong
-            ? longFolderName
-            : 'Folder $idCounter - Depth $currentDepth';
-
-        List<Node<String>> children;
-        if (currentDepth < maxDepth) {
-          children = generateFolderLevel(id, currentDepth + 1);
-        } else {
-          children = generateParents(id);
-        }
-
-        nodes.add(
-          Node<String>(
-            id: id,
-            label: label,
-            type: NodeType.folder,
-            children: children,
-          ),
-        );
-      }
-
-      return nodes;
-    }
-
-    final roots = <Node<String>>[];
-    for (int i = 1; i <= rootCount; i++) {
-      final id = 'root_$i';
+    for (int i = 1; i <= subFolderCount; i++) {
+      final id = '${prefix}_folder_${++idCounter}';
       final useLong = useLongFolderNames || rng.nextDouble() < 0.15;
-      final label = useLong ? longFolderName : 'Department $i';
+      final label = useLong
+          ? longFolderName
+          : 'Folder $idCounter - Depth $currentDepth';
 
-      roots.add(
+      List<Node<String>> children;
+      if (currentDepth < maxDepth) {
+        children = generateFolderLevel(id, currentDepth + 1);
+      } else {
+        children = generateParents(id);
+      }
+
+      nodes.add(
         Node<String>(
           id: id,
           label: label,
           type: NodeType.folder,
-          children: generateFolderLevel(id, 1),
+          children: children,
         ),
       );
     }
 
-    return roots;
+    return nodes;
   }
+
+  final roots = <Node<String>>[];
+  for (int i = 1; i <= rootCount; i++) {
+    final id = 'root_$i';
+    final useLong = useLongFolderNames || rng.nextDouble() < 0.15;
+    final label = useLong ? longFolderName : 'Department $i';
+
+    roots.add(
+      Node<String>(
+        id: id,
+        label: label,
+        type: NodeType.folder,
+        children: generateFolderLevel(id, 1),
+      ),
+    );
+  }
+
+  return roots;
 }
 
 class ThemeDemoViewModel {
