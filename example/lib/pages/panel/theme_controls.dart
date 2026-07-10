@@ -6,8 +6,11 @@ import 'sections/misc_sections.dart';
 import 'sections/tier_sections.dart';
 import 'sections/tooltip_section.dart';
 
-/// The demo's right-hand control panel: one collapsible card per section,
-/// each defined in `sections/`.
+/// The demo's left-hand control panel: a 350px column beside the tree.
+///
+/// Most of it is one collapsible card per section, each defined in `sections/`.
+/// Data Generator and View Mode are not collapsible — they are plain cards, so
+/// they are always on screen.
 ///
 /// Section order is deliberate — Data Generator first, because a reader wants
 /// a tree to look at before they start styling it.
