@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:just_tooltip/just_tooltip.dart';
 
 import '../input/scale_modifier.dart';
 import '../models/flat_node.dart';
@@ -33,6 +34,10 @@ class FolderViewContent<T> extends StatefulWidget {
   final Function(Node<T>, TapDownDetails)? onSecondaryNodeTap;
   final Set<String>? selectedNodeIds;
   final Set<String>? expandedNodeIds;
+
+  /// Builds the row card. See `FolderView.rowTooltipBuilder`.
+  final Widget? Function(BuildContext context, Node<T> node)? rowTooltipBuilder;
+
   final FlutterFolderViewTheme<T> theme;
 
   /// Scale factor applied to content dimensions.
@@ -62,6 +67,7 @@ class FolderViewContent<T> extends StatefulWidget {
     this.onSecondaryNodeTap,
     required this.selectedNodeIds,
     this.expandedNodeIds,
+    this.rowTooltipBuilder,
     required this.theme,
     this.scale = 1.0,
     this.blockModifierScroll = true,
@@ -238,13 +244,43 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     }
   }
 
+  /// Wraps a rendered row in its row card, when the caller supplies one.
+  ///
+  /// The row is the hover region; the pointer is the anchor. A row's RenderBox
+  /// is `contentWidth` wide, so anchoring to it would aim at its centre — off
+  /// screen once the view scrolls horizontally.
+  ///
+  /// A Node's label tooltip, if any, is nested inside this one. `just_tooltip`
+  /// suppresses an ancestor whenever a descendant tooltip contains the pointer,
+  /// so exactly one is visible: the innermost under the cursor.
+  ///
+  /// The card draws its own surface, so the tooltip contributes no background,
+  /// padding, or elevation.
+  Widget _wrapWithRowTooltip(Widget row, Node<T> node) {
+    final builder = widget.rowTooltipBuilder;
+    if (builder == null) return row;
+    final card = builder(context, node);
+    if (card == null) return row;
+
+    return JustTooltip(
+      anchor: TooltipAnchor.pointer,
+      theme: const JustTooltipTheme(
+        padding: EdgeInsets.zero,
+        backgroundColor: Color(0x00000000),
+        elevation: 0.0,
+      ),
+      tooltipBuilder: (_) => card,
+      child: row,
+    );
+  }
+
   Widget _buildItem(int index) {
     final flatNode = widget.flatNodes[index];
     final isExpanded =
         widget.expandedNodeIds?.contains(flatNode.node.id) ?? false;
     final theme = widget.theme;
 
-    final nodeWidget = NodeWidget<T>(
+    Widget nodeWidget = NodeWidget<T>(
       flatNode: flatNode,
       mode: widget.mode,
       onTap: widget.onNodeTap,
@@ -255,6 +291,8 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       theme: theme,
       scale: widget.scale,
     );
+
+    nodeWidget = _wrapWithRowTooltip(nodeWidget, flatNode.node);
 
     // Apply horizontal offset via Transform.translate instead of
     // wrapping the entire ListView in a SingleChildScrollView.

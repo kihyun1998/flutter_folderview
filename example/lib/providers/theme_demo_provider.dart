@@ -273,6 +273,10 @@ class ThemeDemoState extends _$ThemeDemoState {
     state = state.copyWith(tooltipAnchor: anchor);
   }
 
+  void setRowTooltipEnabled(bool enabled) {
+    state = state.copyWith(rowTooltipEnabled: enabled);
+  }
+
   void setTooltipAlignment(TooltipAlignment alignment) {
     state = state.copyWith(tooltipAlignment: alignment);
   }
@@ -624,6 +628,9 @@ class ThemeDemoViewModel {
   final TooltipDirection tooltipDirection;
 
   final TooltipAnchor tooltipAnchor;
+
+  /// The row card is declared once on the FolderView, not per Tier.
+  final bool rowTooltipEnabled;
   final TooltipAlignment tooltipAlignment;
   final double tooltipOffset;
   final double tooltipElevation;
@@ -751,6 +758,7 @@ class ThemeDemoViewModel {
     this.childTooltipBgColor = const Color(0xFF424242),
     this.tooltipDirection = TooltipDirection.top,
     this.tooltipAnchor = TooltipAnchor.child,
+    this.rowTooltipEnabled = false,
     this.tooltipAlignment = TooltipAlignment.center,
     this.tooltipOffset = 8.0,
     this.tooltipElevation = 4.0,
@@ -843,6 +851,7 @@ class ThemeDemoViewModel {
     Color? childTooltipBgColor,
     TooltipDirection? tooltipDirection,
     TooltipAnchor? tooltipAnchor,
+    bool? rowTooltipEnabled,
     TooltipAlignment? tooltipAlignment,
     double? tooltipOffset,
     double? tooltipElevation,
@@ -933,6 +942,7 @@ class ThemeDemoViewModel {
       childTooltipBgColor: childTooltipBgColor ?? this.childTooltipBgColor,
       tooltipDirection: tooltipDirection ?? this.tooltipDirection,
       tooltipAnchor: tooltipAnchor ?? this.tooltipAnchor,
+      rowTooltipEnabled: rowTooltipEnabled ?? this.rowTooltipEnabled,
       tooltipAlignment: tooltipAlignment ?? this.tooltipAlignment,
       tooltipOffset: tooltipOffset ?? this.tooltipOffset,
       tooltipElevation: tooltipElevation ?? this.tooltipElevation,

@@ -170,6 +170,17 @@ FolderView(
 
 ## Tooltip
 
+There are two, and they differ by where you declare them and what they explain.
+
+| | Declared on | Attaches to | Explains |
+|---|---|---|---|
+| **Label tooltip** | `NodeTooltipTheme`, per node type | The node's icon and label | The label — hover truncated text to read the rest |
+| **Row tooltip** | `FolderView.rowTooltipBuilder`, once | The whole rendered row | The node — a card of its details |
+
+Both can be enabled at once. Only one is ever visible: the innermost under the pointer. See [Row tooltip](#row-tooltip) for what that implies.
+
+### Label tooltip
+
 Each node type supports tooltip via `NodeTooltipTheme`:
 
 ```dart
@@ -249,7 +260,37 @@ The anchor is captured when the tooltip is shown and does not follow the pointer
 
 Against a point there are no target edges to align to, so under `TooltipAnchor.pointer` the `alignment` field selects which of the tooltip's *own* edges lands on the pointer.
 
-Note that `anchor` does not widen the hover region. A short label occupies only the left part of its row, and the space to its right raises no tooltip under either anchor. Making the whole row hoverable is tracked separately in [#44](https://github.com/kihyun1998/flutter_folderview/issues/44).
+Note that `anchor` does not widen the hover region. A short label occupies only the left part of its row, and the space to its right raises no tooltip under either anchor. To make the whole row hoverable, use the row tooltip below.
+
+## Row tooltip
+
+`rowTooltipBuilder` returns a card shown while the pointer is anywhere over a node's row — the indent, the expand chevron, the empty space beside a short label. Return `null` for a node that should not have one.
+
+```dart
+FolderView(
+  data: nodes,
+  expandedNodeIds: expandedIds,
+  rowTooltipBuilder: (context, node) {
+    if (node.type == NodeType.folder) return null;
+    return Card(child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Text('${node.label} — ${node.children.length} children'),
+    ));
+  },
+)
+```
+
+The card supplies its own surface, so the tooltip around it draws no background, padding, or elevation. Give it a `Card`, not a bare `Text`.
+
+It is anchored at the pointer, and that is not configurable. A row is laid out at the tree's content width rather than the viewport's, so anchoring to the row's rect would aim at a centre that leaves the screen the moment the view scrolls horizontally.
+
+### Enabling both
+
+Only one tooltip is visible at a time — the innermost under the pointer. So a node type whose label tooltip is enabled will hide the row card wherever its label sits.
+
+This bites harder than it sounds. A label long enough to ellipsize has consumed all the width available to it, so its rect spans the entire row, and the card for that node becomes unreachable. **To show a row card on a node type, leave that type's `useTooltip` off.**
+
+The pairing that works is a label tooltip on the types whose text gets truncated, and a row card on the rest.
 
 ## Example
 
