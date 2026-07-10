@@ -1,6 +1,8 @@
 /// Named combinations of the demo's settings, applied in one click.
 library;
 
+import 'package:flutter_folderview/flutter_folderview.dart';
+
 import '../providers/theme_demo_provider.dart';
 
 /// A named set of settings, applied to the demo in one click.
@@ -27,6 +29,17 @@ class DemoPreset {
 
   /// Returns the view model this preset describes, given the current one.
   final ThemeDemoViewModel Function(ThemeDemoViewModel) apply;
+
+  /// Every preset the bar offers, in the order it offers them.
+  ///
+  /// `Bare` first: it is what the demo opens on, and the zero the others are
+  /// read against.
+  static final List<DemoPreset> all = [
+    bare,
+    everything,
+    rowCardOverLongLabel,
+    treeModeOverDeepHierarchy,
+  ];
 
   /// Every switchable feature off.
   ///
@@ -89,6 +102,33 @@ class DemoPreset {
         tooltipEnableHover: true,
         useLongChildNames: true,
       );
+      return next.copyWith(
+        nodes: generateDataset(
+          rootCount: next.genRootCount,
+          maxDepth: next.genMaxDepth,
+          subFolderCount: next.genSubFolderCount,
+          parentCount: next.genParentCount,
+          childCount: next.genChildCount,
+          useLongFolderNames: next.useLongFolderNames,
+          useLongParentNames: next.useLongParentNames,
+          useLongChildNames: next.useLongChildNames,
+        ),
+        selectedIds: {},
+        expandedIds: {},
+      );
+    },
+  );
+
+  /// The same hierarchy under both projections' difference: Folders exist in
+  /// the data and vanish from the render.
+  static final DemoPreset treeModeOverDeepHierarchy = DemoPreset(
+    title: 'Tree Mode over a deep hierarchy',
+    whatToLookFor:
+        'Switch View Mode back to Folder. The Folders reappear at the root, '
+        'and the Parents drop a level — Tree Mode lifts Parents to the root '
+        'and hides the Folders that contained them.',
+    apply: (vm) {
+      final next = vm.copyWith(viewMode: ViewMode.tree, genMaxDepth: 3);
       return next.copyWith(
         nodes: generateDataset(
           rootCount: next.genRootCount,

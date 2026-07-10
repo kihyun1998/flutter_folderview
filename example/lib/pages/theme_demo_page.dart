@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 
+import '../presets/demo_preset.dart';
 import '../providers/theme_demo_provider.dart';
+import 'panel/preset_bar.dart';
 import 'panel/theme_builder.dart';
 import 'panel/theme_controls.dart';
 
@@ -14,6 +16,26 @@ class ThemeDemoPage extends StatefulWidget {
 
 class _ThemeDemoPageState extends State<ThemeDemoPage> {
   final ThemeDemoState _notifier = ThemeDemoState();
+
+  /// The demo opens on `Bare` rather than on whatever the view model's field
+  /// defaults happened to accumulate.
+  ///
+  /// A bare tree teaches: every preset clicked afterwards has a zero to be
+  /// measured against. It does not hide the row card, which used to default off
+  /// with nothing on screen to say so — the card is now a named button above
+  /// the tree rather than a switch inside a collapsed drawer.
+  DemoPreset _preset = DemoPreset.bare;
+
+  @override
+  void initState() {
+    super.initState();
+    _notifier.state = _preset.apply(_notifier.state);
+  }
+
+  void _applyPreset(DemoPreset preset) {
+    setState(() => _preset = preset);
+    _notifier.state = preset.apply(_notifier.state);
+  }
 
   @override
   void dispose() {
@@ -60,73 +82,84 @@ class _ThemeDemoPageState extends State<ThemeDemoPage> {
             child: ThemeControls(vm: vm, notifier: notifier),
           ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: FolderView<String>(
-                    data: vm.nodes,
-                    mode: vm.viewMode,
-                    scale: vm.scale,
-                    // The row card is declared once for the whole view, unlike
-                    // the per-Tier label tooltips above. It draws its own
-                    // surface, so it gets a real Card rather than bare text.
-                    rowTooltipBuilder: vm.rowTooltipEnabled
-                        ? _buildRowCard
-                        : null,
-                    // Without a wait, sweeping the mouse across the tree pops a
-                    // card on every row it crosses.
-                    rowTooltipTheme: const RowTooltipTheme(
-                      waitDuration: Duration(milliseconds: 300),
-                    ),
-                    onScaleChanged: (newScale) {
-                      notifier.setScale(newScale.clamp(0.5, 3.0));
-                    },
-                    onNodeTap: (node) {
-                      if (node.type == NodeType.child) {
-                        notifier.selectNode(node.id);
-                      } else if (node.canExpand) {
-                        notifier.toggleNode(node.id);
-                      }
-                    },
-                    onDoubleNodeTap: (node) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              const Icon(
-                                Icons.mouse,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  '더블클릭: ${node.label}',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+            child: Column(
+              children: [
+                PresetBar(
+                  presets: DemoPreset.all,
+                  selected: _preset,
+                  onSelected: _applyPreset,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: FolderView<String>(
+                          data: vm.nodes,
+                          mode: vm.viewMode,
+                          scale: vm.scale,
+                          // The row card is declared once for the whole view, unlike
+                          // the per-Tier label tooltips above. It draws its own
+                          // surface, so it gets a real Card rather than bare text.
+                          rowTooltipBuilder: vm.rowTooltipEnabled
+                              ? _buildRowCard
+                              : null,
+                          // Without a wait, sweeping the mouse across the tree pops a
+                          // card on every row it crosses.
+                          rowTooltipTheme: const RowTooltipTheme(
+                            waitDuration: Duration(milliseconds: 300),
+                          ),
+                          onScaleChanged: (newScale) {
+                            notifier.setScale(newScale.clamp(0.5, 3.0));
+                          },
+                          onNodeTap: (node) {
+                            if (node.type == NodeType.child) {
+                              notifier.selectNode(node.id);
+                            } else if (node.canExpand) {
+                              notifier.toggleNode(node.id);
+                            }
+                          },
+                          onDoubleNodeTap: (node) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.mouse,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        '더블클릭: ${node.label}',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                backgroundColor: Colors.green.shade700,
+                                duration: const Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                            ],
-                          ),
-                          backgroundColor: Colors.green.shade700,
-                          duration: const Duration(seconds: 2),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                            );
+                          },
+                          selectedNodeIds: vm.selectedIds,
+                          expandedNodeIds: vm.expandedIds,
+                          theme: theme,
                         ),
-                      );
-                    },
-                    selectedNodeIds: vm.selectedIds,
-                    expandedNodeIds: vm.expandedIds,
-                    theme: theme,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ],

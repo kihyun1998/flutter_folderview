@@ -41,6 +41,10 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # Declared directly, not leaned on transitively: `preset_rendering_test.dart`
+  # asserts that the Bare preset leaves no `JustTooltip` wrapping a Node, and a
+  # test that names a type must depend on the package that defines it.
+  just_tooltip: ^0.4.3
   # integration_test drives the example app on a real device/desktop (or the
   # headless flutter tester) for on-device integration tests.
   integration_test:

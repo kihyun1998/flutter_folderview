@@ -52,6 +52,11 @@ List<String> _childLabels(List<Node<String>> nodes) => [
       ..._childLabels(node.children),
 ];
 
+/// Every Tier present anywhere in the tree.
+Set<NodeType> _tiersIn(List<Node<String>> nodes) => {
+  for (final node in nodes) ...{node.type, ..._tiersIn(node.children)},
+};
+
 void main() {
   // Applying a preset is a pure function over the view model, so it is asserted
   // here rather than by pumping the demo. The expected values come from #61,
@@ -132,6 +137,28 @@ void main() {
 
     test('says what to look for', () {
       expect(DemoPreset.rowCardOverLongLabel.whatToLookFor, isNotEmpty);
+    });
+  });
+
+  group('Tree Mode over a deep hierarchy', () {
+    test('switches the projection and deepens the tree', () {
+      final vm = DemoPreset.treeModeOverDeepHierarchy.apply(_allSwitchesOff());
+
+      expect(vm.viewMode, ViewMode.tree);
+      expect(vm.genMaxDepth, greaterThan(2), reason: 'deeper than the default');
+    });
+
+    test('generates the Folders the projection will hide', () {
+      // The interaction is that Tree Mode hides Folders and lifts Parents to
+      // the root. A tree with no Folder in it cannot demonstrate that.
+      final vm = DemoPreset.treeModeOverDeepHierarchy.apply(_allSwitchesOff());
+
+      expect(vm.nodes.every((n) => n.type == NodeType.folder), isTrue);
+      expect(_tiersIn(vm.nodes), contains(NodeType.parent));
+    });
+
+    test('says what to look for', () {
+      expect(DemoPreset.treeModeOverDeepHierarchy.whatToLookFor, isNotEmpty);
     });
   });
 
