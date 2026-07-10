@@ -37,4 +37,22 @@ class DemoPreset {
       tooltipShowArrow: false,
     ),
   );
+
+  /// Every switchable feature on. The mirror of [bare]: the whole surface at
+  /// once, for when that is what you want to see.
+  static final DemoPreset everything = DemoPreset(
+    title: 'Everything',
+    apply: (vm) => vm.copyWith(
+      rowTooltipEnabled: true,
+      folderTooltipEnabled: true,
+      parentTooltipEnabled: true,
+      childTooltipEnabled: true,
+      tooltipEnableTap: true,
+      tooltipEnableHover: true,
+      tooltipInteractive: true,
+      tooltipHideOnEmptyMessage: true,
+      tooltipBoxShadowEnabled: true,
+      tooltipShowArrow: true,
+    ),
+  );
 }
