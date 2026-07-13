@@ -118,6 +118,6 @@ flutter run -d windows   # or macos, linux, chrome
 
 Both tooltips are hover-driven, so use a desktop or web target; on a touch target only tap-triggered tooltips appear.
 
-The right-hand panel exposes every theme knob — line style, per-tier icons and colours, node spacing, scrollbars, the Ctrl/Cmd + wheel scale gesture, and both tooltips. Open the **Tooltip** section and switch **Row Tooltip (card)** on: hovering a label's text still raises the label tooltip, and hovering anywhere else on the row raises the card.
+The left-hand panel exposes the theme — line style, per-tier icons and colours, node spacing, the Ctrl/Cmd + wheel scale gesture, and both tooltips. Open the **Tooltip** section and switch **Row Tooltip (card)** on: hovering a label's text still raises the label tooltip, and hovering anywhere else on the row raises the card.
 
 See the [package documentation](https://pub.dev/packages/flutter_folderview) for the full API.

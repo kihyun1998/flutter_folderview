@@ -112,16 +112,17 @@ flutter test --coverage
 flutter pub get
 dart format --output=none --set-exit-if-changed .
 flutter analyze
+flutter test        # example/test 만. integration_test/ 는 제외.
 ```
 
 - **`flutter analyze` 통과 ≠ CI 통과.** `dart format --set-exit-if-changed` 는 **별개 게이트**다 — analyze 는 lint 규칙을, format 은 서식 정규형을 본다. 실증(#48): 손으로 줄바꿈한 파일 둘 때문에 두 잡이 모두 떨어졌다. 로컬에서 푸시 전에 돌린다:
   ```
   dart format lib test benchmark && (cd example && dart format .)
   flutter analyze && (cd example && flutter analyze)
-  flutter test
+  flutter test && (cd example && flutter test)
   ```
 - **포맷 검사는 `pub get` 뒤여야 한다.** `dart format` 은 `.dart_tool/package_config.json` 에서 언어 버전을 읽는다. CI 의 주석이 그 이유를 적어두고 있다.
-- **example 잡은 `flutter test` 를 돌리지 않는다.** 실증: `example/test/widget_test.dart` 는 `flutter create` 의 "Counter increments smoke test" 이고, 이 앱에 카운터가 없어 `e5f6353 add example` 이후 **한 번도 통과한 적이 없다.** 아무도 몰랐다.
+- **example 테스트도 CI 게이트다 — 그러나 오래 아니었다.** 실증: `example/test/widget_test.dart` 는 `flutter create` 의 "Counter increments smoke test" 였고, 이 앱에 카운터가 없어 `e5f6353 add example` 이후 **한 번도 통과한 적이 없다.** example 잡이 `flutter analyze` 만 돌렸으므로 아무도 몰랐다. `a44f9e0`(#57) 이 그 테스트를 지우면서 `Test` 스텝을 함께 넣었다. **돌지 않는 테스트는 테스트가 아니다** — 새 테스트를 어느 잡이 실제로 실행하는지 확인하고 쓴다.
 - **통합 테스트는 CI 에 없다.** 실제 데스크톱 앱을 띄운다. 로컬에서 `flutter test integration_test/<file>.dart -d windows`. 한 세션에서 둘을 연달아 돌리면 두 번째가 `Error waiting for a debug connection` 으로 죽는다 — **하나씩** 돌린다.
 - **`git status` 의 `M` 이 항상 내용 변경은 아니다.** 실증: `example/*/flutter/generated_plugin_registrant.*` 은 `flutter analyze` 가 재생성하며 EOL 만 바뀐다. `git diff` 는 비어 있다. 커밋 전에 `git diff --ignore-all-space --stat` 로 걸러내고 `git restore` 한다.
 - **되돌릴 수 없는 것은 사용자가 실행한다.**
