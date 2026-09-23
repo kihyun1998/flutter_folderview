@@ -49,24 +49,100 @@ class EverySettingDemo extends ChangeNotifier {
   Set<String> _expandedIds = {};
   Set<String> get expandedIds => _expandedIds;
 
-  final Set<String> selectedIds = const {};
+  Set<String> _selectedIds = {};
+  Set<String> get selectedIds => _selectedIds;
+
+  SelectionMode _selectionMode = SelectionMode.single;
+  SelectionMode get selectionMode => _selectionMode;
+
+  bool _tapHandlerOn = true;
+  bool get tapHandlerOn => _tapHandlerOn;
+
+  bool _doubleTapHandlerOn = true;
+  bool get doubleTapHandlerOn => _doubleTapHandlerOn;
+
+  bool _secondaryTapHandlerOn = true;
+  bool get secondaryTapHandlerOn => _secondaryTapHandlerOn;
+
+  final List<String> _log = [];
+
+  /// The tap callbacks that fired, newest first, at most [logLength].
+  List<String> get log => List.unmodifiable(_log);
+  static const logLength = 20;
 
   set dataSource(DataSource value) => _update(() => _dataSource = value);
   set folderCount(int value) => _update(() => _folderCount = value);
   set parentsPerFolder(int value) => _update(() => _parentsPerFolder = value);
   set childrenPerParent(int value) => _update(() => _childrenPerParent = value);
 
-  set mode(ViewMode value) {
-    if (value == _mode) return;
-    _mode = value;
+  set mode(ViewMode value) => _set(() => _mode = value);
+  set selectionMode(SelectionMode value) => _set(() => _selectionMode = value);
+  set tapHandlerOn(bool value) => _set(() => _tapHandlerOn = value);
+  set doubleTapHandlerOn(bool value) => _set(() => _doubleTapHandlerOn = value);
+  set secondaryTapHandlerOn(bool value) =>
+      _set(() => _secondaryTapHandlerOn = value);
+
+  /// `onNodeTap`: a Folder or Parent toggles its expansion, a Child toggles
+  /// its selection.
+  void handleTap(Node<String> node) {
+    _record('onNodeTap · ${node.label}');
+    if (node.type == NodeType.child) {
+      final selected = _selectedIds.contains(node.id);
+      _selectedIds = switch (_selectionMode) {
+        SelectionMode.single => selected ? {} : {node.id},
+        SelectionMode.multiple =>
+          selected
+              ? (Set.of(_selectedIds)..remove(node.id))
+              : {..._selectedIds, node.id},
+      };
+    } else {
+      final next = Set<String>.of(_expandedIds);
+      if (!next.remove(node.id)) next.add(node.id);
+      _expandedIds = next;
+    }
     notifyListeners();
   }
 
-  void toggleExpansion(Node<String> node) {
-    if (node.type == NodeType.child) return;
-    final next = Set<String>.of(_expandedIds);
-    if (!next.remove(node.id)) next.add(node.id);
-    _expandedIds = next;
+  /// `onDoubleNodeTap`: logged only.
+  void handleDoubleTap(Node<String> node) {
+    _record('onDoubleNodeTap · ${node.label}');
+    notifyListeners();
+  }
+
+  /// `onSecondaryNodeTap`: logged with the global position of the tap.
+  void handleSecondaryTap(Node<String> node, TapDownDetails details) {
+    final at = details.globalPosition;
+    _record(
+      'onSecondaryNodeTap · ${node.label} @ '
+      '(${at.dx.round()}, ${at.dy.round()})',
+    );
+    notifyListeners();
+  }
+
+  void expandAll() => _set(() {
+    final ids = <String>{};
+    void collect(List<Node<String>> nodes) {
+      for (final node in nodes) {
+        if (node.type != NodeType.child) ids.add(node.id);
+        collect(node.children);
+      }
+    }
+
+    collect(_nodes);
+    _expandedIds = ids;
+  });
+
+  void collapseAll() => _set(() => _expandedIds = {});
+
+  void clearSelection() => _set(() => _selectedIds = {});
+
+  void _record(String entry) {
+    _log.insert(0, entry);
+    if (_log.length > logLength) _log.removeLast();
+  }
+
+  void _set(void Function() change) {
+    change();
     notifyListeners();
   }
 
@@ -97,8 +173,12 @@ class EverySettingDemo extends ChangeNotifier {
     _expandedIds = _dataSource == DataSource.demo
         ? _demoExpandedIds
         : _expandedIds.intersection(ids);
+    _selectedIds = _selectedIds.intersection(ids);
   }
 }
+
+/// How the example's `onNodeTap` handler updates the Selected Set.
+enum SelectionMode { single, multiple }
 
 /// The "Every setting" stage: a `FolderView` over [EverySettingDemo].
 class EverySettingStage extends StatelessWidget {
@@ -115,7 +195,11 @@ class EverySettingStage extends StatelessWidget {
         mode: demo.mode,
         expandedNodeIds: demo.expandedIds,
         selectedNodeIds: demo.selectedIds,
-        onNodeTap: demo.toggleExpansion,
+        onNodeTap: demo.tapHandlerOn ? demo.handleTap : null,
+        onDoubleNodeTap: demo.doubleTapHandlerOn ? demo.handleDoubleTap : null,
+        onSecondaryNodeTap: demo.secondaryTapHandlerOn
+            ? demo.handleSecondaryTap
+            : null,
       ),
     );
   }

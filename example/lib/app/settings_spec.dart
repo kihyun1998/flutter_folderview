@@ -39,7 +39,38 @@ const settingsSpec = <SettingGroup>[
       ),
     ],
   ),
+  _interaction,
 ];
+
+const _interaction = SettingGroup(
+  id: 'interaction',
+  title: 'Interaction',
+  features: [
+    SettingFeature(
+      id: 'interaction',
+      title: 'Taps & state',
+      options: [
+        'FolderView.onNodeTap',
+        'FolderView.onDoubleNodeTap',
+        'FolderView.onSecondaryNodeTap',
+        'FolderView.expandedNodeIds',
+        'FolderView.selectedNodeIds',
+        'selectionMode',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'viewMode',
+          effect:
+              'In Tree Mode a Folder is never rendered, so a Folder id in the '
+              'Expanded Set changes nothing there.',
+          evidence:
+              'lib/services/view_mode_projection.dart: ViewModeProjection.'
+              'project returns only Parents for ViewMode.tree',
+        ),
+      ],
+    ),
+  ],
+);
 
 /// Library options, as `Class.field`, that a recipe demonstrates rather than
 /// the settings panel.

@@ -57,8 +57,80 @@ class EverySettingHost extends SettingsHost {
       itemLabel: (m) => m.name,
       onChanged: (m) => demo.mode = m,
     ),
+    'FolderView.onNodeTap' => buildSwitchTile(
+      id: settingId,
+      label: 'onNodeTap handler',
+      value: demo.tapHandlerOn,
+      onChanged: (on) => demo.tapHandlerOn = on,
+    ),
+    'FolderView.onDoubleNodeTap' => buildSwitchTile(
+      id: settingId,
+      label: 'onDoubleNodeTap handler',
+      value: demo.doubleTapHandlerOn,
+      onChanged: (on) => demo.doubleTapHandlerOn = on,
+    ),
+    'FolderView.onSecondaryNodeTap' => buildSwitchTile(
+      id: settingId,
+      label: 'onSecondaryNodeTap handler',
+      value: demo.secondaryTapHandlerOn,
+      onChanged: (on) => demo.secondaryTapHandlerOn = on,
+    ),
+    'FolderView.expandedNodeIds' => _setRow(
+      settingId,
+      'Expanded Set: ${demo.expandedIds.length}',
+      {'Expand all': demo.expandAll, 'Collapse all': demo.collapseAll},
+    ),
+    'FolderView.selectedNodeIds' => _setRow(
+      settingId,
+      'Selected Set: ${demo.selectedIds.length}',
+      {'Clear': demo.clearSelection},
+    ),
+    'selectionMode' => buildDropdownRow<SelectionMode>(
+      id: settingId,
+      label: 'Selection',
+      value: demo.selectionMode,
+      items: SelectionMode.values,
+      itemLabel: (m) => m.name,
+      onChanged: (m) => demo.selectionMode = m,
+    ),
     _ => throw ArgumentError.value(settingId, 'settingId'),
   };
+
+  @override
+  List<Widget> extrasAfterOptions(String featureId, BuildContext context) {
+    if (featureId != 'interaction') return const [];
+    return [
+      const SizedBox(height: 12),
+      const Text('Event log', style: TextStyle(fontWeight: FontWeight.w600)),
+      Column(
+        key: const Key('interaction-log'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final entry in demo.log)
+            Text(entry, style: const TextStyle(fontSize: 12)),
+        ],
+      ),
+    ];
+  }
+
+  /// A caller-owned set's size, and buttons that replace it.
+  SettingsControl _setRow(
+    String id,
+    String label,
+    Map<String, VoidCallback> actions,
+  ) => SettingsControl(
+    id: id,
+    label: label,
+    child: Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 8,
+      children: [
+        Text(label),
+        for (final MapEntry(:key, :value) in actions.entries)
+          TextButton(onPressed: value, child: Text(key)),
+      ],
+    ),
+  );
 
   /// An integer slider from 1 to 50 in steps of one, disabled unless the data
   /// is generated.
