@@ -6,6 +6,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 ## Governing decisions
 **None** as records. Two calls are the maintainer's, made on #75:
 - **What counts as an option.** The coverage guard counts the public `final` instance fields of every public class in a file the barrel exports: **158** at #75. The hand count in #74 said 144. It had missed `Node` (5), the eight sub-theme containers of `FlutterFolderViewTheme`, and `FolderViewTheme.data`. The maintainer was shown both counts and chose the mechanical rule.
+- **Test helpers live in `example/test/support/`**, so `example/test/` holds only `*_test.dart` files. Neither this repo nor `flutter_table_plus` had a precedent; the maintainer was shown the flat alternative and chose the folder.
 - **Windows window size** is 1200×600, wider than `ShellPage.narrowBreakpoint` (900), so the desktop run opens in the three-region layout. Whether `window_manager` stays at all is decided in #91.
 
 ## Design model
