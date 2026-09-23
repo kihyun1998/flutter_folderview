@@ -17,7 +17,15 @@ class FolderView<T> extends StatefulWidget {
   final List<Node<T>> data;
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
+
+  /// Fires on a second tap within `ChildNodeTheme.clickInterval`. **Child** rows
+  /// only; the first tap has already fired [onNodeTap].
   final Function(Node<T>)? onDoubleNodeTap;
+
+  /// Fires on a secondary (right) click on a row of **any** tier, with the
+  /// pointer position in [TapDownDetails] — the hook for a context menu, and
+  /// for a caller who tracks a focused Folder or Parent, which are not
+  /// selectable (ADR-0003).
   final Function(Node<T>, TapDownDetails)? onSecondaryNodeTap;
   final Set<String>? selectedNodeIds;
   final Set<String>? expandedNodeIds;
@@ -115,26 +123,17 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   /// and diff helpers.
   final Flattener<T> _flattener = Flattener<T>();
 
-  /// Pre-calculated maximum content width from all nodes (including collapsed).
-  /// Computed once when data changes, ensuring stable width.
+  /// Pre-calculated maximum content width from all nodes (including collapsed),
+  /// so expanding never changes it.
   double _precomputedMaxWidth = 0.0;
 
-  /// Whether the width has been computed for the current data.
-  bool _widthComputed = false;
-
-  @override
-  void didUpdateWidget(covariant FolderView<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Reset computed width when data, scale, or theme changes. Theme feeds
-    // icon sizes, fonts and padding into the width measurement, so a new theme
-    // must invalidate the precomputed width too (a different instance is
-    // enough — callers own the theme and rebuild it deliberately).
-    if (!identical(oldWidget.data, widget.data) ||
-        oldWidget.scale != widget.scale ||
-        !identical(oldWidget.theme, widget.theme)) {
-      _widthComputed = false;
-    }
-  }
+  /// The inputs [_precomputedMaxWidth] was measured from, compared on each
+  /// build: data and effective theme by identity, scale and base style by value.
+  List<Node<T>>? _measuredData;
+  FlutterFolderViewTheme<T>? _measuredTheme;
+  double? _measuredScale;
+  TextStyle? _measuredBaseStyle;
+  bool _widthMeasured = false;
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +143,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
     // Apply scale to the theme. scrollbarTheme is preserved as-is (ADR-0001).
     // Each Theme owns its own scaling logic — see `Theme.scale(...)` methods.
     final scaledTheme = effectiveTheme.scaledForContext(context, widget.scale);
+    final baseTextStyle = Theme.of(context).textTheme.bodyMedium;
 
     // Project + flatten (memoized; incremental single-node updates when
     // possible). The Flattener owns the cache and change detection.
@@ -159,13 +159,20 @@ class _FolderViewState<T> extends State<FolderView<T>> {
         final double availableHeight = constraints.maxHeight;
         final double availableWidth = constraints.maxWidth;
 
-        // Pre-compute max width from ALL nodes (including collapsed) once per data/scale change.
-        if (!_widthComputed) {
+        if (!_widthMeasured ||
+            !identical(_measuredData, widget.data) ||
+            !identical(_measuredTheme, effectiveTheme) ||
+            _measuredScale != widget.scale ||
+            _measuredBaseStyle != baseTextStyle) {
           _precomputedMaxWidth = RowMetrics<T>(
             theme: scaledTheme,
-            baseTextStyle: Theme.of(context).textTheme.bodyMedium,
+            baseTextStyle: baseTextStyle,
           ).maxWidth(widget.data);
-          _widthComputed = true;
+          _measuredData = widget.data;
+          _measuredTheme = effectiveTheme;
+          _measuredScale = widget.scale;
+          _measuredBaseStyle = baseTextStyle;
+          _widthMeasured = true;
         }
 
         // Clamp to a reasonable max (3× viewport). _precomputedMaxWidth is

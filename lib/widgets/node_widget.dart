@@ -97,6 +97,7 @@ class NodeWidget<T> extends StatelessWidget {
           useOpenState: true,
           isExpanded: isExpanded,
           onTap: onTap,
+          onSecondaryTap: onSecondaryTap,
           scale: scale,
         );
       case NodeType.parent:
@@ -107,6 +108,7 @@ class NodeWidget<T> extends StatelessWidget {
           useOpenState: mode == ViewMode.tree,
           isExpanded: isExpanded,
           onTap: onTap,
+          onSecondaryTap: onSecondaryTap,
           scale: scale,
         );
     }

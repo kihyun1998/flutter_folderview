@@ -67,4 +67,63 @@ void main() {
       expect(find.byType(FolderViewHorizontalScrollbar), findsOneWidget);
     },
   );
+
+  // The theme can also reach the view without the `theme:` prop changing: from
+  // an ancestor FolderViewTheme, or through the ambient text theme that
+  // measurement merges under the tier style. Either one changes what a row
+  // draws, so either one must re-measure.
+  Widget inheritedHarness({
+    required FlutterFolderViewTheme<String> theme,
+    TextStyle? bodyMedium,
+  }) {
+    return MaterialApp(
+      theme: ThemeData(textTheme: TextTheme(bodyMedium: bodyMedium)),
+      home: Scaffold(
+        body: Center(
+          child: SizedBox(
+            width: 200,
+            height: 400,
+            child: FolderViewTheme<String>(
+              data: theme,
+              child: FolderView<String>(
+                data: data,
+                mode: ViewMode.tree,
+                expandedNodeIds: const {'p1'},
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  testWidgets(
+    'content width recomputes when an ancestor FolderViewTheme changes',
+    (tester) async {
+      await tester.pumpWidget(inheritedHarness(theme: themedWithFont(2)));
+      await tester.pumpAndSettle();
+      expect(find.byType(FolderViewHorizontalScrollbar), findsNothing);
+
+      await tester.pumpWidget(inheritedHarness(theme: themedWithFont(60)));
+      await tester.pumpAndSettle();
+      expect(find.byType(FolderViewHorizontalScrollbar), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'content width recomputes when the ambient text theme changes',
+    (tester) async {
+      // light() tier styles set no fontSize, so bodyMedium alone sizes the text.
+      final plain = FlutterFolderViewTheme<String>.light();
+      await tester.pumpWidget(inheritedHarness(
+          theme: plain, bodyMedium: const TextStyle(fontSize: 2)));
+      await tester.pumpAndSettle();
+      expect(find.byType(FolderViewHorizontalScrollbar), findsNothing);
+
+      await tester.pumpWidget(inheritedHarness(
+          theme: plain, bodyMedium: const TextStyle(fontSize: 60)));
+      await tester.pumpAndSettle();
+      expect(find.byType(FolderViewHorizontalScrollbar), findsOneWidget);
+    },
+  );
 }

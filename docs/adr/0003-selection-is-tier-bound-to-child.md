@@ -14,6 +14,8 @@ Rejected because:
 
 ## Note on the current implementation
 
-`node_widget.dart` (`_buildFolderParentNodeContent`, `_getTextStyle`) currently contains a half-finished `isSelected` branch for **Folders** and **Parents** that applies a hard-coded Material default highlight when their IDs appear in the **Selected Set**. This is a vestige of an earlier exploration and contradicts the decision recorded here. It is scheduled for removal in the architecture review that follows this ADR.
+When this ADR was written, `node_widget.dart` still carried a half-finished `isSelected` branch for **Folders** and **Parents** — a vestige of an earlier exploration that contradicted this decision. The tier-renderer split (`bfb91db`) removed it: `ExpandableNodeRenderer` has no selection branch, and only `ChildNodeRenderer` reads the **Selected Set**.
+
+The container route named above holds as of 0.11.3: `onSecondaryNodeTap` fires on **Folder** and **Parent** rows too. Before that it reached **Child** rows only, so this ADR's advice had no path in the code.
 
 Future PRs should not "complete" this branch by adding `selected*` fields to `FolderNodeTheme` / `ParentNodeTheme` — that would re-open this decision.

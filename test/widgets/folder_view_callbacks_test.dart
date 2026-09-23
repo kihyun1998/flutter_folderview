@@ -117,4 +117,28 @@ void main() {
     // Each tap resolves to the row actually hit, in order.
     expect(tapped, ['c0', 'c1']);
   });
+
+  // Folders and Parents are not selectable (ADR-0003), and ADR-0003 routes a
+  // caller who needs container focus through onSecondaryNodeTap. So a
+  // secondary tap must reach the callback on every tier, not only on Children.
+  for (final (label, id) in [('folder-f', 'f'), ('parent-p', 'p')]) {
+    testWidgets('right-clicking a container ($id) fires onSecondaryNodeTap',
+        (tester) async {
+      final hits = <String>[];
+      TapDownDetails? details;
+      await pump(
+        tester,
+        onSecondaryNodeTap: (n, d) {
+          hits.add(n.id);
+          details = d;
+        },
+      );
+
+      await tester.tap(find.text(label), buttons: kSecondaryButton);
+      await tester.pump();
+
+      expect(hits, [id]);
+      expect(details, isNotNull);
+    });
+  }
 }

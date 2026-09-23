@@ -40,7 +40,7 @@ class ChildNodeRenderer<T> extends StatelessWidget {
       style = style?.merge(selectedStyle) ?? selectedStyle;
     }
 
-    final label = childTheme.labelResolver?.call(node) ?? node.label;
+    final label = metrics.label(node);
     final iconWidget =
         childTheme.widgetResolver?.call(node) ?? childTheme.widget;
 

@@ -148,4 +148,38 @@ void main() {
       expect(metrics.maxWidth(roots), closeTo(referenceMaxWidth(roots), 1e-9));
     });
   });
+
+  group('RowMetrics measures the label that is rendered', () {
+    // The renderers draw `labelResolver?.call(node) ?? node.label`. Measuring
+    // `node.label` instead left a resolved label ellipsized where the view
+    // should have scrolled.
+    const shown = 'a resolved label far wider than the raw one';
+
+    for (final type in NodeType.values) {
+      test('${type.name}: a labelResolver is measured, not node.label', () {
+        String resolve(Node<String> n) => shown;
+        final base = buildTheme();
+        final theme = switch (type) {
+          NodeType.folder => base.copyWith(
+              folderTheme: base.folderTheme.copyWith(labelResolver: resolve)),
+          NodeType.parent => base.copyWith(
+              parentTheme: base.parentTheme.copyWith(labelResolver: resolve)),
+          NodeType.child => base.copyWith(
+              childTheme: base.childTheme.copyWith(labelResolver: resolve)),
+        };
+        const style = TextStyle(fontSize: 14);
+        final withResolver =
+            RowMetrics<String>(theme: theme, baseTextStyle: style);
+        final plain = RowMetrics<String>(theme: base, baseTextStyle: style);
+
+        final raw = Node<String>(id: 'n', label: 'x', type: type);
+        final same = Node<String>(id: 'n', label: shown, type: type);
+
+        expect(withResolver.measureNodeWidth(raw, 0),
+            closeTo(plain.measureNodeWidth(same, 0), 1e-9));
+        expect(withResolver.maxWidth([raw]),
+            closeTo(plain.maxWidth([same]), 1e-9));
+      });
+    }
+  });
 }

@@ -75,13 +75,21 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_example_template:
+    dependency: "direct main"
+    description:
+      name: flutter_example_template
+      sha256: "6d715cc0035b566f0f16463d403112dc840f260531f937963316ac303af8feab"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   flutter_folderview:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.11.1"
+    version: "0.11.3"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -90,6 +98,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
+  flutter_syntax_highlight:
+    dependency: transitive
+    description:
+      name: flutter_syntax_highlight
+      sha256: b66d08374d09f076911374ec59c9444bf0555ebd96e4f51993c7bcc936086d38
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -117,10 +133,10 @@ packages:
     dependency: transitive
     description:
       name: just_tooltip
-      sha256: cd5a0d1733149ce25facb768cb66548620e97e5ce3223f1e97b6f6c2850d94a4
+      sha256: f4f7fe69f386b53ed06ae7fd365fd8ade26aef9e40696f1e97b61e742f6030f1
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.3"
+    version: "0.4.4"
   leak_tracker:
     dependency: transitive
     description:
@@ -344,4 +360,4 @@ packages:
     version: "0.5.1"
 sdks:
   dart: ">=3.9.0-0 <4.0.0"
-  flutter: ">=3.18.0-18.0.pre.54"
+  flutter: ">=3.27.0"

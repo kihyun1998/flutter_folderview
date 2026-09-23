@@ -48,6 +48,19 @@ class RowMetrics<T> {
     }
   }
 
+  /// The label text for [node] — `labelResolver ?? node.label` for its tier.
+  /// Read by both measurement and the renderers.
+  String label(Node<T> node) {
+    switch (node.type) {
+      case NodeType.folder:
+        return theme.folderTheme.labelResolver?.call(node) ?? node.label;
+      case NodeType.parent:
+        return theme.parentTheme.labelResolver?.call(node) ?? node.label;
+      case NodeType.child:
+        return theme.childTheme.labelResolver?.call(node) ?? node.label;
+    }
+  }
+
   /// Width of the tier icon box (icon width plus its horizontal padding/margin).
   double iconBoxWidth(NodeType type) {
     switch (type) {
@@ -85,7 +98,7 @@ class RowMetrics<T> {
       indentWidth(depth) +
       expandStripWidth +
       iconBoxWidth(node.type) +
-      _measureTextWidth(node.label, style) +
+      _measureTextWidth(label(node), style) +
       theme.spacingTheme.contentPadding.right;
 
   /// Whether the tier for [type] resolves its text style per node.

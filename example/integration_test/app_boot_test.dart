@@ -9,11 +9,8 @@ void main() {
   testWidgets('example app boots and renders a FolderView with a node row', (
     tester,
   ) async {
-    // Boot the real example widget tree (MyApp + ThemeDemoPage)
-    // directly, rather than calling the example's main(). main() runs the
-    // Windows-only window_manager setup, which needs a real platform channel;
-    // MyApp is the pure MaterialApp + ThemeDemoPage tree with no platform calls,
-    // so it boots headlessly under the integration binding.
+    // MyApp without main(): the shell over the example's destinations, with
+    // the "Every setting" stage open. main() adds the Windows window setup.
     await tester.pumpWidget(const MyApp());
     await tester.pumpAndSettle();
 
