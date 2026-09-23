@@ -29,6 +29,7 @@ The reasoning lives in the CHANGELOG entries and a comment in `pubspec.yaml`, no
 ## Blast radius
 - [label-tooltip](label-tooltip.md) and [row-card](row-card.md) — their placement and suppression come from the resolved `just_tooltip`.
 - [ci-gates](ci-gates.md) — CI resolves fresh, so it never sees a consumer's older lock.
+- [example](example.md) — the example's Flutter floor is `flutter_example_template`'s (`>=3.27.0`), above this package's (`>=3.13.0`). Raising this package's floor past 3.27 moves the example's floor too.
 
 ## Known holes
 - `example/pubspec.lock` is refreshed only when someone runs `pub get` in `example/` and commits the result. It fell a release behind the root once (refreshed in 0.11.3).

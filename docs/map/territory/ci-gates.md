@@ -28,6 +28,7 @@ None recorded.
 ## Blast radius
 - [dependency-floor-release](dependency-floor-release.md) — CI resolves fresh and on `stable` only, so it cannot catch an SDK floor that is too low.
 - [flattening](flattening.md) and [row-geometry](row-geometry.md) — their hot paths are benchmarked, not gated.
+- [example](example.md) — the `example` job runs the option coverage guard, so a public field added to `lib/` turns that job red until the example exposes the field or lists it with an owning issue.
 
 ## Known holes
 - CI runs only the latest stable Flutter. The declared floor (`>=3.13.0`) is never built.

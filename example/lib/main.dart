@@ -11,8 +11,6 @@ void main() async {
 
   if (Platform.isWindows) {
     await windowManager.ensureInitialized();
-    // Wider than ShellPage.narrowBreakpoint, so the shell opens in its
-    // three-region layout.
     await windowManager.setSize(const Size(1200, 600));
     await windowManager.center();
   }
