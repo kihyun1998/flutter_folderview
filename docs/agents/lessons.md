@@ -116,3 +116,9 @@ mutation-check 를 PR 본문에 적는다.
 - **통합 테스트는 하나씩** — 한 세션에서 둘을 연달아 돌리면 두 번째가 `Error waiting for a
   debug connection`. `generated_plugin_registrant.*` 의 `M` 은 EOL 만 바뀐 것(`git diff
   --ignore-all-space` 로 걸러 `git restore`).
+- **#92 (PR 이 싣는 것은 로컬 diff 가 아니다)**: #75 브랜치를 로컬 `main` 에서 땄는데, 그
+  `main` 에 push 안 된 커밋 셋(지도 구축·0.11.3 수정·주석 정책)이 있었다. PR 은 `origin/main`
+  대비라 52 파일을 실었고 #75 몫은 18 이었다. 본문은 로컬 `main` 대비 diff 만 보고 *"`lib/`
+  unchanged"* 라 적었다 — 거짓이었다(0.11.3 수정이 `lib/` 를 바꿨다). squash 는 그 셋의 메시지를
+  `feat(example)` 하나로 덮었다. **브랜치를 따기 전에 `git log origin/main..main` 이 비었는지,
+  PR 본문을 쓰기 전에 `gh pr view --json files` 의 개수가 내 diff 와 같은지 본다.**
