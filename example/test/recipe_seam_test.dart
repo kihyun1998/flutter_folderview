@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:example/app/destinations.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -31,6 +32,18 @@ List<File> recipeFiles() {
       .toList();
 }
 
+/// The `source` of every destination the example registers.
+List<String> registeredSources() {
+  final destinations = FolderViewDestinations();
+  final sources = destinations.all
+      .whereType<StageDestination>()
+      .map((d) => d.source)
+      .whereType<String>()
+      .toList();
+  destinations.dispose();
+  return sources;
+}
+
 void main() {
   test(
     'every recipe file imports only Flutter, flutter_folderview and dart:',
@@ -44,16 +57,32 @@ void main() {
     },
   );
 
+  test('lib/recipes holds at least one recipe', () {
+    expect(recipeFiles(), isNotEmpty);
+  });
+
   test('every Code pane source is an existing file under lib/recipes', () {
-    final destinations = FolderViewDestinations();
-    addTearDown(destinations.dispose);
-    final sources = destinations.all
-        .whereType<StageDestination>()
-        .map((d) => d.source)
-        .whereType<String>();
-    for (final source in sources) {
+    for (final source in registeredSources()) {
       expect(source, startsWith('$recipesDir/'));
       expect(File(source).existsSync(), isTrue, reason: source);
+    }
+  });
+
+  test('every recipe file is registered as a Code pane source', () {
+    final registered = registeredSources().toSet();
+    final unregistered = recipeFiles()
+        .map((f) => f.path.replaceAll(r'\', '/'))
+        .where((path) => !registered.contains(path))
+        .toList();
+    expect(unregistered, isEmpty);
+  });
+
+  testWidgets('every Code pane source loads from the asset bundle', (
+    tester,
+  ) async {
+    for (final source in registeredSources()) {
+      final text = await tester.runAsync(() => rootBundle.loadString(source));
+      expect(text, File(source).readAsStringSync(), reason: source);
     }
   });
 
