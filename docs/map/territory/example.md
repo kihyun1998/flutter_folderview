@@ -7,6 +7,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 **None** as records. Two calls are the maintainer's, made on #75:
 - **What counts as an option.** The coverage guard counts the public `final` instance fields of every public class in a file the barrel exports: **158** at #75. The hand count in #74 said 144. It had missed `Node` (5), the eight sub-theme containers of `FlutterFolderViewTheme`, and `FolderViewTheme.data`. The maintainer was shown both counts and chose the mechanical rule.
 - **Test helpers live in `example/test/support/`**, so `example/test/` holds only `*_test.dart` files. Neither this repo nor `flutter_table_plus` had a precedent; the maintainer was shown the flat alternative and chose the folder.
+- **`Node`'s five fields are covered by a recipe, not the settings panel** (#76). They are the data's shape, not knobs. The maintainer was also shown the alternative, a read-only "control" in the panel, and chose the recipe. So `Building a tree` became the first recipe, and the first-recipe seam rules from #74 landed with it.
+- **Generated data is strictly Folder → Parent → Child** (#76). The count of each is a setting. The legacy generator's nested-Folder depth was dropped on purpose: the maintainer chose the containment rule in `CONTEXT.md` over keeping that option.
 - **Windows window size** is 1200×600, wider than `ShellPage.narrowBreakpoint` (900), so the desktop run opens in the three-region layout. Whether `window_manager` stays at all is decided in #91.
 
 ## Design model
@@ -21,6 +23,10 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - **`show` is not applied** when the guard resolves exports. At #75 the only `show` export (`scale_modifier.dart`) held no class, so a filter guarded nothing, and mutation testing confirmed it. Without the filter, a future `show` that hides a class makes the guard *demand* coverage for it, which is loud, rather than skipping it silently.
 - **Recipe seam (`recipe_seam_test`).** It walks `lib/recipes/`, the directory rather than the roster, so a recipe nobody registered is still held to the rule. A Code pane file may import only `dart:`, `package:flutter/` and `package:flutter_folderview/`. Every `StageDestination.source` must be an existing file under `lib/recipes/`.
 - **Light mode is pinned** (`ExampleThemeController(ThemeMode.light)`) until #90 wires the `FolderView` theme to the shell's brightness. A dark shell around the default light tree would be a mismatch nobody chose.
+- **"Every setting" knob region**: `FeatureListPane` above and the open feature's `FeatureDetailPane` below, over one `EverySettingHost`. `settings_render_test` opens every feature in `settingsSpec` and requires a `SettingsControl` carrying each listed id. That makes "listed in the spec" mean "drawn", which the coverage guard alone cannot check.
+- **Count sliders are the example's own `SettingsControl`**, not `buildSliderSetting`. The template's slider hard-codes `divisions: (max - min) / 2`, so it cannot step through integers: over 1..50 it steps by 1.96.
+- **Changing the data intersects the Expanded Set with the new ids.** Generated ids (`f1-p2-c3`) share nothing with the demo's, so without the intersection the caller would hand the view ids that name nothing.
+- **The recipe seam is live from #76**: `lib/recipes/` is non-empty, registered sources and recipe files match in both directions, and every source loads through `rootBundle`, the path the Code pane takes. `lib/recipes/` is declared under pubspec `assets`.
 - The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).
 
 ## Code
@@ -28,10 +34,16 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/lib/app/destinations.dart` — `FolderViewDestinations`
 - `example/lib/app/every_setting.dart` — `EverySettingDemo`, `EverySettingStage`
 - `example/lib/app/settings_spec.dart` — `settingsSpec`, `recipeCoverage`
+- `example/lib/app/every_setting_host.dart` — `EverySettingHost`
+- `example/lib/app/every_setting.dart` — `DataSource`, `EverySettingKnobs`
+- `example/lib/app/tree_generator.dart` — `generateTree`
+- `example/lib/recipes/building_a_tree_recipe.dart` — `BuildingATreeRecipe`
+- `example/lib/scenarios/large_tree_scenario.dart` — `LargeTreeDemo`, `LargeTreeStage`
+- `example/test/settings_render_test.dart` — every spec id draws a control
 - `example/test/option_coverage_test.dart` — `notYetCovered`, `coveredOptions`
 - `example/test/support/library_options.dart` — `libraryOptions`, `optionsInSource`
 - `example/test/recipe_seam_test.dart` — `allowedImports`, `disallowedImports`
-- `example/test/support/shell_harness.dart` — `pumpShell`, `openDestination`, `renderedFolderView`
+- `example/test/support/shell_harness.dart` — `pumpShell`, `openDestination`, `openFeature`, `chooseDropdown`, `setSlider`, `renderedFolderView`
 
 ## Reference behaviour
 - `flutter_example_template` **0.2.0**, read from the pub cache source. `PreviewStage` sizes its child with `SizedBox.fromSize(spec.size)` and gives it its own `Overlay`, and `PreviewFrame` scales the whole frame down to fit. Its floor, `flutter >=3.27.0`, is why the example declares the same floor.
@@ -50,5 +62,5 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 ## Known holes
 - **Probed on 2026-09-23: a label tooltip in a preview frame.** The probe went through the real `ShellPage` and selected each viewport from its bar. For a Child label with a 300×120 tooltip, the tooltip painted inside the stage's own `Overlay` and scaled with the frame (desktop frame 1008×630 for a 1440×900 spec, tooltip 210×84). It stayed inside the frame in the 7 of 9 cases where it rested: every direction on desktop and tablet, and `top` on mobile. The first probe wrapped `PreviewStage` in a tight `SizedBox`, which overrode `spec.size`, so all three widths measured the same 1400×900. That probe was discarded.
 - **Probed on 2026-09-23: a tooltip that fits on neither side flickers.** On mobile with `direction: left` or `right`, it alternated shown and hidden every 50 ms frame (`T-T-T-…`). A control run with a plain 390-wide `MaterialApp` and no shell reproduced it exactly, while at 1440 it stayed shown. So the cause is not the shell: the clamped tooltip covers the pointer, and hover is lost and regained. Placement is `just_tooltip`'s, so it is binding upstream behaviour, and it is not recorded as an issue here.
-- The recipe seam walks an empty directory until the first recipe lands. Its import checker is proved on fixtures, and its source check is mutation-tested, but the walk has observed no real file yet.
+- **Probed on 2026-09-23: the Device Wall over the 100k-child scenario** (widget test, debug JIT). Opening the scenario takes 72 ms in one viewport and 232 ms on the wall (3.2×). "Every setting" takes 81 / 116 ms. Ten steady frames take 2–3 ms either way, because rows are virtualized, so only the one-time open triples. `allowsWall` stays on. This is a relative number from a test binding, not a profile-mode frame time.
 - `example/integration_test/` runs only locally, one file at a time ([ci-gates](ci-gates.md)).
