@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -66,7 +67,7 @@ void main() {
 
       await _tap(tester, _child);
 
-      expect(_log(tester).first, 'onNodeTap · $_child');
+      expect(_log(tester), ['onNodeTap · $_child']);
       expect(renderedFolderView(tester).selectedNodeIds, {'1-1-1'});
     });
 
@@ -83,7 +84,7 @@ void main() {
 
       expect(renderedFolderView(tester).expandedNodeIds, contains('1-2'));
       expect(renderedFolderView(tester).selectedNodeIds, isEmpty);
-      expect(_log(tester).first, 'onNodeTap · $_parent');
+      expect(_log(tester), ['onNodeTap · $_parent']);
     });
 
     testWidgets('with the handler off, taps change neither set', (
@@ -115,9 +116,9 @@ void main() {
       await tester.tap(_row(_child));
       await tester.pumpAndSettle();
 
-      expect(_log(tester).take(2).toList().reversed, [
-        'onNodeTap · $_child',
+      expect(_log(tester), [
         'onDoubleNodeTap · $_child',
+        'onNodeTap · $_child',
       ]);
     });
 
@@ -129,21 +130,47 @@ void main() {
       await tester.tap(_row(_parent));
       await tester.pumpAndSettle();
 
-      expect(_log(tester).take(2).toList(), [
-        'onNodeTap · $_parent',
-        'onNodeTap · $_parent',
-      ]);
-      expect(find.byKey(const Key('double-tap-note')), findsOneWidget);
+      expect(_log(tester), ['onNodeTap · $_parent', 'onNodeTap · $_parent']);
     });
 
-    testWidgets('with the handler off, the view gets no double-tap callback', (
+    testWidgets('with the handler off, a quick second tap is swallowed', (
       tester,
     ) async {
       await _openInteraction(tester);
       await _toggle(tester, 'FolderView.onDoubleNodeTap');
-
       expect(renderedFolderView(tester).onDoubleNodeTap, isNull);
-      expect(renderedFolderView(tester).onNodeTap, isNotNull);
+
+      await tester.tap(_row(_child));
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.tap(_row(_child));
+      await tester.pumpAndSettle();
+
+      expect(_log(tester), ['onNodeTap · $_child']);
+      expect(renderedFolderView(tester).selectedNodeIds, {'1-1-1'});
+    });
+
+    testWidgets('Ctrl+tap is always a single tap', (tester) async {
+      await _openInteraction(tester);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.tap(_row(_child));
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.tap(_row(_child));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pumpAndSettle();
+
+      expect(_log(tester), ['onNodeTap · $_child', 'onNodeTap · $_child']);
+      expect(renderedFolderView(tester).selectedNodeIds, isEmpty);
+    });
+
+    testWidgets('the note states the double-tap window', (tester) async {
+      await _openInteraction(tester);
+
+      final note = tester.widget<Text>(
+        find.byKey(const Key('double-tap-note')),
+      );
+      expect(note.data, contains('ChildNodeTheme.clickInterval'));
+      expect(note.data, contains('Ctrl'));
     });
   });
 
@@ -157,21 +184,26 @@ void main() {
       await tester.tapAt(at, buttons: kSecondaryButton);
       await tester.pumpAndSettle();
 
-      expect(
-        _log(tester).first,
+      expect(_log(tester), [
         'onSecondaryNodeTap · $_folder @ '
-        '(${at.dx.round()}, ${at.dy.round()})',
-      );
+            '(${at.dx.round()}, ${at.dy.round()})',
+      ]);
       expect(renderedFolderView(tester).selectedNodeIds, isEmpty);
     });
 
-    testWidgets('with the handler off, the view gets no secondary callback', (
+    testWidgets('with the handler off, a secondary tap logs nothing', (
       tester,
     ) async {
       await _openInteraction(tester);
       await _toggle(tester, 'FolderView.onSecondaryNodeTap');
 
       expect(renderedFolderView(tester).onSecondaryNodeTap, isNull);
+      await tester.tapAt(
+        tester.getCenter(_row(_folder)),
+        buttons: kSecondaryButton,
+      );
+      await tester.pumpAndSettle();
+      expect(_log(tester), isEmpty);
     });
   });
 
@@ -216,21 +248,27 @@ void main() {
       await _openInteraction(tester);
 
       await _press(tester, 'FolderView.expandedNodeIds', 'Expand all');
-      final view = renderedFolderView(tester);
-      final containers = <String>{};
-      void walk(List<Node<String>> nodes) {
-        for (final n in nodes) {
-          if (n.type != NodeType.child) containers.add(n.id);
-          walk(n.children);
-        }
-      }
-
-      walk(view.data);
-      expect(view.expandedNodeIds, containers);
+      // Every Folder and Parent id in lib/data/theme_demo_data.dart.
+      expect(renderedFolderView(tester).expandedNodeIds, {
+        '1', '1-1', '1-2', '2', '2-1', '2-2', '3', '3-1', //
+      });
 
       await _press(tester, 'FolderView.expandedNodeIds', 'Collapse all');
       expect(renderedFolderView(tester).expandedNodeIds, isEmpty);
     });
+  });
+
+  testWidgets('the log keeps the newest 20 entries', (tester) async {
+    await _openInteraction(tester);
+
+    for (var i = 1; i <= 21; i++) {
+      await _tap(tester, i.isOdd ? _child : _otherChild);
+    }
+
+    final log = _log(tester);
+    expect(log, hasLength(20));
+    expect(log.first, 'onNodeTap · $_child'); // tap 21
+    expect(log.last, 'onNodeTap · $_otherChild'); // tap 2; tap 1 dropped
   });
 
   testWidgets('changing the data drops selected ids it no longer holds', (

@@ -77,12 +77,14 @@ class EverySettingHost extends SettingsHost {
     ),
     'FolderView.expandedNodeIds' => _setRow(
       settingId,
-      'Expanded Set: ${demo.expandedIds.length}',
+      'Expanded Set',
+      demo.expandedIds.length,
       {'Expand all': demo.expandAll, 'Collapse all': demo.collapseAll},
     ),
     'FolderView.selectedNodeIds' => _setRow(
       settingId,
-      'Selected Set: ${demo.selectedIds.length}',
+      'Selected Set',
+      demo.selectedIds.length,
       {'Clear': demo.clearSelection},
     ),
     'selectionMode' => buildDropdownRow<SelectionMode>(
@@ -104,8 +106,9 @@ class EverySettingHost extends SettingsHost {
       const Text(
         'A second tap on a Child within ChildNodeTheme.clickInterval '
         '(300 ms by default) is a double tap: onNodeTap fires on the first '
-        'tap, onDoubleNodeTap on the second. Folders and Parents get no '
-        'double tap.',
+        'tap, onDoubleNodeTap on the second. With no onDoubleNodeTap handler '
+        'that second tap fires nothing. Ctrl+tap is always a single tap. '
+        'Folders and Parents get no double tap.',
         key: Key('double-tap-note'),
         style: TextStyle(fontSize: 12),
       ),
@@ -126,6 +129,7 @@ class EverySettingHost extends SettingsHost {
   SettingsControl _setRow(
     String id,
     String label,
+    int size,
     Map<String, VoidCallback> actions,
   ) => SettingsControl(
     id: id,
@@ -134,7 +138,7 @@ class EverySettingHost extends SettingsHost {
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: 8,
       children: [
-        Text(label),
+        Text('$label: $size'),
         for (final MapEntry(:key, :value) in actions.entries)
           TextButton(onPressed: value, child: Text(key)),
       ],

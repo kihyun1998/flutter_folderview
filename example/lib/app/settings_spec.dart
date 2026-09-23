@@ -57,17 +57,6 @@ const _interaction = SettingGroup(
         'FolderView.selectedNodeIds',
         'selectionMode',
       ],
-      interactions: [
-        Interaction(
-          otherFeatureId: 'viewMode',
-          effect:
-              'In Tree Mode a Folder is never rendered, so a Folder id in the '
-              'Expanded Set changes nothing there.',
-          evidence:
-              'lib/services/view_mode_projection.dart: ViewModeProjection.'
-              'project returns only Parents for ViewMode.tree',
-        ),
-      ],
     ),
   ],
 );
