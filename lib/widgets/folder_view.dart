@@ -16,6 +16,7 @@ import 'synced_scroll_controllers.dart';
 class FolderView<T> extends StatefulWidget {
   final List<Node<T>> data;
   final ViewMode mode;
+
   /// Fires on a primary tap on a row of **any** tier. A Ctrl+tap is always a
   /// single tap, and so is every tap on a **Child** row when
   /// [onDoubleNodeTap] is null.
