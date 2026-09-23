@@ -32,8 +32,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - **What the tap log shows about the library** (read in `CustomInkWell._handleTap` and the two tier renderers):
   - A double tap on a Child logs `onNodeTap` on the first tap, then `onDoubleNodeTap`.
   - A Folder or Parent gets no double tap at all (`clickInterval: 0`, `onDoubleTap: null`), so two quick taps there are two `onNodeTap`s.
-  - `onDoubleNodeTap` works without `onNodeTap`, because both renderers always pass `CustomInkWell` a non-null wrapper closure. That clearance holds only while they do: `CustomInkWell` attaches no tap handler when its own `onTap` is null.
-  - The mirror case: **without `onDoubleNodeTap`, a quick second tap on a Child fires nothing.** `ChildNodeRenderer` always hands `CustomInkWell` a double-tap closure, and `_handleTap` counts taps whatever sits behind it. So a caller that sets no double-tap handler loses a fast re-tap. The lens read on #77 probed it, and `interaction_test` pins it ("with the handler off, a quick second tap is swallowed").
+  - `onDoubleNodeTap` works without `onNodeTap`, because both renderers always pass `CustomInkWell` a non-null *tap* closure. That clearance holds only while they do: `CustomInkWell` attaches no tap handler when its own `onTap` is null.
+  - The mirror case: **without `onDoubleNodeTap`, a Child row has no double-tap window**, so every tap fires `onNodeTap` (#95). `interaction_test` pins it: "with the handler off, a quick second tap is a single tap".
   - Ctrl+tap is always an immediate single tap: two Ctrl-taps inside the window log two `onNodeTap`s.
 - **The recipe seam is live from #76**: `lib/recipes/` is non-empty, registered sources and recipe files match in both directions, and every source loads through `rootBundle`, the path the Code pane takes. `lib/recipes/` is declared under pubspec `assets`.
 - The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).

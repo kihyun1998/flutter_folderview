@@ -9,6 +9,7 @@ void main() {
   //   - Ctrl+tap        → onTap once, onDoubleTap never
   //   - single tap      → onTap once, onDoubleTap never
   //   - double tap      → onTap once (first tap) AND onDoubleTap once (second)
+  //   - no onDoubleTap  → every tap is a single tap (no double-tap window)
   const clickInterval = 300;
 
   late int onTap;
@@ -70,5 +71,30 @@ void main() {
 
     expect(onTap, 1);
     expect(onDoubleTap, 1);
+  });
+
+  testWidgets('with no onDoubleTap, two quick taps fire onTap twice',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: CustomInkWell(
+              clickInterval: clickInterval,
+              onTap: () => onTap++,
+              onDoubleTap: null,
+              child: const SizedBox(width: 100, height: 40),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(CustomInkWell));
+    await tester.pump(const Duration(milliseconds: 50)); // within interval
+    await tester.tap(find.byType(CustomInkWell));
+    await tester.pump(const Duration(milliseconds: clickInterval + 50));
+
+    expect(onTap, 2);
   });
 }

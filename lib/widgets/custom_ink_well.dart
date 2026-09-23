@@ -62,7 +62,9 @@ class _CustomInkWellState extends State<CustomInkWell> {
 
   /// Handles a tap.
   ///
-  /// Ctrl+tap (either Control key) is treated as an immediate single tap.
+  /// Ctrl+tap (either Control key) is treated as an immediate single tap, and
+  /// so is every tap when [CustomInkWell.onDoubleTap] is null: with no
+  /// double-tap handler there is no double-tap window.
   /// Otherwise the first tap fires [CustomInkWell.onTap] and arms a timer; a
   /// second tap within [CustomInkWell.clickInterval] fires
   /// [CustomInkWell.onDoubleTap]. A double tap therefore emits `onTap` (on the
@@ -73,7 +75,7 @@ class _CustomInkWellState extends State<CustomInkWell> {
             .isLogicalKeyPressed(LogicalKeyboardKey.controlLeft) ||
         HardwareKeyboard.instance
             .isLogicalKeyPressed(LogicalKeyboardKey.controlRight);
-    if (ctrlPressed) {
+    if (ctrlPressed || widget.onDoubleTap == null) {
       _timer?.cancel();
       _resetTapCount();
       widget.onTap?.call();
@@ -84,7 +86,7 @@ class _CustomInkWellState extends State<CustomInkWell> {
     if (_tapCount == 2) {
       _timer?.cancel();
       _resetTapCount();
-      widget.onDoubleTap?.call();
+      widget.onDoubleTap!();
     } else {
       widget.onTap?.call();
       _timer = Timer(

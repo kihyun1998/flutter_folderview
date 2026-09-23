@@ -3,6 +3,8 @@
 - **fix**: a label from a `labelResolver` is measured. Content width was measured from `node.label` while the row drew the resolved label, so a resolved label longer than the raw one was cut with an ellipsis where the view should have scrolled horizontally. Measurement and rendering now read the label from one place (`RowMetrics.label`), the way they already shared the text style.
 - **fix**: content width is re-measured when the theme reaches the view from an ancestor `FolderViewTheme`, or when the ambient `bodyMedium` changes. Only a new `theme:` argument used to trigger it, so a font change from either source left rows ellipsized at the old width.
 - **fix**: `onSecondaryNodeTap` fires on **Folder** and **Parent** rows, not only on **Child** rows. ADR-0003 names it as the way to track a focused container, which are not selectable. `onDoubleNodeTap` remains Child-only, and both callbacks now say which tiers they fire on.
+- **fix**: without `onDoubleNodeTap`, every tap on a **Child** row fires `onNodeTap` ([#95](https://github.com/kihyun1998/flutter_folderview/issues/95)). A Child row used to keep a double-tap window with nothing behind it, so a second tap within `ChildNodeTheme.clickInterval` (300 ms by default) fired nothing. Reproduced at 50 ms and at 250 ms, an ordinary pace for tapping a Child off and on again. With `onDoubleNodeTap` set, nothing changes: a double tap still fires `onNodeTap` on the first tap and `onDoubleNodeTap` on the second.
+- **docs**: `onNodeTap` and `onDoubleNodeTap` state that a Ctrl+tap is always a single tap.
 
 ## 0.11.2
 

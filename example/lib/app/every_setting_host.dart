@@ -107,7 +107,8 @@ class EverySettingHost extends SettingsHost {
         'A second tap on a Child within ChildNodeTheme.clickInterval '
         '(300 ms by default) is a double tap: onNodeTap fires on the first '
         'tap, onDoubleNodeTap on the second. With no onDoubleNodeTap handler '
-        'that second tap fires nothing. Ctrl+tap is always a single tap. '
+        'there is no window: every tap fires onNodeTap. Ctrl+tap is always a '
+        'single tap. '
         'Folders and Parents get no double tap.',
         key: Key('double-tap-note'),
         style: TextStyle(fontSize: 12),
