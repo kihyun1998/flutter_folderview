@@ -265,6 +265,9 @@ class E {
   final int e; // default = 0
   final int f, g;
   final int h = 1, i = 2;
+  final Widget? Function( // resolver = per node
+    Node node,
+  )? j;
 }
 ''';
       expect(optionsInSource(source), {
@@ -275,6 +278,7 @@ class E {
         'E.e',
         'E.f',
         'E.g',
+        'E.j',
       });
     });
   });
