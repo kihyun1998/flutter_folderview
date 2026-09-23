@@ -127,11 +127,8 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   /// so expanding never changes it.
   double _precomputedMaxWidth = 0.0;
 
-  /// The inputs [_precomputedMaxWidth] was measured from. Compared on every
-  /// build rather than in `didUpdateWidget`, because two of them — a theme from
-  /// an ancestor [FolderViewTheme] and the ambient `bodyMedium` — change without
-  /// this widget's props changing. Data and theme compare by identity: callers
-  /// own them and rebuild them deliberately.
+  /// The inputs [_precomputedMaxWidth] was measured from, compared on each
+  /// build: data and effective theme by identity, scale and base style by value.
   List<Node<T>>? _measuredData;
   FlutterFolderViewTheme<T>? _measuredTheme;
   double? _measuredScale;

@@ -48,9 +48,8 @@ class RowMetrics<T> {
     }
   }
 
-  /// The label text drawn for [node] — `labelResolver ?? node.label` for its
-  /// tier. Shared by rendering and measurement for the same reason as
-  /// [effectiveTextStyle]: a resolved label is measured exactly as it is drawn.
+  /// The label text for [node] — `labelResolver ?? node.label` for its tier.
+  /// Read by both measurement and the renderers.
   String label(Node<T> node) {
     switch (node.type) {
       case NodeType.folder:
