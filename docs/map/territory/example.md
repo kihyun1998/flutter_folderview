@@ -4,7 +4,7 @@
 The `example/` app. It is built on the `flutter_example_template` shell (menu, preview stage at three widths, Device Wall, Code pane, settings panel), and its purpose is to expose **every** public option of the library (#74). It is a consumer of the library, never a part of it: the dependency on the shell sits in `example/pubspec.yaml` only.
 
 ## Governing decisions
-**None** as records. Two calls are the maintainer's, made on #75:
+**None** as records. These calls are the maintainer's, each made on the ticket it names:
 - **What counts as an option.** The coverage guard counts the public `final` instance fields of every public class in a file the barrel exports: **158** at #75. The hand count in #74 said 144. It had missed `Node` (5), the eight sub-theme containers of `FlutterFolderViewTheme`, and `FolderViewTheme.data`. The maintainer was shown both counts and chose the mechanical rule.
 - **Test helpers live in `example/test/support/`**, so `example/test/` holds only `*_test.dart` files. Neither this repo nor `flutter_table_plus` had a precedent; the maintainer was shown the flat alternative and chose the folder.
 - **`Node`'s five fields are covered by a recipe, not the settings panel** (#76). They are the data's shape, not knobs. The maintainer was also shown the alternative, a read-only "control" in the panel, and chose the recipe. So `Building a tree` became the first recipe, and the first-recipe seam rules from #74 landed with it.
@@ -42,6 +42,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/lib/recipes/building_a_tree_recipe.dart` — `BuildingATreeRecipe`
 - `example/lib/scenarios/large_tree_scenario.dart` — `LargeTreeDemo`, `LargeTreeStage`
 - `example/test/settings_render_test.dart` — every spec id draws a control
+- `example/test/settings_spec_test.dart` — unique ids, interactions name another feature and cite evidence
 - `example/test/option_coverage_test.dart` — `notYetCovered`, `coveredOptions`
 - `example/test/support/library_options.dart` — `libraryOptions`, `optionsInSource`
 - `example/test/recipe_seam_test.dart` — `allowedImports`, `disallowedImports`
