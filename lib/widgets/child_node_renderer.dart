@@ -68,7 +68,7 @@ class ChildNodeRenderer<T> extends StatelessWidget {
       highlightColor: childTheme.highlightColor ??
           Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       onTap: () => onTap?.call(node),
-      onDoubleTap: () => onDoubleTap?.call(node),
+      onDoubleTap: onDoubleTap == null ? null : () => onDoubleTap!(node),
       onSecondaryTapDown: onSecondaryTap != null
           ? (details) => onSecondaryTap!(node, details)
           : null,

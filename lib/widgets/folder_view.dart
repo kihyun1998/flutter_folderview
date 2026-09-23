@@ -16,10 +16,15 @@ import 'synced_scroll_controllers.dart';
 class FolderView<T> extends StatefulWidget {
   final List<Node<T>> data;
   final ViewMode mode;
+  /// Fires on a primary tap on a row of **any** tier. A Ctrl+tap is always a
+  /// single tap, and so is every tap on a **Child** row when
+  /// [onDoubleNodeTap] is null.
   final Function(Node<T>)? onNodeTap;
 
   /// Fires on a second tap within `ChildNodeTheme.clickInterval`. **Child** rows
-  /// only; the first tap has already fired [onNodeTap].
+  /// only; the first tap has already fired [onNodeTap]. When null, Child rows
+  /// have no double-tap window and every tap fires [onNodeTap]. A Ctrl+tap is
+  /// never part of a double tap.
   final Function(Node<T>)? onDoubleNodeTap;
 
   /// Fires on a secondary (right) click on a row of **any** tier, with the

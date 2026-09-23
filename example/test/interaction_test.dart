@@ -133,7 +133,7 @@ void main() {
       expect(_log(tester), ['onNodeTap · $_parent', 'onNodeTap · $_parent']);
     });
 
-    testWidgets('with the handler off, a quick second tap is swallowed', (
+    testWidgets('with the handler off, a quick second tap is a single tap', (
       tester,
     ) async {
       await _openInteraction(tester);
@@ -145,8 +145,8 @@ void main() {
       await tester.tap(_row(_child));
       await tester.pumpAndSettle();
 
-      expect(_log(tester), ['onNodeTap · $_child']);
-      expect(renderedFolderView(tester).selectedNodeIds, {'1-1-1'});
+      expect(_log(tester), ['onNodeTap · $_child', 'onNodeTap · $_child']);
+      expect(renderedFolderView(tester).selectedNodeIds, isEmpty);
     });
 
     testWidgets('Ctrl+tap is always a single tap', (tester) async {

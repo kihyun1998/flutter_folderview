@@ -85,6 +85,22 @@ void main() {
     expect(events, ['tap:c0', 'double:c0']);
   });
 
+  for (final gap in [50, 250]) {
+    testWidgets(
+        'without onDoubleNodeTap, two taps on a child ${gap}ms apart fire '
+        'onNodeTap twice', (tester) async {
+      final events = <String>[];
+      await pump(tester, onNodeTap: (n) => events.add('tap:${n.id}'));
+
+      await tester.tap(find.text('child-c0'));
+      await tester.pump(Duration(milliseconds: gap));
+      await tester.tap(find.text('child-c0'));
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(events, ['tap:c0', 'tap:c0']);
+    });
+  }
+
   testWidgets(
       'right-clicking a child fires onSecondaryNodeTap with node and details',
       (tester) async {
