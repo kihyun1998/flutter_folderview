@@ -1,34 +1,45 @@
-import 'package:example/main.dart';
+import 'package:example/pages/theme_demo_page.dart';
+import 'package:flutter_example_template/flutter_example_template.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/shell_harness.dart';
+
 void main() {
-  // Replaces the `flutter create` counter smoke test, which asserted a counter
-  // this app has never had and had therefore failed since the example was
-  // added. Nobody saw it: CI's example job runs `flutter analyze`, never
-  // `flutter test`.
-  //
-  // `integration_test/app_boot_test.dart` asserts the same thing against a real
-  // desktop build. This is the cheap gate — it runs under `flutter test` in
-  // seconds and guards the widget tree rather than the platform.
-  //
-  // MyApp is the pure MaterialApp + ThemeDemoPage tree. The example's `main()`
-  // additionally runs the Windows-only window_manager setup, which needs a real
-  // platform channel and cannot be pumped here.
-  testWidgets('the demo boots and renders a FolderView with node rows', (
+  testWidgets(
+    'the example boots into the shell with a FolderView on the stage',
+    (tester) async {
+      await pumpShell(tester);
+
+      expect(find.byType(ShellPage), findsOneWidget);
+      expect(find.byType(PreviewStage), findsOneWidget);
+
+      final folderView = find.byType(FolderView<String>);
+      expect(
+        find.descendant(of: find.byType(PreviewStage), matching: folderView),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: folderView,
+          matching: find.text('Theme System Architecture'),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets('the legacy panel opens the previous demo, unchanged', (
     tester,
   ) async {
-    await tester.pumpWidget(const MyApp());
-    await tester.pumpAndSettle();
+    await pumpShell(tester);
 
-    final folderView = find.byType(FolderView<String>);
-    expect(folderView, findsOneWidget);
+    await openDestination(tester, 'Legacy panel');
 
-    // The seeded demo data's first root folder. Proves a row actually rendered,
-    // rather than the view being present but empty.
+    expect(find.byType(ThemeDemoPage), findsOneWidget);
     expect(
       find.descendant(
-        of: folderView,
+        of: find.byType(ThemeDemoPage),
         matching: find.text('Theme System Architecture'),
       ),
       findsOneWidget,

@@ -75,6 +75,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_example_template:
+    dependency: "direct main"
+    description:
+      name: flutter_example_template
+      sha256: "6d715cc0035b566f0f16463d403112dc840f260531f937963316ac303af8feab"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   flutter_folderview:
     dependency: "direct main"
     description:
@@ -90,6 +98,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
+  flutter_syntax_highlight:
+    dependency: transitive
+    description:
+      name: flutter_syntax_highlight
+      sha256: b66d08374d09f076911374ec59c9444bf0555ebd96e4f51993c7bcc936086d38
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -344,4 +360,4 @@ packages:
     version: "0.5.1"
 sdks:
   dart: ">=3.9.0-0 <4.0.0"
-  flutter: ">=3.18.0-18.0.pre.54"
+  flutter: ">=3.27.0"
