@@ -130,6 +130,9 @@ void main() {
       expect(slider('folderCount').onChanged, isNull);
       await chooseDropdown(tester, 'FolderView.data', 'Generated');
       expect(slider('folderCount').onChanged, isNotNull);
+
+      final count = slider('folderCount');
+      expect(count.divisions, (count.max - count.min).round());
     });
   });
 
