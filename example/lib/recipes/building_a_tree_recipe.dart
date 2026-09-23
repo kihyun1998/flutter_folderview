@@ -5,10 +5,7 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 /// payload on every Child. Tapping a Folder or Parent toggles it; tapping a
 /// Child shows its payload.
 class BuildingATreeRecipe extends StatefulWidget {
-  const BuildingATreeRecipe({super.key, this.mode = ViewMode.folder});
-
-  /// Which projection of the tree to render.
-  final ViewMode mode;
+  const BuildingATreeRecipe({super.key});
 
   @override
   State<BuildingATreeRecipe> createState() => _BuildingATreeRecipeState();
@@ -79,7 +76,7 @@ class _BuildingATreeRecipeState extends State<BuildingATreeRecipe> {
         Expanded(
           child: FolderView<String>(
             data: _tree,
-            mode: widget.mode,
+            mode: ViewMode.folder,
             expandedNodeIds: _expanded,
             onNodeTap: _onTap,
           ),

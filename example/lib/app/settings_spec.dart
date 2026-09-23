@@ -31,9 +31,9 @@ const settingsSpec = <SettingGroup>[
                 'to the root, descending through Folders only. A Folder id in '
                 'the Expanded Set has no effect there.',
             evidence:
-                'CONTEXT.md, "Tree Mode" and Relationships: "In tree View '
-                'Mode, a Folder\'s membership in the Expanded Set has no '
-                'defined effect"',
+                'lib/services/view_mode_projection.dart: '
+                'ViewModeProjection._collectParents recurses into Folders '
+                'only and returns the Parents it finds as the roots',
           ),
         ],
       ),

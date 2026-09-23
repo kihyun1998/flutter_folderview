@@ -1,4 +1,6 @@
 import 'package:example/app/tree_generator.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_example_template/flutter_example_template.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -55,10 +57,10 @@ void main() {
       await pumpShell(tester);
       await openFeature(tester, 'Data');
 
+      await chooseDropdown(tester, 'FolderView.data', 'Generated');
       await setSlider(tester, 'folderCount', 2);
       await setSlider(tester, 'parentsPerFolder', 3);
       await setSlider(tester, 'childrenPerParent', 4);
-      await chooseDropdown(tester, 'FolderView.data', 'Generated');
 
       final data = renderedFolderView(tester).data;
       expect(data, hasLength(2));
@@ -102,7 +104,46 @@ void main() {
       await chooseDropdown(tester, 'FolderView.data', 'Demo');
 
       expect(_row('Theme System Architecture'), findsOneWidget);
+      expect(renderedFolderView(tester).expandedNodeIds, {
+        '1',
+        '1-1',
+        '2',
+        '2-1',
+        '2-2',
+        '3',
+      });
     });
+
+    testWidgets('the counts are disabled while the data is the demo', (
+      tester,
+    ) async {
+      await pumpShell(tester);
+      await openFeature(tester, 'Data');
+
+      Slider slider(String id) => tester.widget<Slider>(
+        find.descendant(
+          of: find.byWidgetPredicate((w) => w is SettingsControl && w.id == id),
+          matching: find.byType(Slider),
+        ),
+      );
+
+      expect(slider('folderCount').onChanged, isNull);
+      await chooseDropdown(tester, 'FolderView.data', 'Generated');
+      expect(slider('folderCount').onChanged, isNotNull);
+    });
+  });
+
+  testWidgets('the open feature survives leaving and returning', (
+    tester,
+  ) async {
+    await pumpShell(tester);
+    await openFeature(tester, 'Data');
+    expect(find.byType(FeatureDetailPane), findsOneWidget);
+
+    await openDestination(tester, 'Building a tree');
+    await openDestination(tester, 'Every setting');
+
+    expect(find.byType(FeatureDetailPane), findsOneWidget);
   });
 
   group('Every setting: View Mode', () {
@@ -117,26 +158,19 @@ void main() {
       tester,
     ) async {
       await pumpShell(tester);
-      await openFeature(tester, 'View Mode');
+      await openFeature(tester, 'Data');
+      await chooseDropdown(tester, 'FolderView.data', 'Generated');
 
+      expect(renderedFolderView(tester).expandedNodeIds, isEmpty);
+      expect(_row('Folder 1'), findsOneWidget);
+      expect(_row('Parent 1.1'), findsNothing);
+
+      await openFeature(tester, 'View Mode');
       await chooseDropdown(tester, 'FolderView.mode', 'tree');
 
       expect(renderedFolderView(tester).mode, ViewMode.tree);
-      final data = renderedFolderView(tester).data;
-      final folderLabels = data
-          .where((n) => n.type == NodeType.folder)
-          .map((n) => n.label);
-      final parentLabels = data
-          .where((n) => n.type == NodeType.folder)
-          .expand((f) => f.children)
-          .where((n) => n.type == NodeType.parent)
-          .map((n) => n.label);
-      for (final label in folderLabels) {
-        expect(_row(label), findsNothing, reason: 'Folder "$label"');
-      }
-      for (final label in parentLabels) {
-        expect(_row(label), findsWidgets, reason: 'Parent "$label"');
-      }
+      expect(_row('Folder 1'), findsNothing);
+      expect(_row('Parent 1.1'), findsOneWidget);
     });
   });
 }

@@ -60,27 +60,31 @@ class EverySettingHost extends SettingsHost {
     _ => throw ArgumentError.value(settingId, 'settingId'),
   };
 
-  /// An integer slider from 1 to 50 in steps of one.
+  /// An integer slider from 1 to 50 in steps of one, disabled unless the data
+  /// is generated.
   SettingsControl _count(
     String id,
     String label,
     int value,
     void Function(int) onChanged,
-  ) => SettingsControl(
-    id: id,
-    label: label,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('$label: $value'),
-        Slider(
-          value: value.toDouble(),
-          min: 1,
-          max: 50,
-          divisions: 49,
-          onChanged: (v) => onChanged(v.round()),
-        ),
-      ],
-    ),
-  );
+  ) {
+    final enabled = demo.dataSource == DataSource.generated;
+    return SettingsControl(
+      id: id,
+      label: label,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(enabled ? '$label: $value' : '$label: $value (Generated only)'),
+          Slider(
+            value: value.toDouble(),
+            min: 1,
+            max: 50,
+            divisions: 49,
+            onChanged: enabled ? (v) => onChanged(v.round()) : null,
+          ),
+        ],
+      ),
+    );
+  }
 }

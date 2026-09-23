@@ -14,7 +14,18 @@ enum DataSource { demo, generated }
 class EverySettingDemo extends ChangeNotifier {
   EverySettingDemo() {
     _rebuildNodes();
-    _expandedIds = {'1', '1-1', '2', '2-1', '2-2', '3'};
+  }
+
+  static const _demoExpandedIds = {'1', '1-1', '2', '2-1', '2-2', '3'};
+
+  String? _openFeatureId;
+
+  /// The feature open in the knob region.
+  String? get openFeatureId => _openFeatureId;
+  set openFeatureId(String? value) {
+    if (value == _openFeatureId) return;
+    _openFeatureId = value;
+    notifyListeners();
   }
 
   DataSource _dataSource = DataSource.demo;
@@ -83,7 +94,9 @@ class EverySettingDemo extends ChangeNotifier {
     }
 
     collect(_nodes);
-    _expandedIds = _expandedIds.intersection(ids);
+    _expandedIds = _dataSource == DataSource.demo
+        ? _demoExpandedIds
+        : _expandedIds.intersection(ids);
   }
 }
 
@@ -121,7 +134,6 @@ class EverySettingKnobs extends StatefulWidget {
 
 class _EverySettingKnobsState extends State<EverySettingKnobs> {
   late final _host = EverySettingHost(widget.demo);
-  String? _featureId;
 
   @override
   Widget build(BuildContext context) {
@@ -129,15 +141,17 @@ class _EverySettingKnobsState extends State<EverySettingKnobs> {
       listenable: widget.demo,
       builder: (context, _) {
         final features = [for (final g in _host.spec) ...g.features];
-        final feature = features.where((f) => f.id == _featureId).firstOrNull;
+        final feature = features
+            .where((f) => f.id == widget.demo.openFeatureId)
+            .firstOrNull;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               child: FeatureListPane(
                 host: _host,
-                selectedFeatureId: _featureId,
-                onFeatureSelected: (id) => setState(() => _featureId = id),
+                selectedFeatureId: widget.demo.openFeatureId,
+                onFeatureSelected: (id) => widget.demo.openFeatureId = id,
               ),
             ),
             if (feature != null) ...[

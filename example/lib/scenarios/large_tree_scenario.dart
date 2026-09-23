@@ -3,12 +3,12 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 
 import '../app/tree_generator.dart';
 
-/// The large-tree scenario's state: a generated tree of [folders] × 10 × 100
+/// The large-tree scenario's state: a generated tree of 100 × 10 × 100
 /// nodes and its caller-owned Expanded Set, which starts with everything open.
 class LargeTreeDemo extends ChangeNotifier {
-  LargeTreeDemo({this.folders = 100})
+  LargeTreeDemo()
     : nodes = generateTree(
-        folders: folders,
+        folders: 100,
         parentsPerFolder: 10,
         childrenPerParent: 100,
       ) {
@@ -20,7 +20,6 @@ class LargeTreeDemo extends ChangeNotifier {
     };
   }
 
-  final int folders;
   final List<Node<String>> nodes;
 
   late Set<String> _expandedIds;

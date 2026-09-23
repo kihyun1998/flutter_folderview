@@ -54,7 +54,7 @@ Future<void> chooseDropdown(WidgetTester tester, String id, String item) async {
   await tester.pumpAndSettle();
 }
 
-/// Drags the slider of the control with [id] until it reads [value].
+/// Calls the `onChanged` of the slider in the control with [id] with [value].
 Future<void> setSlider(WidgetTester tester, String id, double value) async {
   final control = find.byWidgetPredicate(
     (w) => w is SettingsControl && w.id == id,
