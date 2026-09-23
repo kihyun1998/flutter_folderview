@@ -4,26 +4,19 @@ import 'dart:io';
 /// `final` instance fields of each public class in a library file the barrel
 /// exports.
 ///
-/// [barrelPath] is the package barrel; exports are resolved relative to it.
-/// `package:` exports and names hidden by a `show` clause are skipped.
+/// [barrelPath] is the package barrel; exports are resolved relative to it,
+/// and `package:` exports are skipped. A `show` clause is not applied, so every
+/// class in an exported file counts.
 Set<String> libraryOptions(String barrelPath) {
   final barrel = File(barrelPath);
-  final options = <String>{};
-  final export = RegExp(
-    r'''^export\s+'([^']+)'(?:\s+show\s+([^;]+))?;''',
-    multiLine: true,
-  );
-  for (final match in export.allMatches(barrel.readAsStringSync())) {
-    final uri = match.group(1)!;
-    if (uri.startsWith('package:')) continue;
-    final shown = match.group(2)?.split(',').map((s) => s.trim()).toSet();
-    final file = File('${barrel.parent.path}/$uri');
-    for (final option in optionsInSource(file.readAsStringSync())) {
-      final className = option.split('.').first;
-      if (shown == null || shown.contains(className)) options.add(option);
-    }
-  }
-  return options;
+  final export = RegExp(r'''^export\s+'([^']+)'[^;]*;''', multiLine: true);
+  return {
+    for (final match in export.allMatches(barrel.readAsStringSync()))
+      if (!match.group(1)!.startsWith('package:'))
+        ...optionsInSource(
+          File('${barrel.parent.path}/${match.group(1)}').readAsStringSync(),
+        ),
+  };
 }
 
 /// The public `final` instance fields of each public top-level class in
