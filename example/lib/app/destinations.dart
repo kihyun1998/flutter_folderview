@@ -12,7 +12,8 @@ class FolderViewDestinations implements ShellDestinations {
   FolderViewDestinations();
 
   final _everySetting = EverySettingDemo();
-  late final _largeTree = LargeTreeDemo();
+  LargeTreeDemo? _largeTreeDemo;
+  LargeTreeDemo get _largeTree => _largeTreeDemo ??= LargeTreeDemo();
 
   @override
   late final List<ShellDestination> all = [
@@ -49,6 +50,6 @@ class FolderViewDestinations implements ShellDestinations {
   @override
   void dispose() {
     _everySetting.dispose();
-    _largeTree.dispose();
+    _largeTreeDemo?.dispose();
   }
 }
