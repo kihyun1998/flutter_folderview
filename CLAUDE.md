@@ -1,13 +1,21 @@
 # CLAUDE.md
 
-## Working discipline — theflow
+## Working discipline
 
-Substantive changes (bug fix / feature / behavior change) follow the **`theflow`**
-skill — run `/theflow` at the start. This repo's bindings (module map, reference
-routing, boundary rule, proof methods, surfaces, gate matrix) live in
-**`docs/agents/theflow.md`**; the per-incident evidence (#42–#45, #47, #48,
-#50–#52, #57 …) in **`docs/agents/lessons.md`**. Read both before starting; add
-new war-stories to lessons.
+Substantive changes follow `thegraph`. Its build is `docs/agents/thegraph.md`;
+what depends on what is `docs/map/`; per-incident evidence is
+`docs/agents/lessons.md` (add new war-stories there).
+
+- Test seam: prefer `FolderView` (public) over `FolderViewContent` (internal)
+  when a test has to reproduce a row wider than the viewport.
+- Record the mutation check in the PR body: which mutation, and what died (or
+  that nothing did).
+- Branch → `fix|feat(<scope>): …` → PR (`Closes #n`) → CI green → squash merge
+  `--delete-branch`.
+- `dart pub publish` is run by the maintainer, never by the agent; `--dry-run`
+  must show 0 warnings.
+- Before a release the maintainer runs the example and eyeballs hover; the agent
+  cannot hover.
 
 ## Identity & invariants (the boundary)
 
@@ -48,3 +56,10 @@ Canonical label strings (`needs-triage`, `needs-info`, `ready-for-agent`,
 ### Domain docs
 Single-context layout: `CONTEXT.md` + `docs/adr/` at the repo root. See
 `docs/agents/domain.md`.
+
+## Comments and the map
+
+A comment says what the code is. Why it is this way, what it deliberately leaves
+out, the trap and the measured value go to the territory note under `docs/map/`;
+history goes to the commit message. The map's entry point and reading protocol:
+`docs/map/README.md`.
