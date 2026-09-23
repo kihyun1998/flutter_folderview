@@ -9,7 +9,7 @@ Turns pointer taps on a row into the caller's callbacks (`onNodeTap`, `onDoubleN
 
 ## Design model
 - `CustomInkWell` fires `onTap` immediately on the first tap and arms a `clickInterval` timer. A second tap inside the window fires `onDoubleTap`. A double tap therefore emits both, on purpose, so single-tap feedback is never delayed. Ctrl+tap is always an immediate single tap.
-- **Per tier.** A Child row gets `onTap`, `onDoubleTap`, `onSecondaryTap`, `ChildNodeTheme.clickInterval` and the selection colours. A Folder or Parent row gets `onTap` only: `clickInterval: 0`, `onDoubleTap: null`, and no secondary handler.
+- **Per tier.** A Child row gets `onTap`, `onDoubleTap`, `onSecondaryTap`, `ChildNodeTheme.clickInterval` and the selection colours. A Folder or Parent row gets `onTap` and `onSecondaryTap`, with `clickInterval: 0` and `onDoubleTap: null`. The secondary route is how ADR-0003 lets a caller track a focused container.
 - Ink is hoisted: `FolderViewContent` supplies one transparent `Material` above the list, and rows paint onto it. A `CustomInkWell` outside that ancestor asserts, by design. A per-row `Material` was measurably slower under scroll.
 - Rows are wrapped in `ExcludeFocus`, so there is no keyboard focus or navigation.
 
@@ -33,4 +33,4 @@ None recorded.
 - [scale-input](scale-input.md) — Control is also the Scale Modifier off macOS.
 
 ## Known holes
-- **`onSecondaryNodeTap` never fires for a Folder or Parent.** Probed on 2026-09-23: a secondary tap on a Parent row and on a Child row recorded only the Child. [ADR-0003](../../adr/0003-selection-is-tier-bound-to-child.md) tells callers who need container focus to "react via `onSecondaryNodeTap`". The code does not deliver it for containers, so the ADR's escape hatch does not exist. `onDoubleNodeTap` is also Child-only (read from the code). Neither callback's dartdoc says so. Not filed.
+- `onDoubleNodeTap` is Child-only by construction (`clickInterval: 0` on containers). Its dartdoc says so. No record decides it.

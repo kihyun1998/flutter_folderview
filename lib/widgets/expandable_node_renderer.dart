@@ -22,6 +22,7 @@ class ExpandableNodeRenderer<T> extends StatelessWidget {
   final bool useOpenState;
   final bool isExpanded;
   final Function(Node<T>)? onTap;
+  final Function(Node<T>, TapDownDetails)? onSecondaryTap;
   final double scale;
 
   const ExpandableNodeRenderer({
@@ -32,6 +33,7 @@ class ExpandableNodeRenderer<T> extends StatelessWidget {
     required this.useOpenState,
     required this.isExpanded,
     required this.onTap,
+    required this.onSecondaryTap,
     required this.scale,
   });
 
@@ -40,7 +42,7 @@ class ExpandableNodeRenderer<T> extends StatelessWidget {
     final node = flatNode.node;
     final expandTheme = metrics.theme.expandIconTheme;
     final style = metrics.effectiveTextStyle(node);
-    final label = themeView.labelResolver?.call(node) ?? node.label;
+    final label = metrics.label(node);
 
     // Icon resolution: open-state icon only when this tier uses it and the node
     // is expanded; otherwise the collapsed widget.
@@ -102,6 +104,9 @@ class ExpandableNodeRenderer<T> extends StatelessWidget {
           Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       onTap: () => onTap?.call(node),
       onDoubleTap: null,
+      onSecondaryTapDown: onSecondaryTap != null
+          ? (details) => onSecondaryTap!(node, details)
+          : null,
       child: Row(
         children: [
           chevron,

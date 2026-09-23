@@ -20,7 +20,6 @@ abstract interface class ExpandableNodeThemeView<T> {
   double get height;
   EdgeInsets get padding;
   EdgeInsets get margin;
-  String? Function(Node<T> node)? get labelResolver;
   Color? get hoverColor;
   Color? get splashColor;
   Color? get highlightColor;

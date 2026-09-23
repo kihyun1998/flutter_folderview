@@ -31,5 +31,5 @@ The reasoning lives in the CHANGELOG entries and a comment in `pubspec.yaml`, no
 - [ci-gates](ci-gates.md) — CI resolves fresh, so it never sees a consumer's older lock.
 
 ## Known holes
-- **`example/pubspec.lock` is behind the constraint.** It still records `just_tooltip 0.4.3` and `flutter_folderview 0.11.1`, while the root requires `^0.4.4` and is at `0.11.2`. Any `pub get` rewrites it (observed 2026-09-23). The example is being replaced, so this is not filed.
+- `example/pubspec.lock` is refreshed only when someone runs `pub get` in `example/` and commits the result. It fell a release behind the root once (refreshed in 0.11.3).
 - No gate checks the SDK floor against the dependency's own floor. #47 found the mismatch by hand.

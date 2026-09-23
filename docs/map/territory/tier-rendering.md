@@ -12,7 +12,7 @@ Draws one row for one `FlatNode`. It builds a tier-agnostic scaffold (fixed row 
 - Indent is `depth × expandStripWidth`, and tree-line columns have the same width. Both come from `RowMetrics`.
 - Icon precedence: `*Resolver(node)` over the static widget. A Folder always uses the open-state icon when it is expanded. A Parent uses it only in `tree` mode.
 - The chevron rotates 90° when expanded and takes `expandedColor ?? color`. A node without children still reserves the chevron strip.
-- The label shown is `labelResolver?.call(node) ?? node.label`. See [row-geometry](row-geometry.md) for why that matters.
+- The label shown is `RowMetrics.label`, the same rule measurement uses ([row-geometry](row-geometry.md)).
 - `NodeLabel` is a start-aligned `Row(min)`: icon box, then `Flexible(Text(ellipsis))`. The label tooltip wraps only the `Text` ([label-tooltip](label-tooltip.md)).
 
 ## Code
@@ -37,4 +37,4 @@ Draws one row for one `FlatNode`. It builds a tier-agnostic scaffold (fixed row 
 - [view-mode-projection](view-mode-projection.md) — the Parent open-state icon depends on the mode.
 
 ## Known holes
-- [ADR-0003](../../adr/0003-selection-is-tier-bound-to-child.md)'s "Note on the current implementation" still says a half-finished Folder/Parent `isSelected` branch lives in `node_widget.dart` and is scheduled for removal. It was removed by the tier-renderer split (`bfb91db`): `ExpandableNodeRenderer` has no selection branch. The ADR's note is a stale prediction. The ADR is not edited from here.
+- `ChildNodeRenderer` merges `selectedTextStyle` itself, outside `RowMetrics`, so it is the one width input the two paths do not share ([row-geometry](row-geometry.md)).

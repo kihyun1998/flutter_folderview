@@ -53,7 +53,6 @@ class ParentNodeTheme<T> implements ExpandableNodeThemeView<T> {
 
   /// Resolver function to dynamically determine the label text based on node data
   /// If returns null, falls back to [node.label]
-  @override
   final String? Function(Node<T> node)? labelResolver;
 
   /// Hover color when mouse hovers over the node

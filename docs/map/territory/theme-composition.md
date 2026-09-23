@@ -26,15 +26,14 @@ The public theming surface. `FlutterFolderViewTheme` aggregates eight sub-themes
 **None.**
 
 ## Cross-cutting invariants
-- [measured-equals-rendered](../invariant/measured-equals-rendered.md) — a theme reaching the view by inheritance does not re-measure.
+- [measured-equals-rendered](../invariant/measured-equals-rendered.md) — a theme field that changes a row's width has to reach measurement, however the theme arrives.
 
 ## Blast radius
 - [scale](scale.md) — every new spatial field is a Scale decision.
-- [row-geometry](row-geometry.md) — theme identity invalidates measurement, but only for `theme:`.
+- [row-geometry](row-geometry.md) — the effective theme's identity invalidates measurement, whether it comes from `theme:` or from an ancestor.
 - [tier-rendering](tier-rendering.md) — the renderers read the tier themes, via `ExpandableNodeThemeView` for Folder and Parent.
 - [label-tooltip](label-tooltip.md) — `tooltipTheme` is a field on each tier theme.
 
 ## Known holes
 - **`FlutterFolderViewTheme.animationDuration` is read nowhere in `lib/`.** It is carried through `copyWith`, `lerp` and `==` but drives no animation. Read from the code.
 - `FolderViewNodeStyleTheme` and `FolderViewSpacingTheme` each box one field (`borderRadius`, `contentPadding`). Tracked: [#16](https://github.com/kihyun1998/flutter_folderview/issues/16). That issue's third item, a hand-rolled `lerpDouble`, no longer holds: every theme imports `dart:ui`'s. Its line citation into `node_widget.dart` points past the end of the current file.
-- An inherited theme change leaves the width stale ([row-geometry](row-geometry.md), probed).

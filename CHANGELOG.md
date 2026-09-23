@@ -1,3 +1,9 @@
+## 0.11.3
+
+- **fix**: a label from a `labelResolver` is measured. Content width was measured from `node.label` while the row drew the resolved label, so a resolved label longer than the raw one was cut with an ellipsis where the view should have scrolled horizontally. Measurement and rendering now read the label from one place (`RowMetrics.label`), the way they already shared the text style.
+- **fix**: content width is re-measured when the theme reaches the view from an ancestor `FolderViewTheme`, or when the ambient `bodyMedium` changes. Only a new `theme:` argument used to trigger it, so a font change from either source left rows ellipsized at the old width.
+- **fix**: `onSecondaryNodeTap` fires on **Folder** and **Parent** rows, not only on **Child** rows. ADR-0003 names it as the way to track a focused container, which are not selectable. `onDoubleNodeTap` remains Child-only, and both callbacks now say which tiers they fire on.
+
 ## 0.11.2
 
 - **deps**: `just_tooltip` `^0.4.4` ([#71](https://github.com/kihyun1998/flutter_folderview/issues/71)). Unlike `0.11.1`'s bump, this one is not documentation of intent: raising the floor is what carries the fix to a project that already depends on us. `pub` does not re-resolve a lockfile that still satisfies its constraint, so `^0.4.3` left an installed `0.4.3` exactly where it was — measured, by pinning this repo's own lock to the floor: `pub get` moved it to `0.4.4` under `^0.4.4` and not at all under `^0.4.3`. No new SDK bound; the Flutter `3.13.0` floor is still `0.4.2`'s.
