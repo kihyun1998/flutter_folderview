@@ -101,6 +101,15 @@ class EverySettingHost extends SettingsHost {
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
+      const Text(
+        'A second tap on a Child within ChildNodeTheme.clickInterval '
+        '(300 ms by default) is a double tap: onNodeTap fires on the first '
+        'tap, onDoubleNodeTap on the second. Folders and Parents get no '
+        'double tap.',
+        key: Key('double-tap-note'),
+        style: TextStyle(fontSize: 12),
+      ),
+      const SizedBox(height: 12),
       const Text('Event log', style: TextStyle(fontWeight: FontWeight.w600)),
       Column(
         key: const Key('interaction-log'),

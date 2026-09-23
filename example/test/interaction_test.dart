@@ -121,6 +121,21 @@ void main() {
       ]);
     });
 
+    testWidgets('a double tap on a Parent is two single taps', (tester) async {
+      await _openInteraction(tester);
+
+      await tester.tap(_row(_parent));
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.tap(_row(_parent));
+      await tester.pumpAndSettle();
+
+      expect(_log(tester).take(2).toList(), [
+        'onNodeTap · $_parent',
+        'onNodeTap · $_parent',
+      ]);
+      expect(find.byKey(const Key('double-tap-note')), findsOneWidget);
+    });
+
     testWidgets('with the handler off, the view gets no double-tap callback', (
       tester,
     ) async {
