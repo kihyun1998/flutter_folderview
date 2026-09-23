@@ -33,4 +33,5 @@ None recorded.
 - [scale-input](scale-input.md) — Control is also the Scale Modifier off macOS.
 
 ## Known holes
-- `onDoubleNodeTap` is Child-only by construction (`clickInterval: 0` on containers). Its dartdoc says so. No record decides it.
+- `onDoubleNodeTap` is Child-only by construction: container rows pass `onDoubleTap: null`, which since #95 means no double-tap window. The `clickInterval: 0` they also pass has had no effect since then. Its dartdoc says so. No record decides it.
+- **Probed on 2026-09-23 (the lens read on #95): swapping `onDoubleNodeTap` at runtime.** Set-then-removed and removed-then-set between two taps both give `[tap, tap]`. Removing it and setting it back within the window, with no tap in between, keeps the first tap's count, so the second tap is a double: `[tap, dbl]`. Flutter's `GestureDetector` would drop that state, because it registers no double-tap recognizer while the callback is null. Reachable only by flipping the handler twice inside 300 ms, so it is left as is. The fix, if it ever matters, is to reset the count in `didUpdateWidget` when `onDoubleTap` changes to or from null.

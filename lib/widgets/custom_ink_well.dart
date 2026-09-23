@@ -86,7 +86,7 @@ class _CustomInkWellState extends State<CustomInkWell> {
     if (_tapCount == 2) {
       _timer?.cancel();
       _resetTapCount();
-      widget.onDoubleTap?.call();
+      widget.onDoubleTap!();
     } else {
       widget.onTap?.call();
       _timer = Timer(

@@ -9,6 +9,7 @@ void main() {
   //   - Ctrl+tap        → onTap once, onDoubleTap never
   //   - single tap      → onTap once, onDoubleTap never
   //   - double tap      → onTap once (first tap) AND onDoubleTap once (second)
+  //   - no onDoubleTap  → every tap is a single tap (no double-tap window)
   const clickInterval = 300;
 
   late int onTap;

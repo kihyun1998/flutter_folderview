@@ -33,7 +33,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - A double tap on a Child logs `onNodeTap` on the first tap, then `onDoubleNodeTap`.
   - A Folder or Parent gets no double tap at all (`clickInterval: 0`, `onDoubleTap: null`), so two quick taps there are two `onNodeTap`s.
   - `onDoubleNodeTap` works without `onNodeTap`, because both renderers always pass `CustomInkWell` a non-null *tap* closure. That clearance holds only while they do: `CustomInkWell` attaches no tap handler when its own `onTap` is null.
-  - The mirror case: **without `onDoubleNodeTap`, a Child row has no double-tap window**, so every tap fires `onNodeTap` (#95). Before that fix the window stayed open with nothing behind it and a quick second tap fired nothing. The example's `interaction_test` pinned that as its expected value, and the #95 fix turned exactly that test red. It now reads "with the handler off, a quick second tap is a single tap".
+  - The mirror case: **without `onDoubleNodeTap`, a Child row has no double-tap window**, so every tap fires `onNodeTap` (#95). `interaction_test` pins it: "with the handler off, a quick second tap is a single tap".
   - Ctrl+tap is always an immediate single tap: two Ctrl-taps inside the window log two `onNodeTap`s.
 - **The recipe seam is live from #76**: `lib/recipes/` is non-empty, registered sources and recipe files match in both directions, and every source loads through `rootBundle`, the path the Code pane takes. `lib/recipes/` is declared under pubspec `assets`.
 - The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).

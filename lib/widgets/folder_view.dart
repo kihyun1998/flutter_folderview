@@ -17,8 +17,10 @@ class FolderView<T> extends StatefulWidget {
   final List<Node<T>> data;
   final ViewMode mode;
 
-  /// Fires on a primary tap on a row of **any** tier. A Ctrl+tap is always a
-  /// single tap, and so is every tap on a **Child** row when
+  /// Fires on a primary tap on a row of **any** tier. On a **Child** row with
+  /// [onDoubleNodeTap] set, a second tap within `ChildNodeTheme.clickInterval`
+  /// fires [onDoubleNodeTap] instead, after this has fired for the first. A
+  /// Ctrl+tap is always a single tap, and so is every tap on a Child row when
   /// [onDoubleNodeTap] is null.
   final Function(Node<T>)? onNodeTap;
 
