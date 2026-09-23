@@ -41,14 +41,15 @@ Future<void> chooseDropdown(WidgetTester tester, String id, String item) async {
   final control = find.byWidgetPredicate(
     (w) => w is SettingsControl && w.id == id,
   );
-  await tester.tap(
-    find
-        .descendant(
-          of: control,
-          matching: find.byWidgetPredicate((w) => w is DropdownButton),
-        )
-        .first,
-  );
+  final dropdown = find
+      .descendant(
+        of: control,
+        matching: find.byWidgetPredicate((w) => w is DropdownButton),
+      )
+      .first;
+  await tester.ensureVisible(dropdown);
+  await tester.pumpAndSettle();
+  await tester.tap(dropdown);
   await tester.pumpAndSettle();
   await tester.tap(find.text(item).last);
   await tester.pumpAndSettle();

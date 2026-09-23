@@ -39,7 +39,27 @@ const settingsSpec = <SettingGroup>[
       ),
     ],
   ),
+  _interaction,
 ];
+
+const _interaction = SettingGroup(
+  id: 'interaction',
+  title: 'Interaction',
+  features: [
+    SettingFeature(
+      id: 'interaction',
+      title: 'Taps & state',
+      options: [
+        'FolderView.onNodeTap',
+        'FolderView.onDoubleNodeTap',
+        'FolderView.onSecondaryNodeTap',
+        'FolderView.expandedNodeIds',
+        'FolderView.selectedNodeIds',
+        'selectionMode',
+      ],
+    ),
+  ],
+);
 
 /// Library options, as `Class.field`, that a recipe demonstrates rather than
 /// the settings panel.
