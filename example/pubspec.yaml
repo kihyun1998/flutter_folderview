@@ -20,8 +20,6 @@ version: 1.0.0+1
 
 environment:
   sdk: ^3.8.1
-  # The higher of the two floors: flutter_example_template (>=3.27.0) and
-  # flutter_folderview (>=3.13.0).
   flutter: ">=3.27.0"
 
 # Dependencies specify other packages that your package needs in order to work.

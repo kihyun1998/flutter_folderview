@@ -15,9 +15,9 @@ const recipesDir = 'lib/recipes';
 
 /// The imports and exports in [source] that fall outside [allowedImports].
 List<String> disallowedImports(String source) =>
-    RegExp(r'''^\s*(?:import|export)\s+'([^']+)'.*;''', multiLine: true)
+    RegExp(r'''^\s*(?:import|export)\s+(['"])(.+?)\1''', multiLine: true)
         .allMatches(source)
-        .map((m) => m.group(1)!)
+        .map((m) => m.group(2)!)
         .where((uri) => !allowedImports.any(uri.startsWith))
         .toList();
 
@@ -79,6 +79,19 @@ export 'package:window_manager/window_manager.dart';
         'package:example/app/destinations.dart',
         '../app/every_setting.dart',
         'package:window_manager/window_manager.dart',
+      ]);
+    });
+
+    test('flags a wrapped show clause and a double-quoted import', () {
+      const source = '''
+import 'package:example/app/destinations.dart'
+    show FolderViewDestinations;
+import "package:flutter_example_template/flutter_example_template.dart";
+import "package:flutter/material.dart";
+''';
+      expect(disallowedImports(source), [
+        'package:example/app/destinations.dart',
+        'package:flutter_example_template/flutter_example_template.dart',
       ]);
     });
   });

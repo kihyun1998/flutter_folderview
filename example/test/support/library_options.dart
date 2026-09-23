@@ -19,39 +19,60 @@ Set<String> libraryOptions(String barrelPath) {
   };
 }
 
-/// The public `final` instance fields of each public top-level class in
-/// [source], as `Class.field`. A declaration may span several lines.
+/// The public `final` instance fields of each public top-level class or enum
+/// in [source], as `Class.field`. A declaration may span several lines and
+/// may declare several names.
 Set<String> optionsInSource(String source) {
   final options = <String>{};
-  final classStart = RegExp(
-    r'^(?:abstract\s+|final\s+|base\s+|sealed\s+)*class\s+(\w+)',
+  final typeStart = RegExp(
+    r'^(?:(?:abstract|base|final|interface|mixin|sealed)\s+)*(?:class|enum)\s+(\w+)',
   );
-  final fieldName = RegExp(r'(\w+)\s*;\s*$');
-  String? currentClass;
+  final lineComment = RegExp(r'\s*//.*$');
+  String? currentType;
   final lines = source.split(RegExp(r'\r?\n'));
   for (var i = 0; i < lines.length; i++) {
     final line = lines[i];
-    final start = classStart.firstMatch(line);
+    final start = typeStart.firstMatch(line);
     if (start != null) {
-      currentClass = start.group(1);
+      currentType = start.group(1);
       continue;
     }
     if (line.startsWith('}')) {
-      currentClass = null;
+      currentType = null;
       continue;
     }
-    if (currentClass == null || currentClass.startsWith('_')) continue;
+    if (currentType == null || currentType.startsWith('_')) continue;
     if (!line.startsWith('  final ')) continue;
 
-    var declaration = line;
+    var declaration = line.replaceFirst(lineComment, '');
     while (!declaration.contains(';') && i + 1 < lines.length) {
-      declaration += ' ${lines[++i].trim()}';
+      declaration += ' ${lines[++i].replaceFirst(lineComment, '').trim()}';
     }
+    declaration = declaration.substring(0, declaration.indexOf(';'));
     if (declaration.contains('=')) continue;
-    final name = fieldName.firstMatch(declaration)?.group(1);
-    if (name != null && !name.startsWith('_')) {
-      options.add('$currentClass.$name');
+    for (final name in _declaredNames(declaration)) {
+      if (!name.startsWith('_')) options.add('$currentType.$name');
     }
   }
   return options;
+}
+
+/// The names in a `final Type a, b` declaration: the last identifier of each
+/// comma-separated part, splitting only outside brackets.
+Iterable<String> _declaredNames(String declaration) sync* {
+  final lastIdentifier = RegExp(r'(\w+)\s*$');
+  var depth = 0;
+  var partStart = 0;
+  for (var i = 0; i <= declaration.length; i++) {
+    final char = i < declaration.length ? declaration[i] : ',';
+    if ('<([{'.contains(char)) depth++;
+    if ('>)]}'.contains(char)) depth--;
+    if (char == ',' && depth == 0) {
+      final name = lastIdentifier.firstMatch(
+        declaration.substring(partStart, i),
+      );
+      if (name != null) yield name.group(1)!;
+      partStart = i + 1;
+    }
+  }
 }

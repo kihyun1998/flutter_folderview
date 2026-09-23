@@ -239,5 +239,43 @@ abstract class Base {
         'Base.id',
       });
     });
+
+    test('reads every class modifier, enums, comments and name lists', () {
+      const source = '''
+interface class A {
+  final int a;
+}
+
+abstract interface class B {
+  final int b;
+}
+
+mixin class C {
+  final int c;
+}
+
+enum D {
+  one(1);
+
+  const D(this.d);
+  final int d;
+}
+
+class E {
+  final int e; // default = 0
+  final int f, g;
+  final int h = 1, i = 2;
+}
+''';
+      expect(optionsInSource(source), {
+        'A.a',
+        'B.b',
+        'C.c',
+        'D.d',
+        'E.e',
+        'E.f',
+        'E.g',
+      });
+    });
   });
 }
