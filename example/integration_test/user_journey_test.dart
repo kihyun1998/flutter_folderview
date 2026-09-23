@@ -19,8 +19,14 @@ void main() {
   testWidgets('example app: expand, select, zoom, and switch view mode', (
     tester,
   ) async {
-    // Boot the real example widget tree (no main(); avoids window_manager).
+    // MyApp without main(), then the legacy panel: the demo whose controls this
+    // journey drives.
+    tester.view.physicalSize = const Size(1600, 1000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Legacy panel').first);
     await tester.pumpAndSettle();
     expect(folderView, findsOneWidget);
     expect(row('Theme System Architecture'), findsOneWidget);
