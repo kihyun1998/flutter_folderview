@@ -28,6 +28,11 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - **Changing the data intersects the Expanded Set with the new ids.** Generated ids (`f1-p2-c3`) share nothing with the demo's, so without the intersection the caller would hand the view ids that name nothing. Switching back to Demo restores the demo's own starting set, because the intersection alone would leave it empty.
 - **The open feature lives in `EverySettingDemo`, not in the knob widget's `State`.** The shell discards the knob region when you leave the destination, and in the narrow layout when you switch tabs. Measured by the lens read on #76: 1 → 0 detail panes after a round trip.
 - **The counts are disabled (`onChanged: null`) while the data is Demo**, labelled "(Generated only)". A live slider that changes nothing on screen would say nothing about why.
+- **"Taps & state" (#77) shows ADR-0002 as behaviour.** Each tap callback has a switch: on installs the example's handler, off passes `null`. With `onNodeTap` off, no tap changes either set, because the library proposes and only the caller applies. The handler toggles expansion for a Folder or Parent and selection for a Child. The library does not enforce ADR-0003, so the example's handler does. `selectionMode` (single / multiple) is example-only: the library leaves that choice to the caller. The event log keeps the newest 20 callbacks.
+- **What the tap log shows about the library** (read in `CustomInkWell._handleTap` and the two tier renderers):
+  - A double tap on a Child logs `onNodeTap` on the first tap, then `onDoubleNodeTap`.
+  - A Folder or Parent gets no double tap at all (`clickInterval: 0`, `onDoubleTap: null`), so two quick taps there are two `onNodeTap`s.
+  - `onDoubleNodeTap` works without `onNodeTap`, because both renderers always pass `CustomInkWell` a non-null wrapper closure. That clearance holds only while they do: `CustomInkWell` attaches no tap handler when its own `onTap` is null.
 - **The recipe seam is live from #76**: `lib/recipes/` is non-empty, registered sources and recipe files match in both directions, and every source loads through `rootBundle`, the path the Code pane takes. `lib/recipes/` is declared under pubspec `assets`.
 - The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).
 
@@ -43,6 +48,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/lib/scenarios/large_tree_scenario.dart` — `LargeTreeDemo`, `LargeTreeStage`
 - `example/test/settings_render_test.dart` — every spec id draws a control
 - `example/test/settings_spec_test.dart` — unique ids, interactions name another feature and cite evidence
+- `example/test/interaction_test.dart` — tap callbacks, handler switches, Selected and Expanded Set
 - `example/test/option_coverage_test.dart` — `notYetCovered`, `coveredOptions`
 - `example/test/support/library_options.dart` — `libraryOptions`, `optionsInSource`
 - `example/test/recipe_seam_test.dart` — `allowedImports`, `disallowedImports`
