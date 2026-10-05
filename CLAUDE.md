@@ -22,7 +22,7 @@ what depends on what is `docs/map/`; per-incident evidence is
 `flutter_folderview` renders a **semantic three-tier hierarchy** — **Folder →
 Parent → Child** (each a `Node`) — in two interchangeable **View Modes**
 (`folder` / `tree`). The tier roles are part of the *contract*, not styling. The
-full domain, the tier rules, and the ubiquitous language live in **`CONTEXT.md`**
+full domain, the tier rules, and the ubiquitous language live in **`GLOSSARY.md`**
 (source of truth — a `Node` is **not** a "row"; a "row" is a *rendered line*);
 decisions in **`docs/adr/`**.
 
@@ -54,7 +54,7 @@ Canonical label strings (`needs-triage`, `needs-info`, `ready-for-agent`,
 `ready-for-human`, `wontfix`) — no overrides. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
-Single-context layout: `CONTEXT.md` + `docs/adr/` at the repo root. See
+Single-context layout: `GLOSSARY.md` + `docs/adr/` at the repo root. See
 `docs/agents/domain.md`.
 
 ## Comments and the map
