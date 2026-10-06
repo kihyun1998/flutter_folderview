@@ -8,7 +8,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - **What counts as an option.** The coverage guard counts the public `final` instance fields of every public class in a file the barrel exports: **158** at #75. The hand count in #74 said 144. It had missed `Node` (5), the eight sub-theme containers of `FlutterFolderViewTheme`, and `FolderViewTheme.data`. The maintainer was shown both counts and chose the mechanical rule.
 - **Test helpers live in `example/test/support/`**, so `example/test/` holds only `*_test.dart` files. Neither this repo nor `flutter_table_plus` had a precedent; the maintainer was shown the flat alternative and chose the folder.
 - **`Node`'s five fields are covered by a recipe, not the settings panel** (#76). They are the data's shape, not knobs. The maintainer was also shown the alternative, a read-only "control" in the panel, and chose the recipe. So `Building a tree` became the first recipe, and the first-recipe seam rules from #74 landed with it.
-- **Generated data is strictly Folder → Parent → Child** (#76). The count of each is a setting. The legacy generator's nested-Folder depth was dropped on purpose: the maintainer chose the containment rule in `CONTEXT.md` over keeping that option.
+- **Generated data is strictly Folder → Parent → Child** (#76). The count of each is a setting. The legacy generator's nested-Folder depth was dropped on purpose: the maintainer chose the containment rule in `GLOSSARY.md` over keeping that option.
 - **Windows window size** is 1200×600, wider than `ShellPage.narrowBreakpoint` (900), so the desktop run opens in the three-region layout. Whether `window_manager` stays at all is decided in #91.
 
 ## Design model

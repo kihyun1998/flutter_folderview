@@ -7,7 +7,7 @@ A dependency graph over what this package *does*. It answers two questions that 
 1. **Horizontal: "if I touch this, what else moves?"** Open the territory you are changing and read its `## Blast radius` as a checklist. Then follow its `## Cross-cutting invariants`.
 2. **Vertical: "what is this derived from?"** In the same note, `## Governing decisions` gives the record, `## Design model` the rules, `## Code` the symbols, and `## Reference behaviour` the outside source it was checked against.
 
-Domain vocabulary is [`CONTEXT.md`](../../CONTEXT.md). Decisions are [`docs/adr/`](../adr/). Per-incident evidence is in [`lessons.md`](../agents/lessons.md).
+Domain vocabulary is [`GLOSSARY.md`](../../GLOSSARY.md). Decisions are [`docs/adr/`](../adr/). Per-incident evidence is in [`lessons.md`](../agents/lessons.md).
 
 ## Why this layer exists
 The same fact was found three times at three sites: **a row can be wider than the viewport** (#42 label anchor, #47 tooltip outside the view, #44/#45 row-card anchor). The three sites never call each other, so no file, ADR or issue connected them. Each was found from scratch. That fact now has one node: [row-wider-than-viewport](invariant/row-wider-than-viewport.md).
@@ -46,7 +46,7 @@ Scope each sentinel query to its heading. A bare `**None.**` search conflates th
 
 ## Measurements at build (2026-09-23)
 - **M1, public surface.** Of 17 exported types, 5 are the subject of an ADR (the scrollbar theme and the four tier and tooltip themes). Of 14 `FolderView` parameters, 5 are governed (ADR-0002's interaction state). The newest large surface, `rowTooltipBuilder` / `RowTooltipTheme`, has **no** record. Its central contract (a pointer anchor as a correctness requirement) lives in `CLAUDE.md` and dartdoc.
-- **M2, mentioned versus subject.** "row" appears in 2 ADR bodies and 0 titles. Flattening and View Mode appear in 0 ADRs, and `CONTEXT.md` defines them.
+- **M2, mentioned versus subject.** "row" appears in 2 ADR bodies and 0 titles. Flattening and View Mode appear in 0 ADRs, and `GLOSSARY.md` defines them.
 - **M3, file size.** No file exceeds 30% of its layer. `folder_view_content.dart` is 27% of `widgets/`, and it hosts four territories (scroll-sync, scroll-anchoring, row-card, and part of scale-input), which is why the map goes finer than the file there.
 - **M4, stale forward prose.** [ADR-0003](../adr/0003-selection-is-tier-bound-to-child.md)'s implementation note predicted a removal that had already happened (`bfb91db`), and it recommended `onSecondaryNodeTap` for containers, which the code did not deliver (probed). Both were fixed in 0.11.3.
 - **M5, backlog.** One open issue, #16. Its body is partly stale ([theme-composition](territory/theme-composition.md)).

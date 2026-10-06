@@ -2,7 +2,7 @@ import '../models/node.dart';
 
 /// Projects the input hierarchy onto the list of root nodes visible in a given
 /// [ViewMode] — the code counterpart of the **View Mode projection** described
-/// in `CONTEXT.md`.
+/// in `GLOSSARY.md`.
 ///
 /// The projection does not flatten or mutate the input; it only decides which
 /// nodes occupy the root of the rendered list. Flattening (expand/collapse) is

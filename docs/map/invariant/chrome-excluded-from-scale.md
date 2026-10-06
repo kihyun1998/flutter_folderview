@@ -17,7 +17,7 @@ Tooltips that grow with the view but keep small text: a large box around text at
 
 ## Discovery history
 - [ADR-0001](../../adr/0001-scrollbars-excluded-from-scale.md) — scrollbars classified as chrome.
-- [ADR-0004](../../adr/0004-tooltips-excluded-from-scale.md) — tooltip scaling was *implemented* during the per-theme `scale` refactor, measured as visually worse, and reverted. `CONTEXT.md` keeps the flagged ambiguity.
+- [ADR-0004](../../adr/0004-tooltips-excluded-from-scale.md) — tooltip scaling was *implemented* during the per-theme `scale` refactor, measured as visually worse, and reverted. `GLOSSARY.md` keeps the flagged ambiguity.
 - `RowTooltipTheme` (#44) was born under the rule and says so in its dartdoc.
 
 Two decisions and one reverted implementation.

@@ -2,7 +2,7 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_folderview/services/view_mode_projection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-// Expected outputs come from the CONTEXT.md domain rules for View Mode, not from
+// Expected outputs come from the GLOSSARY.md domain rules for View Mode, not from
 // the current implementation:
 //   - folder mode: root shows Folders + Parents; a root-level Child is dropped.
 //   - tree mode: Folders are hidden and their Parents are lifted (recursively)

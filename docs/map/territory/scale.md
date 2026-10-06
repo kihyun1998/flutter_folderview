@@ -12,7 +12,7 @@ Applies the caller's **Scale** factor uniformly to every content-spatial propert
 - `FolderView.scale` → `FlutterFolderViewTheme.scaledForContext`, which returns `this` at 1.0 and otherwise takes `defaultFontSize` from Material `bodyMedium` → `FlutterFolderViewTheme.scale`. That method multiplies `rowHeight` and `rowSpacing` and delegates to each sub-theme's `scale`, **except** `scrollbarTheme`.
 - Each tier theme's `scale` does not delegate to its `tooltipTheme`. `NodeTooltipTheme` and `RowTooltipTheme` have no `scale` method.
 - Text: `scaleTextStyle` materializes a null style from `defaultFontSize`. `scaleOptionalTextStyle` keeps opt-in styles null.
-- User-supplied `Widget`s cannot be rescaled. `NodeIconBox` wraps them in `FittedBox` when `scale != 1`, which is approximate by design (`CONTEXT.md` flagged ambiguity).
+- User-supplied `Widget`s cannot be rescaled. `NodeIconBox` wraps them in `FittedBox` when `scale != 1`, which is approximate by design (`GLOSSARY.md` flagged ambiguity).
 - Because each tier theme hand-lists its fields ([ADR-0005](../../adr/0005-tier-theme-boilerplate-not-extracted.md)), a new spatial field has to be added to `scale` in every class that has it, or it silently stays unscaled.
 
 ## Code

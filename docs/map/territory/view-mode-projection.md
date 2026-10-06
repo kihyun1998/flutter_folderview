@@ -6,14 +6,14 @@ Decides which **Nodes** sit at the root of the rendered list for a given **View 
 ## Governing decisions
 **None.**
 
-[`CONTEXT.md`](../../../CONTEXT.md) defines **Folder Mode** and **Tree Mode** and says violations of the tier rules produce undefined visible behavior. That is a definition, not a recorded decision with alternatives. No ADR says *why* there are exactly two modes or why a root-level **Child** is dropped rather than rendered.
+[`GLOSSARY.md`](../../../GLOSSARY.md) defines **Folder Mode** and **Tree Mode** and says violations of the tier rules produce undefined visible behavior. That is a definition, not a recorded decision with alternatives. No ADR says *why* there are exactly two modes or why a root-level **Child** is dropped rather than rendered.
 
 ## Design model
 - `folder`: the root keeps **Folders** and **Parents**. A root-level **Child** is dropped silently.
 - `tree`: **Parents** are collected recursively, descending through **Folders** only. A **Parent** nested in a **Parent** (a tier violation) is not lifted.
 - A **Folder** ID in the **Expanded Set** has no effect in `tree`, because the **Folder** is never rendered.
 - Tier behaviour that depends on mode lives downstream, not here: a **Parent** shows its open-state icon only in `tree` ([tier-rendering](tier-rendering.md)).
-- Populated from the source and `CONTEXT.md`. No design doc sits above it.
+- Populated from the source and `GLOSSARY.md`. No design doc sits above it.
 
 ## Code
 - `lib/services/view_mode_projection.dart` — `ViewModeProjection.project`, `ViewModeProjection._collectParents`
