@@ -55,12 +55,13 @@ void main() {
   }
 
   // Dispatches a mouse-wheel pointer signal over [at]. A positive [dy] is a
-  // wheel-down (scroll content down); negative is a wheel-up.
+  // wheel-down (scroll content down); negative is a wheel-up. Pumps until the
+  // wheel motion settles, so the offset read afterwards is where it stops.
   Future<void> sendWheel(WidgetTester tester, Offset at, double dy) async {
     final pointer = TestPointer(1, PointerDeviceKind.mouse);
     await tester.sendEventToBinding(pointer.hover(at));
     await tester.sendEventToBinding(pointer.scroll(Offset(0, dy)));
-    await tester.pump();
+    await tester.pumpAndSettle();
   }
 
   // The vertical ListView's own scroll offset. find.byType(ListView) matches
