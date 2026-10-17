@@ -114,7 +114,7 @@ class EverySettingHost extends SettingsHost {
       demo.wheelDurationMs.toDouble(),
       min: 50,
       max: 1000,
-      divisions: 95,
+      divisions: 475,
       format: (v) => '${v.round()} ms',
       enabled:
           demo.wheelMotionKind == WheelMotionKind.spring ||
@@ -160,7 +160,7 @@ class EverySettingHost extends SettingsHost {
       demo.wheelTimeConstantMs.toDouble(),
       min: 10,
       max: 300,
-      divisions: 29,
+      divisions: 145,
       format: (v) => '${v.round()} ms',
       enabled: demo.wheelMotionKind == WheelMotionKind.lerp,
       onChanged: (v) => demo.wheelTimeConstantMs = v.round(),
