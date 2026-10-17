@@ -96,10 +96,7 @@ class ParentNodeTheme<T> implements ExpandableNodeThemeView<T> {
   /// Scales: [width], [height], [padding], [margin], [textStyle].
   /// **Does NOT scale**: [tooltipTheme] — see ADR-0004.
   /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
-  ParentNodeTheme<T> scale(
-    double factor, {
-    required double defaultFontSize,
-  }) {
+  ParentNodeTheme<T> scale(double factor, {required double defaultFontSize}) {
     assert(factor > 0, 'scale factor must be > 0, got $factor');
     if (factor == 1.0) return this;
     return copyWith(

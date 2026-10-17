@@ -9,26 +9,35 @@ void main() {
     test('FlutterFolderViewTheme', () {
       final theme = FlutterFolderViewTheme<String>.light();
       final result = theme.scale(factor: 1.0, defaultFontSize: defaultFontSize);
-      expect(identical(result, theme), isTrue,
-          reason: 'scale(1.0) must return identical this — no allocation');
+      expect(
+        identical(result, theme),
+        isTrue,
+        reason: 'scale(1.0) must return identical this — no allocation',
+      );
     });
 
     test('FolderNodeTheme', () {
       const t = FolderNodeTheme<String>();
       expect(
-          identical(t.scale(1.0, defaultFontSize: defaultFontSize), t), isTrue);
+        identical(t.scale(1.0, defaultFontSize: defaultFontSize), t),
+        isTrue,
+      );
     });
 
     test('ParentNodeTheme', () {
       const t = ParentNodeTheme<String>();
       expect(
-          identical(t.scale(1.0, defaultFontSize: defaultFontSize), t), isTrue);
+        identical(t.scale(1.0, defaultFontSize: defaultFontSize), t),
+        isTrue,
+      );
     });
 
     test('ChildNodeTheme', () {
       const t = ChildNodeTheme<String>();
       expect(
-          identical(t.scale(1.0, defaultFontSize: defaultFontSize), t), isTrue);
+        identical(t.scale(1.0, defaultFontSize: defaultFontSize), t),
+        isTrue,
+      );
     });
 
     test('ExpandIconTheme', () {
@@ -64,8 +73,11 @@ void main() {
           ),
         ),
       );
-      expect(identical(result, theme), isTrue,
-          reason: 'scaledForContext must short-circuit before Theme.of lookup');
+      expect(
+        identical(result, theme),
+        isTrue,
+        reason: 'scaledForContext must short-circuit before Theme.of lookup',
+      );
     });
   });
 
@@ -135,21 +147,21 @@ void main() {
     });
 
     test('FolderViewSpacingTheme scales contentPadding', () {
-      const t = FolderViewSpacingTheme(
-        contentPadding: EdgeInsets.all(10.0),
-      );
+      const t = FolderViewSpacingTheme(contentPadding: EdgeInsets.all(10.0));
       expect(t.scale(2.0).contentPadding, const EdgeInsets.all(20.0));
     });
   });
 
   group('TextStyle scaling and null fontSize resolution', () {
-    test('null textStyle becomes TextStyle(fontSize: defaultFontSize * factor)',
-        () {
-      const t = ChildNodeTheme<String>();
-      final scaled = t.scale(2.0, defaultFontSize: 14.0);
-      expect(scaled.textStyle, isNotNull);
-      expect(scaled.textStyle!.fontSize, 28.0);
-    });
+    test(
+      'null textStyle becomes TextStyle(fontSize: defaultFontSize * factor)',
+      () {
+        const t = ChildNodeTheme<String>();
+        final scaled = t.scale(2.0, defaultFontSize: 14.0);
+        expect(scaled.textStyle, isNotNull);
+        expect(scaled.textStyle!.fontSize, 28.0);
+      },
+    );
 
     test('present textStyle without fontSize uses defaultFontSize', () {
       const t = ChildNodeTheme<String>(
@@ -180,13 +192,15 @@ void main() {
       expect(scaled2.textStyle!.letterSpacing, isNull);
     });
 
-    test('selectedTextStyle preserves null (no defaultFontSize resolution)',
-        () {
+    test('selectedTextStyle preserves null (no defaultFontSize resolution)', () {
       const t = ChildNodeTheme<String>();
       final scaled = t.scale(2.0, defaultFontSize: 14.0);
-      expect(scaled.selectedTextStyle, isNull,
-          reason:
-              'Opt-in styles must stay null when unset — no surprise materialization');
+      expect(
+        scaled.selectedTextStyle,
+        isNull,
+        reason:
+            'Opt-in styles must stay null when unset — no surprise materialization',
+      );
     });
 
     test('selectedTextStyle scales when set', () {
@@ -208,8 +222,11 @@ void main() {
       );
       const t = FolderNodeTheme<String>(tooltipTheme: tip);
       final scaled = t.scale(2.0, defaultFontSize: 14.0);
-      expect(identical(scaled.tooltipTheme, tip), isTrue,
-          reason: 'ADR-0004: tooltipTheme must be pointer-equal pass-through');
+      expect(
+        identical(scaled.tooltipTheme, tip),
+        isTrue,
+        reason: 'ADR-0004: tooltipTheme must be pointer-equal pass-through',
+      );
     });
 
     test('ParentNodeTheme.scale passes tooltipTheme through identical', () {
@@ -228,14 +245,21 @@ void main() {
   });
 
   group('Scrollbar exclusion (ADR-0001)', () {
-    test('FlutterFolderViewTheme.scale passes scrollbarTheme through identical',
-        () {
-      final theme = FlutterFolderViewTheme<String>.light();
-      final scaled = theme.scale(factor: 2.0, defaultFontSize: defaultFontSize);
-      expect(identical(scaled.scrollbarTheme, theme.scrollbarTheme), isTrue,
-          reason:
-              'ADR-0001: scrollbarTheme must be pointer-equal pass-through');
-    });
+    test(
+      'FlutterFolderViewTheme.scale passes scrollbarTheme through identical',
+      () {
+        final theme = FlutterFolderViewTheme<String>.light();
+        final scaled = theme.scale(
+          factor: 2.0,
+          defaultFontSize: defaultFontSize,
+        );
+        expect(
+          identical(scaled.scrollbarTheme, theme.scrollbarTheme),
+          isTrue,
+          reason: 'ADR-0001: scrollbarTheme must be pointer-equal pass-through',
+        );
+      },
+    );
 
     test('scrollbarTheme fields literally unchanged across scale', () {
       final theme = FlutterFolderViewTheme<String>.light();

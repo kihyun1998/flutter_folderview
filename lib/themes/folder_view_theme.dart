@@ -19,11 +19,7 @@ class FolderViewTheme<T> extends InheritedWidget {
   final FlutterFolderViewTheme<T> data;
 
   /// Creates a [FolderViewTheme] that provides [data] to its descendants
-  const FolderViewTheme({
-    super.key,
-    required this.data,
-    required super.child,
-  });
+  const FolderViewTheme({super.key, required this.data, required super.child});
 
   /// Retrieves the [FlutterFolderViewTheme] from the closest [FolderViewTheme] ancestor
   ///
@@ -35,8 +31,8 @@ class FolderViewTheme<T> extends InheritedWidget {
   /// final lineColor = theme.lineTheme.lineColor;
   /// ```
   static FlutterFolderViewTheme<T> of<T>(BuildContext context) {
-    final FolderViewTheme<T>? theme =
-        context.dependOnInheritedWidgetOfExactType<FolderViewTheme<T>>();
+    final FolderViewTheme<T>? theme = context
+        .dependOnInheritedWidgetOfExactType<FolderViewTheme<T>>();
     return theme?.data ?? FlutterFolderViewTheme<T>.light();
   }
 
@@ -48,8 +44,8 @@ class FolderViewTheme<T> extends InheritedWidget {
   ///
   /// If there is no [FolderViewTheme] ancestor, returns a default light theme.
   static FlutterFolderViewTheme<T> maybeOf<T>(BuildContext context) {
-    final FolderViewTheme<T>? theme =
-        context.getInheritedWidgetOfExactType<FolderViewTheme<T>>();
+    final FolderViewTheme<T>? theme = context
+        .getInheritedWidgetOfExactType<FolderViewTheme<T>>();
     return theme?.data ?? FlutterFolderViewTheme<T>.light();
   }
 

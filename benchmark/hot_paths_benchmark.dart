@@ -40,13 +40,28 @@ class _Forest {
         final children = <Node<String>>[
           for (var c = 0; c < childrenPerParent; c++)
             Node<String>(
-                id: '${pId}_c$c', label: '${pId}_c$c', type: NodeType.child),
+              id: '${pId}_c$c',
+              label: '${pId}_c$c',
+              type: NodeType.child,
+            ),
         ];
-        parents.add(Node<String>(
-            id: pId, label: pId, type: NodeType.parent, children: children));
+        parents.add(
+          Node<String>(
+            id: pId,
+            label: pId,
+            type: NodeType.parent,
+            children: children,
+          ),
+        );
       }
-      roots.add(Node<String>(
-          id: fId, label: fId, type: NodeType.folder, children: parents));
+      roots.add(
+        Node<String>(
+          id: fId,
+          label: fId,
+          type: NodeType.folder,
+          children: parents,
+        ),
+      );
     }
   }
 
@@ -147,9 +162,15 @@ class IncrementalToggleBenchmark extends BenchmarkBase {
   void run() {
     // Single-node collapse (target removed) then single-node expand (restored).
     _flattener.update(
-        data: _roots, mode: ViewMode.folder, expandedIds: _withoutTarget);
+      data: _roots,
+      mode: ViewMode.folder,
+      expandedIds: _withoutTarget,
+    );
     _flattener.update(
-        data: _roots, mode: ViewMode.folder, expandedIds: _fullyExpanded);
+      data: _roots,
+      mode: ViewMode.folder,
+      expandedIds: _fullyExpanded,
+    );
   }
 }
 

@@ -59,13 +59,17 @@ class ChildNodeRenderer<T> extends StatelessWidget {
       borderRadius: metrics.theme.nodeStyleTheme.borderRadius,
       isSelected: isSelected,
       backgroundColor: Colors.transparent,
-      selectedColor: childTheme.selectedBackgroundColor ??
+      selectedColor:
+          childTheme.selectedBackgroundColor ??
           Theme.of(context).colorScheme.primaryContainer,
-      hoverColor: childTheme.hoverColor ??
+      hoverColor:
+          childTheme.hoverColor ??
           Theme.of(context).colorScheme.surfaceContainerHighest,
-      splashColor: childTheme.splashColor ??
+      splashColor:
+          childTheme.splashColor ??
           Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-      highlightColor: childTheme.highlightColor ??
+      highlightColor:
+          childTheme.highlightColor ??
           Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       onTap: () => onTap?.call(node),
       onDoubleTap: onDoubleTap == null ? null : () => onDoubleTap!(node),

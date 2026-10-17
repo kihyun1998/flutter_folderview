@@ -12,8 +12,9 @@ import 'package:flutter_test/flutter_test.dart';
 // (testWidgets verifies foundation debug vars are unset at that point, which is
 // earlier than tearDown), so each test resets it in a finally block.
 void main() {
-  testWidgets('on Windows, Control is the scale modifier and Meta is not',
-      (tester) async {
+  testWidgets('on Windows, Control is the scale modifier and Meta is not', (
+    tester,
+  ) async {
     await tester.pumpWidget(const SizedBox());
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     try {
@@ -22,16 +23,20 @@ void main() {
       await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
 
       await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
-      expect(isScaleModifierPressed(), isFalse,
-          reason: 'Windows checks Control only (avoids sticky-Meta bug)');
+      expect(
+        isScaleModifierPressed(),
+        isFalse,
+        reason: 'Windows checks Control only (avoids sticky-Meta bug)',
+      );
       await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
     } finally {
       debugDefaultTargetPlatformOverride = null;
     }
   });
 
-  testWidgets('on macOS, Meta is the scale modifier and Control is not',
-      (tester) async {
+  testWidgets('on macOS, Meta is the scale modifier and Control is not', (
+    tester,
+  ) async {
     await tester.pumpWidget(const SizedBox());
     debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
     try {

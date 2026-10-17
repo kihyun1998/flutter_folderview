@@ -78,8 +78,11 @@ class FlutterFolderViewTheme<T> {
       ),
       folderTheme: FolderNodeTheme<T>(
         widget: Icon(Icons.folder, color: Colors.grey.shade700, size: 20),
-        openWidget:
-            Icon(Icons.folder_open, color: Colors.grey.shade700, size: 20),
+        openWidget: Icon(
+          Icons.folder_open,
+          color: Colors.grey.shade700,
+          size: 20,
+        ),
         textStyle: const TextStyle(color: Colors.black87),
         hoverColor: Colors.grey.shade200,
         splashColor: Colors.blue.withValues(alpha: 0.3),
@@ -93,8 +96,11 @@ class FlutterFolderViewTheme<T> {
         highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       childTheme: ChildNodeTheme<T>(
-        widget: Icon(Icons.insert_drive_file,
-            color: Colors.grey.shade700, size: 20),
+        widget: Icon(
+          Icons.insert_drive_file,
+          color: Colors.grey.shade700,
+          size: 20,
+        ),
         textStyle: const TextStyle(color: Colors.black87),
         selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         selectedBackgroundColor: Colors.blue.shade50,
@@ -103,8 +109,11 @@ class FlutterFolderViewTheme<T> {
         highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       expandIconTheme: ExpandIconTheme(
-        widget:
-            Icon(Icons.chevron_right, color: Colors.grey.shade700, size: 20),
+        widget: Icon(
+          Icons.chevron_right,
+          color: Colors.grey.shade700,
+          size: 20,
+        ),
       ),
       spacingTheme: const FolderViewSpacingTheme(),
     );
@@ -124,8 +133,11 @@ class FlutterFolderViewTheme<T> {
       ),
       folderTheme: FolderNodeTheme<T>(
         widget: Icon(Icons.folder, color: Colors.grey.shade400, size: 20),
-        openWidget:
-            Icon(Icons.folder_open, color: Colors.grey.shade400, size: 20),
+        openWidget: Icon(
+          Icons.folder_open,
+          color: Colors.grey.shade400,
+          size: 20,
+        ),
         textStyle: const TextStyle(color: Colors.white70),
         hoverColor: Colors.grey.shade800,
         splashColor: Colors.blue.withValues(alpha: 0.3),
@@ -139,8 +151,11 @@ class FlutterFolderViewTheme<T> {
         highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       childTheme: ChildNodeTheme<T>(
-        widget: Icon(Icons.insert_drive_file,
-            color: Colors.grey.shade400, size: 20),
+        widget: Icon(
+          Icons.insert_drive_file,
+          color: Colors.grey.shade400,
+          size: 20,
+        ),
         textStyle: const TextStyle(color: Colors.white70),
         selectedTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         selectedBackgroundColor: Colors.blue.shade900.withValues(alpha: 0.3),
@@ -149,8 +164,11 @@ class FlutterFolderViewTheme<T> {
         highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       expandIconTheme: ExpandIconTheme(
-        widget:
-            Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 20),
+        widget: Icon(
+          Icons.chevron_right,
+          color: Colors.grey.shade400,
+          size: 20,
+        ),
       ),
       spacingTheme: const FolderViewSpacingTheme(),
     );
@@ -261,8 +279,11 @@ class FlutterFolderViewTheme<T> {
       folderTheme: FolderNodeTheme.lerp(a.folderTheme, b.folderTheme, t),
       parentTheme: ParentNodeTheme.lerp(a.parentTheme, b.parentTheme, t),
       childTheme: ChildNodeTheme.lerp(a.childTheme, b.childTheme, t),
-      expandIconTheme:
-          ExpandIconTheme.lerp(a.expandIconTheme, b.expandIconTheme, t),
+      expandIconTheme: ExpandIconTheme.lerp(
+        a.expandIconTheme,
+        b.expandIconTheme,
+        t,
+      ),
       spacingTheme: FolderViewSpacingTheme.lerp(
         a.spacingTheme,
         b.spacingTheme,
@@ -299,17 +320,17 @@ class FlutterFolderViewTheme<T> {
 
   @override
   int get hashCode => Object.hash(
-        lineTheme,
-        scrollbarTheme,
-        folderTheme,
-        parentTheme,
-        childTheme,
-        expandIconTheme,
-        spacingTheme,
-        nodeStyleTheme,
-        animationDuration,
-        Object.hash(rowHeight, rowSpacing),
-      );
+    lineTheme,
+    scrollbarTheme,
+    folderTheme,
+    parentTheme,
+    childTheme,
+    expandIconTheme,
+    spacingTheme,
+    nodeStyleTheme,
+    animationDuration,
+    Object.hash(rowHeight, rowSpacing),
+  );
 
   @override
   String toString() {

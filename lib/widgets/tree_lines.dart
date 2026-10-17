@@ -78,11 +78,11 @@ class TreeLinePlan {
 
   @override
   int get hashCode => Object.hash(
-        Object.hashAll(continuationXs),
-        connectorX,
-        connectorIsLast,
-        connectorEndX,
-      );
+    Object.hashAll(continuationXs),
+    connectorX,
+    connectorIsLast,
+    connectorEndX,
+  );
 }
 
 /// Paints a row's connector and ancestor continuation lines in one pass,

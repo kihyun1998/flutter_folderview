@@ -11,41 +11,43 @@ import 'package:flutter_test/flutter_test.dart';
 /// singleton and suppresses later tooltips in the same test.
 void main() {
   List<Node<String>> data() => [
-        Node<String>(
-          id: 'f',
-          label: 'folder-f',
-          type: NodeType.folder,
-          children: [
-            Node<String>(id: 'p', label: 'parent-p', type: NodeType.parent),
-          ],
-        ),
-      ];
+    Node<String>(
+      id: 'f',
+      label: 'folder-f',
+      type: NodeType.folder,
+      children: [
+        Node<String>(id: 'p', label: 'parent-p', type: NodeType.parent),
+      ],
+    ),
+  ];
 
   Future<void> pump(WidgetTester tester, {RowTooltipTheme? rowTooltipTheme}) {
-    return tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox(
-            width: 500,
-            height: 400,
-            child: FolderView<String>(
-              data: data(),
-              mode: ViewMode.folder,
-              expandedNodeIds: const {'f'},
-              rowTooltipTheme: rowTooltipTheme,
-              // Only the Folder row gets a card. The card is drawn over the
-              // row beneath it, so if that row had one too, moving the pointer
-              // onto the card would raise the neighbour's card and every
-              // assertion below would read `true` regardless of `interactive`.
-              rowTooltipBuilder: (context, node) => node.id == 'f'
-                  ? const SizedBox(key: Key('card'), width: 120, height: 60)
-                  : null,
+    return tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 500,
+              height: 400,
+              child: FolderView<String>(
+                data: data(),
+                mode: ViewMode.folder,
+                expandedNodeIds: const {'f'},
+                rowTooltipTheme: rowTooltipTheme,
+                // Only the Folder row gets a card. The card is drawn over the
+                // row beneath it, so if that row had one too, moving the pointer
+                // onto the card would raise the neighbour's card and every
+                // assertion below would read `true` regardless of `interactive`.
+                rowTooltipBuilder: (context, node) => node.id == 'f'
+                    ? const SizedBox(key: Key('card'), width: 120, height: 60)
+                    : null,
+              ),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   Future<TestGesture> mouse(WidgetTester tester) async {
@@ -68,8 +70,9 @@ void main() {
     expect(shown(), isTrue);
   });
 
-  testWidgets('unset: the card is interactive — the pointer may enter it',
-      (tester) async {
+  testWidgets('unset: the card is interactive — the pointer may enter it', (
+    tester,
+  ) async {
     await pump(tester);
     final row = tester.getRect(find.text('folder-f'));
     final g = await mouse(tester);
@@ -79,8 +82,11 @@ void main() {
     await g.moveTo(tester.getRect(find.byKey(const Key('card'))).center);
     await tester.pumpAndSettle();
 
-    expect(shown(), isTrue,
-        reason: 'a card holds widgets the user may want to reach');
+    expect(
+      shown(),
+      isTrue,
+      reason: 'a card holds widgets the user may want to reach',
+    );
   });
 
   // just_tooltip 0.4.2 armed a 100ms "hover bridge" when the cursor left the
@@ -90,8 +96,9 @@ void main() {
   // home, a quarter second removed from its cause. An interactive,
   // pointer-anchored card — ours — is drawn beside the cursor, so the round trip
   // is easy to make by accident. Fixed upstream in 0.4.3.
-  testWidgets('the card survives the cursor returning from it to the row',
-      (tester) async {
+  testWidgets('the card survives the cursor returning from it to the row', (
+    tester,
+  ) async {
     await pump(tester);
     final row = tester.getRect(find.text('folder-f'));
     final onRow = Offset(300, row.center.dy);
@@ -109,12 +116,16 @@ void main() {
     // Long enough for the bridge (100ms) and the fade (150ms) to have run.
     await tester.pump(const Duration(milliseconds: 450));
     await tester.pumpAndSettle();
-    expect(shown(), isTrue,
-        reason: 'the pointer is over the row, so the card belongs on screen');
+    expect(
+      shown(),
+      isTrue,
+      reason: 'the pointer is over the row, so the card belongs on screen',
+    );
   });
 
-  testWidgets('interactive: false — the card leaves with the pointer',
-      (tester) async {
+  testWidgets('interactive: false — the card leaves with the pointer', (
+    tester,
+  ) async {
     await pump(
       tester,
       rowTooltipTheme: const RowTooltipTheme(interactive: false),
@@ -154,15 +165,18 @@ void main() {
   // The tooltip pads its content with `surface.padding`. Comparing the card's
   // rect to that Padding's rect is what tells chrome from no chrome — the
   // card's own size never changes, so asserting on it proves nothing.
-  Rect surfaceBoxOf(WidgetTester tester) => tester.getRect(find
-      .ancestor(
-        of: find.byKey(const Key('card')),
-        matching: find.byType(Padding),
-      )
-      .first);
+  Rect surfaceBoxOf(WidgetTester tester) => tester.getRect(
+    find
+        .ancestor(
+          of: find.byKey(const Key('card')),
+          matching: find.byType(Padding),
+        )
+        .first,
+  );
 
-  testWidgets('unset: the tooltip adds no surface around the card',
-      (tester) async {
+  testWidgets('unset: the tooltip adds no surface around the card', (
+    tester,
+  ) async {
     await pump(tester);
     final row = tester.getRect(find.text('folder-f'));
     final g = await mouse(tester);
@@ -170,8 +184,11 @@ void main() {
     await tester.pumpAndSettle();
 
     final card = tester.getRect(find.byKey(const Key('card')));
-    expect(surfaceBoxOf(tester).size, card.size,
-        reason: 'bare(): the tooltip is exactly the card');
+    expect(
+      surfaceBoxOf(tester).size,
+      card.size,
+      reason: 'bare(): the tooltip is exactly the card',
+    );
   });
 
   testWidgets('a surface gives the card padding back', (tester) async {
@@ -187,7 +204,10 @@ void main() {
     await tester.pumpAndSettle();
 
     final card = tester.getRect(find.byKey(const Key('card')));
-    expect(surfaceBoxOf(tester).size, Size(card.width + 20, card.height + 20),
-        reason: 'a builder returning bare content can ask for chrome');
+    expect(
+      surfaceBoxOf(tester).size,
+      Size(card.width + 20, card.height + 20),
+      reason: 'a builder returning bare content can ask for chrome',
+    );
   });
 }

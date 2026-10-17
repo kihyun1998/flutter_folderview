@@ -71,10 +71,13 @@ class _CustomInkWellState extends State<CustomInkWell> {
   /// first tap) followed by `onDoubleTap` (on the second) — this dual emission
   /// is intentional so that single-tap feedback stays immediate.
   void _handleTap() {
-    final ctrlPressed = HardwareKeyboard.instance
-            .isLogicalKeyPressed(LogicalKeyboardKey.controlLeft) ||
-        HardwareKeyboard.instance
-            .isLogicalKeyPressed(LogicalKeyboardKey.controlRight);
+    final ctrlPressed =
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.controlLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.controlRight,
+        );
     if (ctrlPressed || widget.onDoubleTap == null) {
       _timer?.cancel();
       _resetTapCount();

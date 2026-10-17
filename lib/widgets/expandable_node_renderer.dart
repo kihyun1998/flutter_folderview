@@ -48,7 +48,8 @@ class ExpandableNodeRenderer<T> extends StatelessWidget {
     // is expanded; otherwise the collapsed widget.
     final Widget? iconWidget;
     if (useOpenState && isExpanded) {
-      iconWidget = themeView.openWidgetResolver?.call(node) ??
+      iconWidget =
+          themeView.openWidgetResolver?.call(node) ??
           themeView.openWidget ??
           themeView.widget;
     } else {
@@ -96,11 +97,14 @@ class ExpandableNodeRenderer<T> extends StatelessWidget {
       clickInterval: 0,
       borderRadius: metrics.theme.nodeStyleTheme.borderRadius,
       backgroundColor: Colors.transparent,
-      hoverColor: themeView.hoverColor ??
+      hoverColor:
+          themeView.hoverColor ??
           Theme.of(context).colorScheme.surfaceContainerHighest,
-      splashColor: themeView.splashColor ??
+      splashColor:
+          themeView.splashColor ??
           Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-      highlightColor: themeView.highlightColor ??
+      highlightColor:
+          themeView.highlightColor ??
           Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       onTap: () => onTap?.call(node),
       onDoubleTap: null,

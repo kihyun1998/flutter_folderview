@@ -93,10 +93,7 @@ class ChildNodeTheme<T> {
   /// [selectedTextStyle] (preserves null).
   /// **Does NOT scale**: [tooltipTheme] — see ADR-0004.
   /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
-  ChildNodeTheme<T> scale(
-    double factor, {
-    required double defaultFontSize,
-  }) {
+  ChildNodeTheme<T> scale(double factor, {required double defaultFontSize}) {
     assert(factor > 0, 'scale factor must be > 0, got $factor');
     if (factor == 1.0) return this;
     return copyWith(
@@ -105,8 +102,11 @@ class ChildNodeTheme<T> {
       padding: padding * factor,
       margin: margin * factor,
       textStyle: scaleTextStyle(textStyle, factor, defaultFontSize),
-      selectedTextStyle:
-          scaleOptionalTextStyle(selectedTextStyle, factor, defaultFontSize),
+      selectedTextStyle: scaleOptionalTextStyle(
+        selectedTextStyle,
+        factor,
+        defaultFontSize,
+      ),
       // tooltipTheme intentionally not delegated — ADR-0004 (chrome).
     );
   }
@@ -176,19 +176,30 @@ class ChildNodeTheme<T> {
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       textStyleResolver: t < 0.5 ? a.textStyleResolver : b.textStyleResolver,
       labelResolver: t < 0.5 ? a.labelResolver : b.labelResolver,
-      selectedTextStyle:
-          TextStyle.lerp(a.selectedTextStyle, b.selectedTextStyle, t),
-      selectedTextStyleResolver:
-          t < 0.5 ? a.selectedTextStyleResolver : b.selectedTextStyleResolver,
-      selectedBackgroundColor:
-          Color.lerp(a.selectedBackgroundColor, b.selectedBackgroundColor, t),
+      selectedTextStyle: TextStyle.lerp(
+        a.selectedTextStyle,
+        b.selectedTextStyle,
+        t,
+      ),
+      selectedTextStyleResolver: t < 0.5
+          ? a.selectedTextStyleResolver
+          : b.selectedTextStyleResolver,
+      selectedBackgroundColor: Color.lerp(
+        a.selectedBackgroundColor,
+        b.selectedBackgroundColor,
+        t,
+      ),
       hoverColor: Color.lerp(a.hoverColor, b.hoverColor, t),
       splashColor: Color.lerp(a.splashColor, b.splashColor, t),
       highlightColor: Color.lerp(a.highlightColor, b.highlightColor, t),
-      clickInterval: (lerpDouble(
-                  a.clickInterval.toDouble(), b.clickInterval.toDouble(), t) ??
-              300)
-          .round(),
+      clickInterval:
+          (lerpDouble(
+                    a.clickInterval.toDouble(),
+                    b.clickInterval.toDouble(),
+                    t,
+                  ) ??
+                  300)
+              .round(),
       tooltipTheme: NodeTooltipTheme.lerp(a.tooltipTheme, b.tooltipTheme, t),
     );
   }

@@ -35,8 +35,9 @@ void main() {
     onDoubleTap = 0;
   });
 
-  testWidgets('Ctrl+tap fires onTap once and never onDoubleTap',
-      (tester) async {
+  testWidgets('Ctrl+tap fires onTap once and never onDoubleTap', (
+    tester,
+  ) async {
     await tester.pumpWidget(harness());
 
     await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
@@ -48,8 +49,9 @@ void main() {
     expect(onDoubleTap, 0);
   });
 
-  testWidgets('single tap (no follow-up) fires onTap once, no onDoubleTap',
-      (tester) async {
+  testWidgets('single tap (no follow-up) fires onTap once, no onDoubleTap', (
+    tester,
+  ) async {
     await tester.pumpWidget(harness());
 
     await tester.tap(find.byType(CustomInkWell));
@@ -60,8 +62,9 @@ void main() {
     expect(onDoubleTap, 0);
   });
 
-  testWidgets('double tap fires onTap once (first) and onDoubleTap once',
-      (tester) async {
+  testWidgets('double tap fires onTap once (first) and onDoubleTap once', (
+    tester,
+  ) async {
     await tester.pumpWidget(harness());
 
     await tester.tap(find.byType(CustomInkWell));
@@ -73,8 +76,9 @@ void main() {
     expect(onDoubleTap, 1);
   });
 
-  testWidgets('with no onDoubleTap, two quick taps fire onTap twice',
-      (tester) async {
+  testWidgets('with no onDoubleTap, two quick taps fire onTap twice', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(

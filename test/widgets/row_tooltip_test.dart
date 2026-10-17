@@ -17,22 +17,22 @@ void main() {
   // wide row leaves empty space to its right — space that raises no label
   // tooltip today, and is therefore where a row card must become visible.
   List<Node<String>> data(String childLabel) => [
+    Node<String>(
+      id: 'f',
+      label: 'folder-f',
+      type: NodeType.folder,
+      children: [
         Node<String>(
-          id: 'f',
-          label: 'folder-f',
-          type: NodeType.folder,
+          id: 'p',
+          label: 'parent-p',
+          type: NodeType.parent,
           children: [
-            Node<String>(
-              id: 'p',
-              label: 'parent-p',
-              type: NodeType.parent,
-              children: [
-                Node<String>(id: 'c0', label: childLabel, type: NodeType.child),
-              ],
-            ),
+            Node<String>(id: 'c0', label: childLabel, type: NodeType.child),
           ],
         ),
-      ];
+      ],
+    ),
+  ];
 
   /// A Child label long enough to make its row the widest in the tree. The row
   /// is sized to it, and `Flexible` grows the label to fill the row — so this
@@ -78,31 +78,33 @@ void main() {
     FlutterFolderViewTheme<String>? theme,
     void Function(Node<String>)? onNodeTap,
   }) async {
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox(
-            width: 400,
-            height: 200,
-            child: FolderView<String>(
-              data: data(label),
-              mode: ViewMode.folder,
-              expandedNodeIds: const {'f', 'p'},
-              theme: theme,
-              onNodeTap: onNodeTap,
-              rowTooltipBuilder: rowTooltipBuilder,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 400,
+              height: 200,
+              child: FolderView<String>(
+                data: data(label),
+                mode: ViewMode.folder,
+                expandedNodeIds: const {'f', 'p'},
+                theme: theme,
+                onNodeTap: onNodeTap,
+                rowTooltipBuilder: rowTooltipBuilder,
+              ),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   Widget? cardForChild(BuildContext context, Node<String> node) =>
       node.id == 'c0'
-          ? const SizedBox(key: Key('card'), width: 100, height: 40)
-          : null;
+      ? const SizedBox(key: Key('card'), width: 100, height: 40)
+      : null;
 
   Future<TestGesture> mouse(WidgetTester tester) async {
     final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
@@ -112,23 +114,26 @@ void main() {
     return gesture;
   }
 
-  testWidgets('a row card appears when hovering the empty space beside a label',
-      (tester) async {
-    await pump(tester, rowTooltipBuilder: cardForChild);
+  testWidgets(
+    'a row card appears when hovering the empty space beside a label',
+    (tester) async {
+      await pump(tester, rowTooltipBuilder: cardForChild);
 
-    final label = tester.getRect(find.text('a.pdf'));
-    expect(find.byKey(const Key('card')), findsNothing);
+      final label = tester.getRect(find.text('a.pdf'));
+      expect(find.byKey(const Key('card')), findsNothing);
 
-    final gesture = await mouse(tester);
-    // Well to the right of the label's glyphs: empty row space.
-    await gesture.moveTo(Offset(label.right + 120, label.center.dy));
-    await tester.pumpAndSettle();
+      final gesture = await mouse(tester);
+      // Well to the right of the label's glyphs: empty row space.
+      await gesture.moveTo(Offset(label.right + 120, label.center.dy));
+      await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('card')), findsOneWidget);
-  });
+      expect(find.byKey(const Key('card')), findsOneWidget);
+    },
+  );
 
-  testWidgets('a Node whose builder returns null is left unwrapped',
-      (tester) async {
+  testWidgets('a Node whose builder returns null is left unwrapped', (
+    tester,
+  ) async {
     await pump(tester, rowTooltipBuilder: cardForChild);
 
     // Asserting the card's absence is not enough: a row wrapped in a tooltip
@@ -143,10 +148,7 @@ void main() {
       reason: 'the builder returned null for the Folder, so no JustTooltip',
     );
     expect(
-      find.ancestor(
-        of: find.text('a.pdf'),
-        matching: find.byType(JustTooltip),
-      ),
+      find.ancestor(of: find.text('a.pdf'), matching: find.byType(JustTooltip)),
       findsOneWidget,
       reason: 'and exactly one for the Child, which does have a card',
     );
@@ -174,19 +176,27 @@ void main() {
       await pump(tester, label: longLabel, rowTooltipBuilder: cardForChild);
 
       final label = tester.getRect(find.text(longLabel));
-      expect(label.width, greaterThan(400),
-          reason: 'the row really did outgrow its 400px viewport');
+      expect(
+        label.width,
+        greaterThan(400),
+        reason: 'the row really did outgrow its 400px viewport',
+      );
 
       final gesture = await mouse(tester);
       await gesture.moveTo(Offset(120, label.center.dy));
       await tester.pumpAndSettle();
 
       final card = tester.getRect(find.byKey(const Key('card')));
-      expect(card.center.dx, moreOrLessEquals(120, epsilon: 0.5),
-          reason: 'the card follows the cursor');
       expect(
-          card.center.dx, isNot(moreOrLessEquals(label.center.dx, epsilon: 1)),
-          reason: 'and emphatically not the off-screen centre of the row');
+        card.center.dx,
+        moreOrLessEquals(120, epsilon: 0.5),
+        reason: 'the card follows the cursor',
+      );
+      expect(
+        card.center.dx,
+        isNot(moreOrLessEquals(label.center.dx, epsilon: 1)),
+        reason: 'and emphatically not the off-screen centre of the row',
+      );
     });
   });
 
@@ -196,11 +206,15 @@ void main() {
     // the gesture arena before any wrapper's and wins the sweep. Wrapping the
     // row in a GestureDetector, opaque or not, was verified not to break this.
     // What this test would catch is an AbsorbPointer or IgnorePointer.
-    testWidgets('tapping a row wrapped in a card still fires onNodeTap',
-        (tester) async {
+    testWidgets('tapping a row wrapped in a card still fires onNodeTap', (
+      tester,
+    ) async {
       final tapped = <Node<String>>[];
-      await pump(tester,
-          rowTooltipBuilder: cardForChild, onNodeTap: tapped.add);
+      await pump(
+        tester,
+        rowTooltipBuilder: cardForChild,
+        onNodeTap: tapped.add,
+      );
 
       await tester.tap(find.text('a.pdf'));
       await tester.pump(const Duration(milliseconds: 400)); // click timer
@@ -250,9 +264,13 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       expect(tapped, hasLength(1));
-      expect(tapped.single.id, 'f',
-          reason: 'Expansion is caller-driven (ADR-0002): the card must leave '
-              'the chevron tap reaching onNodeTap');
+      expect(
+        tapped.single.id,
+        'f',
+        reason:
+            'Expansion is caller-driven (ADR-0002): the card must leave '
+            'the chevron tap reaching onNodeTap',
+      );
     });
   });
 
@@ -263,26 +281,32 @@ void main() {
   // and `_wrapWithRowTooltip`. These tests characterise that, they do not
   // implement it.
   group('label tooltip nested inside the row card', () {
-    testWidgets('hovering the glyphs of a short label shows the label tooltip',
-        (tester) async {
-      await pump(
-        tester,
-        rowTooltipBuilder: cardForChild,
-        theme: themeWithLabelTooltip(),
-      );
+    testWidgets(
+      'hovering the glyphs of a short label shows the label tooltip',
+      (tester) async {
+        await pump(
+          tester,
+          rowTooltipBuilder: cardForChild,
+          theme: themeWithLabelTooltip(),
+        );
 
-      final label = tester.getRect(find.text('a.pdf'));
-      final gesture = await mouse(tester);
-      await gesture.moveTo(label.center);
-      await tester.pumpAndSettle();
+        final label = tester.getRect(find.text('a.pdf'));
+        final gesture = await mouse(tester);
+        await gesture.moveTo(label.center);
+        await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('labeltip')), findsOneWidget);
-      expect(find.byKey(const Key('card')), findsNothing,
-          reason: 'the innermost tooltip under the pointer wins');
-    });
+        expect(find.byKey(const Key('labeltip')), findsOneWidget);
+        expect(
+          find.byKey(const Key('card')),
+          findsNothing,
+          reason: 'the innermost tooltip under the pointer wins',
+        );
+      },
+    );
 
-    testWidgets('hovering beside a short label shows the row card',
-        (tester) async {
+    testWidgets('hovering beside a short label shows the row card', (
+      tester,
+    ) async {
       await pump(
         tester,
         rowTooltipBuilder: cardForChild,
@@ -295,16 +319,20 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('card')), findsOneWidget);
-      expect(find.byKey(const Key('labeltip')), findsNothing,
-          reason: 'the pointer is outside the label, so only the row remains');
+      expect(
+        find.byKey(const Key('labeltip')),
+        findsNothing,
+        reason: 'the pointer is outside the label, so only the row remains',
+      );
     });
 
     // The trap. The widest row is sized to its own label, and the label grows
     // to fill it, so the label's rect spans the row. There is then no point on
     // the row where the label tooltip does not contain the pointer — and it is
     // the innermost. The row card is unreachable for that Node.
-    testWidgets('a row-spanning label leaves the row card nowhere to appear',
-        (tester) async {
+    testWidgets('a row-spanning label leaves the row card nowhere to appear', (
+      tester,
+    ) async {
       await pump(
         tester,
         label: longLabel,
@@ -313,8 +341,11 @@ void main() {
       );
 
       final label = tester.getRect(find.text(longLabel));
-      expect(label.width, greaterThan(400),
-          reason: 'the label really did span past the viewport');
+      expect(
+        label.width,
+        greaterThan(400),
+        reason: 'the label really did span past the viewport',
+      );
 
       final gesture = await mouse(tester);
       // A point inside the viewport. The label's own centre is off screen —
@@ -323,9 +354,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('labeltip')), findsOneWidget);
-      expect(find.byKey(const Key('card')), findsNothing,
-          reason: 'callers wanting a row card must disable the label tooltip '
-              'for that Tier');
+      expect(
+        find.byKey(const Key('card')),
+        findsNothing,
+        reason:
+            'callers wanting a row card must disable the label tooltip '
+            'for that Tier',
+      );
     });
   });
 }

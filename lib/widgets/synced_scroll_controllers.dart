@@ -2,10 +2,7 @@
 import 'package:flutter/material.dart';
 
 class SyncedScrollControllers extends StatefulWidget {
-  const SyncedScrollControllers({
-    super.key,
-    required this.builder,
-  });
+  const SyncedScrollControllers({super.key, required this.builder});
 
   final Widget Function(
     BuildContext context,
@@ -13,7 +10,8 @@ class SyncedScrollControllers extends StatefulWidget {
     ScrollController? verticalScrollbarController,
     ScrollController? horizontalController,
     ScrollController? horizontalScrollbarController,
-  ) builder;
+  )
+  builder;
 
   @override
   State<SyncedScrollControllers> createState() =>

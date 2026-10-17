@@ -204,44 +204,45 @@ class _FolderViewState<T> extends State<FolderView<T>> {
 
         return SyncedScrollControllers(
           key: ValueKey(widget.mode),
-          builder: (
-            context,
-            verticalController,
-            verticalScrollbarController,
-            horizontalController,
-            horizontalScrollbarController,
-          ) {
-            final content = FolderViewContent<T>(
-              flatNodes: flatNodes,
-              mode: widget.mode,
-              onNodeTap: widget.onNodeTap,
-              onDoubleNodeTap: widget.onDoubleNodeTap,
-              onSecondaryNodeTap: widget.onSecondaryNodeTap,
-              selectedNodeIds: widget.selectedNodeIds,
-              expandedNodeIds: widget.expandedNodeIds,
-              rowTooltipBuilder: widget.rowTooltipBuilder,
-              rowTooltipTheme: widget.rowTooltipTheme,
-              contentWidth: contentWidth,
-              contentHeight: contentHeight,
-              needsHorizontalScroll: needsHorizontalScroll,
-              needsVerticalScroll: needsVerticalScroll,
-              horizontalController: horizontalController!,
-              verticalController: verticalController!,
-              horizontalBarController: horizontalScrollbarController!,
-              verticalBarController: verticalScrollbarController!,
-              theme: scaledTheme,
-              scale: widget.scale,
-              blockModifierScroll: _blockModifierScroll,
-              change: flattenResult.change,
-            );
+          builder:
+              (
+                context,
+                verticalController,
+                verticalScrollbarController,
+                horizontalController,
+                horizontalScrollbarController,
+              ) {
+                final content = FolderViewContent<T>(
+                  flatNodes: flatNodes,
+                  mode: widget.mode,
+                  onNodeTap: widget.onNodeTap,
+                  onDoubleNodeTap: widget.onDoubleNodeTap,
+                  onSecondaryNodeTap: widget.onSecondaryNodeTap,
+                  selectedNodeIds: widget.selectedNodeIds,
+                  expandedNodeIds: widget.expandedNodeIds,
+                  rowTooltipBuilder: widget.rowTooltipBuilder,
+                  rowTooltipTheme: widget.rowTooltipTheme,
+                  contentWidth: contentWidth,
+                  contentHeight: contentHeight,
+                  needsHorizontalScroll: needsHorizontalScroll,
+                  needsVerticalScroll: needsVerticalScroll,
+                  horizontalController: horizontalController!,
+                  verticalController: verticalController!,
+                  horizontalBarController: horizontalScrollbarController!,
+                  verticalBarController: verticalScrollbarController!,
+                  theme: scaledTheme,
+                  scale: widget.scale,
+                  blockModifierScroll: _blockModifierScroll,
+                  change: flattenResult.change,
+                );
 
-            if (!_blockModifierScroll) return content;
+                if (!_blockModifierScroll) return content;
 
-            return Listener(
-              onPointerSignal: _handlePointerSignalForScale,
-              child: content,
-            );
-          },
+                return Listener(
+                  onPointerSignal: _handlePointerSignalForScale,
+                  child: content,
+                );
+              },
         );
       },
     );
@@ -251,8 +252,9 @@ class _FolderViewState<T> extends State<FolderView<T>> {
   void _handlePointerSignalForScale(PointerSignalEvent event) {
     if (event is PointerScrollEvent && isScaleModifierPressed()) {
       if (widget.onScaleChanged != null) {
-        final delta =
-            event.scrollDelta.dy > 0 ? -widget.scaleStep : widget.scaleStep;
+        final delta = event.scrollDelta.dy > 0
+            ? -widget.scaleStep
+            : widget.scaleStep;
         widget.onScaleChanged!(widget.scale + delta);
       }
     }

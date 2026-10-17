@@ -32,50 +32,56 @@ void main() {
       'a_very_long_report_filename_that_will_certainly_be_ellipsized.pdf';
 
   List<Node<String>> data() => [
+    Node<String>(
+      id: 'f',
+      label: 'folder-f',
+      type: NodeType.folder,
+      children: [
         Node<String>(
-          id: 'f',
-          label: 'folder-f',
-          type: NodeType.folder,
+          id: 'p',
+          label: 'parent-p',
+          type: NodeType.parent,
           children: [
-            Node<String>(
-              id: 'p',
-              label: 'parent-p',
-              type: NodeType.parent,
-              children: [
-                Node<String>(id: 'c0', label: longLabel, type: NodeType.child),
-              ],
-            ),
+            Node<String>(id: 'c0', label: longLabel, type: NodeType.child),
           ],
         ),
-      ];
+      ],
+    ),
+  ];
 
   Future<void> pump(WidgetTester tester, {TooltipAnchor? anchor}) async {
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox(
-            key: const Key('view'),
-            width: viewWidth,
-            height: 200,
-            child: FolderView<String>(
-              data: data(),
-              mode: ViewMode.folder,
-              expandedNodeIds: const {'f', 'p'},
-              theme: FlutterFolderViewTheme<String>(
-                lineTheme:
-                    const FolderViewLineTheme(lineColor: Color(0xFF000000)),
-                scrollbarTheme: const FolderViewScrollbarTheme(
-                  thumbColor: Color(0xFF000000),
-                  trackColor: Color(0xFF000000),
-                ),
-                childTheme: ChildNodeTheme<String>(
-                  tooltipTheme: NodeTooltipTheme<String>(
-                    useTooltip: true,
-                    anchor: anchor ?? const NodeTooltipTheme<String>().anchor,
-                    padding: EdgeInsets.zero,
-                    tooltipBuilder: (_) =>
-                        const SizedBox(key: Key('tip'), width: 100, height: 40),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              key: const Key('view'),
+              width: viewWidth,
+              height: 200,
+              child: FolderView<String>(
+                data: data(),
+                mode: ViewMode.folder,
+                expandedNodeIds: const {'f', 'p'},
+                theme: FlutterFolderViewTheme<String>(
+                  lineTheme: const FolderViewLineTheme(
+                    lineColor: Color(0xFF000000),
+                  ),
+                  scrollbarTheme: const FolderViewScrollbarTheme(
+                    thumbColor: Color(0xFF000000),
+                    trackColor: Color(0xFF000000),
+                  ),
+                  childTheme: ChildNodeTheme<String>(
+                    tooltipTheme: NodeTooltipTheme<String>(
+                      useTooltip: true,
+                      anchor: anchor ?? const NodeTooltipTheme<String>().anchor,
+                      padding: EdgeInsets.zero,
+                      tooltipBuilder: (_) => const SizedBox(
+                        key: Key('tip'),
+                        width: 100,
+                        height: 40,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -83,7 +89,7 @@ void main() {
           ),
         ),
       ),
-    ));
+    );
   }
 
   Future<void> hoverInsideView(WidgetTester tester, Rect label) async {
@@ -96,30 +102,41 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('the label outgrows the view without being truncated',
-      (tester) async {
+  testWidgets('the label outgrows the view without being truncated', (
+    tester,
+  ) async {
     await pump(tester);
     final label = tester.getRect(find.text(longLabel));
     final view = tester.getRect(find.byKey(const Key('view')));
     final para = tester.renderObject<RenderParagraph>(find.text(longLabel));
 
     expect(view.width, viewWidth);
-    expect(label.right, greaterThan(view.right),
-        reason: 'the label rect extends past the view it is drawn in');
-    expect(label.center.dx, greaterThan(view.right),
-        reason: 'and so does the centre a child-anchored tooltip aims at');
+    expect(
+      label.right,
+      greaterThan(view.right),
+      reason: 'the label rect extends past the view it is drawn in',
+    );
+    expect(
+      label.center.dx,
+      greaterThan(view.right),
+      reason: 'and so does the centre a child-anchored tooltip aims at',
+    );
 
     // Ellipsis is not what makes the rect wide, and does not occur here.
     expect(para.didExceedMaxLines, isFalse);
     expect(
-        label.width,
-        moreOrLessEquals(para.getMaxIntrinsicWidth(double.infinity),
-            epsilon: 0.5),
-        reason: 'the label is laid out at full intrinsic width, not truncated');
+      label.width,
+      moreOrLessEquals(
+        para.getMaxIntrinsicWidth(double.infinity),
+        epsilon: 0.5,
+      ),
+      reason: 'the label is laid out at full intrinsic width, not truncated',
+    );
   });
 
-  testWidgets('the default anchor targets the visible part of the label',
-      (tester) async {
+  testWidgets('the default anchor targets the visible part of the label', (
+    tester,
+  ) async {
     await pump(tester);
     final label = tester.getRect(find.text(longLabel));
     final view = tester.getRect(find.byKey(const Key('view')));
@@ -127,30 +144,46 @@ void main() {
 
     final tip = tester.getRect(find.byKey(const Key('tip')));
 
-    expect(view.contains(tip.center), isTrue,
-        reason: 'the tooltip is drawn inside the FolderView, not over whatever '
-            'the host app renders beside it');
+    expect(
+      view.contains(tip.center),
+      isTrue,
+      reason:
+          'the tooltip is drawn inside the FolderView, not over whatever '
+          'the host app renders beside it',
+    );
     expect(tip.left, greaterThanOrEqualTo(view.left));
     expect(tip.right, lessThanOrEqualTo(view.right));
-    expect(tip.center.dx, greaterThan(label.left),
-        reason: 'and it is aimed within the part of the label on screen');
+    expect(
+      tip.center.dx,
+      greaterThan(label.left),
+      reason: 'and it is aimed within the part of the label on screen',
+    );
     expect(tip.center.dx, lessThan(view.right));
-    expect(tip.center.dx, isNot(moreOrLessEquals(label.center.dx, epsilon: 1)),
-        reason: 'the whole label rect, whose centre is off screen, is no '
-            'longer the target');
+    expect(
+      tip.center.dx,
+      isNot(moreOrLessEquals(label.center.dx, epsilon: 1)),
+      reason:
+          'the whole label rect, whose centre is off screen, is no '
+          'longer the target',
+    );
   });
 
-  testWidgets('TooltipAnchor.pointer keeps the tooltip inside the view',
-      (tester) async {
+  testWidgets('TooltipAnchor.pointer keeps the tooltip inside the view', (
+    tester,
+  ) async {
     await pump(tester, anchor: TooltipAnchor.pointer);
     final label = tester.getRect(find.text(longLabel));
     final view = tester.getRect(find.byKey(const Key('view')));
     await hoverInsideView(tester, label);
 
     final tip = tester.getRect(find.byKey(const Key('tip')));
-    expect(tip.center.dx, moreOrLessEquals(200, epsilon: 0.5),
-        reason: 'anchored at the cursor, which is inside the view by '
-            'construction');
+    expect(
+      tip.center.dx,
+      moreOrLessEquals(200, epsilon: 0.5),
+      reason:
+          'anchored at the cursor, which is inside the view by '
+          'construction',
+    );
     expect(view.contains(tip.center), isTrue);
   });
 }

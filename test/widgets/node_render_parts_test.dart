@@ -8,12 +8,15 @@ void main() {
   final node = Node<String>(id: 'n', label: 'n', type: NodeType.child);
 
   Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
-        MaterialApp(home: Scaffold(body: Center(child: child))),
-      );
+    MaterialApp(
+      home: Scaffold(body: Center(child: child)),
+    ),
+  );
 
   group('wrapWithNodeTooltip', () {
-    testWidgets('returns the child unchanged when tooltips are disabled',
-        (tester) async {
+    testWidgets('returns the child unchanged when tooltips are disabled', (
+      tester,
+    ) async {
       await pump(
         tester,
         wrapWithNodeTooltip<String>(
@@ -26,22 +29,26 @@ void main() {
       expect(find.text('content'), findsOneWidget);
     });
 
-    testWidgets('wraps in a JustTooltip when enabled with a message',
-        (tester) async {
+    testWidgets('wraps in a JustTooltip when enabled with a message', (
+      tester,
+    ) async {
       await pump(
         tester,
         wrapWithNodeTooltip<String>(
           child: const Text('content'),
-          tooltipTheme:
-              const NodeTooltipTheme<String>(useTooltip: true, message: 'hi'),
+          tooltipTheme: const NodeTooltipTheme<String>(
+            useTooltip: true,
+            message: 'hi',
+          ),
           node: node,
         ),
       );
       expect(find.byType(JustTooltip), findsOneWidget);
     });
 
-    testWidgets('returns child when enabled but there is no content',
-        (tester) async {
+    testWidgets('returns child when enabled but there is no content', (
+      tester,
+    ) async {
       await pump(
         tester,
         wrapWithNodeTooltip<String>(
@@ -60,7 +67,8 @@ void main() {
           child: const Text('content'),
           tooltipTheme: NodeTooltipTheme<String>(
             useTooltip: true,
-            tooltipBuilderResolver: (n) => (context) => const Text('tip'),
+            tooltipBuilderResolver: (n) =>
+                (context) => const Text('tip'),
           ),
           node: node,
         ),
@@ -68,14 +76,17 @@ void main() {
       expect(find.byType(JustTooltip), findsOneWidget);
     });
 
-    testWidgets('anchors to the child rect when anchor is left unset',
-        (tester) async {
+    testWidgets('anchors to the child rect when anchor is left unset', (
+      tester,
+    ) async {
       await pump(
         tester,
         wrapWithNodeTooltip<String>(
           child: const Text('content'),
-          tooltipTheme:
-              const NodeTooltipTheme<String>(useTooltip: true, message: 'hi'),
+          tooltipTheme: const NodeTooltipTheme<String>(
+            useTooltip: true,
+            message: 'hi',
+          ),
           node: node,
         ),
       );
@@ -100,8 +111,9 @@ void main() {
       expect(tooltip.anchor, TooltipAnchor.pointer);
     });
 
-    testWidgets('forwards anchor on the tooltipBuilder path too',
-        (tester) async {
+    testWidgets('forwards anchor on the tooltipBuilder path too', (
+      tester,
+    ) async {
       await pump(
         tester,
         wrapWithNodeTooltip<String>(
@@ -121,8 +133,9 @@ void main() {
   });
 
   group('NodeIconBox', () {
-    testWidgets('renders an empty spacer when the icon is null',
-        (tester) async {
+    testWidgets('renders an empty spacer when the icon is null', (
+      tester,
+    ) async {
       await pump(
         tester,
         const NodeIconBox(
@@ -139,8 +152,9 @@ void main() {
       expect(find.byIcon(Icons.star), findsNothing);
     });
 
-    testWidgets('renders the icon without a FittedBox at scale 1',
-        (tester) async {
+    testWidgets('renders the icon without a FittedBox at scale 1', (
+      tester,
+    ) async {
       await pump(
         tester,
         const NodeIconBox(
@@ -157,8 +171,9 @@ void main() {
       expect(find.byType(FittedBox), findsNothing);
     });
 
-    testWidgets('wraps the icon in a FittedBox when scale != 1',
-        (tester) async {
+    testWidgets('wraps the icon in a FittedBox when scale != 1', (
+      tester,
+    ) async {
       await pump(
         tester,
         const NodeIconBox(
