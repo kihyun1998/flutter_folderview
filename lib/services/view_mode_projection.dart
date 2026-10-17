@@ -26,16 +26,14 @@ class ViewModeProjection {
       case ViewMode.folder:
         return nodes
             .where(
-                (n) => n.type == NodeType.folder || n.type == NodeType.parent)
+              (n) => n.type == NodeType.folder || n.type == NodeType.parent,
+            )
             .toList();
     }
   }
 
   /// Recursively collects **Parents**, descending through **Folders**.
-  static void _collectParents<T>(
-    List<Node<T>> nodes,
-    List<Node<T>> parents,
-  ) {
+  static void _collectParents<T>(List<Node<T>> nodes, List<Node<T>> parents) {
     for (final node in nodes) {
       if (node.type == NodeType.parent) {
         parents.add(node);

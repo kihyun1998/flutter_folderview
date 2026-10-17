@@ -57,7 +57,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/test/support/shell_harness.dart` — `pumpShell`, `openDestination`, `openFeature`, `chooseDropdown`, `setSlider`, `renderedFolderView`
 
 ## Reference behaviour
-- `flutter_example_template` **0.2.0**, read from the pub cache source. `PreviewStage` sizes its child with `SizedBox.fromSize(spec.size)` and gives it its own `Overlay`, and `PreviewFrame` scales the whole frame down to fit. Its floor, `flutter >=3.27.0`, is why the example declares the same floor.
+- `flutter_example_template` **0.2.0**, read from the pub cache source. `PreviewStage` sizes its child with `SizedBox.fromSize(spec.size)` and gives it its own `Overlay`, and `PreviewFrame` scales the whole frame down to fit. Its floor is `flutter >=3.27.0`; the example declares the library's higher 3.32.0.
 - `flutter_table_plus/example`, an *example* to diverge from deliberately. Its `settings_spec_test` and `recipe_seam_test` are the prior art for the guard and the seam. That repo keeps a hand-written spec and settings model in step; this one derives the option list from the library instead.
 
 ## Cross-cutting invariants
@@ -67,7 +67,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 ## Blast radius
 - **Every public field in `lib/`.** Adding, renaming or removing one reddens the example's coverage guard. That is the point, and the change that makes it has to either expose the option or list it with an owning issue.
 - [ci-gates](ci-gates.md) — the guard and the seam run in the `example` job. `integration_test/` stays outside it.
-- [dependency-floor-release](dependency-floor-release.md) — the example's Flutter floor is the shell's (3.27.0), not the library's (3.13.0).
+- [dependency-floor-release](dependency-floor-release.md) — the example's Flutter floor is the library's (3.32.0), above the shell's (3.27.0).
 - [label-tooltip](label-tooltip.md) and [row-card](row-card.md) — both render inside the preview stage's own overlay.
 
 ## Known holes

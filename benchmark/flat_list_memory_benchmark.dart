@@ -35,7 +35,8 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   // A Folder > Parent > Child forest of ~[targetNodes] nodes, all expanded.
   ({List<Node<String>> roots, Set<String> expanded}) buildForest(
-      int targetNodes) {
+    int targetNodes,
+  ) {
     const parentsPerFolder = 5;
     const childrenPerParent = 8;
     const perRoot = 1 + parentsPerFolder * (1 + childrenPerParent); // 46
@@ -49,19 +50,30 @@ void main() {
       for (var p = 0; p < parentsPerFolder; p++) {
         final pId = '${fId}_p$p';
         expanded.add(pId);
-        parents.add(Node<String>(
-          id: pId,
-          label: pId,
-          type: NodeType.parent,
-          children: [
-            for (var c = 0; c < childrenPerParent; c++)
-              Node<String>(
-                  id: '${pId}_c$c', label: '${pId}_c$c', type: NodeType.child),
-          ],
-        ));
+        parents.add(
+          Node<String>(
+            id: pId,
+            label: pId,
+            type: NodeType.parent,
+            children: [
+              for (var c = 0; c < childrenPerParent; c++)
+                Node<String>(
+                  id: '${pId}_c$c',
+                  label: '${pId}_c$c',
+                  type: NodeType.child,
+                ),
+            ],
+          ),
+        );
       }
-      roots.add(Node<String>(
-          id: fId, label: fId, type: NodeType.folder, children: parents));
+      roots.add(
+        Node<String>(
+          id: fId,
+          label: fId,
+          type: NodeType.folder,
+          children: parents,
+        ),
+      );
     }
     return (roots: roots, expanded: expanded);
   }
@@ -70,7 +82,9 @@ void main() {
     for (final n in [1000, 10000]) {
       final forest = buildForest(n);
       List<FlatNode<String>> flatten() => FlattenService.flatten<String>(
-          nodes: forest.roots, expandedNodeIds: forest.expanded);
+        nodes: forest.roots,
+        expandedNodeIds: forest.expanded,
+      );
 
       // Retain a warmup set so the VM's heap arenas are already grown before we
       // baseline — otherwise collectable warmup garbage inflates rss0 and later
@@ -97,8 +111,9 @@ void main() {
 
       // (B) Simulate the pre-#33 representation: a List<bool> of length == depth
       // per node, retained alongside.
-      List<List<bool>> flagsFor(List<FlatNode<String>> list) =>
-          [for (final fn in list) List<bool>.filled(fn.depth, false)];
+      List<List<bool>> flagsFor(List<FlatNode<String>> list) => [
+        for (final fn in list) List<bool>.filled(fn.depth, false),
+      ];
       final listsB = <List<List<bool>>>[];
       for (var i = 0; i < phaseCopies; i++) {
         listsB.add(flagsFor(listsA[i]));
@@ -114,11 +129,13 @@ void main() {
       }
 
       // ignore: avoid_print
-      print('flat-list heap n=$n (nodesPerList=$nodesPerList, '
-          'measured phase=$phaseNodes nodes): '
-          'FlatNode ~${bytesPerNodeA.toStringAsFixed(1)} B/node | '
-          'simulated per-node List<bool> (removed by #33) '
-          '~${bytesPerNodeListBool.toStringAsFixed(1)} B/node');
+      print(
+        'flat-list heap n=$n (nodesPerList=$nodesPerList, '
+        'measured phase=$phaseNodes nodes): '
+        'FlatNode ~${bytesPerNodeA.toStringAsFixed(1)} B/node | '
+        'simulated per-node List<bool> (removed by #33) '
+        '~${bytesPerNodeListBool.toStringAsFixed(1)} B/node',
+      );
     }
   }, timeout: const Timeout(Duration(minutes: 2)));
 }

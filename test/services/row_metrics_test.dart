@@ -29,23 +29,27 @@ void main() {
   group('RowMetrics geometry', () {
     final metrics = RowMetrics<String>(theme: buildTheme());
 
-    test('expandStripWidth = width + horizontal padding + horizontal margin',
-        () {
-      expect(metrics.expandStripWidth, 16);
-    });
+    test(
+      'expandStripWidth = width + horizontal padding + horizontal margin',
+      () {
+        expect(metrics.expandStripWidth, 16);
+      },
+    );
 
     test('indentWidth is depth times the expand strip width', () {
       expect(metrics.indentWidth(0), 0);
       expect(metrics.indentWidth(3), 48); // 3 * 16
     });
 
-    test('iconBoxWidth is per-tier width plus horizontal padding and margin',
-        () {
-      // no padding/margin on the node themes here, so box == width
-      expect(metrics.iconBoxWidth(NodeType.folder), 20);
-      expect(metrics.iconBoxWidth(NodeType.parent), 30);
-      expect(metrics.iconBoxWidth(NodeType.child), 40);
-    });
+    test(
+      'iconBoxWidth is per-tier width plus horizontal padding and margin',
+      () {
+        // no padding/margin on the node themes here, so box == width
+        expect(metrics.iconBoxWidth(NodeType.folder), 20);
+        expect(metrics.iconBoxWidth(NodeType.parent), 30);
+        expect(metrics.iconBoxWidth(NodeType.child), 40);
+      },
+    );
   });
 
   group('RowMetrics.effectiveTextStyle (measure == render resolution)', () {
@@ -90,9 +94,7 @@ void main() {
     });
 
     test('maxWidth reflects the widest node', () {
-      final narrow = [
-        Node<String>(id: 'a', label: 'i', type: NodeType.child),
-      ];
+      final narrow = [Node<String>(id: 'a', label: 'i', type: NodeType.child)];
       final wide = [
         Node<String>(id: 'b', label: 'wwwwwwwwww', type: NodeType.child),
       ];
@@ -118,35 +120,42 @@ void main() {
       return buildTheme().spacingTheme.contentPadding.left + widest;
     }
 
-    test('maxWidth equals the naive per-node maximum (repeated + mixed tiers)',
-        () {
-      // Repeated labels ('shared'), mixed tiers and depths, so the dedup/hoist
-      // path is exercised without changing the result.
-      final roots = [
-        Node<String>(
+    test(
+      'maxWidth equals the naive per-node maximum (repeated + mixed tiers)',
+      () {
+        // Repeated labels ('shared'), mixed tiers and depths, so the dedup/hoist
+        // path is exercised without changing the result.
+        final roots = [
+          Node<String>(
             id: 'A',
             label: 'shared',
             type: NodeType.folder,
             children: [
               Node<String>(
-                  id: 'p1',
-                  label: 'shared',
-                  type: NodeType.parent,
-                  children: [
-                    Node<String>(
-                        id: 'c1', label: 'shared', type: NodeType.child),
-                    Node<String>(
-                        id: 'c2',
-                        label: 'a considerably wider child label here',
-                        type: NodeType.child),
-                  ]),
+                id: 'p1',
+                label: 'shared',
+                type: NodeType.parent,
+                children: [
+                  Node<String>(id: 'c1', label: 'shared', type: NodeType.child),
+                  Node<String>(
+                    id: 'c2',
+                    label: 'a considerably wider child label here',
+                    type: NodeType.child,
+                  ),
+                ],
+              ),
               Node<String>(id: 'p2', label: 'another', type: NodeType.parent),
-            ]),
-        Node<String>(id: 'B', label: 'shared', type: NodeType.folder),
-      ];
+            ],
+          ),
+          Node<String>(id: 'B', label: 'shared', type: NodeType.folder),
+        ];
 
-      expect(metrics.maxWidth(roots), closeTo(referenceMaxWidth(roots), 1e-9));
-    });
+        expect(
+          metrics.maxWidth(roots),
+          closeTo(referenceMaxWidth(roots), 1e-9),
+        );
+      },
+    );
   });
 
   group('RowMetrics measures the label that is rendered', () {
@@ -161,24 +170,33 @@ void main() {
         final base = buildTheme();
         final theme = switch (type) {
           NodeType.folder => base.copyWith(
-              folderTheme: base.folderTheme.copyWith(labelResolver: resolve)),
+            folderTheme: base.folderTheme.copyWith(labelResolver: resolve),
+          ),
           NodeType.parent => base.copyWith(
-              parentTheme: base.parentTheme.copyWith(labelResolver: resolve)),
+            parentTheme: base.parentTheme.copyWith(labelResolver: resolve),
+          ),
           NodeType.child => base.copyWith(
-              childTheme: base.childTheme.copyWith(labelResolver: resolve)),
+            childTheme: base.childTheme.copyWith(labelResolver: resolve),
+          ),
         };
         const style = TextStyle(fontSize: 14);
-        final withResolver =
-            RowMetrics<String>(theme: theme, baseTextStyle: style);
+        final withResolver = RowMetrics<String>(
+          theme: theme,
+          baseTextStyle: style,
+        );
         final plain = RowMetrics<String>(theme: base, baseTextStyle: style);
 
         final raw = Node<String>(id: 'n', label: 'x', type: type);
         final same = Node<String>(id: 'n', label: shown, type: type);
 
-        expect(withResolver.measureNodeWidth(raw, 0),
-            closeTo(plain.measureNodeWidth(same, 0), 1e-9));
-        expect(withResolver.maxWidth([raw]),
-            closeTo(plain.maxWidth([same]), 1e-9));
+        expect(
+          withResolver.measureNodeWidth(raw, 0),
+          closeTo(plain.measureNodeWidth(same, 0), 1e-9),
+        );
+        expect(
+          withResolver.maxWidth([raw]),
+          closeTo(plain.maxWidth([same]), 1e-9),
+        );
       });
     }
   });

@@ -112,15 +112,8 @@ class ExpandIconTheme {
   }
 
   @override
-  int get hashCode => Object.hash(
-        widget,
-        width,
-        height,
-        padding,
-        margin,
-        color,
-        expandedColor,
-      );
+  int get hashCode =>
+      Object.hash(widget, width, height, padding, margin, color, expandedColor);
 
   @override
   String toString() {

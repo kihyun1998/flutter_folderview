@@ -110,20 +110,21 @@ void main() {
     },
   );
 
-  testWidgets(
-    'content width recomputes when the ambient text theme changes',
-    (tester) async {
-      // light() tier styles set no fontSize, so bodyMedium alone sizes the text.
-      final plain = FlutterFolderViewTheme<String>.light();
-      await tester.pumpWidget(inheritedHarness(
-          theme: plain, bodyMedium: const TextStyle(fontSize: 2)));
-      await tester.pumpAndSettle();
-      expect(find.byType(FolderViewHorizontalScrollbar), findsNothing);
+  testWidgets('content width recomputes when the ambient text theme changes', (
+    tester,
+  ) async {
+    // light() tier styles set no fontSize, so bodyMedium alone sizes the text.
+    final plain = FlutterFolderViewTheme<String>.light();
+    await tester.pumpWidget(
+      inheritedHarness(theme: plain, bodyMedium: const TextStyle(fontSize: 2)),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(FolderViewHorizontalScrollbar), findsNothing);
 
-      await tester.pumpWidget(inheritedHarness(
-          theme: plain, bodyMedium: const TextStyle(fontSize: 60)));
-      await tester.pumpAndSettle();
-      expect(find.byType(FolderViewHorizontalScrollbar), findsOneWidget);
-    },
-  );
+    await tester.pumpWidget(
+      inheritedHarness(theme: plain, bodyMedium: const TextStyle(fontSize: 60)),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(FolderViewHorizontalScrollbar), findsOneWidget);
+  });
 }

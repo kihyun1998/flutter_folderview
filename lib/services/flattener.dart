@@ -99,8 +99,9 @@ class Flattener<T> {
     );
     _cachedData = data;
     _cachedMode = mode;
-    _cachedExpandedIds =
-        expandedIds != null ? Set<String>.of(expandedIds) : null;
+    _cachedExpandedIds = expandedIds != null
+        ? Set<String>.of(expandedIds)
+        : null;
     return FlattenResult(list: _cachedList, change: null);
   }
 

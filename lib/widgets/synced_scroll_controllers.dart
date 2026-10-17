@@ -1,11 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter_smooth_wheel_scroll/flutter_smooth_wheel_scroll.dart';
 
 class SyncedScrollControllers extends StatefulWidget {
-  const SyncedScrollControllers({
-    super.key,
-    required this.builder,
-  });
+  const SyncedScrollControllers({super.key, required this.builder});
 
   final Widget Function(
     BuildContext context,
@@ -13,7 +11,8 @@ class SyncedScrollControllers extends StatefulWidget {
     ScrollController? verticalScrollbarController,
     ScrollController? horizontalController,
     ScrollController? horizontalScrollbarController,
-  ) builder;
+  )
+  builder;
 
   @override
   State<SyncedScrollControllers> createState() =>
@@ -45,10 +44,10 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
     _doNotReissueJump.clear();
 
     /// Main vertical scroll controller
-    _sc11 = ScrollController();
+    _sc11 = SmoothScrollController(motion: const WheelMotion.spring());
 
     /// Main horizontal scroll controller
-    _sc21 = ScrollController();
+    _sc21 = SmoothScrollController(motion: const WheelMotion.spring());
 
     /// Vertical scrollbar controller
     _sc12 = ScrollController(initialScrollOffset: 0.0);

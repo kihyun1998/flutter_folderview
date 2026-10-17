@@ -1,13 +1,6 @@
-enum ViewMode {
-  tree,
-  folder,
-}
+enum ViewMode { tree, folder }
 
-enum NodeType {
-  folder,
-  parent,
-  child,
-}
+enum NodeType { folder, parent, child }
 
 enum LineStyle {
   connector, // Traditional tree lines with ├─ and └─

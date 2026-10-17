@@ -44,15 +44,21 @@ void main() {
     });
 
     test('snaps non-interpolable fields at t = 0.5', () {
-      const a =
-          RowTooltipTheme(interactive: false, direction: TooltipDirection.top);
+      const a = RowTooltipTheme(
+        interactive: false,
+        direction: TooltipDirection.top,
+      );
       const b = RowTooltipTheme(
-          interactive: true, direction: TooltipDirection.bottom);
+        interactive: true,
+        direction: TooltipDirection.bottom,
+      );
       expect(RowTooltipTheme.lerp(a, b, 0.49).interactive, isFalse);
       expect(RowTooltipTheme.lerp(a, b, 0.5).interactive, isTrue);
       expect(RowTooltipTheme.lerp(a, b, 0.49).direction, TooltipDirection.top);
       expect(
-          RowTooltipTheme.lerp(a, b, 0.5).direction, TooltipDirection.bottom);
+        RowTooltipTheme.lerp(a, b, 0.5).direction,
+        TooltipDirection.bottom,
+      );
     });
 
     test('handles null a / null b / both null', () {

@@ -295,8 +295,9 @@ class NodeTooltipTheme<T> {
       message: t < 0.5 ? a.message : b.message,
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       tooltipBuilder: t < 0.5 ? a.tooltipBuilder : b.tooltipBuilder,
-      tooltipBuilderResolver:
-          t < 0.5 ? a.tooltipBuilderResolver : b.tooltipBuilderResolver,
+      tooltipBuilderResolver: t < 0.5
+          ? a.tooltipBuilderResolver
+          : b.tooltipBuilderResolver,
       backgroundColor: Color.lerp(a.backgroundColor, b.backgroundColor, t),
       elevation: lerpDouble(a.elevation, b.elevation, t),
       boxShadow: BoxShadow.lerpList(a.boxShadow ?? [], b.boxShadow ?? [], t),
@@ -316,8 +317,11 @@ class NodeTooltipTheme<T> {
       showArrow: t < 0.5 ? a.showArrow : b.showArrow,
       arrowBaseWidth: lerpDouble(a.arrowBaseWidth, b.arrowBaseWidth, t),
       arrowLength: lerpDouble(a.arrowLength, b.arrowLength, t),
-      arrowPositionRatio:
-          lerpDouble(a.arrowPositionRatio, b.arrowPositionRatio, t),
+      arrowPositionRatio: lerpDouble(
+        a.arrowPositionRatio,
+        b.arrowPositionRatio,
+        t,
+      ),
       screenMargin: lerpDouble(a.screenMargin, b.screenMargin, t),
       animation: t < 0.5 ? a.animation : b.animation,
       animationCurve: t < 0.5 ? a.animationCurve : b.animationCurve,

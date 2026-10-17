@@ -59,21 +59,28 @@ void main() {
         final children = <Node<String>>[
           for (var c = 0; c < childrenPerParent; c++)
             Node<String>(
-                id: 's${salt}_r${r}_p${p}_c$c',
-                label: uniqueLabel(),
-                type: NodeType.child),
+              id: 's${salt}_r${r}_p${p}_c$c',
+              label: uniqueLabel(),
+              type: NodeType.child,
+            ),
         ];
-        parents.add(Node<String>(
+        parents.add(
+          Node<String>(
             id: 's${salt}_r${r}_p$p',
             label: uniqueLabel(),
             type: NodeType.parent,
-            children: children));
+            children: children,
+          ),
+        );
       }
-      roots.add(Node<String>(
+      roots.add(
+        Node<String>(
           id: 's${salt}_r$r',
           label: uniqueLabel(),
           type: NodeType.folder,
-          children: parents));
+          children: parents,
+        ),
+      );
     }
     return roots;
   }
@@ -94,7 +101,9 @@ void main() {
   test('measure cold RowMetrics.maxWidth on unique-label data', () {
     final theme = FlutterFolderViewTheme<String>.light();
     RowMetrics<String> metrics() => RowMetrics<String>(
-        theme: theme, baseTextStyle: const TextStyle(fontSize: 14));
+      theme: theme,
+      baseTextStyle: const TextStyle(fontSize: 14),
+    );
 
     // Warm the text-layout engine once (first-ever layout pays a one-time init
     // cost we do not want to attribute to maxWidth).
@@ -127,10 +136,12 @@ void main() {
       warmSw.stop();
 
       // ignore: avoid_print
-      print('maxWidth n=$n (nodes=$nodes): '
-          'COLD median=${median}us (min=${micros.first} max=${micros.last}, '
-          '$trials trials, unique labels) | '
-          'WARM (cache hit)=${warmSw.elapsedMicroseconds}us');
+      print(
+        'maxWidth n=$n (nodes=$nodes): '
+        'COLD median=${median}us (min=${micros.first} max=${micros.last}, '
+        '$trials trials, unique labels) | '
+        'WARM (cache hit)=${warmSw.elapsedMicroseconds}us',
+      );
     }
   }, timeout: const Timeout(Duration(minutes: 2)));
 }

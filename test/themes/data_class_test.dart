@@ -64,10 +64,16 @@ void main() {
     test('== / hashCode', () {
       // Non-const so the instances differ by identity — forces == to evaluate
       // the field comparisons rather than short-circuiting on identical().
-      final a =
-          ExpandIconTheme(width: 10, height: 6, color: const Color(0xFF000001));
-      final b =
-          ExpandIconTheme(width: 10, height: 6, color: const Color(0xFF000001));
+      final a = ExpandIconTheme(
+        width: 10,
+        height: 6,
+        color: const Color(0xFF000001),
+      );
+      final b = ExpandIconTheme(
+        width: 10,
+        height: 6,
+        color: const Color(0xFF000001),
+      );
       final differHeight = ExpandIconTheme(width: 10, height: 9);
       expect(a, b);
       expect(a.hashCode, b.hashCode);
@@ -78,19 +84,27 @@ void main() {
   group('FolderViewSpacingTheme copyWith/lerp/==', () {
     test('copyWith + lerp + ==', () {
       const t = FolderViewSpacingTheme(contentPadding: EdgeInsets.all(4));
-      expect(t.copyWith(contentPadding: const EdgeInsets.all(8)).contentPadding,
-          const EdgeInsets.all(8));
+      expect(
+        t.copyWith(contentPadding: const EdgeInsets.all(8)).contentPadding,
+        const EdgeInsets.all(8),
+      );
       expect(t.copyWith().contentPadding, const EdgeInsets.all(4));
       const a = FolderViewSpacingTheme(contentPadding: EdgeInsets.all(10));
       const b = FolderViewSpacingTheme(contentPadding: EdgeInsets.all(20));
-      expect(FolderViewSpacingTheme.lerp(a, b, 0.5).contentPadding,
-          const EdgeInsets.all(15));
-      expect(FolderViewSpacingTheme.lerp(null, null, 0.5).contentPadding,
-          EdgeInsets.zero);
-      final a2 =
-          FolderViewSpacingTheme(contentPadding: const EdgeInsets.all(10));
-      final a3 =
-          FolderViewSpacingTheme(contentPadding: const EdgeInsets.all(10));
+      expect(
+        FolderViewSpacingTheme.lerp(a, b, 0.5).contentPadding,
+        const EdgeInsets.all(15),
+      );
+      expect(
+        FolderViewSpacingTheme.lerp(null, null, 0.5).contentPadding,
+        EdgeInsets.zero,
+      );
+      final a2 = FolderViewSpacingTheme(
+        contentPadding: const EdgeInsets.all(10),
+      );
+      final a3 = FolderViewSpacingTheme(
+        contentPadding: const EdgeInsets.all(10),
+      );
       expect(a2, a3); // non-const: exercises == field comparison
       expect(a2.hashCode, a3.hashCode);
       expect(a2 == b, isFalse);

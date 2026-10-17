@@ -41,14 +41,16 @@ class FlattenService {
       final isFirst = i == 0;
       final isLast = i == nodes.length - 1;
 
-      result.add(FlatNode<T>(
-        node: node,
-        depth: depth,
-        isFirst: isFirst,
-        isLast: isLast,
-        isRoot: isRoot,
-        ancestorIsLastMask: ancestorIsLastMask,
-      ));
+      result.add(
+        FlatNode<T>(
+          node: node,
+          depth: depth,
+          isFirst: isFirst,
+          isLast: isLast,
+          isRoot: isRoot,
+          ancestorIsLastMask: ancestorIsLastMask,
+        ),
+      );
 
       // Recurse into children if expanded
       final isExpanded = expandedNodeIds?.contains(node.id) ?? false;
@@ -59,8 +61,11 @@ class FlattenService {
           expandedNodeIds: expandedNodeIds,
           depth: depth + 1,
           isRoot: false,
-          ancestorIsLastMask:
-              _childAncestorMask(ancestorIsLastMask, depth, isLast),
+          ancestorIsLastMask: _childAncestorMask(
+            ancestorIsLastMask,
+            depth,
+            isLast,
+          ),
         );
       }
     }
@@ -71,9 +76,14 @@ class FlattenService {
   /// its bit is set iff [parentIsLast]. Single source of truth for the encoding
   /// and the depth cap.
   static int _childAncestorMask(
-      int parentMask, int parentDepth, bool parentIsLast) {
-    assert(parentDepth < FlatNode.maxDepth,
-        'tree depth exceeds FlatNode.maxDepth (${FlatNode.maxDepth})');
+    int parentMask,
+    int parentDepth,
+    bool parentIsLast,
+  ) {
+    assert(
+      parentDepth < FlatNode.maxDepth,
+      'tree depth exceeds FlatNode.maxDepth (${FlatNode.maxDepth})',
+    );
     return parentIsLast ? (parentMask | (1 << parentDepth)) : parentMask;
   }
 
@@ -106,7 +116,10 @@ class FlattenService {
       depth: flatNode.depth + 1,
       isRoot: false,
       ancestorIsLastMask: _childAncestorMask(
-          flatNode.ancestorIsLastMask, flatNode.depth, flatNode.isLast),
+        flatNode.ancestorIsLastMask,
+        flatNode.depth,
+        flatNode.isLast,
+      ),
     );
 
     // Insert the subtree after the node, in place.

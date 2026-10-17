@@ -89,8 +89,9 @@ class RowMetrics<T> {
   /// `textStyleResolver`, the result depends only on the node's tier, which
   /// lets [maxWidth] cache it per tier instead of merging per node.
   TextStyle _mergedStyle(Node<T> node) =>
-      (baseTextStyle ?? const TextStyle(fontSize: 14))
-          .merge(effectiveTextStyle(node));
+      (baseTextStyle ?? const TextStyle(fontSize: 14)).merge(
+        effectiveTextStyle(node),
+      );
 
   /// The single row-width formula shared by the per-node [measureNodeWidth] and
   /// the batched [maxWidth], so the two can never drift.
@@ -139,13 +140,13 @@ class RowMetrics<T> {
   }
 
   static double _measureTextWidth(String label, TextStyle style) {
-    final key = '$label\x00${style.fontSize}'
+    final key =
+        '$label\x00${style.fontSize}'
         '\x00${style.fontWeight}\x00${style.letterSpacing}';
     return _textWidthCache[key] ??= (TextPainter(
       text: TextSpan(text: label, style: style),
       textDirection: TextDirection.ltr,
       maxLines: 1,
-    )..layout())
-        .width;
+    )..layout()).width;
   }
 }

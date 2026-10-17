@@ -81,11 +81,7 @@ class NodeLabel<T> extends StatelessWidget {
             child: wrapWithNodeTooltip<T>(
               tooltipTheme: tooltipTheme,
               node: node,
-              child: Text(
-                label,
-                style: style,
-                overflow: TextOverflow.ellipsis,
-              ),
+              child: Text(label, style: style, overflow: TextOverflow.ellipsis),
             ),
           ),
         ],
@@ -128,9 +124,11 @@ Widget wrapWithNodeTooltip<T>({
     theme: JustTooltipTheme(
       textStyle: tooltipTheme.textStyle,
       backgroundColor: tooltipTheme.backgroundColor ?? const Color(0xFF616161),
-      borderRadius: tooltipTheme.borderRadius ??
+      borderRadius:
+          tooltipTheme.borderRadius ??
           const BorderRadius.all(Radius.circular(6)),
-      padding: tooltipTheme.padding ??
+      padding:
+          tooltipTheme.padding ??
           const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       elevation: tooltipTheme.elevation ?? 4.0,
       boxShadow: tooltipTheme.boxShadow,

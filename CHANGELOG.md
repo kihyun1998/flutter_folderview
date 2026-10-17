@@ -1,3 +1,14 @@
+## 0.12.0
+
+- **feat**: a mouse-wheel notch over the view animates to its target instead of jumping ([#100](https://github.com/kihyun1998/flutter_folderview/issues/100)). The main vertical and horizontal scroll controllers are now `SmoothScrollController`s from `flutter_smooth_wheel_scroll`, moving as `WheelMotion.spring()`: 400 ms, no bounce. The scrollbars follow the list on every frame of a motion. Trackpad scrolling, dragging, the scrollbar and programmatic jumps behave as before.
+  - **What a consumer sees differently.** After a wheel notch, the scroll offset reaches its target over several frames, not at once. A widget test that wheel-scrolls and reads the offset after a single `pump` now has to pump until the motion settles.
+  - The Scale Modifier + wheel still proposes a Scale and, while `blockModifierScroll` is in effect, does not scroll.
+  - Not yet configurable; an option to choose the motion, or to turn it off, follows ([#101](https://github.com/kihyun1998/flutter_folderview/issues/101)).
+- **BREAKING**: minimum Flutter is now `3.32.0` (Dart `3.8.0`), up from `3.13.0` (Dart `3.1.0`) ([#100](https://github.com/kihyun1998/flutter_folderview/issues/100)).
+  - **What a consumer sees differently.** On Flutter 3.13–3.31 this version does not resolve, and `pub` stays on the previous version. No class, method or field changed because of the floor.
+  - **Why.** This package now depends on [`flutter_smooth_wheel_scroll`](https://pub.dev/packages/flutter_smooth_wheel_scroll) `^0.1.3`, which declares Flutter `>=3.32.0` / Dart `^3.8.0`. It uses `SpringDescription.withDurationAndBounce` (flutter#164411), and 3.32.0 is the first stable release to carry it. The floor is the max of what the dependencies demand: `max(3.13, 3.32)`.
+  - **The source was reformatted, with no behaviour change.** `dart format` picks its style from the package's language version, and from Dart 3.7 that is the tall style. That reformat is a separate, mechanical commit.
+
 ## 0.11.3
 
 - **fix**: a label from a `labelResolver` is measured. Content width was measured from `node.label` while the row drew the resolved label, so a resolved label longer than the raw one was cut with an ellipsis where the view should have scrolled horizontally. Measurement and rendering now read the label from one place (`RowMetrics.label`), the way they already shared the text style.

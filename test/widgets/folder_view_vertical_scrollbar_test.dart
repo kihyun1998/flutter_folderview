@@ -46,8 +46,9 @@ void main() {
   double opacityOf(WidgetTester tester) =>
       tester.widget<AnimatedOpacity>(find.byType(AnimatedOpacity)).opacity;
 
-  testWidgets('renders a Scrollbar and uses hoverOpacity when hovered',
-      (tester) async {
+  testWidgets('renders a Scrollbar and uses hoverOpacity when hovered', (
+    tester,
+  ) async {
     await pumpBar(tester, isHover: true, needsHorizontalScroll: false);
     expect(find.byType(Scrollbar), findsOneWidget);
     expect(opacityOf(tester), 0.7);
@@ -58,8 +59,9 @@ void main() {
     expect(opacityOf(tester), 0.1);
   });
 
-  testWidgets('leaves room for the horizontal scrollbar when both are needed',
-      (tester) async {
+  testWidgets('leaves room for the horizontal scrollbar when both are needed', (
+    tester,
+  ) async {
     await pumpBar(tester, isHover: true, needsHorizontalScroll: true);
     // The vertical bar stops short of the bottom by the horizontal track width.
     final positioned = tester.widget<Positioned>(

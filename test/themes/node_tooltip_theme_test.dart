@@ -66,7 +66,9 @@ void main() {
       expect(NodeTooltipTheme.lerp<String>(null, t, 0.5).offset, 9);
       expect(NodeTooltipTheme.lerp<String>(t, null, 0.5).offset, 9);
       expect(
-          NodeTooltipTheme.lerp<String>(null, null, 0.5).useTooltip, isFalse);
+        NodeTooltipTheme.lerp<String>(null, null, 0.5).useTooltip,
+        isFalse,
+      );
     });
   });
 }

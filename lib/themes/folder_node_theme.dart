@@ -102,10 +102,7 @@ class FolderNodeTheme<T> implements ExpandableNodeThemeView<T> {
   /// scaling — callers should pass `Theme.of(context).textTheme.bodyMedium?.fontSize`.
   ///
   /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
-  FolderNodeTheme<T> scale(
-    double factor, {
-    required double defaultFontSize,
-  }) {
+  FolderNodeTheme<T> scale(double factor, {required double defaultFontSize}) {
     assert(factor > 0, 'scale factor must be > 0, got $factor');
     if (factor == 1.0) return this;
     return copyWith(

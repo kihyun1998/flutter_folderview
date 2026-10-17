@@ -43,7 +43,8 @@ class FolderViewSpacingTheme {
     if (b == null) return a;
 
     return FolderViewSpacingTheme(
-      contentPadding: EdgeInsets.lerp(a.contentPadding, b.contentPadding, t) ??
+      contentPadding:
+          EdgeInsets.lerp(a.contentPadding, b.contentPadding, t) ??
           EdgeInsets.zero,
     );
   }

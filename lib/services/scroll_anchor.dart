@@ -49,11 +49,14 @@ class ScrollAnchor {
         ? (currentVerticalOffset - oldTopPadding) / oldItemExtent
         : 0.0;
     final newOffset = newTopPadding + topFractionalIndex * newItemExtent;
-    final newMaxExtent =
-        (newContentHeight - viewportHeight).clamp(0.0, double.infinity);
+    final newMaxExtent = (newContentHeight - viewportHeight).clamp(
+      0.0,
+      double.infinity,
+    );
     final clampedV = newOffset.clamp(0.0, newMaxExtent);
-    final double? vertical =
-        (clampedV - currentVerticalOffset).abs() > 0.5 ? clampedV : null;
+    final double? vertical = (clampedV - currentVerticalOffset).abs() > 0.5
+        ? clampedV
+        : null;
 
     // Horizontal: scale the offset by the content-width ratio.
     double? horizontal;
@@ -84,9 +87,10 @@ class ScrollAnchor {
     if (identical(oldList, newList)) return null;
     if (oldList.isEmpty || newList.isEmpty) return null;
 
-    final topIndex = ((currentOffset - topPadding) / itemExtent)
-        .floor()
-        .clamp(0, oldList.length - 1);
+    final topIndex = ((currentOffset - topPadding) / itemExtent).floor().clamp(
+      0,
+      oldList.length - 1,
+    );
 
     var anchorPixelOffset =
         currentOffset - (topPadding + topIndex * itemExtent);
@@ -102,8 +106,10 @@ class ScrollAnchor {
     if (newIndex < 0) return null;
 
     final targetOffset = topPadding + newIndex * itemExtent + anchorPixelOffset;
-    final newMaxExtent =
-        (newContentHeight - viewportHeight).clamp(0.0, double.infinity);
+    final newMaxExtent = (newContentHeight - viewportHeight).clamp(
+      0.0,
+      double.infinity,
+    );
     final clamped = targetOffset.clamp(0.0, newMaxExtent);
 
     return (clamped - currentOffset).abs() > 0.5 ? clamped : null;

@@ -6,13 +6,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   FlatNode<String> fn(String id) => FlatNode<String>(
-        node: Node<String>(id: id, label: id, type: NodeType.parent),
-        depth: 0,
-        isFirst: false,
-        isLast: false,
-        isRoot: true,
-        ancestorIsLastMask: 0,
-      );
+    node: Node<String>(id: id, label: id, type: NodeType.parent),
+    depth: 0,
+    isFirst: false,
+    isLast: false,
+    isRoot: true,
+    ancestorIsLastMask: 0,
+  );
 
   group('ScrollAnchor.verticalOffsetForFlattenChange', () {
     test('a change above the viewport shifts the offset by the row delta', () {

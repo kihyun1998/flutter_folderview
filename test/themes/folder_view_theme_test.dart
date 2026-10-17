@@ -12,7 +12,9 @@ void main() {
       // Identity short-circuit still holds (sanity that they are well-formed).
       expect(
         identical(
-            light.scale(factor: 1.0, defaultFontSize: defaultFontSize), light),
+          light.scale(factor: 1.0, defaultFontSize: defaultFontSize),
+          light,
+        ),
         isTrue,
       );
       // The two presets differ somewhere visible (line colour).
@@ -21,10 +23,12 @@ void main() {
   });
 
   group('FolderViewTheme (InheritedWidget)', () {
-    testWidgets('of() returns the ancestor theme, or the default when absent',
-        (tester) async {
-      final custom =
-          FlutterFolderViewTheme<String>.light().copyWith(rowHeight: 77);
+    testWidgets('of() returns the ancestor theme, or the default when absent', (
+      tester,
+    ) async {
+      final custom = FlutterFolderViewTheme<String>.light().copyWith(
+        rowHeight: 77,
+      );
       late FlutterFolderViewTheme<String> found;
       late FlutterFolderViewTheme<String> fallback;
 
@@ -35,15 +39,19 @@ void main() {
             children: [
               FolderViewTheme<String>(
                 data: custom,
-                child: Builder(builder: (ctx) {
-                  found = FolderViewTheme.of<String>(ctx);
-                  return const SizedBox();
-                }),
+                child: Builder(
+                  builder: (ctx) {
+                    found = FolderViewTheme.of<String>(ctx);
+                    return const SizedBox();
+                  },
+                ),
               ),
-              Builder(builder: (ctx) {
-                fallback = FolderViewTheme.of<String>(ctx);
-                return const SizedBox();
-              }),
+              Builder(
+                builder: (ctx) {
+                  fallback = FolderViewTheme.of<String>(ctx);
+                  return const SizedBox();
+                },
+              ),
             ],
           ),
         ),
@@ -53,20 +61,24 @@ void main() {
       expect(fallback.rowHeight, 40); // default light rowHeight
     });
 
-    testWidgets('maybeOf() reads without registering a dependency',
-        (tester) async {
-      final custom =
-          FlutterFolderViewTheme<String>.light().copyWith(rowHeight: 55);
+    testWidgets('maybeOf() reads without registering a dependency', (
+      tester,
+    ) async {
+      final custom = FlutterFolderViewTheme<String>.light().copyWith(
+        rowHeight: 55,
+      );
       late FlutterFolderViewTheme<String> found;
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: FolderViewTheme<String>(
             data: custom,
-            child: Builder(builder: (ctx) {
-              found = FolderViewTheme.maybeOf<String>(ctx);
-              return const SizedBox();
-            }),
+            child: Builder(
+              builder: (ctx) {
+                found = FolderViewTheme.maybeOf<String>(ctx);
+                return const SizedBox();
+              },
+            ),
           ),
         ),
       );
@@ -78,8 +90,10 @@ void main() {
       final t2 = FlutterFolderViewTheme<String>.light().copyWith(rowHeight: 20);
       final a = FolderViewTheme<String>(data: t1, child: const SizedBox());
       final same = FolderViewTheme<String>(data: t1, child: const SizedBox());
-      final changed =
-          FolderViewTheme<String>(data: t2, child: const SizedBox());
+      final changed = FolderViewTheme<String>(
+        data: t2,
+        child: const SizedBox(),
+      );
       expect(a.updateShouldNotify(same), isFalse); // identical data instance
       expect(a.updateShouldNotify(changed), isTrue);
     });

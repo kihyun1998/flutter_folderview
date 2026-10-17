@@ -146,10 +146,12 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         currentHorizontalOffset: currentH,
         oldContentWidth: oldContentWidth,
         newContentWidth: newContentWidth,
-        hMinScrollExtent:
-            hController.hasClients ? hController.position.minScrollExtent : 0.0,
-        hMaxScrollExtent:
-            hController.hasClients ? hController.position.maxScrollExtent : 0.0,
+        hMinScrollExtent: hController.hasClients
+            ? hController.position.minScrollExtent
+            : 0.0,
+        hMaxScrollExtent: hController.hasClients
+            ? hController.position.maxScrollExtent
+            : 0.0,
       );
 
       if (result.vertical != null) {
@@ -338,17 +340,11 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         alignment: Alignment.centerLeft,
         maxWidth: widget.contentWidth,
         minWidth: widget.contentWidth,
-        child: SizedBox(
-          width: widget.contentWidth,
-          child: nodeWidget,
-        ),
+        child: SizedBox(width: widget.contentWidth, child: nodeWidget),
       ),
       builder: (context, offset, child) {
         if (offset == 0.0) return child!;
-        return Transform.translate(
-          offset: Offset(-offset, 0),
-          child: child,
-        );
+        return Transform.translate(offset: Offset(-offset, 0), child: child);
       },
     );
   }
@@ -435,12 +431,12 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                   valueListenable: _isHover,
                   builder: (context, isHover, _) =>
                       FolderViewHorizontalScrollbar(
-                    isHover: isHover,
-                    horizontalScrollbarController:
-                        widget.horizontalBarController,
-                    contentWidth: widget.contentWidth,
-                    scrollbarTheme: widget.theme.scrollbarTheme,
-                  ),
+                        isHover: isHover,
+                        horizontalScrollbarController:
+                            widget.horizontalBarController,
+                        contentWidth: widget.contentWidth,
+                        scrollbarTheme: widget.theme.scrollbarTheme,
+                      ),
                 ),
             ],
           ),

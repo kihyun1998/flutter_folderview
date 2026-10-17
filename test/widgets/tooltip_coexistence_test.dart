@@ -21,59 +21,65 @@ void main() {
   const long = 'a_much_longer_child_label_here.pdf';
 
   List<Node<String>> data() => [
+    Node<String>(
+      id: 'f',
+      label: 'folder-f',
+      type: NodeType.folder,
+      children: [
         Node<String>(
-          id: 'f',
-          label: 'folder-f',
-          type: NodeType.folder,
+          id: 'p',
+          label: 'parent-p',
+          type: NodeType.parent,
           children: [
-            Node<String>(
-              id: 'p',
-              label: 'parent-p',
-              type: NodeType.parent,
-              children: [
-                Node<String>(id: 'c0', label: short, type: NodeType.child),
-                Node<String>(id: 'c1', label: long, type: NodeType.child),
-              ],
-            ),
+            Node<String>(id: 'c0', label: short, type: NodeType.child),
+            Node<String>(id: 'c1', label: long, type: NodeType.child),
           ],
         ),
-      ];
+      ],
+    ),
+  ];
 
   Future<void> pump(WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox(
-            width: 500,
-            height: 300,
-            child: FolderView<String>(
-              data: data(),
-              mode: ViewMode.folder,
-              expandedNodeIds: const {'f', 'p'},
-              theme: FlutterFolderViewTheme<String>(
-                lineTheme:
-                    const FolderViewLineTheme(lineColor: Color(0xFF000000)),
-                scrollbarTheme: const FolderViewScrollbarTheme(
-                  thumbColor: Color(0xFF000000),
-                  trackColor: Color(0xFF000000),
-                ),
-                childTheme: ChildNodeTheme<String>(
-                  tooltipTheme: NodeTooltipTheme<String>(
-                    useTooltip: true,
-                    padding: EdgeInsets.zero,
-                    tooltipBuilder: (_) => const SizedBox(
-                        key: Key('labeltip'), width: 60, height: 20),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 500,
+              height: 300,
+              child: FolderView<String>(
+                data: data(),
+                mode: ViewMode.folder,
+                expandedNodeIds: const {'f', 'p'},
+                theme: FlutterFolderViewTheme<String>(
+                  lineTheme: const FolderViewLineTheme(
+                    lineColor: Color(0xFF000000),
+                  ),
+                  scrollbarTheme: const FolderViewScrollbarTheme(
+                    thumbColor: Color(0xFF000000),
+                    trackColor: Color(0xFF000000),
+                  ),
+                  childTheme: ChildNodeTheme<String>(
+                    tooltipTheme: NodeTooltipTheme<String>(
+                      useTooltip: true,
+                      padding: EdgeInsets.zero,
+                      tooltipBuilder: (_) => const SizedBox(
+                        key: Key('labeltip'),
+                        width: 60,
+                        height: 20,
+                      ),
+                    ),
                   ),
                 ),
+                rowTooltipBuilder: (context, node) =>
+                    const SizedBox(key: Key('card'), width: 80, height: 30),
               ),
-              rowTooltipBuilder: (context, node) =>
-                  const SizedBox(key: Key('card'), width: 80, height: 30),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   Future<String> hoverOnce(WidgetTester tester, Offset at) async {

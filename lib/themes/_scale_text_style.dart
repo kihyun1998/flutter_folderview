@@ -13,8 +13,9 @@ TextStyle scaleTextStyle(
   final base = style ?? TextStyle(fontSize: defaultFontSize);
   return base.copyWith(
     fontSize: (base.fontSize ?? defaultFontSize) * factor,
-    letterSpacing:
-        base.letterSpacing != null ? base.letterSpacing! * factor : null,
+    letterSpacing: base.letterSpacing != null
+        ? base.letterSpacing! * factor
+        : null,
   );
 }
 
@@ -30,7 +31,8 @@ TextStyle? scaleOptionalTextStyle(
   if (style == null) return null;
   return style.copyWith(
     fontSize: style.fontSize != null ? style.fontSize! * factor : null,
-    letterSpacing:
-        style.letterSpacing != null ? style.letterSpacing! * factor : null,
+    letterSpacing: style.letterSpacing != null
+        ? style.letterSpacing! * factor
+        : null,
   );
 }
