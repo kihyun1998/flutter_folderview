@@ -95,11 +95,82 @@ class EverySettingHost extends SettingsHost {
       itemLabel: (m) => m.name,
       onChanged: (m) => demo.selectionMode = m,
     ),
+    'FolderView.wheelMotion' => buildDropdownRow<WheelMotionKind>(
+      id: settingId,
+      label: 'Motion',
+      value: demo.wheelMotionKind,
+      items: WheelMotionKind.values,
+      itemLabel: (k) => switch (k) {
+        WheelMotionKind.off => 'Off',
+        WheelMotionKind.spring => 'Spring',
+        WheelMotionKind.curve => 'Curve',
+        WheelMotionKind.lerp => 'Lerp',
+      },
+      onChanged: (k) => demo.wheelMotionKind = k,
+    ),
+    'wheelDurationMs' => _slider(
+      settingId,
+      'Duration',
+      demo.wheelDurationMs.toDouble(),
+      min: 50,
+      max: 1000,
+      divisions: 95,
+      format: (v) => '${v.round()} ms',
+      enabled:
+          demo.wheelMotionKind == WheelMotionKind.spring ||
+          demo.wheelMotionKind == WheelMotionKind.curve,
+      onChanged: (v) => demo.wheelDurationMs = v.round(),
+    ),
+    'wheelBounce' => _slider(
+      settingId,
+      'Bounce',
+      demo.wheelBounce,
+      min: -0.5,
+      max: 0.8,
+      divisions: 26,
+      format: (v) => v.toStringAsFixed(2),
+      enabled: demo.wheelMotionKind == WheelMotionKind.spring,
+      onChanged: (v) => demo.wheelBounce = v,
+    ),
+    'wheelCurve' => SettingsControl(
+      id: settingId,
+      label: 'Curve',
+      indent: true,
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 12,
+        children: [
+          const Text('Curve'),
+          DropdownButton<WheelCurveOption>(
+            value: demo.wheelCurve,
+            items: [
+              for (final c in WheelCurveOption.values)
+                DropdownMenuItem(value: c, child: Text(c.name)),
+            ],
+            onChanged: demo.wheelMotionKind == WheelMotionKind.curve
+                ? (c) => demo.wheelCurve = c!
+                : null,
+          ),
+        ],
+      ),
+    ),
+    'wheelTimeConstantMs' => _slider(
+      settingId,
+      'Time constant',
+      demo.wheelTimeConstantMs.toDouble(),
+      min: 10,
+      max: 300,
+      divisions: 29,
+      format: (v) => '${v.round()} ms',
+      enabled: demo.wheelMotionKind == WheelMotionKind.lerp,
+      onChanged: (v) => demo.wheelTimeConstantMs = v.round(),
+    ),
     _ => throw ArgumentError.value(settingId, 'settingId'),
   };
 
   @override
   List<Widget> extrasAfterOptions(String featureId, BuildContext context) {
+    if (featureId == 'wheel') return _wheelExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -125,6 +196,57 @@ class EverySettingHost extends SettingsHost {
       ),
     ];
   }
+
+  /// The current `wheelMotion` as code, and what the panel does not set.
+  List<Widget> _wheelExtras() => [
+    const SizedBox(height: 12),
+    SelectableText(
+      demo.wheelMotionCode,
+      key: const Key('wheel-code'),
+      style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+    ),
+    const SizedBox(height: 12),
+    const Text(
+      'Turn the mouse wheel over the tree. Only the wheel animates: a '
+      'trackpad, a dragged scrollbar, and a wheel turned over a scrollbar '
+      'move the view at once. How far one notch travels is app-wide, through '
+      'SmoothWheelBinding in flutter_smooth_wheel_scroll, and is not set '
+      'here. Choose Generated data with large counts for room to scroll.',
+      key: Key('wheel-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// A slider for a wheel knob, disabled when the chosen motion does not read
+  /// it.
+  SettingsControl _slider(
+    String id,
+    String label,
+    double value, {
+    required double min,
+    required double max,
+    required int divisions,
+    required String Function(double) format,
+    required bool enabled,
+    required void Function(double) onChanged,
+  }) => SettingsControl(
+    id: id,
+    label: label,
+    indent: true,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$label: ${format(value)}'),
+        Slider(
+          value: value,
+          min: min,
+          max: max,
+          divisions: divisions,
+          onChanged: enabled ? onChanged : null,
+        ),
+      ],
+    ),
+  );
 
   /// A caller-owned set's size, and buttons that replace it.
   SettingsControl _setRow(

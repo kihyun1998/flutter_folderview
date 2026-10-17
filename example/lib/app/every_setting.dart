@@ -64,6 +64,58 @@ class EverySettingDemo extends ChangeNotifier {
   bool _secondaryTapHandlerOn = true;
   bool get secondaryTapHandlerOn => _secondaryTapHandlerOn;
 
+  WheelMotionKind _wheelMotionKind = WheelMotionKind.spring;
+  WheelMotionKind get wheelMotionKind => _wheelMotionKind;
+
+  // The defaults are the library's own, so the stage opens on what a
+  // FolderView with no `wheelMotion` does.
+  int _wheelDurationMs = 400;
+  int get wheelDurationMs => _wheelDurationMs;
+
+  double _wheelBounce = 0;
+  double get wheelBounce => _wheelBounce;
+
+  WheelCurveOption _wheelCurve = WheelCurveOption.easeOutCubic;
+  WheelCurveOption get wheelCurve => _wheelCurve;
+
+  int _wheelTimeConstantMs = 60;
+  int get wheelTimeConstantMs => _wheelTimeConstantMs;
+
+  /// The `FolderView.wheelMotion` the settings describe.
+  WheelMotion? get wheelMotion => switch (_wheelMotionKind) {
+    WheelMotionKind.off => null,
+    WheelMotionKind.spring => WheelMotion.spring(
+      duration: Duration(milliseconds: _wheelDurationMs),
+      bounce: _wheelBounce,
+    ),
+    WheelMotionKind.curve => WheelMotion.curve(
+      duration: Duration(milliseconds: _wheelDurationMs),
+      curve: _wheelCurve.curve,
+    ),
+    WheelMotionKind.lerp => WheelMotion.lerp(
+      timeConstant: Duration(milliseconds: _wheelTimeConstantMs),
+    ),
+  };
+
+  /// [wheelMotion] as the argument a caller would write.
+  String get wheelMotionCode => switch (_wheelMotionKind) {
+    WheelMotionKind.off => 'wheelMotion: null,',
+    WheelMotionKind.spring =>
+      'wheelMotion: const WheelMotion.spring(\n'
+          '  duration: Duration(milliseconds: $_wheelDurationMs),\n'
+          '  bounce: ${_wheelBounce.toStringAsFixed(2)},\n'
+          '),',
+    WheelMotionKind.curve =>
+      'wheelMotion: const WheelMotion.curve(\n'
+          '  duration: Duration(milliseconds: $_wheelDurationMs),\n'
+          '  curve: Curves.${_wheelCurve.name},\n'
+          '),',
+    WheelMotionKind.lerp =>
+      'wheelMotion: const WheelMotion.lerp(\n'
+          '  timeConstant: Duration(milliseconds: $_wheelTimeConstantMs),\n'
+          '),',
+  };
+
   final List<String> _log = [];
 
   /// The tap callbacks that fired, newest first, at most [logLength].
@@ -81,6 +133,13 @@ class EverySettingDemo extends ChangeNotifier {
   set doubleTapHandlerOn(bool value) => _set(() => _doubleTapHandlerOn = value);
   set secondaryTapHandlerOn(bool value) =>
       _set(() => _secondaryTapHandlerOn = value);
+  set wheelMotionKind(WheelMotionKind value) =>
+      _set(() => _wheelMotionKind = value);
+  set wheelDurationMs(int value) => _set(() => _wheelDurationMs = value);
+  set wheelBounce(double value) => _set(() => _wheelBounce = value);
+  set wheelCurve(WheelCurveOption value) => _set(() => _wheelCurve = value);
+  set wheelTimeConstantMs(int value) =>
+      _set(() => _wheelTimeConstantMs = value);
 
   /// `onNodeTap`: a Folder or Parent toggles its expansion, a Child toggles
   /// its selection.
@@ -180,6 +239,23 @@ class EverySettingDemo extends ChangeNotifier {
 /// How the example's `onNodeTap` handler updates the Selected Set.
 enum SelectionMode { single, multiple }
 
+/// Which `WheelMotion` the stage hands the view; [off] is `null`, which moves
+/// the view at once.
+enum WheelMotionKind { off, spring, curve, lerp }
+
+/// The curves the panel offers a `WheelMotion.curve`.
+enum WheelCurveOption {
+  easeOutCubic(Curves.easeOutCubic),
+  easeOut(Curves.easeOut),
+  easeInOut(Curves.easeInOut),
+  decelerate(Curves.decelerate),
+  linear(Curves.linear);
+
+  const WheelCurveOption(this.curve);
+
+  final Curve curve;
+}
+
 /// The "Every setting" stage: a `FolderView` over [EverySettingDemo].
 class EverySettingStage extends StatelessWidget {
   const EverySettingStage({super.key, required this.demo});
@@ -200,6 +276,7 @@ class EverySettingStage extends StatelessWidget {
         onSecondaryNodeTap: demo.secondaryTapHandlerOn
             ? demo.handleSecondaryTap
             : null,
+        wheelMotion: demo.wheelMotion,
       ),
     );
   }

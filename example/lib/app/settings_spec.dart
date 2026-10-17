@@ -58,6 +58,17 @@ const _interaction = SettingGroup(
         'selectionMode',
       ],
     ),
+    SettingFeature(
+      id: 'wheel',
+      title: 'Smooth wheel',
+      options: [
+        'FolderView.wheelMotion',
+        'wheelDurationMs',
+        'wheelBounce',
+        'wheelCurve',
+        'wheelTimeConstantMs',
+      ],
+    ),
   ],
 );
 

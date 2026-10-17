@@ -54,6 +54,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  # The test reads the rendered FolderView.wheelMotion's subtype and fields,
+  # which the library's re-export of WheelMotion alone does not name.
+  flutter_smooth_wheel_scroll: ^0.1.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

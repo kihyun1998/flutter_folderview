@@ -36,6 +36,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - The mirror case: **without `onDoubleNodeTap`, a Child row has no double-tap window**, so every tap fires `onNodeTap` (#95). `interaction_test` pins it: "with the handler off, a quick second tap is a single tap".
   - Ctrl+tap is always an immediate single tap: two Ctrl-taps inside the window log two `onNodeTap`s.
 - **The recipe seam is live from #76**: `lib/recipes/` is non-empty, registered sources and recipe files match in both directions, and every source loads through `rootBundle`, the path the Code pane takes. `lib/recipes/` is declared under pubspec `assets`.
+- **"Smooth wheel" (#102) lets the maintainer feel `FolderView.wheelMotion` before a release.** A Motion dropdown (Off / Spring / Curve / Lerp) is the `FolderView.wheelMotion` control, and four example-only knobs feed it. Each knob is disabled unless the chosen motion reads it. The defaults are the library's own, so the stage opens on what a `FolderView` with no `wheelMotion` does. Below the knobs, the current value is shown as the argument a caller would write. There is no recipe for it, which is the maintainer's call: the code text stands in for one. The knobs build their own sliders because the template's slider cannot be disabled. The example takes `flutter_smooth_wheel_scroll` as a dev dependency, so that the test can read the rendered motion's subtype and fields. The library re-exports `WheelMotion` alone.
 - The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).
 
 ## Code
@@ -51,6 +52,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/test/settings_render_test.dart` — every spec id draws a control
 - `example/test/settings_spec_test.dart` — unique ids, interactions name another feature and cite evidence
 - `example/test/interaction_test.dart` — tap callbacks, handler switches, Selected and Expanded Set
+- `example/lib/app/every_setting.dart` — `WheelMotionKind`, `WheelCurveOption`, `EverySettingDemo.wheelMotion`, `EverySettingDemo.wheelMotionCode`
+- `example/test/smooth_wheel_test.dart` — the Motion dropdown and knobs reach the rendered `wheelMotion`, and the code text matches
 - `example/test/option_coverage_test.dart` — `notYetCovered`, `coveredOptions`
 - `example/test/support/library_options.dart` — `libraryOptions`, `optionsInSource`
 - `example/test/recipe_seam_test.dart` — `allowedImports`, `disallowedImports`
