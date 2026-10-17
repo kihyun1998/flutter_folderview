@@ -9,6 +9,9 @@ export 'package:just_tooltip/just_tooltip.dart'
         JustTooltipController,
         JustTooltipTheme;
 
+export 'package:flutter_smooth_wheel_scroll/flutter_smooth_wheel_scroll.dart'
+    show WheelMotion;
+
 export 'models/node.dart';
 export 'themes/child_node_theme.dart';
 export 'themes/expand_icon_theme.dart';

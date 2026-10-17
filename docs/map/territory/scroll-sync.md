@@ -9,13 +9,16 @@ Scrolls the content vertically and horizontally while keeping the vertical `List
 ## Design model
 - Four controllers: main vertical, vertical bar, main horizontal and horizontal bar. Each main/bar pair mirrors the other through `_jumpToNoCascade`, which uses a one-shot flag so that a mirrored jump does not bounce back.
 - **Wheel input is animated on the main controllers only** (#100). Both are `SmoothScrollController`s from `flutter_smooth_wheel_scroll`, moving as `WheelMotion.spring()`, as in `flutter_table_plus`. The bar controllers stay plain and follow by `jumpTo`, once per frame of a motion. The main horizontal one receives no wheel input: its `Scrollable` is zero-height, and Shift+wheel over the vertical `ListView` reads `dx` (read from the code). It is converted for parity.
+- **`FolderView.wheelMotion` picks the motion** (#101), defaulting to `WheelMotion.spring()`. `null` is a zero-duration spring, which upstream hands to `ScrollController`'s own `pointerScroll`. So `null` is the same code path, not a branch, and the main controllers are always `SmoothScrollController`s. A change swaps the motion on the existing controllers in `didUpdateWidget`, because recreating them resets the offset. A View Mode change still recreates them.
 - Horizontal scroll: a hidden, zero-height `SingleChildScrollView` holds `horizontalController` so it has a `ScrollPosition`. Its offset feeds a `ValueNotifier`, and each row wraps in `OverflowBox` → `SizedBox(contentWidth)` → `Transform.translate(-offset)`. Only visible rows rebuild on a horizontal scroll. When `contentWidth` fits the viewport, the wrapper is skipped entirely.
 - A row's `RenderBox` is therefore `contentWidth` wide and translated left. Its rect extends past the viewport whenever the content is wider than the view ([row-wider-than-viewport](../invariant/row-wider-than-viewport.md)).
 - `SyncedScrollControllers` is keyed by `ValueKey(mode)`, so a mode switch creates fresh controllers at offset 0.
 - Scrollbars are shown on hover of the whole view. The platform scrollbars are suppressed with `ScrollConfiguration(scrollbars: false)`. When a horizontal bar is needed, a track-height spacer is reserved under the list.
 
 ## Code
-- `lib/widgets/synced_scroll_controllers.dart` — `SyncedScrollControllers`, `_SyncedScrollControllersState._jumpToNoCascade`
+- `lib/widgets/synced_scroll_controllers.dart` — `SyncedScrollControllers`, `_SyncedScrollControllersState._jumpToNoCascade`, `_SyncedScrollControllersState.didUpdateWidget`
+- `lib/widgets/folder_view.dart` — `FolderView.wheelMotion`
+- `lib/flutter_folderview.dart` — `WheelMotion` (re-export)
 - `lib/widgets/folder_view_content.dart` — `_FolderViewContentState._buildItem`, `_FolderViewContentState._onHorizontalScroll`
 - `lib/widgets/folder_view_vertical_scrollbar.dart` — `FolderViewVerticalScrollbar`
 - `lib/widgets/folder_view_horizontal_scrollbar.dart` — `FolderViewHorizontalScrollbar`

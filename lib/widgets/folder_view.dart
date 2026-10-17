@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smooth_wheel_scroll/flutter_smooth_wheel_scroll.dart';
 
 import '../input/scale_modifier.dart';
 import '../models/flat_node.dart';
@@ -99,6 +100,29 @@ class FolderView<T> extends StatefulWidget {
   /// interactive, and drawing no surface of its own.
   final RowTooltipTheme? rowTooltipTheme;
 
+  /// How the view moves on mouse wheel input.
+  ///
+  /// Defaults to `WheelMotion.spring()`: the view animates to where a notch
+  /// points, and notches during the motion add to its target. The scrollbars
+  /// follow it on every frame. Pass `null` to move at once on every notch
+  /// instead.
+  ///
+  /// ```dart
+  /// wheelMotion: const WheelMotion.spring(
+  ///   duration: Duration(milliseconds: 250),
+  /// ),
+  /// wheelMotion: null, // no animation
+  /// ```
+  ///
+  /// Only the wheel is animated: trackpad scrolling, dragging a scrollbar, and
+  /// the jumps that keep a Node in place on expand, collapse or a [scale]
+  /// change move the view at once, and stop a motion in progress. A wheel
+  /// turned over a scrollbar moves it at once too.
+  ///
+  /// How far a notch travels is not set here; that is app-wide, through
+  /// `SmoothWheelBinding` in `flutter_smooth_wheel_scroll`.
+  final WheelMotion? wheelMotion;
+
   const FolderView({
     super.key,
     required this.data,
@@ -115,6 +139,7 @@ class FolderView<T> extends StatefulWidget {
     this.blockModifierScroll,
     this.rowTooltipBuilder,
     this.rowTooltipTheme,
+    this.wheelMotion = const WheelMotion.spring(),
   }) : assert(scale > 0, 'scale must be greater than 0');
 
   @override
@@ -204,6 +229,7 @@ class _FolderViewState<T> extends State<FolderView<T>> {
 
         return SyncedScrollControllers(
           key: ValueKey(widget.mode),
+          wheelMotion: widget.wheelMotion,
           builder:
               (
                 context,

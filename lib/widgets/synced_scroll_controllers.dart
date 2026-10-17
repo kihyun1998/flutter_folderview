@@ -3,7 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smooth_wheel_scroll/flutter_smooth_wheel_scroll.dart';
 
 class SyncedScrollControllers extends StatefulWidget {
-  const SyncedScrollControllers({super.key, required this.builder});
+  const SyncedScrollControllers({
+    super.key,
+    required this.builder,
+    this.wheelMotion,
+  });
+
+  /// How the two main controllers move on mouse wheel input; `null` moves
+  /// them at once.
+  final WheelMotion? wheelMotion;
 
   final Widget Function(
     BuildContext context,
@@ -35,6 +43,23 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
   }
 
   @override
+  void didUpdateWidget(SyncedScrollControllers oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.wheelMotion != oldWidget.wheelMotion) {
+      for (final controller in [_sc11, _sc21]) {
+        if (controller is SmoothScrollController) controller.motion = _motion;
+      }
+    }
+  }
+
+  /// A zero duration takes `ScrollController`'s own wheel path.
+  static const WheelMotion _instant = WheelMotion.spring(
+    duration: Duration.zero,
+  );
+
+  WheelMotion get _motion => widget.wheelMotion ?? _instant;
+
+  @override
   void dispose() {
     _disposeOrUnsubscribe();
     super.dispose();
@@ -44,10 +69,10 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
     _doNotReissueJump.clear();
 
     /// Main vertical scroll controller
-    _sc11 = SmoothScrollController(motion: const WheelMotion.spring());
+    _sc11 = SmoothScrollController(motion: _motion);
 
     /// Main horizontal scroll controller
-    _sc21 = SmoothScrollController(motion: const WheelMotion.spring());
+    _sc21 = SmoothScrollController(motion: _motion);
 
     /// Vertical scrollbar controller
     _sc12 = ScrollController(initialScrollOffset: 0.0);
