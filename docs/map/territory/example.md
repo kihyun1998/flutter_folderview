@@ -53,6 +53,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/test/settings_spec_test.dart` — unique ids, interactions name another feature and cite evidence
 - `example/test/interaction_test.dart` — tap callbacks, handler switches, Selected and Expanded Set
 - `example/lib/app/every_setting.dart` — `WheelMotionKind`, `WheelCurveOption`, `EverySettingDemo.wheelMotion`, `EverySettingDemo.wheelMotionCode`
+- `example/test/room_test.dart` — the Room draws a `FolderView` at 1:1, desktop scales it down
 - `example/test/smooth_wheel_test.dart` — the Motion dropdown and knobs reach the rendered `wheelMotion`, and the code text matches
 - `example/test/option_coverage_test.dart` — `notYetCovered`, `coveredOptions`
 - `example/test/support/library_options.dart` — `libraryOptions`, `optionsInSource`
@@ -60,7 +61,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/test/support/shell_harness.dart` — `pumpShell`, `openDestination`, `openFeature`, `chooseDropdown`, `setSlider`, `renderedFolderView`
 
 ## Reference behaviour
-- `flutter_example_template` **0.2.0**, read from the pub cache source. `PreviewStage` sizes its child with `SizedBox.fromSize(spec.size)` and gives it its own `Overlay`, and `PreviewFrame` scales the whole frame down to fit. Its floor is `flutter >=3.27.0`; the example declares the library's higher 3.32.0.
+- `flutter_example_template` **0.3.0** (#108), read from the pub cache source. In the framed modes, `PreviewStage` sizes its child with `SizedBox.fromSize(spec.size)` and gives it its own `Overlay`, and `PreviewFrame` scales the whole frame down to fit. The **Room** (`ViewportBar.roomId`, offered on every destination by `ShellPage`) is `PreviewRoom`: the stage region at its own size, unscaled. Its `MediaQuery` says that box is the whole screen, and it adds no `Overlay` of its own. Which `Overlay` a tooltip paints into there is #109's to pin. `room_test` measures the rendered `FolderView` at scale 1 in the Room and below 1 in desktop. Its floor is `flutter >=3.27.0`; the example declares the library's higher 3.32.0.
 - `flutter_table_plus/example`, an *example* to diverge from deliberately. Its `settings_spec_test` and `recipe_seam_test` are the prior art for the guard and the seam. That repo keeps a hand-written spec and settings model in step; this one derives the option list from the library instead.
 
 ## Cross-cutting invariants
