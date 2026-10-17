@@ -9,6 +9,7 @@ Turns the **Scale Modifier** held during a mouse-wheel scroll into a proposed **
 ## Design model
 - Only active when `onScaleChanged` is non-null. A `Listener` catches `PointerScrollEvent` while the modifier is down and proposes `scale ± scaleStep` (default 0.05). The value is **not clamped**; the caller clamps.
 - `blockModifierScroll` defaults to following `onScaleChanged`. Blocking swaps the `ListView` physics to `_ModifierKeyAwareScrollPhysics`, which refuses user offsets while the modifier is pressed.
+- The block holds under smooth wheel scrolling (#100): `Scrollable` asks `physics.shouldAcceptUserOffset` before it claims a wheel event, so a refused notch never reaches `SmoothScrollController.pointerScroll` (read from SDK 3.47.1; pinned by the scale-gesture tests, which settle after each notch).
 - Modifier: Meta on macOS, Control elsewhere. Meta is ignored off macOS because a Windows-key key-up can be lost, which would leave the flag stuck.
 
 ## Code

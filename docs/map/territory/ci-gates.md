@@ -31,5 +31,5 @@ None recorded.
 - [example](example.md) — the `example` job runs the option coverage guard, so a public field added to `lib/` turns that job red until the example exposes the field or lists it with an owning issue.
 
 ## Known holes
-- CI runs only the latest stable Flutter. The declared floor (`>=3.13.0`) is never built.
+- CI runs only the latest stable Flutter. The declared floor (`>=3.32.0`) is never built.
 - `benchmark/` has no baseline, so a regression is only visible to someone who runs it and remembers the old number.
