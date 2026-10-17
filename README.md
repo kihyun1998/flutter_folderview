@@ -9,7 +9,7 @@ dependencies:
   flutter_folderview: ^0.11.2
 ```
 
-Requires **Flutter 3.13.0** (Dart 3.1.0) or newer, raised from 3.10.0 in `0.11.0`.
+Requires **Flutter 3.32.0** (Dart 3.8.0) or newer, raised from 3.13.0 in `0.12.0`.
 
 ## Basic Usage
 

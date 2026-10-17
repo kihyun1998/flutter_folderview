@@ -1,6 +1,6 @@
 name: flutter_folderview
 description: "A customizable Flutter widget for displaying hierarchical data in tree and folder views with rich theming support."
-version: 0.11.3
+version: 0.12.0
 homepage: https://github.com/kihyun1998/flutter_folderview
 repository: https://github.com/kihyun1998/flutter_folderview
 issue_tracker: https://github.com/kihyun1998/flutter_folderview/issues
@@ -12,17 +12,22 @@ topics:
   - treeview
   - explorer
 
-# Raised from Dart 3.0.0 / Flutter 3.10.0 by just_tooltip 0.4.2, whose ancestor
-# clip walk reads `RenderObject.parent`. That was `AbstractNode?` — a type with
-# no `describeApproximatePaintClip` — until Flutter 3.13. Unchanged by 0.4.4.
+# The floor is the max of what the dependencies demand. just_tooltip 0.4.2
+# declares Flutter `>=3.13.0` / Dart `>=3.1.0`: its ancestor clip walk reads
+# `RenderObject.parent`, which was `AbstractNode?` — a type with no
+# `describeApproximatePaintClip` — until Flutter 3.13. flutter_smooth_wheel_scroll
+# 0.1.3 declares Flutter `>=3.32.0` / Dart `^3.8.0`
+# (`SpringDescription.withDurationAndBounce`, flutter#164411, first stable in
+# 3.32.0). So the floor is `max(3.13, 3.32) = 3.32` / `max(3.1, 3.8) = 3.8`.
 environment:
-  sdk: ">=3.1.0 <4.0.0"
-  flutter: ">=3.13.0"
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:
     sdk: flutter
   just_tooltip: ^0.4.4
+  flutter_smooth_wheel_scroll: ^0.1.3
 
 dev_dependencies:
   flutter_lints: ^5.0.0
