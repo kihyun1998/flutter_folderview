@@ -79,10 +79,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_example_template
-      sha256: "6d715cc0035b566f0f16463d403112dc840f260531f937963316ac303af8feab"
+      sha256: "7d3e06c4cf2afe5aa6e1cc4be0a9f840990b63932f9986340d20cb2566fbfd78"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
+    version: "0.3.0"
   flutter_folderview:
     dependency: "direct main"
     description:

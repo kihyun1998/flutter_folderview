@@ -34,7 +34,7 @@ dependencies:
   flutter_folderview:
     path: ../
   # The example shell: menu, preview stage, device wall, Code pane, settings panel.
-  flutter_example_template: ^0.2.0
+  flutter_example_template: ^0.3.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
