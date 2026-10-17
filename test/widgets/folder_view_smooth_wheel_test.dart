@@ -22,7 +22,17 @@ final List<Node<String>> _nodes = [
   ),
 ];
 
-Future<void> _pump(WidgetTester tester) async {
+/// Stands for an argument left out, as opposed to one passed as `null`.
+const Object _omitted = Object();
+
+final GlobalKey _viewKey = GlobalKey();
+
+/// Builds the view. [wheelMotion] left out builds it without the argument, so
+/// its default is what runs.
+Future<void> _pump(
+  WidgetTester tester, {
+  Object? wheelMotion = _omitted,
+}) async {
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -30,11 +40,20 @@ Future<void> _pump(WidgetTester tester) async {
           child: SizedBox(
             width: 400,
             height: 300,
-            child: FolderView<String>(
-              data: _nodes,
-              mode: ViewMode.folder,
-              expandedNodeIds: const {'f'},
-            ),
+            child: identical(wheelMotion, _omitted)
+                ? FolderView<String>(
+                    key: _viewKey,
+                    data: _nodes,
+                    mode: ViewMode.folder,
+                    expandedNodeIds: const {'f'},
+                  )
+                : FolderView<String>(
+                    key: _viewKey,
+                    data: _nodes,
+                    mode: ViewMode.folder,
+                    expandedNodeIds: const {'f'},
+                    wheelMotion: wheelMotion as WheelMotion?,
+                  ),
           ),
         ),
       ),
@@ -129,5 +148,57 @@ void main() {
     } finally {
       debugDefaultTargetPlatformOverride = null;
     }
+  });
+
+  testWidgets('wheelMotion null moves at once', (tester) async {
+    await _pump(tester, wheelMotion: null);
+
+    await _wheel(tester, 120);
+    await tester.pump();
+    expect(_list(tester).pixels, 120);
+  });
+
+  for (final (name, motion) in [
+    ('curve', const WheelMotion.curve(curve: Curves.easeOut)),
+    ('lerp', const WheelMotion.lerp()),
+  ]) {
+    testWidgets('wheelMotion $name animates, unlike the default spring', (
+      tester,
+    ) async {
+      // The default spring's first frame, as the baseline.
+      await _pump(tester);
+      await _wheel(tester, 120);
+      await tester.pump();
+      await tester.pump(_frame);
+      final springStep = _list(tester).pixels;
+      await tester.pumpAndSettle();
+
+      await _pump(tester, wheelMotion: motion);
+      await _wheel(tester, 120);
+      await tester.pump();
+      await tester.pump(_frame);
+      final step = _list(tester).pixels - 120;
+      expect(step, greaterThan(0));
+      expect(step, lessThan(120));
+      expect(step, isNot(moreOrLessEquals(springStep)));
+
+      await tester.pumpAndSettle();
+      expect(_list(tester).pixels, 240);
+    });
+  }
+
+  testWidgets('changing wheelMotion keeps the offset and applies to the next '
+      'notch', (tester) async {
+    await _pump(tester);
+    await _wheel(tester, 120);
+    await tester.pumpAndSettle();
+    expect(_list(tester).pixels, 120);
+
+    await _pump(tester, wheelMotion: null);
+    expect(_list(tester).pixels, 120);
+
+    await _wheel(tester, 120);
+    await tester.pump();
+    expect(_list(tester).pixels, 240);
   });
 }

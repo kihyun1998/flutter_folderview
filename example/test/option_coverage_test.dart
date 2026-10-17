@@ -63,6 +63,7 @@ const notYetCovered = <String, int>{
   'FolderView.scale': 78,
   'FolderView.scaleStep': 78,
   'FolderView.theme': 90,
+  'FolderView.wheelMotion': 102,
   'FolderViewLineTheme.lineColor': 80,
   'FolderViewLineTheme.lineStyle': 80,
   'FolderViewLineTheme.lineWidth': 80,
