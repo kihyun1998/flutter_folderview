@@ -69,6 +69,31 @@ const _interaction = SettingGroup(
         'wheelTimeConstantMs',
       ],
     ),
+    SettingFeature(
+      id: 'scale',
+      title: 'Scale',
+      options: [
+        'FolderView.scale',
+        'FolderView.onScaleChanged',
+        'FolderView.scaleStep',
+        'FolderView.blockModifierScroll',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'wheel',
+          effect:
+              'Ctrl+wheel (Cmd+wheel on macOS) proposes a Scale and, while '
+              'blockModifierScroll is in effect, neither scrolls nor starts a '
+              'wheel motion. With blockModifierScroll false, the same notch '
+              'scrolls and proposes no Scale.',
+          evidence:
+              'test/widgets/folder_view_scale_gesture_test.dart: "while '
+              'blocking, modifier+wheel leaves the scroll offset put" settles '
+              'after each notch since 0.12.0, and "blockModifierScroll:false '
+              'overrides a non-null onScaleChanged"',
+        ),
+      ],
+    ),
   ],
 );
 

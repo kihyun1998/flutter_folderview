@@ -9,6 +9,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - **Test helpers live in `example/test/support/`**, so `example/test/` holds only `*_test.dart` files. Neither this repo nor `flutter_table_plus` had a precedent; the maintainer was shown the flat alternative and chose the folder.
 - **`Node`'s five fields are covered by a recipe, not the settings panel** (#76). They are the data's shape, not knobs. The maintainer was also shown the alternative, a read-only "control" in the panel, and chose the recipe. So `Building a tree` became the first recipe, and the first-recipe seam rules from #74 landed with it.
 - **Generated data is strictly Folder → Parent → Child** (#76). The count of each is a setting. The legacy generator's nested-Folder depth was dropped on purpose: the maintainer chose the containment rule in `GLOSSARY.md` over keeping that option.
+- **Chrome-excluded-from-Scale is a panel note under Scale, not yet an interaction** (#78). The note is the Scale feature's `extrasAfterOptions` text (`scale-note`, pinned by `scale_test`), because the template's `SettingFeature` has no note field, so `settings_spec.dart` itself does not carry the rule. An `Interaction` must name another feature, and at #78 no scrollbar or tooltip feature existed. The maintainer was shown three options: a note now with the interaction handed to #85 / #86 / #89; a note only; or empty Scrollbar and Tooltip features created early. They chose the first. The interaction is added by whichever of those tickets creates the feature, pointing at `scale`.
 - **Windows window size** is 1200×600, wider than `ShellPage.narrowBreakpoint` (900), so the desktop run opens in the three-region layout. Whether `window_manager` stays at all is decided in #91.
 
 ## Design model
@@ -37,6 +38,11 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - Ctrl+tap is always an immediate single tap: two Ctrl-taps inside the window log two `onNodeTap`s.
 - **The recipe seam is live from #76**: `lib/recipes/` is non-empty, registered sources and recipe files match in both directions, and every source loads through `rootBundle`, the path the Code pane takes. `lib/recipes/` is declared under pubspec `assets`.
 - **"Smooth wheel" (#102) lets the maintainer feel `FolderView.wheelMotion` before a release.** A Motion dropdown (Off / Spring / Curve / Lerp) is the `FolderView.wheelMotion` control, and four example-only knobs feed it. Each knob is disabled unless the chosen motion reads it. The defaults are the library's own, so the stage opens on what a `FolderView` with no `wheelMotion` does. Below the knobs, the current value is shown as the argument a caller would write. There is no recipe for it, which is the maintainer's call: the code text stands in for one. The knobs build their own sliders because the template's slider cannot be disabled. The example takes `flutter_smooth_wheel_scroll` as a dev dependency, so that the test can read the rendered motion's subtype and fields. The library re-exports `WheelMotion` alone.
+- **"Scale" (#78) shows ADR-0002 for the Scale.** The `onScaleChanged` switch installs the example's handler, which clamps the proposed value to 0.5–3.0 (the legacy panel's range) because the library clamps nothing. With the handler off, only the slider changes the Scale. `blockModifierScroll` is a three-way dropdown, because the field is `bool?`: Follow handler (`null`), On, Off. What the dropdown reveals, read in `_FolderViewState.build` and pinned by the library's scale-gesture tests:
+  - The `Listener` that proposes a Scale exists only while blocking is in effect. So **Off scrolls the list and proposes no Scale**, even with a handler installed.
+  - **On blocks the modifier scroll with no handler**, so Ctrl+wheel does nothing at all.
+  - The interaction with Smooth wheel: a blocked notch never reaches `SmoothScrollController.pointerScroll` ([scale-input](scale-input.md)).
+  The dropdown labels are short because the knob region is 279 px wide at a 1600 px window, and the template's `buildDropdownRow` is a `Row` that overflowed by 21 px with "Block modifier scroll" / "Follow onScaleChanged" (measured at #78).
 - The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).
 
 ## Code
@@ -53,6 +59,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/test/settings_spec_test.dart` — unique ids, interactions name another feature and cite evidence
 - `example/test/interaction_test.dart` — tap callbacks, handler switches, Selected and Expanded Set
 - `example/lib/app/every_setting.dart` — `WheelMotionKind`, `WheelCurveOption`, `EverySettingDemo.wheelMotion`, `EverySettingDemo.wheelMotionCode`
+- `example/lib/app/every_setting.dart` — `ModifierScrollBlock`, `EverySettingDemo.handleScaleChanged`, `EverySettingDemo.blockModifierScroll`
+- `example/test/scale_test.dart` — the Scale controls reach the rendered `FolderView`; Ctrl+wheel proposes, the handler clamps, blocking decides scroll versus Scale
 - `example/test/room_test.dart` — the Room draws a `FolderView` at 1:1, desktop scales it down
 - `example/test/smooth_wheel_test.dart` — the Motion dropdown and knobs reach the rendered `wheelMotion`, and the code text matches
 - `example/test/option_coverage_test.dart` — `notYetCovered`, `coveredOptions`
@@ -65,7 +73,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `flutter_table_plus/example`, an *example* to diverge from deliberately. Its `settings_spec_test` and `recipe_seam_test` are the prior art for the guard and the seam. That repo keeps a hand-written spec and settings model in step; this one derives the option list from the library instead.
 
 ## Cross-cutting invariants
-- [chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md) — the settings spec records it as an interaction on Scale (#78).
+- [chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md) — the Scale feature's panel note (`scale-note`) states it (#78); `settings_spec.dart` does not yet. The spec gains it as an interaction when the scrollbar (#85) or tooltip (#86, #89) feature exists.
 - [innermost-tooltip-wins](../invariant/innermost-tooltip-wins.md) and [row-wider-than-viewport](../invariant/row-wider-than-viewport.md) — the row-card scenarios (#89) demonstrate both.
 
 ## Blast radius
