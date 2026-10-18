@@ -165,12 +165,55 @@ class EverySettingHost extends SettingsHost {
       enabled: demo.wheelMotionKind == WheelMotionKind.lerp,
       onChanged: (v) => demo.wheelTimeConstantMs = v.round(),
     ),
+    'FolderView.scale' => _slider(
+      settingId,
+      'Scale',
+      demo.scale,
+      min: EverySettingDemo.minScale,
+      max: EverySettingDemo.maxScale,
+      divisions: 50,
+      format: (v) => v.toStringAsFixed(2),
+      enabled: true,
+      indent: false,
+      onChanged: (v) => demo.scale = v,
+    ),
+    'FolderView.onScaleChanged' => buildSwitchTile(
+      id: settingId,
+      label: 'onScaleChanged handler',
+      value: demo.scaleHandlerOn,
+      onChanged: (on) => demo.scaleHandlerOn = on,
+    ),
+    'FolderView.scaleStep' => _slider(
+      settingId,
+      'Step',
+      demo.scaleStep,
+      min: 0.01,
+      max: 0.25,
+      divisions: 24,
+      format: (v) => v.toStringAsFixed(2),
+      enabled: true,
+      indent: false,
+      onChanged: (v) => demo.scaleStep = v,
+    ),
+    'FolderView.blockModifierScroll' => buildDropdownRow<ModifierScrollBlock>(
+      id: settingId,
+      label: 'Block scroll',
+      value: demo.modifierScrollBlock,
+      items: ModifierScrollBlock.values,
+      itemLabel: (b) => switch (b) {
+        ModifierScrollBlock.follow => 'Follow handler',
+        ModifierScrollBlock.on => 'On',
+        ModifierScrollBlock.off => 'Off',
+      },
+      onChanged: (b) => demo.modifierScrollBlock = b,
+    ),
     _ => throw ArgumentError.value(settingId, 'settingId'),
   };
 
   @override
   List<Widget> extrasAfterOptions(String featureId, BuildContext context) {
     if (featureId == 'wheel') return _wheelExtras();
+    if (featureId == 'scale') return _scaleExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -217,8 +260,26 @@ class EverySettingHost extends SettingsHost {
     ),
   ];
 
-  /// A slider for a wheel knob, disabled when the chosen motion does not read
-  /// it.
+  /// What the Scale controls do not show on their own.
+  List<Widget> _scaleExtras() => [
+    const SizedBox(height: 12),
+    const Text(
+      'Hold Ctrl (Cmd on macOS) and turn the mouse wheel over the tree. The '
+      'library proposes scale ± step through onScaleChanged and clamps '
+      'nothing; this example applies the value clamped to 0.5–3.0. With the '
+      'handler off, nothing changes the Scale but the slider. Follow blocks '
+      'the modifier scroll exactly when the handler is on. Off lets the notch '
+      'scroll and proposes no Scale; On blocks it even with no handler. '
+      'Scrollbars and tooltips keep their size at every Scale (ADR-0001, '
+      'ADR-0004). The preview frames shrink the whole stage; choose the Room '
+      'to see a Scale at real pixels.',
+      key: Key('scale-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// A slider for a numeric setting, disabled when [enabled] is false; a wheel
+  /// knob is [indent]ed under the Motion dropdown.
   SettingsControl _slider(
     String id,
     String label,
@@ -229,10 +290,11 @@ class EverySettingHost extends SettingsHost {
     required String Function(double) format,
     required bool enabled,
     required void Function(double) onChanged,
+    bool indent = true,
   }) => SettingsControl(
     id: id,
     label: label,
-    indent: true,
+    indent: indent,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

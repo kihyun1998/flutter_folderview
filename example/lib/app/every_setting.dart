@@ -116,6 +116,30 @@ class EverySettingDemo extends ChangeNotifier {
           '),',
   };
 
+  /// The range the example's `onScaleChanged` handler clamps a proposed Scale
+  /// to; the library proposes without clamping.
+  static const minScale = 0.5;
+  static const maxScale = 3.0;
+
+  double _scale = 1.0;
+  double get scale => _scale;
+
+  bool _scaleHandlerOn = true;
+  bool get scaleHandlerOn => _scaleHandlerOn;
+
+  double _scaleStep = 0.05;
+  double get scaleStep => _scaleStep;
+
+  ModifierScrollBlock _modifierScrollBlock = ModifierScrollBlock.follow;
+  ModifierScrollBlock get modifierScrollBlock => _modifierScrollBlock;
+
+  /// The `FolderView.blockModifierScroll` the settings describe.
+  bool? get blockModifierScroll => switch (_modifierScrollBlock) {
+    ModifierScrollBlock.follow => null,
+    ModifierScrollBlock.on => true,
+    ModifierScrollBlock.off => false,
+  };
+
   final List<String> _log = [];
 
   /// The tap callbacks that fired, newest first, at most [logLength].
@@ -140,6 +164,16 @@ class EverySettingDemo extends ChangeNotifier {
   set wheelCurve(WheelCurveOption value) => _set(() => _wheelCurve = value);
   set wheelTimeConstantMs(int value) =>
       _set(() => _wheelTimeConstantMs = value);
+  set scale(double value) => _set(() => _scale = value);
+  set scaleHandlerOn(bool value) => _set(() => _scaleHandlerOn = value);
+  set scaleStep(double value) => _set(() => _scaleStep = value);
+  set modifierScrollBlock(ModifierScrollBlock value) =>
+      _set(() => _modifierScrollBlock = value);
+
+  /// `onScaleChanged`: applies the proposed Scale, clamped to [minScale] ..
+  /// [maxScale].
+  void handleScaleChanged(double proposed) =>
+      _set(() => _scale = proposed.clamp(minScale, maxScale));
 
   /// `onNodeTap`: a Folder or Parent toggles its expansion, a Child toggles
   /// its selection.
@@ -243,6 +277,10 @@ enum SelectionMode { single, multiple }
 /// the view at once.
 enum WheelMotionKind { off, spring, curve, lerp }
 
+/// The `FolderView.blockModifierScroll` value: [follow] is `null`, which
+/// blocks exactly when `onScaleChanged` is non-null.
+enum ModifierScrollBlock { follow, on, off }
+
 /// The curves the panel offers a `WheelMotion.curve`.
 enum WheelCurveOption {
   easeOutCubic(Curves.easeOutCubic),
@@ -277,6 +315,10 @@ class EverySettingStage extends StatelessWidget {
             ? demo.handleSecondaryTap
             : null,
         wheelMotion: demo.wheelMotion,
+        scale: demo.scale,
+        onScaleChanged: demo.scaleHandlerOn ? demo.handleScaleChanged : null,
+        scaleStep: demo.scaleStep,
+        blockModifierScroll: demo.blockModifierScroll,
       ),
     );
   }
