@@ -157,9 +157,11 @@ class EverySettingDemo extends ChangeNotifier {
   double _borderRadius = 8;
   double get borderRadius => _borderRadius;
 
-  /// The colours the `lineColor` control offers; the first is `light()`'s.
+  /// The colours the `lineColor` control offers; the first two are `light()`'s
+  /// and `dark()`'s.
   static const lineColors = [
     Color(0xFF9E9E9E),
+    Color(0xFF757575),
     Color(0xFF2196F3),
     Color(0xFF4CAF50),
     Color(0xFFFF9800),
@@ -212,10 +214,11 @@ class EverySettingDemo extends ChangeNotifier {
   Color? _expandIconExpandedColor;
   Color? get expandIconExpandedColor => _expandIconExpandedColor;
 
-  /// The colours the scrollbar's thumb and track controls offer; the first of
-  /// each is `light()`'s.
+  /// The colours the scrollbar's thumb and track controls offer; the first two
+  /// of each are `light()`'s and `dark()`'s.
   static const scrollbarThumbColors = [
     Color(0xFF757575),
+    Color(0xFFBDBDBD),
     Color(0xFF2196F3),
     Color(0xFF4CAF50),
     Color(0xFFF44336),
@@ -223,6 +226,7 @@ class EverySettingDemo extends ChangeNotifier {
   ];
   static const scrollbarTrackColors = [
     Color(0xFFEEEEEE),
+    Color(0xFF424242),
     Color(0xFFE3F2FD),
     Color(0xFFFFF3E0),
     Color(0x00000000),
@@ -268,13 +272,109 @@ class EverySettingDemo extends ChangeNotifier {
   /// setting changes.
   FlutterFolderViewTheme<String> get theme => _theme ??= _buildTheme();
 
+  ThemePreset _base = ThemePreset.light;
+
+  /// The factory the theme starts from: the last preset applied.
+  ThemePreset get base => _base;
+
+  /// The preset the theme settings still match, or null once a theme setting
+  /// has moved away from it.
+  ThemePreset? get activePreset => _matches(_base.theme) ? _base : null;
+
+  ThemeInjection _injection = ThemeInjection.parameter;
+  ThemeInjection get injection => _injection;
+  set injection(ThemeInjection value) => _set(() => _injection = value);
+
+  /// Resets every theme setting to [preset]'s factory, and starts from it.
+  void applyPreset(ThemePreset preset) {
+    final f = preset.theme;
+    _base = preset;
+    _rowHeight = f.rowHeight;
+    _rowSpacing = f.rowSpacing;
+    _animationDuration = f.animationDuration;
+    _contentPadding = f.spacingTheme.contentPadding;
+    _borderRadius = f.nodeStyleTheme.borderRadius;
+    _lineColor = f.lineTheme.lineColor;
+    _lineWidth = f.lineTheme.lineWidth;
+    _lineStyle = f.lineTheme.lineStyle;
+    final e = f.expandIconTheme;
+    _expandIconSample = false;
+    _expandIconWidth = e.width;
+    _expandIconHeight = e.height;
+    _expandIconPadding = e.padding;
+    _expandIconMargin = e.margin;
+    _expandIconColor = e.color;
+    _expandIconExpandedColor = e.expandedColor;
+    final b = f.scrollbarTheme;
+    _thumbColor = b.thumbColor;
+    _trackColor = b.trackColor;
+    _thickness = b.thickness;
+    _thumbRadius = b.radius;
+    _thumbVisibility = b.thumbVisibility;
+    _hoverOpacity = b.hoverOpacity;
+    _nonHoverOpacity = b.nonHoverOpacity;
+    _hoverAnimationMs = b.hoverAnimationDuration.inMilliseconds;
+    _trackWidth = b.trackWidth;
+    _trackRadius = b.trackRadius;
+    _trackVisibility = b.trackVisibility;
+    _theme = null;
+    notifyListeners();
+  }
+
+  bool _matches(FlutterFolderViewTheme<String> f) {
+    final e = f.expandIconTheme;
+    final b = f.scrollbarTheme;
+    return _rowHeight == f.rowHeight &&
+        _rowSpacing == f.rowSpacing &&
+        _animationDuration == f.animationDuration &&
+        _contentPadding == f.spacingTheme.contentPadding &&
+        _borderRadius == f.nodeStyleTheme.borderRadius &&
+        _lineColor == f.lineTheme.lineColor &&
+        _lineWidth == f.lineTheme.lineWidth &&
+        _lineStyle == f.lineTheme.lineStyle &&
+        !_expandIconSample &&
+        _expandIconWidth == e.width &&
+        _expandIconHeight == e.height &&
+        _expandIconPadding == e.padding &&
+        _expandIconMargin == e.margin &&
+        _expandIconColor == e.color &&
+        _expandIconExpandedColor == e.expandedColor &&
+        _thumbColor == b.thumbColor &&
+        _trackColor == b.trackColor &&
+        _thickness == b.thickness &&
+        _thumbRadius == b.radius &&
+        _thumbVisibility == b.thumbVisibility &&
+        _hoverOpacity == b.hoverOpacity &&
+        _nonHoverOpacity == b.nonHoverOpacity &&
+        _hoverAnimationMs == b.hoverAnimationDuration.inMilliseconds &&
+        _trackWidth == b.trackWidth &&
+        _trackRadius == b.trackRadius &&
+        _trackVisibility == b.trackVisibility;
+  }
+
+  /// `FolderViewTheme.data`'s path, as the code a caller would write.
+  String get injectionCode => switch (_injection) {
+    ThemeInjection.parameter =>
+      'FolderView<String>(\n'
+          '  theme: theme,\n'
+          '  // data, mode, …\n'
+          ')',
+    ThemeInjection.ancestor =>
+      'FolderViewTheme<String>(\n'
+          '  data: theme,\n'
+          '  child: FolderView<String>(\n'
+          '    // data, mode, …\n'
+          '  ),\n'
+          ')',
+  };
+
   FlutterFolderViewTheme<String> _buildTheme() {
-    final light = FlutterFolderViewTheme<String>.light();
-    return light.copyWith(
+    final base = _base.theme;
+    return base.copyWith(
       expandIconTheme: ExpandIconTheme(
         widget: _expandIconSample
             ? sampleExpandIcon
-            : light.expandIconTheme.widget,
+            : base.expandIconTheme.widget,
         width: _expandIconWidth,
         height: _expandIconHeight,
         padding: _expandIconPadding,
@@ -330,7 +430,10 @@ class EverySettingDemo extends ChangeNotifier {
   String get expandIconThemeCode {
     final widget = _expandIconSample
         ? 'Icon(Icons.arrow_right, size: 20)'
-        : 'Icon(Icons.chevron_right, color: Colors.grey.shade700, size: 20)';
+        : 'Icon(Icons.chevron_right, color: Colors.grey.${switch (_base) {
+            ThemePreset.light => 'shade700',
+            ThemePreset.dark => 'shade400',
+          }}, size: 20)';
     return 'expandIconTheme: ${_expandIconSample ? 'const ' : ''}'
         'ExpandIconTheme(\n'
         '  widget: $widget,\n'
@@ -562,6 +665,20 @@ enum WheelMotionKind { off, spring, curve, lerp }
 /// blocks exactly when `onScaleChanged` is non-null.
 enum ModifierScrollBlock { follow, on, off }
 
+/// The `FlutterFolderViewTheme` factories offered as presets.
+enum ThemePreset {
+  light,
+  dark;
+
+  FlutterFolderViewTheme<String> get theme => switch (this) {
+    ThemePreset.light => FlutterFolderViewTheme<String>.light(),
+    ThemePreset.dark => FlutterFolderViewTheme<String>.dark(),
+  };
+}
+
+/// How the stage hands the view its theme.
+enum ThemeInjection { parameter, ancestor }
+
 /// The curves the panel offers a `WheelMotion.curve`.
 enum WheelCurveOption {
   easeOutCubic(Curves.easeOutCubic),
@@ -585,7 +702,18 @@ class EverySettingStage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: demo,
-      builder: (context, _) => FolderView<String>(
+      builder: (context, _) => switch (demo.injection) {
+        ThemeInjection.parameter => _view(demo.theme),
+        ThemeInjection.ancestor => FolderViewTheme<String>(
+          data: demo.theme,
+          child: _view(null),
+        ),
+      },
+    );
+  }
+
+  FolderView<String> _view(FlutterFolderViewTheme<String>? theme) =>
+      FolderView<String>(
         data: demo.nodes,
         mode: demo.mode,
         expandedNodeIds: demo.expandedIds,
@@ -600,10 +728,8 @@ class EverySettingStage extends StatelessWidget {
         onScaleChanged: demo.scaleHandlerOn ? demo.handleScaleChanged : null,
         scaleStep: demo.scaleStep,
         blockModifierScroll: demo.blockModifierScroll,
-        theme: demo.theme,
-      ),
-    );
-  }
+        theme: theme,
+      );
 }
 
 /// The "Every setting" knob region: the feature list, and the open feature's
@@ -632,6 +758,7 @@ class _EverySettingKnobsState extends State<EverySettingKnobs> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            PresetBar(host: _host),
             Expanded(
               child: FeatureListPane(
                 host: _host,
