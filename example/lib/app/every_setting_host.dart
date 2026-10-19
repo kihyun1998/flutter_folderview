@@ -457,6 +457,128 @@ class EverySettingHost extends SettingsHost {
       EverySettingDemo.folderHighlightColors,
       (c) => demo.folderHighlightColor = c,
     ),
+    'FlutterFolderViewTheme.parentTheme' => _codeControl(
+      settingId,
+      'parentTheme',
+      demo.parentThemeCode,
+    ),
+    'ParentNodeTheme.widget' => buildSwitchTile(
+      id: settingId,
+      label: 'Sample widget (outlined tree)',
+      value: demo.parentWidgetSample,
+      onChanged: (on) => demo.parentWidgetSample = on,
+      indent: true,
+    ),
+    'ParentNodeTheme.openWidget' => buildDropdownRow<ParentOpenWidget>(
+      id: settingId,
+      label: 'Open widget',
+      value: demo.parentOpenWidget,
+      items: ParentOpenWidget.values,
+      itemLabel: (o) => switch (o) {
+        ParentOpenWidget.factory => 'Factory (none)',
+        ParentOpenWidget.sample => 'Sample',
+      },
+      onChanged: (o) => demo.parentOpenWidget = o,
+      indent: true,
+    ),
+    'ParentNodeTheme.widgetResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'widgetResolver sample',
+      value: demo.parentWidgetResolver,
+      onChanged: (on) => demo.parentWidgetResolver = on,
+      indent: true,
+    ),
+    'ParentNodeTheme.openWidgetResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'openWidgetResolver sample',
+      value: demo.parentOpenWidgetResolver,
+      onChanged: (on) => demo.parentOpenWidgetResolver = on,
+      indent: true,
+    ),
+    'ParentNodeTheme.width' => _pxSlider(
+      settingId,
+      'Width',
+      demo.parentWidth,
+      8,
+      40,
+      (v) => demo.parentWidth = v,
+    ),
+    'ParentNodeTheme.height' => _pxSlider(
+      settingId,
+      'Height',
+      demo.parentHeight,
+      8,
+      40,
+      (v) => demo.parentHeight = v,
+    ),
+    'ParentNodeTheme.padding' => _edgeControl(
+      settingId,
+      'Padding',
+      demo.parentPadding,
+      (p) => demo.parentPadding = p,
+    ),
+    'ParentNodeTheme.margin' => _edgeControl(
+      settingId,
+      'Margin',
+      demo.parentMargin,
+      (p) => demo.parentMargin = p,
+    ),
+    'ParentNodeTheme.textStyle' => _colorControl(
+      settingId,
+      'Text color',
+      demo.parentTextColor,
+      EverySettingDemo.parentTextColors,
+      (c) => demo.parentTextColor = c,
+    ),
+    'parentFontSize' => buildDropdownRow<double?>(
+      id: settingId,
+      label: 'Font size',
+      value: demo.parentFontSize,
+      items: EverySettingDemo.parentFontSizes,
+      itemLabel: (s) => s == null ? 'default' : '${s.round()}',
+      onChanged: (s) => demo.parentFontSize = s,
+      indent: true,
+    ),
+    'parentBold' => buildSwitchTile(
+      id: settingId,
+      label: 'Bold',
+      value: demo.parentBold,
+      onChanged: (on) => demo.parentBold = on,
+      indent: true,
+    ),
+    'ParentNodeTheme.textStyleResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'textStyleResolver sample',
+      value: demo.parentTextStyleResolver,
+      onChanged: (on) => demo.parentTextStyleResolver = on,
+    ),
+    'ParentNodeTheme.labelResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'labelResolver sample',
+      value: demo.parentLabelResolver,
+      onChanged: (on) => demo.parentLabelResolver = on,
+    ),
+    'ParentNodeTheme.hoverColor' => _colorControl(
+      settingId,
+      'Hover',
+      demo.parentHoverColor,
+      EverySettingDemo.parentHoverColors,
+      (c) => demo.parentHoverColor = c,
+    ),
+    'ParentNodeTheme.splashColor' => _colorControl(
+      settingId,
+      'Splash',
+      demo.parentSplashColor,
+      EverySettingDemo.parentSplashColors,
+      (c) => demo.parentSplashColor = c,
+    ),
+    'ParentNodeTheme.highlightColor' => _colorControl(
+      settingId,
+      'Highlight',
+      demo.parentHighlightColor,
+      EverySettingDemo.parentHighlightColors,
+      (c) => demo.parentHighlightColor = c,
+    ),
     'FlutterFolderViewTheme.scrollbarTheme' => _codeControl(
       settingId,
       'scrollbarTheme',
@@ -758,6 +880,8 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'themeInjection') return _themeInjectionExtras();
     if (featureId == 'folderIcons') return _folderIconsExtras();
     if (featureId == 'folderLabel') return _folderLabelExtras();
+    if (featureId == 'parentIcons') return _parentIconsExtras();
+    if (featureId == 'parentLabel') return _parentLabelExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -818,6 +942,35 @@ class EverySettingHost extends SettingsHost {
       'ADR-0004). The preview frames shrink the whole stage; choose the Room '
       'to see a Scale at real pixels.',
       key: Key('scale-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Parent icon controls do not show on their own.
+  List<Widget> _parentIconsExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'A Parent shows openWidget only in Tree Mode: in Folder Mode an expanded '
+      'Parent keeps its widget. Both factories leave openWidget unset, so '
+      'Factory means none, and the widget stays. A resolver wins over the '
+      'static widget for the Nodes it returns non-null for: the samples swap '
+      'the icon of a Parent that holds two Children. Width plus horizontal '
+      'padding and margin is the icon box, which the content width is '
+      'measured with.',
+      key: Key('parent-icons-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Parent label controls do not show on their own.
+  List<Widget> _parentLabelExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'textStyleResolver replaces textStyle for the Nodes it returns a style '
+      'for; it does not merge with it. The sample restyles a Parent that '
+      'holds two Children. labelResolver changes the text drawn and measured: '
+      'the sample adds the Child count.',
+      key: Key('parent-label-note'),
       style: TextStyle(fontSize: 12),
     ),
   ];

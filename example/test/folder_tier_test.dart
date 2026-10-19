@@ -288,6 +288,9 @@ void main() {
       await _toggle(tester, 'FolderNodeTheme.textStyleResolver');
       final f3 = _label(tester, _f3);
       expect(f3.text.style!.fontWeight, FontWeight.bold);
+      // The test font is as wide bold as regular, so the sample's larger
+      // size is what a short measurement would miss.
+      expect(f3.text.style!.fontSize, 16);
       _expectFitsInWindow(tester, f3);
     });
 

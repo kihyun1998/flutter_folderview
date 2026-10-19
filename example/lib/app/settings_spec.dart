@@ -41,6 +41,7 @@ const settingsSpec = <SettingGroup>[
   ),
   _interaction,
   _folderTier,
+  _parentTier,
   SettingGroup(
     id: 'layout',
     title: 'Layout',
@@ -321,8 +322,9 @@ const _folderTier = SettingGroup(
         Interaction(
           otherFeatureId: 'scale',
           effect:
-              'The Scale multiplies the font size; an unset size starts from '
-              'the ambient bodyMedium.',
+              'The Scale multiplies the textStyle font size; an unset size '
+              'starts from the ambient bodyMedium. A style returned by '
+              'textStyleResolver is not scaled.',
           evidence:
               'lib/themes/folder_node_theme.dart: FolderNodeTheme.scale; '
               'lib/themes/_scale_text_style.dart: scaleTextStyle',
@@ -336,6 +338,94 @@ const _folderTier = SettingGroup(
         'FolderNodeTheme.hoverColor',
         'FolderNodeTheme.splashColor',
         'FolderNodeTheme.highlightColor',
+      ],
+    ),
+  ],
+);
+
+const _parentTier = SettingGroup(
+  id: 'parentTier',
+  title: 'Parent tier',
+  features: [
+    SettingFeature(
+      id: 'parentIcons',
+      title: 'Parent icons',
+      options: [
+        'FlutterFolderViewTheme.parentTheme',
+        'ParentNodeTheme.widget',
+        'ParentNodeTheme.openWidget',
+        'ParentNodeTheme.widgetResolver',
+        'ParentNodeTheme.openWidgetResolver',
+        'ParentNodeTheme.width',
+        'ParentNodeTheme.height',
+        'ParentNodeTheme.padding',
+        'ParentNodeTheme.margin',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'viewMode',
+          effect:
+              'An expanded Parent shows openWidget only in Tree Mode; in Folder '
+              'Mode it keeps its widget.',
+          evidence:
+              'lib/widgets/node_widget.dart: NodeWidget._content passes '
+              'useOpenState: mode == ViewMode.tree for a Parent; '
+              'lib/widgets/expandable_node_renderer.dart: the open icon is '
+              'used only when useOpenState && isExpanded',
+        ),
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'The Scale multiplies width, height, padding and margin. At a '
+              'Scale other than 1 the icon is fitted into the scaled box.',
+          evidence:
+              'lib/themes/parent_node_theme.dart: ParentNodeTheme.scale; '
+              'lib/widgets/node_render_parts.dart: NodeIconBox',
+        ),
+      ],
+    ),
+    SettingFeature(
+      id: 'parentLabel',
+      title: 'Parent label',
+      options: [
+        'ParentNodeTheme.textStyle',
+        'parentFontSize',
+        'parentBold',
+        'ParentNodeTheme.textStyleResolver',
+        'ParentNodeTheme.labelResolver',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'scrollbars',
+          effect:
+              'The resolved label and its resolved style are what the content '
+              'width is measured with, so a longer or bolder label widens the '
+              'content and can bring in the horizontal scrollbar, up to three '
+              'times the view width.',
+          evidence:
+              'lib/services/row_metrics.dart: RowMetrics.label and '
+              'RowMetrics.effectiveTextStyle feed _rowWidth; '
+              'lib/services/size_service.dart: SizeService.clampContentWidth',
+        ),
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'The Scale multiplies the textStyle font size; an unset size '
+              'starts from the ambient bodyMedium. A style returned by '
+              'textStyleResolver is not scaled.',
+          evidence:
+              'lib/themes/parent_node_theme.dart: ParentNodeTheme.scale; '
+              'lib/themes/_scale_text_style.dart: scaleTextStyle',
+        ),
+      ],
+    ),
+    SettingFeature(
+      id: 'parentInk',
+      title: 'Parent ink',
+      options: [
+        'ParentNodeTheme.hoverColor',
+        'ParentNodeTheme.splashColor',
+        'ParentNodeTheme.highlightColor',
       ],
     ),
   ],
