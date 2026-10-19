@@ -40,6 +40,7 @@ const settingsSpec = <SettingGroup>[
     ],
   ),
   _interaction,
+  _folderTier,
   SettingGroup(
     id: 'layout',
     title: 'Layout',
@@ -250,6 +251,91 @@ const _interaction = SettingGroup(
               'after each notch since 0.12.0, and "blockModifierScroll:false '
               'overrides a non-null onScaleChanged"',
         ),
+      ],
+    ),
+  ],
+);
+
+const _folderTier = SettingGroup(
+  id: 'folderTier',
+  title: 'Folder tier',
+  features: [
+    SettingFeature(
+      id: 'folderIcons',
+      title: 'Folder icons',
+      options: [
+        'FlutterFolderViewTheme.folderTheme',
+        'FolderNodeTheme.widget',
+        'FolderNodeTheme.openWidget',
+        'FolderNodeTheme.widgetResolver',
+        'FolderNodeTheme.openWidgetResolver',
+        'FolderNodeTheme.width',
+        'FolderNodeTheme.height',
+        'FolderNodeTheme.padding',
+        'FolderNodeTheme.margin',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'viewMode',
+          effect:
+              'Tree Mode hides every Folder, so no Folder setting shows there.',
+          evidence:
+              'lib/services/view_mode_projection.dart: '
+              'ViewModeProjection._collectParents lifts the Parents and drops '
+              'the Folders',
+        ),
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'The Scale multiplies width, height, padding and margin. At a '
+              'Scale other than 1 the icon is fitted into the scaled box.',
+          evidence:
+              'lib/themes/folder_node_theme.dart: FolderNodeTheme.scale; '
+              'lib/widgets/node_render_parts.dart: NodeIconBox',
+        ),
+      ],
+    ),
+    SettingFeature(
+      id: 'folderLabel',
+      title: 'Folder label',
+      options: [
+        'FolderNodeTheme.textStyle',
+        'folderFontSize',
+        'folderBold',
+        'FolderNodeTheme.textStyleResolver',
+        'FolderNodeTheme.labelResolver',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'scrollbars',
+          effect:
+              'The resolved label and its resolved style are what the content '
+              'width is measured with, so a longer or bolder label widens the '
+              'content and can bring in the horizontal scrollbar, up to three '
+              'times the view width.',
+          evidence:
+              'lib/services/row_metrics.dart: RowMetrics.label and '
+              'RowMetrics.effectiveTextStyle feed _rowWidth; '
+              'lib/services/size_service.dart: SizeService.clampContentWidth',
+        ),
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'The Scale multiplies the font size; an unset size starts from '
+              'the ambient bodyMedium.',
+          evidence:
+              'lib/themes/folder_node_theme.dart: FolderNodeTheme.scale; '
+              'lib/themes/_scale_text_style.dart: scaleTextStyle',
+        ),
+      ],
+    ),
+    SettingFeature(
+      id: 'folderInk',
+      title: 'Folder ink',
+      options: [
+        'FolderNodeTheme.hoverColor',
+        'FolderNodeTheme.splashColor',
+        'FolderNodeTheme.highlightColor',
       ],
     ),
   ],

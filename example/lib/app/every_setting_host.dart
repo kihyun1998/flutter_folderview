@@ -334,6 +334,129 @@ class EverySettingHost extends SettingsHost {
       'FolderViewTheme.data',
       demo.injectionCode,
     ),
+    'FlutterFolderViewTheme.folderTheme' => _codeControl(
+      settingId,
+      'folderTheme',
+      demo.folderThemeCode,
+    ),
+    'FolderNodeTheme.widget' => buildSwitchTile(
+      id: settingId,
+      label: 'Sample widget (outlined folder)',
+      value: demo.folderWidgetSample,
+      onChanged: (on) => demo.folderWidgetSample = on,
+      indent: true,
+    ),
+    'FolderNodeTheme.openWidget' => buildDropdownRow<FolderOpenWidget>(
+      id: settingId,
+      label: 'Open widget',
+      value: demo.folderOpenWidget,
+      items: FolderOpenWidget.values,
+      itemLabel: (o) => switch (o) {
+        FolderOpenWidget.factory => 'Factory',
+        FolderOpenWidget.sample => 'Sample',
+        FolderOpenWidget.none => 'None',
+      },
+      onChanged: (o) => demo.folderOpenWidget = o,
+      indent: true,
+    ),
+    'FolderNodeTheme.widgetResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'widgetResolver sample',
+      value: demo.folderWidgetResolver,
+      onChanged: (on) => demo.folderWidgetResolver = on,
+      indent: true,
+    ),
+    'FolderNodeTheme.openWidgetResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'openWidgetResolver sample',
+      value: demo.folderOpenWidgetResolver,
+      onChanged: (on) => demo.folderOpenWidgetResolver = on,
+      indent: true,
+    ),
+    'FolderNodeTheme.width' => _pxSlider(
+      settingId,
+      'Width',
+      demo.folderWidth,
+      8,
+      40,
+      (v) => demo.folderWidth = v,
+    ),
+    'FolderNodeTheme.height' => _pxSlider(
+      settingId,
+      'Height',
+      demo.folderHeight,
+      8,
+      40,
+      (v) => demo.folderHeight = v,
+    ),
+    'FolderNodeTheme.padding' => _edgeControl(
+      settingId,
+      'Padding',
+      demo.folderPadding,
+      (p) => demo.folderPadding = p,
+    ),
+    'FolderNodeTheme.margin' => _edgeControl(
+      settingId,
+      'Margin',
+      demo.folderMargin,
+      (p) => demo.folderMargin = p,
+    ),
+    'FolderNodeTheme.textStyle' => _colorControl(
+      settingId,
+      'Text color',
+      demo.folderTextColor,
+      EverySettingDemo.folderTextColors,
+      (c) => demo.folderTextColor = c,
+    ),
+    'folderFontSize' => buildDropdownRow<double?>(
+      id: settingId,
+      label: 'Font size',
+      value: demo.folderFontSize,
+      items: EverySettingDemo.folderFontSizes,
+      itemLabel: (s) => s == null ? 'default' : '${s.round()}',
+      onChanged: (s) => demo.folderFontSize = s,
+      indent: true,
+    ),
+    'folderBold' => buildSwitchTile(
+      id: settingId,
+      label: 'Bold',
+      value: demo.folderBold,
+      onChanged: (on) => demo.folderBold = on,
+      indent: true,
+    ),
+    'FolderNodeTheme.textStyleResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'textStyleResolver sample',
+      value: demo.folderTextStyleResolver,
+      onChanged: (on) => demo.folderTextStyleResolver = on,
+    ),
+    'FolderNodeTheme.labelResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'labelResolver sample',
+      value: demo.folderLabelResolver,
+      onChanged: (on) => demo.folderLabelResolver = on,
+    ),
+    'FolderNodeTheme.hoverColor' => _colorControl(
+      settingId,
+      'Hover',
+      demo.folderHoverColor,
+      EverySettingDemo.folderHoverColors,
+      (c) => demo.folderHoverColor = c,
+    ),
+    'FolderNodeTheme.splashColor' => _colorControl(
+      settingId,
+      'Splash',
+      demo.folderSplashColor,
+      EverySettingDemo.folderSplashColors,
+      (c) => demo.folderSplashColor = c,
+    ),
+    'FolderNodeTheme.highlightColor' => _colorControl(
+      settingId,
+      'Highlight',
+      demo.folderHighlightColor,
+      EverySettingDemo.folderHighlightColors,
+      (c) => demo.folderHighlightColor = c,
+    ),
     'FlutterFolderViewTheme.scrollbarTheme' => _codeControl(
       settingId,
       'scrollbarTheme',
@@ -633,6 +756,8 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'expandIcon') return _expandIconExtras();
     if (featureId == 'scrollbars') return _scrollbarExtras();
     if (featureId == 'themeInjection') return _themeInjectionExtras();
+    if (featureId == 'folderIcons') return _folderIconsExtras();
+    if (featureId == 'folderLabel') return _folderLabelExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -693,6 +818,35 @@ class EverySettingHost extends SettingsHost {
       'ADR-0004). The preview frames shrink the whole stage; choose the Room '
       'to see a Scale at real pixels.',
       key: Key('scale-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Folder icon controls do not show on their own.
+  List<Widget> _folderIconsExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'An expanded Folder shows openWidget; with openWidget None it falls back '
+      'to widget. A resolver wins over the static widget for the Nodes it '
+      'returns non-null for: the samples swap the icon of a Folder that holds '
+      'a single Parent. Width plus horizontal padding and margin is the icon '
+      'box, which the content width is measured with. Folders are hidden in '
+      'Tree Mode, so nothing here shows there.',
+      key: Key('folder-icons-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Folder label controls do not show on their own.
+  List<Widget> _folderLabelExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'textStyleResolver replaces textStyle for the Nodes it returns a style '
+      'for; it does not merge with it. The sample restyles a Folder that holds '
+      'a single Parent. labelResolver changes the text drawn and measured, so '
+      'a longer label widens the content instead of being cut: the sample '
+      'adds the Parent count.',
+      key: Key('folder-label-note'),
       style: TextStyle(fontSize: 12),
     ),
   ];

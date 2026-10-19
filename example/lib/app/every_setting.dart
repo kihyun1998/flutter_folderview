@@ -266,6 +266,120 @@ class EverySettingDemo extends ChangeNotifier {
   bool _trackVisibility = false;
   bool get trackVisibility => _trackVisibility;
 
+  /// The samples the Folder icon controls install. They have no colour of
+  /// their own, so the ambient icon colour reaches them.
+  static const sampleFolderIcon = Icon(Icons.folder_outlined, size: 20);
+  static const sampleFolderOpenIcon = Icon(
+    Icons.folder_open_outlined,
+    size: 20,
+  );
+
+  /// What the Folder resolver samples return for a Folder that holds a single
+  /// Parent; every other Folder gets `null`, so the static field applies.
+  static const sampleSingleParentIcon = Icon(Icons.folder_special, size: 20);
+  static const sampleSingleParentOpenIcon = Icon(
+    Icons.snippet_folder,
+    size: 20,
+  );
+  static const sampleFolderStyle = TextStyle(
+    color: Color(0xFF00897B),
+    fontWeight: FontWeight.bold,
+  );
+
+  /// The colours the Folder label and ink controls offer; the first two are
+  /// `light()`'s and `dark()`'s.
+  static const folderTextColors = <Color?>[
+    Color(0xDD000000),
+    Color(0xB3FFFFFF),
+    Color(0xFFD32F2F),
+    Color(0xFF1976D2),
+  ];
+  static const folderHoverColors = <Color?>[
+    Color(0xFFEEEEEE),
+    Color(0xFF424242),
+    Color(0xFFFFECB3),
+    null,
+  ];
+  static final folderSplashColors = <Color?>[
+    Colors.blue.withValues(alpha: 0.3),
+    Colors.red.withValues(alpha: 0.3),
+    Colors.green.withValues(alpha: 0.3),
+    null,
+  ];
+  static final folderHighlightColors = <Color?>[
+    Colors.blue.withValues(alpha: 0.1),
+    Colors.red.withValues(alpha: 0.1),
+    Colors.green.withValues(alpha: 0.1),
+    null,
+  ];
+
+  /// The font sizes the Folder label offers; `null` is the ambient size.
+  static const folderFontSizes = <double?>[null, 12, 14, 16, 18, 20];
+
+  static Widget? _singleParentIcon(Node<String> node) =>
+      node.children.length == 1 ? sampleSingleParentIcon : null;
+  static Widget? _singleParentOpenIcon(Node<String> node) =>
+      node.children.length == 1 ? sampleSingleParentOpenIcon : null;
+  static TextStyle? _singleParentStyle(Node<String> node) =>
+      node.children.length == 1 ? sampleFolderStyle : null;
+  static String? _parentCountLabel(Node<String> node) =>
+      '${node.label} (${node.children.length})';
+
+  // The defaults are `FlutterFolderViewTheme.light().folderTheme`'s.
+  bool _folderWidgetSample = false;
+  bool get folderWidgetSample => _folderWidgetSample;
+
+  FolderOpenWidget _folderOpenWidget = FolderOpenWidget.factory;
+  FolderOpenWidget get folderOpenWidget => _folderOpenWidget;
+
+  bool _folderWidgetResolver = false;
+  bool get folderWidgetResolver => _folderWidgetResolver;
+
+  bool _folderOpenWidgetResolver = false;
+  bool get folderOpenWidgetResolver => _folderOpenWidgetResolver;
+
+  double _folderWidth = 20;
+  double get folderWidth => _folderWidth;
+
+  double _folderHeight = 20;
+  double get folderHeight => _folderHeight;
+
+  EdgeInsets _folderPadding = EdgeInsets.zero;
+  EdgeInsets get folderPadding => _folderPadding;
+
+  EdgeInsets _folderMargin = EdgeInsets.zero;
+  EdgeInsets get folderMargin => _folderMargin;
+
+  Color? _folderTextColor = folderTextColors.first;
+  Color? get folderTextColor => _folderTextColor;
+
+  double? _folderFontSize;
+  double? get folderFontSize => _folderFontSize;
+
+  bool _folderBold = false;
+  bool get folderBold => _folderBold;
+
+  bool _folderTextStyleResolver = false;
+  bool get folderTextStyleResolver => _folderTextStyleResolver;
+
+  bool _folderLabelResolver = false;
+  bool get folderLabelResolver => _folderLabelResolver;
+
+  Color? _folderHoverColor = folderHoverColors.first;
+  Color? get folderHoverColor => _folderHoverColor;
+
+  Color? _folderSplashColor = folderSplashColors.first;
+  Color? get folderSplashColor => _folderSplashColor;
+
+  Color? _folderHighlightColor = folderHighlightColors.first;
+  Color? get folderHighlightColor => _folderHighlightColor;
+
+  TextStyle get _folderTextStyle => TextStyle(
+    color: _folderTextColor,
+    fontSize: _folderFontSize,
+    fontWeight: _folderBold ? FontWeight.bold : null,
+  );
+
   FlutterFolderViewTheme<String>? _theme;
 
   /// The `FolderView.theme` the settings describe: one instance until a theme
@@ -317,6 +431,23 @@ class EverySettingDemo extends ChangeNotifier {
     _trackWidth = b.trackWidth;
     _trackRadius = b.trackRadius;
     _trackVisibility = b.trackVisibility;
+    final d = f.folderTheme;
+    _folderWidgetSample = false;
+    _folderOpenWidget = FolderOpenWidget.factory;
+    _folderWidgetResolver = false;
+    _folderOpenWidgetResolver = false;
+    _folderWidth = d.width;
+    _folderHeight = d.height;
+    _folderPadding = d.padding;
+    _folderMargin = d.margin;
+    _folderTextColor = d.textStyle?.color;
+    _folderFontSize = d.textStyle?.fontSize;
+    _folderBold = d.textStyle?.fontWeight == FontWeight.bold;
+    _folderTextStyleResolver = false;
+    _folderLabelResolver = false;
+    _folderHoverColor = d.hoverColor;
+    _folderSplashColor = d.splashColor;
+    _folderHighlightColor = d.highlightColor;
     _theme = null;
     notifyListeners();
   }
@@ -349,8 +480,27 @@ class EverySettingDemo extends ChangeNotifier {
         _hoverAnimationMs == b.hoverAnimationDuration.inMilliseconds &&
         _trackWidth == b.trackWidth &&
         _trackRadius == b.trackRadius &&
-        _trackVisibility == b.trackVisibility;
+        _trackVisibility == b.trackVisibility &&
+        _folderMatches(f.folderTheme);
   }
+
+  bool _folderMatches(FolderNodeTheme<String> d) =>
+      !_folderWidgetSample &&
+      _folderOpenWidget == FolderOpenWidget.factory &&
+      !_folderWidgetResolver &&
+      !_folderOpenWidgetResolver &&
+      _folderWidth == d.width &&
+      _folderHeight == d.height &&
+      _folderPadding == d.padding &&
+      _folderMargin == d.margin &&
+      _folderTextColor == d.textStyle?.color &&
+      _folderFontSize == d.textStyle?.fontSize &&
+      _folderBold == (d.textStyle?.fontWeight == FontWeight.bold) &&
+      !_folderTextStyleResolver &&
+      !_folderLabelResolver &&
+      _folderHoverColor == d.hoverColor &&
+      _folderSplashColor == d.splashColor &&
+      _folderHighlightColor == d.highlightColor;
 
   /// `FolderViewTheme.data`'s path, as the code a caller would write.
   String get injectionCode => switch (_injection) {
@@ -381,6 +531,31 @@ class EverySettingDemo extends ChangeNotifier {
         margin: _expandIconMargin,
         color: _expandIconColor,
         expandedColor: _expandIconExpandedColor,
+      ),
+      folderTheme: FolderNodeTheme<String>(
+        widget: _folderWidgetSample
+            ? sampleFolderIcon
+            : base.folderTheme.widget,
+        widgetResolver: _folderWidgetResolver ? _singleParentIcon : null,
+        openWidget: switch (_folderOpenWidget) {
+          FolderOpenWidget.factory => base.folderTheme.openWidget,
+          FolderOpenWidget.sample => sampleFolderOpenIcon,
+          FolderOpenWidget.none => null,
+        },
+        openWidgetResolver: _folderOpenWidgetResolver
+            ? _singleParentOpenIcon
+            : null,
+        width: _folderWidth,
+        height: _folderHeight,
+        padding: _folderPadding,
+        margin: _folderMargin,
+        textStyle: _folderTextStyle,
+        textStyleResolver: _folderTextStyleResolver ? _singleParentStyle : null,
+        labelResolver: _folderLabelResolver ? _parentCountLabel : null,
+        hoverColor: _folderHoverColor,
+        splashColor: _folderSplashColor,
+        highlightColor: _folderHighlightColor,
+        tooltipTheme: base.folderTheme.tooltipTheme,
       ),
       rowHeight: _rowHeight,
       rowSpacing: _rowSpacing,
@@ -425,6 +600,41 @@ class EverySettingDemo extends ChangeNotifier {
       '  trackVisibility: $_trackVisibility,\n'
       '),';
 
+  /// `FlutterFolderViewTheme.folderTheme` as the argument a caller would
+  /// write. The tooltip theme is left out: its knobs belong to the tooltip
+  /// features.
+  String get folderThemeCode {
+    final grey = switch (_base) {
+      ThemePreset.light => 'shade700',
+      ThemePreset.dark => 'shade400',
+    };
+    final style = [
+      if (_folderTextColor != null) 'color: ${_colorCode(_folderTextColor!)}',
+      if (_folderFontSize != null) 'fontSize: ${_num(_folderFontSize!)}',
+      if (_folderBold) 'fontWeight: FontWeight.bold',
+    ].join(', ');
+    return 'folderTheme: FolderNodeTheme<String>(\n'
+        '  widget: ${_folderWidgetSample ? 'const Icon(Icons.folder_outlined, size: 20)' : 'Icon(Icons.folder, color: Colors.grey.$grey, size: 20)'},\n'
+        '${_folderWidgetResolver ? '  widgetResolver: (node) => node.children.length == 1\n      ? const Icon(Icons.folder_special, size: 20)\n      : null,\n' : ''}'
+        '${switch (_folderOpenWidget) {
+          FolderOpenWidget.factory => '  openWidget: Icon(Icons.folder_open, color: Colors.grey.$grey, size: 20),\n',
+          FolderOpenWidget.sample => '  openWidget: const Icon(Icons.folder_open_outlined, size: 20),\n',
+          FolderOpenWidget.none => '',
+        }}'
+        '${_folderOpenWidgetResolver ? '  openWidgetResolver: (node) => node.children.length == 1\n      ? const Icon(Icons.snippet_folder, size: 20)\n      : null,\n' : ''}'
+        '  width: ${_num(_folderWidth)},\n'
+        '  height: ${_num(_folderHeight)},\n'
+        '  padding: ${_edgeCode(_folderPadding)},\n'
+        '  margin: ${_edgeCode(_folderMargin)},\n'
+        '  textStyle: TextStyle($style),\n'
+        '${_folderTextStyleResolver ? '  textStyleResolver: (node) => node.children.length == 1\n      ? const TextStyle(color: Color(0xFF00897B), fontWeight: FontWeight.bold)\n      : null,\n' : ''}'
+        '${_folderLabelResolver ? "  labelResolver: (node) => '\${node.label} (\${node.children.length})',\n" : ''}'
+        '${_colorLine('hoverColor', _folderHoverColor)}'
+        '${_inkLine('splashColor', _folderSplashColor, folderSplashColors, 0.3)}'
+        '${_inkLine('highlightColor', _folderHighlightColor, folderHighlightColors, 0.1)}'
+        '),';
+  }
+
   /// `FlutterFolderViewTheme.expandIconTheme` as the argument a caller would
   /// write.
   String get expandIconThemeCode {
@@ -452,6 +662,20 @@ class EverySettingDemo extends ChangeNotifier {
 
   static String _colorCode(Color c) =>
       'Color(0x${c.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()})';
+
+  /// An ink colour line: a swatch built with `withValues` is written the same
+  /// way, since its hex form has a different alpha.
+  static String _inkLine(
+    String name,
+    Color? c,
+    List<Color?> swatches,
+    double alpha,
+  ) {
+    const bases = ['Colors.blue', 'Colors.red', 'Colors.green'];
+    final i = swatches.indexOf(c);
+    if (c == null || i < 0 || i >= bases.length) return _colorLine(name, c);
+    return '  $name: ${bases[i]}.withValues(alpha: $alpha),\n';
+  }
 
   static String _colorLine(String name, Color? c) =>
       c == null ? '' : '  $name: ${_colorCode(c)},\n';
@@ -547,6 +771,33 @@ class EverySettingDemo extends ChangeNotifier {
   set trackWidth(double value) => _setTheme(() => _trackWidth = value);
   set trackRadius(double value) => _setTheme(() => _trackRadius = value);
   set trackVisibility(bool value) => _setTheme(() => _trackVisibility = value);
+  set folderWidgetSample(bool value) =>
+      _setTheme(() => _folderWidgetSample = value);
+  set folderOpenWidget(FolderOpenWidget value) =>
+      _setTheme(() => _folderOpenWidget = value);
+  set folderWidgetResolver(bool value) =>
+      _setTheme(() => _folderWidgetResolver = value);
+  set folderOpenWidgetResolver(bool value) =>
+      _setTheme(() => _folderOpenWidgetResolver = value);
+  set folderWidth(double value) => _setTheme(() => _folderWidth = value);
+  set folderHeight(double value) => _setTheme(() => _folderHeight = value);
+  set folderPadding(EdgeInsets value) =>
+      _setTheme(() => _folderPadding = value);
+  set folderMargin(EdgeInsets value) => _setTheme(() => _folderMargin = value);
+  set folderTextColor(Color? value) =>
+      _setTheme(() => _folderTextColor = value);
+  set folderFontSize(double? value) => _setTheme(() => _folderFontSize = value);
+  set folderBold(bool value) => _setTheme(() => _folderBold = value);
+  set folderTextStyleResolver(bool value) =>
+      _setTheme(() => _folderTextStyleResolver = value);
+  set folderLabelResolver(bool value) =>
+      _setTheme(() => _folderLabelResolver = value);
+  set folderHoverColor(Color? value) =>
+      _setTheme(() => _folderHoverColor = value);
+  set folderSplashColor(Color? value) =>
+      _setTheme(() => _folderSplashColor = value);
+  set folderHighlightColor(Color? value) =>
+      _setTheme(() => _folderHighlightColor = value);
 
   /// `onScaleChanged`: applies the proposed Scale, clamped to [minScale] ..
   /// [maxScale].
@@ -678,6 +929,10 @@ enum ThemePreset {
 
 /// How the stage hands the view its theme.
 enum ThemeInjection { parameter, ancestor }
+
+/// The Folder `openWidget`: the factory's, the sample, or none, which falls
+/// back to `widget`.
+enum FolderOpenWidget { factory, sample, none }
 
 /// The curves the panel offers a `WheelMotion.curve`.
 enum WheelCurveOption {

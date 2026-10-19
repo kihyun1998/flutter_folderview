@@ -64,6 +64,15 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - Each knob is checked against the strokes drawn: a `connector` draws a horizontal stub, `scope` draws verticals only, and `none` draws no line at all. The same holds in Tree Mode, where the lifted Parents are roots and draw no connector, so only Children do.
   - `lineColor` is a row of swatches: the template has no colour control, so the swatches follow the legacy panel's `colorRow`. The first swatch is `light()`'s grey.
   - **Compare a painted colour by `toARGB32()`, not `==`.** `Paint` stores its colour as Float32, so `paint.color == Color(0xFF9E9E9E)` is false even though both print the same channels. Measured at #80.
+- **"Folder tier" (#82) is its own group, mirrored later by Parent and Child** (ADR-0005; #74). It has three features: Folder icons, Folder label and Folder ink. Its state is `_folder*` fields on `EverySettingDemo`, and no tier abstraction is shared with #83 or #84.
+  - **The resolver samples act on a Folder that holds a single Parent.** In the demo data that is Folder 3, the long-label one. The samples swap its icons and restyle its label. The label resolver appends every Folder's Parent count. The rule was first confirmed as "more than 2 Parents", but the demo Folders hold 2, 2 and 1, so it would have shown nothing. The single-Parent rule is that correction, derived from the data and then accepted by the maintainer.
+  - `textStyle` is three controls (colour, font size, bold), because the field is a whole `TextStyle`. A preset resets them to the factory style's colour and size, and to whether it is bold.
+  - The splash and highlight swatches are built with `Colors.blue.withValues(alpha: …)`, as the factories do. A `const Color(0x4D…)` has alpha 77/255, not 0.3, so it would never equal them.
+  - **Measured-equals-rendered needs a window, and the window has two edges.** A row is cut only when the content is wider than the view and narrower than `SizeService`'s 3× cap. On desktop the long Folder fits, so nothing can be cut. Measured at #82 with the label resolver on:
+  - In the mobile frame (view 390 px, cap 1170), the long Folder's row measured 1194.3 px. It was clamped to 1170, and the label, which needs 1154.3 px, was laid out at 1130 and cut, whatever the measurement said.
+  - In the tablet frame (view 834 px, cap 2502), the same row fits.
+
+  The resolver tests run in the tablet frame and assert both edges first, through `_expectFitsInWindow`: the label is wider than the view, and well under the cap. On desktop, the `lib/` mutations that measure `node.label` instead of the resolved label, or `textStyle` instead of the resolved style, survived. In the tablet frame they redden, and switching the frame to mobile fails the cap edge.
 - **"Scrollbars" (#85).**
   - **The bars show only on hover.** At `light()`'s `nonHoverOpacity` of 0 they are hidden until the pointer is over the tree, so `scrollbar_test` drives a mouse pointer.
   - The thumb is asserted where it is painted: the `Scrollbar`'s `drawRRect` carries `thumbColor`, and its rect is `thickness` wide with `radius` corners.
@@ -98,6 +107,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/lib/app/every_setting.dart` — `EverySettingDemo.scrollbarThumbColors`, `EverySettingDemo.scrollbarTrackColors`, `EverySettingDemo.scrollbarThemeCode`
 - `example/lib/app/every_setting.dart` — `ThemePreset`, `ThemeInjection`, `EverySettingDemo.applyPreset`, `EverySettingDemo.activePreset`, `EverySettingDemo.injectionCode`, `EverySettingStage`
 - `example/lib/app/every_setting_host.dart` — `EverySettingHost.presets`, `EverySettingHost.applyPreset`
+- `example/lib/app/every_setting.dart` — `FolderOpenWidget`, `EverySettingDemo.folderThemeCode`, `EverySettingDemo._folderMatches`, `EverySettingDemo.sampleFolderIcon`
+- `example/test/folder_tier_test.dart` — Folder glyphs per row, the icon box, the label style and resolvers (in the tablet frame), the ink, presets, the code text
 - `example/test/theme_injection_test.dart` — presets reset and release, both injection paths under Dark, the code text, the shell untouched
 - `example/test/scrollbar_test.dart` — hover fade, the track box, the painted thumb, Material's track, the bar at Scale 2, the code text
 - `example/test/expand_icon_test.dart` — glyph colours per row, the indent unit, the sample switch, the code text
