@@ -47,10 +47,11 @@ class FolderView<T> extends StatefulWidget {
   final double scale;
 
   /// Callback fired when the user Ctrl+scrolls (or Cmd+scrolls on macOS)
-  /// over the view, requesting a scale change.
+  /// over the view while blocking is in effect, requesting a scale change.
   ///
-  /// When non-null, the library intercepts modifier+wheel events internally
-  /// and calls this callback with the proposed new scale value.
+  /// The library calls this with the proposed new scale value, unclamped,
+  /// while blocking is in effect (see [blockModifierScroll]). By default that
+  /// is whenever this callback is non-null.
   ///
   /// The caller should update [scale] in response:
   /// ```dart
@@ -59,11 +60,13 @@ class FolderView<T> extends StatefulWidget {
   /// },
   /// ```
   ///
-  /// When null, modifier+wheel events are not intercepted and scroll normally.
+  /// With `blockModifierScroll: false`, modifier+wheel scrolls the view and
+  /// this callback is never called. When this is null, modifier+wheel
+  /// scrolls normally, unless `blockModifierScroll: true` blocks it.
   final ValueChanged<double>? onScaleChanged;
 
-  /// The amount [scale] changes per mouse wheel tick when [onScaleChanged]
-  /// is active. Defaults to `0.05`.
+  /// The amount [scale] changes per mouse wheel tick, in the value proposed
+  /// to [onScaleChanged]. Defaults to `0.05`.
   final double scaleStep;
 
   /// Whether to block normal scrolling while Ctrl (Windows/Linux) or
@@ -72,6 +75,14 @@ class FolderView<T> extends StatefulWidget {
   ///
   /// Defaults to `null`, which follows [onScaleChanged]: blocking is enabled
   /// when [onScaleChanged] is non-null, and disabled otherwise.
+  ///
+  /// [onScaleChanged] is called only while blocking is in effect. `false`
+  /// therefore turns zoom-by-wheel off as well: modifier+wheel scrolls the
+  /// view, and no scale is proposed. `true` with no [onScaleChanged] blocks
+  /// the scroll and proposes nothing.
+  ///
+  /// The block applies to the rows. A wheel over the vertical scrollbar
+  /// still scrolls the view.
   final bool? blockModifierScroll;
 
   /// Builds a card shown while the pointer is anywhere over a Node's rendered
