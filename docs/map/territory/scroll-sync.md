@@ -40,6 +40,12 @@ The motion never passes an end, and that rests on upstream clamping twice: the t
 - [scale-input](scale-input.md) — the `ListView` physics are swapped to block modifier-wheel scrolling.
 
 ## Known holes
+- **Probed on 2026-10-19: `FolderViewScrollbarTheme` styles two different tracks.**
+  - `trackColor`, `trackWidth` and `trackRadius` style the `Container` the bar sits in.
+  - `trackVisibility` turns on the Material `Scrollbar`'s own track inside it. That track is painted in Material's colour (a `0x081D1B20` rect and a `0x1A1D1B20` edge line) and never in `trackColor`.
+  - The `ScrollbarThemeData` the bar builds sets only thumb colour, radius and thickness.
+  - With `trackColor` green, the `Scrollbar` painted no green in either state. The green is the `Container`'s.
+- **Probed on 2026-10-19: a `thickness` above `trackWidth` paints the thumb past its box, over the rows.** Setup: `thickness` 20, `trackWidth` 8. The thumb's rect ran from x = −12 to 8 in the 8 px bar box, and no clip sits above it. Nothing clamps `thickness` to `trackWidth`. Tracked, with the two tracks: #122.
 - **A wheel turned over a scrollbar is not animated.** The bar is its own `Scrollable` with a plain controller. Upstream documents the same limit.
 - **A notch during a programmatic `jumpTo` is lost.** Scroll anchoring's post-frame `jumpTo` (expand/collapse, Scale change) ends a running motion, and the remaining distance of that notch goes with it. Read from the code, not probed.
 - The `_buildItem` comment on `Transform.translate` is duplicated verbatim, a leftover of an edit. Cosmetic.

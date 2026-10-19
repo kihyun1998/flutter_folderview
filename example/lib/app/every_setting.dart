@@ -212,6 +212,56 @@ class EverySettingDemo extends ChangeNotifier {
   Color? _expandIconExpandedColor;
   Color? get expandIconExpandedColor => _expandIconExpandedColor;
 
+  /// The colours the scrollbar's thumb and track controls offer; the first of
+  /// each is `light()`'s.
+  static const scrollbarThumbColors = [
+    Color(0xFF757575),
+    Color(0xFF2196F3),
+    Color(0xFF4CAF50),
+    Color(0xFFF44336),
+    Color(0xFF212121),
+  ];
+  static const scrollbarTrackColors = [
+    Color(0xFFEEEEEE),
+    Color(0xFFE3F2FD),
+    Color(0xFFFFF3E0),
+    Color(0x00000000),
+  ];
+
+  // The defaults are `FlutterFolderViewTheme.light().scrollbarTheme`'s.
+  Color _thumbColor = scrollbarThumbColors.first;
+  Color get thumbColor => _thumbColor;
+
+  Color _trackColor = scrollbarTrackColors.first;
+  Color get trackColor => _trackColor;
+
+  double _thickness = 12;
+  double get thickness => _thickness;
+
+  double _thumbRadius = 4;
+  double get thumbRadius => _thumbRadius;
+
+  bool _thumbVisibility = true;
+  bool get thumbVisibility => _thumbVisibility;
+
+  double _hoverOpacity = 0.8;
+  double get hoverOpacity => _hoverOpacity;
+
+  double _nonHoverOpacity = 0;
+  double get nonHoverOpacity => _nonHoverOpacity;
+
+  int _hoverAnimationMs = 200;
+  int get hoverAnimationMs => _hoverAnimationMs;
+
+  double _trackWidth = 16;
+  double get trackWidth => _trackWidth;
+
+  double _trackRadius = 8;
+  double get trackRadius => _trackRadius;
+
+  bool _trackVisibility = false;
+  bool get trackVisibility => _trackVisibility;
+
   FlutterFolderViewTheme<String>? _theme;
 
   /// The `FolderView.theme` the settings describe: one instance until a theme
@@ -242,8 +292,38 @@ class EverySettingDemo extends ChangeNotifier {
         lineWidth: _lineWidth,
         lineStyle: _lineStyle,
       ),
+      scrollbarTheme: FolderViewScrollbarTheme(
+        thumbColor: _thumbColor,
+        trackColor: _trackColor,
+        thickness: _thickness,
+        radius: _thumbRadius,
+        thumbVisibility: _thumbVisibility,
+        hoverOpacity: _hoverOpacity,
+        nonHoverOpacity: _nonHoverOpacity,
+        hoverAnimationDuration: Duration(milliseconds: _hoverAnimationMs),
+        trackWidth: _trackWidth,
+        trackRadius: _trackRadius,
+        trackVisibility: _trackVisibility,
+      ),
     );
   }
+
+  /// `FlutterFolderViewTheme.scrollbarTheme` as the argument a caller would
+  /// write.
+  String get scrollbarThemeCode =>
+      'scrollbarTheme: const FolderViewScrollbarTheme(\n'
+      '  thumbColor: ${_colorCode(_thumbColor)},\n'
+      '  trackColor: ${_colorCode(_trackColor)},\n'
+      '  thickness: ${_num(_thickness)},\n'
+      '  radius: ${_num(_thumbRadius)},\n'
+      '  thumbVisibility: $_thumbVisibility,\n'
+      '  hoverOpacity: ${_num(_hoverOpacity)},\n'
+      '  nonHoverOpacity: ${_num(_nonHoverOpacity)},\n'
+      '  hoverAnimationDuration: Duration(milliseconds: $_hoverAnimationMs),\n'
+      '  trackWidth: ${_num(_trackWidth)},\n'
+      '  trackRadius: ${_num(_trackRadius)},\n'
+      '  trackVisibility: $_trackVisibility,\n'
+      '),';
 
   /// `FlutterFolderViewTheme.expandIconTheme` as the argument a caller would
   /// write.
@@ -352,6 +432,18 @@ class EverySettingDemo extends ChangeNotifier {
       _setTheme(() => _expandIconColor = value);
   set expandIconExpandedColor(Color? value) =>
       _setTheme(() => _expandIconExpandedColor = value);
+  set thumbColor(Color value) => _setTheme(() => _thumbColor = value);
+  set trackColor(Color value) => _setTheme(() => _trackColor = value);
+  set thickness(double value) => _setTheme(() => _thickness = value);
+  set thumbRadius(double value) => _setTheme(() => _thumbRadius = value);
+  set thumbVisibility(bool value) => _setTheme(() => _thumbVisibility = value);
+  set hoverOpacity(double value) => _setTheme(() => _hoverOpacity = value);
+  set nonHoverOpacity(double value) =>
+      _setTheme(() => _nonHoverOpacity = value);
+  set hoverAnimationMs(int value) => _setTheme(() => _hoverAnimationMs = value);
+  set trackWidth(double value) => _setTheme(() => _trackWidth = value);
+  set trackRadius(double value) => _setTheme(() => _trackRadius = value);
+  set trackVisibility(bool value) => _setTheme(() => _trackVisibility = value);
 
   /// `onScaleChanged`: applies the proposed Scale, clamped to [minScale] ..
   /// [maxScale].
