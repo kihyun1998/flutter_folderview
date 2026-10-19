@@ -108,6 +108,40 @@ const settingsSpec = <SettingGroup>[
         ],
       ),
       SettingFeature(
+        id: 'scrollbars',
+        title: 'Scrollbars',
+        options: [
+          'FlutterFolderViewTheme.scrollbarTheme',
+          'FolderViewScrollbarTheme.thumbColor',
+          'FolderViewScrollbarTheme.thickness',
+          'FolderViewScrollbarTheme.radius',
+          'FolderViewScrollbarTheme.thumbVisibility',
+          'FolderViewScrollbarTheme.trackColor',
+          'FolderViewScrollbarTheme.trackWidth',
+          'FolderViewScrollbarTheme.trackRadius',
+          'FolderViewScrollbarTheme.trackVisibility',
+          'FolderViewScrollbarTheme.hoverOpacity',
+          'FolderViewScrollbarTheme.nonHoverOpacity',
+          'FolderViewScrollbarTheme.hoverAnimationDuration',
+        ],
+        interactions: [
+          Interaction(
+            otherFeatureId: 'scale',
+            effect:
+                'Scrollbars keep their size at every Scale: thickness, '
+                'radius, trackWidth and trackRadius are never multiplied.',
+            evidence:
+                'docs/adr/0001-scrollbars-excluded-from-scale.md; '
+                'lib/themes/flutter_folder_view_theme.dart: '
+                'FlutterFolderViewTheme.scale does not delegate to '
+                'scrollbarTheme; test/themes/scale_test.dart: '
+                '"FlutterFolderViewTheme.scale passes scrollbarTheme through '
+                'identical"; CHANGELOG.md: "Scrollbar appearance (thickness, '
+                'track width, colors) is NOT affected by scale"',
+          ),
+        ],
+      ),
+      SettingFeature(
         id: 'lines',
         title: 'Tree lines',
         options: [

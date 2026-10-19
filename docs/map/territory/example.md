@@ -9,7 +9,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - **Test helpers live in `example/test/support/`**, so `example/test/` holds only `*_test.dart` files. Neither this repo nor `flutter_table_plus` had a precedent; the maintainer was shown the flat alternative and chose the folder.
 - **`Node`'s five fields are covered by a recipe, not the settings panel** (#76). They are the data's shape, not knobs. The maintainer was also shown the alternative, a read-only "control" in the panel, and chose the recipe. So `Building a tree` became the first recipe, and the first-recipe seam rules from #74 landed with it.
 - **Generated data is strictly Folder → Parent → Child** (#76). The count of each is a setting. The legacy generator's nested-Folder depth was dropped on purpose: the maintainer chose the containment rule in `GLOSSARY.md` over keeping that option.
-- **Chrome-excluded-from-Scale is a panel note under Scale, not yet an interaction** (#78). The note is the Scale feature's `extrasAfterOptions` text (`scale-note`, pinned by `scale_test`), because the template's `SettingFeature` has no note field, so `settings_spec.dart` itself does not carry the rule. An `Interaction` must name another feature, and at #78 no scrollbar or tooltip feature existed. The maintainer was shown three options: a note now with the interaction handed to #85 / #86 / #89; a note only; or empty Scrollbar and Tooltip features created early. They chose the first. The interaction is added by whichever of those tickets creates the feature, pointing at `scale`.
+- **Chrome-excluded-from-Scale starts as a panel note under Scale, and each chrome feature adds its interaction** (#78). The note is the Scale feature's `extrasAfterOptions` text (`scale-note`, pinned by `scale_test`), because the template's `SettingFeature` has no note field. An `Interaction` must name another feature, and at #78 no scrollbar or tooltip feature existed. The maintainer was shown three options: a note now, with the interaction handed to #85 / #86 / #89; a note only; or empty Scrollbar and Tooltip features created early. They chose the first. Scrollbars added theirs in #85. The tooltip features add theirs in #86 and #89, pointing at `scale`.
 - **A theme container id is covered by a code-text control** (#79). Examples are `FlutterFolderViewTheme.spacingTheme` and `.nodeStyleTheme`. The control is read-only and shows the sub-theme as the argument a caller writes, as Smooth wheel shows `wheelMotion`. The maintainer was shown two alternatives: changing the guard to count a container as covered once its fields are, which reopens the #75 mechanical rule, or a theming recipe. They chose the control. This is the convention for the container ids in #80–#85. It does not cover the Tier `tooltipTheme` containers, which #86 binds through its Tier selector.
 - **Windows window size** is 1200×600, wider than `ShellPage.narrowBreakpoint` (900), so the desktop run opens in the three-region layout. Whether `window_manager` stays at all is decided in #91.
 
@@ -54,6 +54,11 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - Each knob is checked against the strokes drawn: a `connector` draws a horizontal stub, `scope` draws verticals only, and `none` draws no line at all. The same holds in Tree Mode, where the lifted Parents are roots and draw no connector, so only Children do.
   - `lineColor` is a row of swatches: the template has no colour control, so the swatches follow the legacy panel's `colorRow`. The first swatch is `light()`'s grey.
   - **Compare a painted colour by `toARGB32()`, not `==`.** `Paint` stores its colour as Float32, so `paint.color == Color(0xFF9E9E9E)` is false even though both print the same channels. Measured at #80.
+- **"Scrollbars" (#85).**
+  - **The bars show only on hover.** At `light()`'s `nonHoverOpacity` of 0 they are hidden until the pointer is over the tree, so `scrollbar_test` drives a mouse pointer.
+  - The thumb is asserted where it is painted: the `Scrollbar`'s `drawRRect` carries `thumbColor`, and its rect is `thickness` wide with `radius` corners.
+  - **The data must scroll for a thumb to exist**, so the tests take Generated data and Expand all first.
+  - The note states the two tracks plainly ([scroll-sync](scroll-sync.md) Known holes).
 - **"Expand icon" (#81).**
   - **The widget switch installs an uncoloured `Icons.arrow_right`.** `light()`'s chevron sets its own grey, so `color` and `expandedColor` don't reach it ([tier-rendering](tier-rendering.md) Known holes). The panel note says so, and `expand_icon_test` pins both sides: with the sample, expanded rows take `expandedColor` and the others take `color`; `light()`'s chevron stays grey whatever they say. The colour swatches start with `null`, meaning not set.
   - Width, horizontal padding and horizontal margin are asserted by one rule: each moves a Child's label by the same amount, because their sum is the indent unit. Height does not move it.
@@ -80,6 +85,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/lib/app/every_setting.dart` — `EverySettingDemo.theme`, `EverySettingDemo.spacingThemeCode`, `EverySettingDemo.nodeStyleThemeCode`
 - `example/lib/app/every_setting.dart` — `EverySettingDemo.lineColors`, `EverySettingDemo.lineThemeCode`
 - `example/lib/app/every_setting.dart` — `EverySettingDemo.expandIconColors`, `EverySettingDemo.sampleExpandIcon`, `EverySettingDemo.expandIconThemeCode`
+- `example/lib/app/every_setting.dart` — `EverySettingDemo.scrollbarThumbColors`, `EverySettingDemo.scrollbarTrackColors`, `EverySettingDemo.scrollbarThemeCode`
+- `example/test/scrollbar_test.dart` — hover fade, the track box, the painted thumb, Material's track, the bar at Scale 2, the code text
 - `example/test/expand_icon_test.dart` — glyph colours per row, the indent unit, the sample switch, the code text
 - `example/test/lines_test.dart` — the line knobs reach the painted strokes in both View Modes; the `lineTheme` code text
 - `example/test/layout_test.dart` — the Layout controls reach the rendered theme and rows; the theme instance is kept; the container code text
@@ -96,7 +103,10 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `flutter_table_plus/example`, an *example* to diverge from deliberately. Its `settings_spec_test` and `recipe_seam_test` are the prior art for the guard and the seam. That repo keeps a hand-written spec and settings model in step; this one derives the option list from the library instead.
 
 ## Cross-cutting invariants
-- [chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md) — the Scale feature's panel note (`scale-note`) states it (#78); `settings_spec.dart` does not yet. The spec gains it as an interaction when the scrollbar (#85) or tooltip (#86, #89) feature exists.
+- [chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md):
+  - The Scale feature's panel note (`scale-note`) states it (#78).
+  - In the spec, it is the Scrollbars feature's interaction with `scale` (#85). `scrollbar_test` pins the bar's width at Scale 2, and a mutation that scales `scrollbarTheme` reddens it.
+  - The tooltip half becomes an interaction once #86 and #89 create their features.
 - [innermost-tooltip-wins](../invariant/innermost-tooltip-wins.md) and [row-wider-than-viewport](../invariant/row-wider-than-viewport.md) — the row-card scenarios (#89) demonstrate both.
 
 ## Blast radius

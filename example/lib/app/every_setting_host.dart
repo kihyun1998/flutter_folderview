@@ -292,6 +292,94 @@ class EverySettingHost extends SettingsHost {
       EverySettingDemo.lineColors,
       (c) => demo.lineColor = c!,
     ),
+    'FlutterFolderViewTheme.scrollbarTheme' => _codeControl(
+      settingId,
+      'scrollbarTheme',
+      demo.scrollbarThemeCode,
+    ),
+    'FolderViewScrollbarTheme.thumbColor' => _colorControl(
+      settingId,
+      'Thumb color',
+      demo.thumbColor,
+      EverySettingDemo.scrollbarThumbColors,
+      (c) => demo.thumbColor = c!,
+    ),
+    'FolderViewScrollbarTheme.thickness' => _pxSlider(
+      settingId,
+      'Thickness',
+      demo.thickness,
+      2,
+      20,
+      (v) => demo.thickness = v,
+    ),
+    'FolderViewScrollbarTheme.radius' => _pxSlider(
+      settingId,
+      'Thumb radius',
+      demo.thumbRadius,
+      0,
+      12,
+      (v) => demo.thumbRadius = v,
+    ),
+    'FolderViewScrollbarTheme.thumbVisibility' => buildSwitchTile(
+      id: settingId,
+      label: 'Thumb always visible',
+      value: demo.thumbVisibility,
+      onChanged: (on) => demo.thumbVisibility = on,
+      indent: true,
+    ),
+    'FolderViewScrollbarTheme.trackColor' => _colorControl(
+      settingId,
+      'Track color',
+      demo.trackColor,
+      EverySettingDemo.scrollbarTrackColors,
+      (c) => demo.trackColor = c!,
+    ),
+    'FolderViewScrollbarTheme.trackWidth' => _pxSlider(
+      settingId,
+      'Track width',
+      demo.trackWidth,
+      4,
+      32,
+      (v) => demo.trackWidth = v,
+    ),
+    'FolderViewScrollbarTheme.trackRadius' => _pxSlider(
+      settingId,
+      'Track radius',
+      demo.trackRadius,
+      0,
+      16,
+      (v) => demo.trackRadius = v,
+    ),
+    'FolderViewScrollbarTheme.trackVisibility' => buildSwitchTile(
+      id: settingId,
+      label: "Material's own track",
+      value: demo.trackVisibility,
+      onChanged: (on) => demo.trackVisibility = on,
+      indent: true,
+    ),
+    'FolderViewScrollbarTheme.hoverOpacity' => _opacitySlider(
+      settingId,
+      'Opacity on hover',
+      demo.hoverOpacity,
+      (v) => demo.hoverOpacity = v,
+    ),
+    'FolderViewScrollbarTheme.nonHoverOpacity' => _opacitySlider(
+      settingId,
+      'Opacity otherwise',
+      demo.nonHoverOpacity,
+      (v) => demo.nonHoverOpacity = v,
+    ),
+    'FolderViewScrollbarTheme.hoverAnimationDuration' => _slider(
+      settingId,
+      'Fade duration',
+      demo.hoverAnimationMs.toDouble(),
+      min: 0,
+      max: 1000,
+      divisions: 50,
+      format: (v) => '${v.round()} ms',
+      enabled: true,
+      onChanged: (v) => demo.hoverAnimationMs = v.round(),
+    ),
     'FlutterFolderViewTheme.expandIconTheme' => _codeControl(
       settingId,
       'expandIconTheme',
@@ -399,13 +487,51 @@ class EverySettingHost extends SettingsHost {
                 ),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: c == null
+              child: c == null || c.a == 0
                   ? const Icon(Icons.block, size: 14, color: Colors.grey)
                   : null,
             ),
           ),
       ],
     ),
+  );
+
+  /// A whole-pixel slider from [min] to [max].
+  SettingsControl _pxSlider(
+    String id,
+    String label,
+    double value,
+    double min,
+    double max,
+    void Function(double) onChanged,
+  ) => _slider(
+    id,
+    label,
+    value,
+    min: min,
+    max: max,
+    divisions: (max - min).round(),
+    format: (v) => '${v.round()} px',
+    enabled: true,
+    onChanged: (v) => onChanged(v.roundToDouble()),
+  );
+
+  /// An opacity slider from 0 to 1 in steps of 0.05.
+  SettingsControl _opacitySlider(
+    String id,
+    String label,
+    double value,
+    void Function(double) onChanged,
+  ) => _slider(
+    id,
+    label,
+    value,
+    min: 0,
+    max: 1,
+    divisions: 20,
+    format: (v) => v.toStringAsFixed(2),
+    enabled: true,
+    onChanged: (v) => onChanged((v * 20).round() / 20),
   );
 
   /// A theme container, shown as the argument a caller would write.
@@ -463,6 +589,7 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'scale') return _scaleExtras();
     if (featureId == 'layout') return _layoutExtras();
     if (featureId == 'expandIcon') return _expandIconExtras();
+    if (featureId == 'scrollbars') return _scrollbarExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -523,6 +650,24 @@ class EverySettingHost extends SettingsHost {
       'ADR-0004). The preview frames shrink the whole stage; choose the Room '
       'to see a Scale at real pixels.',
       key: Key('scale-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Scrollbar controls do not show on their own.
+  List<Widget> _scrollbarExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'The bars fade to "Opacity on hover" while the pointer is over the '
+      'tree and to "Opacity otherwise" when it leaves; at the default 0 they '
+      'are hidden until you hover. The horizontal bar appears only when the '
+      'content is wider than the view. There are two tracks: trackColor, '
+      'trackWidth and trackRadius style the box the bar sits in, while '
+      "trackVisibility turns on Material's own track inside it, drawn in "
+      "Material's colour, not trackColor. A thickness above trackWidth paints "
+      'the thumb past the box, over the rows. Scrollbars keep their size at '
+      'every Scale (ADR-0001).',
+      key: Key('scrollbar-note'),
       style: TextStyle(fontSize: 12),
     ),
   ];
