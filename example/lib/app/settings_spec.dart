@@ -71,6 +71,43 @@ const settingsSpec = <SettingGroup>[
         ],
       ),
       SettingFeature(
+        id: 'expandIcon',
+        title: 'Expand icon',
+        options: [
+          'FlutterFolderViewTheme.expandIconTheme',
+          'ExpandIconTheme.widget',
+          'ExpandIconTheme.width',
+          'ExpandIconTheme.height',
+          'ExpandIconTheme.padding',
+          'ExpandIconTheme.margin',
+          'ExpandIconTheme.color',
+          'ExpandIconTheme.expandedColor',
+        ],
+        interactions: [
+          Interaction(
+            otherFeatureId: 'lines',
+            effect:
+                'Width plus horizontal padding and margin is the width of '
+                'every tree-line column and of one indent level.',
+            evidence:
+                'lib/services/row_metrics.dart: RowMetrics.expandStripWidth '
+                'and RowMetrics.indentWidth; lib/widgets/node_widget.dart '
+                'passes expandStripWidth to TreeLines as its column width',
+          ),
+          Interaction(
+            otherFeatureId: 'scale',
+            effect:
+                'The Scale multiplies width, height, padding and margin, and '
+                'with them the indent unit. At a Scale other than 1 the widget '
+                'is fitted into the scaled box. Colours are not scaled.',
+            evidence:
+                'lib/themes/expand_icon_theme.dart: ExpandIconTheme.scale; '
+                'lib/widgets/node_render_parts.dart: NodeIconBox wraps the '
+                'icon in a FittedBox when scale != 1.0',
+          ),
+        ],
+      ),
+      SettingFeature(
         id: 'lines',
         title: 'Tree lines',
         options: [

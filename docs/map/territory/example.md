@@ -54,6 +54,11 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - Each knob is checked against the strokes drawn: a `connector` draws a horizontal stub, `scope` draws verticals only, and `none` draws no line at all. The same holds in Tree Mode, where the lifted Parents are roots and draw no connector, so only Children do.
   - `lineColor` is a row of swatches: the template has no colour control, so the swatches follow the legacy panel's `colorRow`. The first swatch is `light()`'s grey.
   - **Compare a painted colour by `toARGB32()`, not `==`.** `Paint` stores its colour as Float32, so `paint.color == Color(0xFF9E9E9E)` is false even though both print the same channels. Measured at #80.
+- **"Expand icon" (#81).**
+  - **The widget switch installs an uncoloured `Icons.arrow_right`.** `light()`'s chevron sets its own grey, so `color` and `expandedColor` don't reach it ([tier-rendering](tier-rendering.md) Known holes). The panel note says so, and `expand_icon_test` pins both sides: with the sample, expanded rows take `expandedColor` and the others take `color`; `light()`'s chevron stays grey whatever they say. The colour swatches start with `null`, meaning not set.
+  - Width, horizontal padding and horizontal margin are asserted by one rule: each moves a Child's label by the same amount, because their sum is the indent unit. Height does not move it.
+  - **A painted glyph is read per row, not per widget.** `const Icon` instances are one object, so `find.byWidget(icon)` matches every row. Read each `RichText` whose text is the glyph, then pick the one nearest the row.
+- **`openFeature` scrolls the lazy feature list from the top until the entry is built** (#81). With "Expand icon" ahead of it, "Tree lines" was no longer built while a feature was open, so `ensureVisible` found nothing.
 - **`openFeature` settles after `ensureVisible`, before it taps.** Without the settle, an entry low in the feature list is tapped where it was before the scroll. With a feature open, the list pane ends at y = 527.5 on a 1000 px window, so "Tree lines" sat at 533–546, under the detail pane. Measured at #80. Earlier tests passed only because their entries were already in view.
 - The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).
 
@@ -74,6 +79,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/lib/app/every_setting.dart` — `ModifierScrollBlock`, `EverySettingDemo.handleScaleChanged`, `EverySettingDemo.blockModifierScroll`
 - `example/lib/app/every_setting.dart` — `EverySettingDemo.theme`, `EverySettingDemo.spacingThemeCode`, `EverySettingDemo.nodeStyleThemeCode`
 - `example/lib/app/every_setting.dart` — `EverySettingDemo.lineColors`, `EverySettingDemo.lineThemeCode`
+- `example/lib/app/every_setting.dart` — `EverySettingDemo.expandIconColors`, `EverySettingDemo.sampleExpandIcon`, `EverySettingDemo.expandIconThemeCode`
+- `example/test/expand_icon_test.dart` — glyph colours per row, the indent unit, the sample switch, the code text
 - `example/test/lines_test.dart` — the line knobs reach the painted strokes in both View Modes; the `lineTheme` code text
 - `example/test/layout_test.dart` — the Layout controls reach the rendered theme and rows; the theme instance is kept; the container code text
 - `example/test/scale_test.dart` — the Scale controls reach the rendered `FolderView`; Ctrl+wheel proposes, the handler clamps, blocking decides scroll versus Scale

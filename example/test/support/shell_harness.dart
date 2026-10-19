@@ -31,6 +31,18 @@ Future<void> openFeature(WidgetTester tester, String title) async {
     of: find.byType(FeatureListPane),
     matching: find.text(title),
   );
+  // The list builds lazily: from the top, scroll until the entry is built.
+  final list = find
+      .descendant(
+        of: find.byType(FeatureListPane),
+        matching: find.byWidgetPredicate(
+          (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+        ),
+      )
+      .first;
+  tester.state<ScrollableState>(list).position.jumpTo(0);
+  await tester.pumpAndSettle();
+  await tester.scrollUntilVisible(entry, 48, scrollable: list);
   await tester.ensureVisible(entry.first);
   await tester.pumpAndSettle();
   await tester.tap(entry.first);

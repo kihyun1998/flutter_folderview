@@ -248,7 +248,12 @@ class EverySettingHost extends SettingsHost {
       'spacingTheme',
       demo.spacingThemeCode,
     ),
-    'FolderViewSpacingTheme.contentPadding' => _paddingControl(settingId),
+    'FolderViewSpacingTheme.contentPadding' => _edgeControl(
+      settingId,
+      'Content padding',
+      demo.contentPadding,
+      (p) => demo.contentPadding = p,
+    ),
     'FlutterFolderViewTheme.nodeStyleTheme' => _codeControl(
       settingId,
       'nodeStyleTheme',
@@ -280,7 +285,73 @@ class EverySettingHost extends SettingsHost {
       onChanged: (s) => demo.lineStyle = s,
       indent: true,
     ),
-    'FolderViewLineTheme.lineColor' => _colorControl(settingId),
+    'FolderViewLineTheme.lineColor' => _colorControl(
+      settingId,
+      'Color',
+      demo.lineColor,
+      EverySettingDemo.lineColors,
+      (c) => demo.lineColor = c!,
+    ),
+    'FlutterFolderViewTheme.expandIconTheme' => _codeControl(
+      settingId,
+      'expandIconTheme',
+      demo.expandIconThemeCode,
+    ),
+    'ExpandIconTheme.widget' => buildSwitchTile(
+      id: settingId,
+      label: 'Sample widget (uncoloured arrow)',
+      value: demo.expandIconSample,
+      onChanged: (on) => demo.expandIconSample = on,
+      indent: true,
+    ),
+    'ExpandIconTheme.width' => _slider(
+      settingId,
+      'Width',
+      demo.expandIconWidth,
+      min: 8,
+      max: 40,
+      divisions: 32,
+      format: (v) => '${v.round()} px',
+      enabled: true,
+      onChanged: (v) => demo.expandIconWidth = v.roundToDouble(),
+    ),
+    'ExpandIconTheme.height' => _slider(
+      settingId,
+      'Height',
+      demo.expandIconHeight,
+      min: 8,
+      max: 40,
+      divisions: 32,
+      format: (v) => '${v.round()} px',
+      enabled: true,
+      onChanged: (v) => demo.expandIconHeight = v.roundToDouble(),
+    ),
+    'ExpandIconTheme.padding' => _edgeControl(
+      settingId,
+      'Padding',
+      demo.expandIconPadding,
+      (p) => demo.expandIconPadding = p,
+    ),
+    'ExpandIconTheme.margin' => _edgeControl(
+      settingId,
+      'Margin',
+      demo.expandIconMargin,
+      (p) => demo.expandIconMargin = p,
+    ),
+    'ExpandIconTheme.color' => _colorControl(
+      settingId,
+      'Color',
+      demo.expandIconColor,
+      EverySettingDemo.expandIconColors,
+      (c) => demo.expandIconColor = c,
+    ),
+    'ExpandIconTheme.expandedColor' => _colorControl(
+      settingId,
+      'Expanded color',
+      demo.expandIconExpandedColor,
+      EverySettingDemo.expandIconColors,
+      (c) => demo.expandIconExpandedColor = c,
+    ),
     'FolderViewLineTheme.lineWidth' => _slider(
       settingId,
       'Width',
@@ -295,34 +366,42 @@ class EverySettingHost extends SettingsHost {
     _ => throw ArgumentError.value(settingId, 'settingId'),
   };
 
-  /// `lineColor`: one swatch per colour in `EverySettingDemo.lineColors`.
-  SettingsControl _colorControl(String id) => SettingsControl(
+  /// One swatch per colour in [colors]; a `null` colour is drawn as an empty
+  /// box and means "not set".
+  SettingsControl _colorControl(
+    String id,
+    String label,
+    Color? value,
+    List<Color?> colors,
+    void Function(Color?) onChanged,
+  ) => SettingsControl(
     id: id,
-    label: 'Color',
+    label: label,
     indent: true,
     child: Wrap(
       spacing: 4,
       runSpacing: 4,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        const Text('Color'),
-        for (final (i, c) in EverySettingDemo.lineColors.indexed)
+        Text(label),
+        for (final (i, c) in colors.indexed)
           InkWell(
             key: ValueKey('$id.$i'),
-            onTap: () => demo.lineColor = c,
+            onTap: () => onChanged(c),
             child: Container(
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: c,
+                color: c ?? Colors.white,
                 border: Border.all(
-                  color: c == demo.lineColor
-                      ? Colors.black
-                      : Colors.grey.shade300,
-                  width: c == demo.lineColor ? 2 : 1,
+                  color: c == value ? Colors.black : Colors.grey.shade300,
+                  width: c == value ? 2 : 1,
                 ),
                 borderRadius: BorderRadius.circular(4),
               ),
+              child: c == null
+                  ? const Icon(Icons.block, size: 14, color: Colors.grey)
+                  : null,
             ),
           ),
       ],
@@ -340,9 +419,13 @@ class EverySettingHost extends SettingsHost {
         ),
       );
 
-  /// `contentPadding`: one slider per side, 0 to 40 px.
-  SettingsControl _paddingControl(String id) {
-    final p = demo.contentPadding;
+  /// An `EdgeInsets`: one slider per side, 0 to 40 px.
+  SettingsControl _edgeControl(
+    String id,
+    String label,
+    EdgeInsets p,
+    void Function(EdgeInsets) onChanged,
+  ) {
     Widget side(String name, double value, EdgeInsets Function(double) with_) =>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,13 +437,13 @@ class EverySettingHost extends SettingsHost {
               min: 0,
               max: 40,
               divisions: 40,
-              onChanged: (v) => demo.contentPadding = with_(v.roundToDouble()),
+              onChanged: (v) => onChanged(with_(v.roundToDouble())),
             ),
           ],
         );
     return SettingsControl(
       id: id,
-      label: 'Content padding',
+      label: label,
       indent: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,6 +462,7 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'wheel') return _wheelExtras();
     if (featureId == 'scale') return _scaleExtras();
     if (featureId == 'layout') return _layoutExtras();
+    if (featureId == 'expandIcon') return _expandIconExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -439,6 +523,24 @@ class EverySettingHost extends SettingsHost {
       'ADR-0004). The preview frames shrink the whole stage; choose the Room '
       'to see a Scale at real pixels.',
       key: Key('scale-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Expand icon controls do not show on their own.
+  List<Widget> _expandIconExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'Width plus horizontal padding and margin is the indent unit: every '
+      'level of the tree, and every tree-line column, is that wide. Width and '
+      'height size the icon box: at Scale 1 the icon keeps its own size '
+      'inside it, at any other Scale it is fitted to the box. The icon turns '
+      '90° when its row is expanded. '
+      'color and expandedColor reach the icon through IconTheme, so they '
+      "have no effect on light()'s chevron, which sets its own grey. Turn on "
+      'the sample widget to see them: expanded rows take expandedColor, or '
+      'color when it is not set.',
+      key: Key('expand-icon-note'),
       style: TextStyle(fontSize: 12),
     ),
   ];

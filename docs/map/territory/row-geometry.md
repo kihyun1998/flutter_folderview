@@ -36,6 +36,7 @@ Works out how wide and tall the content is. Every row is laid out at one `conten
 - [label-tooltip](label-tooltip.md) — whether a label is ellipsized decides the rect a `child`-anchored tooltip aims at.
 
 ## Known holes
+- **A Child row is measured one expand strip wider than it draws.** `RowMetrics._rowWidth` adds `expandStripWidth` for every tier. `ChildNodeRenderer` draws no expand box, so a Child's content is indent, then icon box, then label. This over-measures rather than under-measures, so nothing is ellipsized. The horizontal scroll extent can still run up to one strip past the widest Child, and the example's expand-icon width knob (#81) widens that gap. Read from the code; not probed.
 - **`selectedTextStyle` is not measured.** It is merged at render time (for example, bold on a selected Child) and never measured, a remaining case of [measured-equals-rendered](../invariant/measured-equals-rendered.md). Read from the code; not probed.
 - The static cache key omits `fontFamily`, so two tiers that differ only in font family share a cached width. Read from the code; not probed.
 - [view-mode-projection](view-mode-projection.md): tree mode is measured at folder-mode depths.
