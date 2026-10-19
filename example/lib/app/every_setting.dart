@@ -177,29 +177,106 @@ class EverySettingDemo extends ChangeNotifier {
   LineStyle _lineStyle = LineStyle.connector;
   LineStyle get lineStyle => _lineStyle;
 
+  /// The colours the expand icon's `color` and `expandedColor` controls offer;
+  /// `null` is `light()`'s.
+  static const expandIconColors = <Color?>[
+    null,
+    Color(0xFFF44336),
+    Color(0xFF4CAF50),
+    Color(0xFF2196F3),
+    Color(0xFFFF9800),
+  ];
+
+  /// The sample `ExpandIconTheme.widget`: an icon with no colour of its own,
+  /// so `color` and `expandedColor` reach it.
+  static const sampleExpandIcon = Icon(Icons.arrow_right, size: 20);
+
+  bool _expandIconSample = false;
+  bool get expandIconSample => _expandIconSample;
+
+  double _expandIconWidth = 20;
+  double get expandIconWidth => _expandIconWidth;
+
+  double _expandIconHeight = 20;
+  double get expandIconHeight => _expandIconHeight;
+
+  EdgeInsets _expandIconPadding = EdgeInsets.zero;
+  EdgeInsets get expandIconPadding => _expandIconPadding;
+
+  EdgeInsets _expandIconMargin = EdgeInsets.zero;
+  EdgeInsets get expandIconMargin => _expandIconMargin;
+
+  Color? _expandIconColor;
+  Color? get expandIconColor => _expandIconColor;
+
+  Color? _expandIconExpandedColor;
+  Color? get expandIconExpandedColor => _expandIconExpandedColor;
+
   FlutterFolderViewTheme<String>? _theme;
 
   /// The `FolderView.theme` the settings describe: one instance until a theme
   /// setting changes.
-  FlutterFolderViewTheme<String> get theme =>
-      _theme ??= FlutterFolderViewTheme<String>.light().copyWith(
-        rowHeight: _rowHeight,
-        rowSpacing: _rowSpacing,
-        animationDuration: _animationDuration,
-        spacingTheme: FolderViewSpacingTheme(contentPadding: _contentPadding),
-        nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _borderRadius),
-        lineTheme: FolderViewLineTheme(
-          lineColor: _lineColor,
-          lineWidth: _lineWidth,
-          lineStyle: _lineStyle,
-        ),
-      );
+  FlutterFolderViewTheme<String> get theme => _theme ??= _buildTheme();
+
+  FlutterFolderViewTheme<String> _buildTheme() {
+    final light = FlutterFolderViewTheme<String>.light();
+    return light.copyWith(
+      expandIconTheme: ExpandIconTheme(
+        widget: _expandIconSample
+            ? sampleExpandIcon
+            : light.expandIconTheme.widget,
+        width: _expandIconWidth,
+        height: _expandIconHeight,
+        padding: _expandIconPadding,
+        margin: _expandIconMargin,
+        color: _expandIconColor,
+        expandedColor: _expandIconExpandedColor,
+      ),
+      rowHeight: _rowHeight,
+      rowSpacing: _rowSpacing,
+      animationDuration: _animationDuration,
+      spacingTheme: FolderViewSpacingTheme(contentPadding: _contentPadding),
+      nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _borderRadius),
+      lineTheme: FolderViewLineTheme(
+        lineColor: _lineColor,
+        lineWidth: _lineWidth,
+        lineStyle: _lineStyle,
+      ),
+    );
+  }
+
+  /// `FlutterFolderViewTheme.expandIconTheme` as the argument a caller would
+  /// write.
+  String get expandIconThemeCode {
+    final widget = _expandIconSample
+        ? 'Icon(Icons.arrow_right, size: 20)'
+        : 'Icon(Icons.chevron_right, color: Colors.grey.shade700, size: 20)';
+    return 'expandIconTheme: ${_expandIconSample ? 'const ' : ''}'
+        'ExpandIconTheme(\n'
+        '  widget: $widget,\n'
+        '  width: ${_num(_expandIconWidth)},\n'
+        '  height: ${_num(_expandIconHeight)},\n'
+        '  padding: ${_edgeCode(_expandIconPadding)},\n'
+        '  margin: ${_edgeCode(_expandIconMargin)},\n'
+        '${_colorLine('color', _expandIconColor)}'
+        '${_colorLine('expandedColor', _expandIconExpandedColor)}'
+        '),';
+  }
+
+  static String _edgeCode(EdgeInsets p) =>
+      'EdgeInsets.fromLTRB(${_num(p.left)}, ${_num(p.top)}, '
+      '${_num(p.right)}, ${_num(p.bottom)})';
+
+  static String _colorCode(Color c) =>
+      'Color(0x${c.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()})';
+
+  static String _colorLine(String name, Color? c) =>
+      c == null ? '' : '  $name: ${_colorCode(c)},\n';
 
   /// `FlutterFolderViewTheme.lineTheme` as the argument a caller would write.
   String get lineThemeCode {
-    final argb = _lineColor.toARGB32().toRadixString(16).padLeft(8, '0');
     return 'lineTheme: const FolderViewLineTheme(\n'
-        '  lineColor: Color(0x${argb.toUpperCase()}),\n'
+        '  lineColor: ${_colorCode(_lineColor)},\n'
         '  lineWidth: ${_num(_lineWidth)},\n'
         '  lineStyle: LineStyle.${_lineStyle.name},\n'
         '),';
@@ -207,13 +284,10 @@ class EverySettingDemo extends ChangeNotifier {
 
   /// `FlutterFolderViewTheme.spacingTheme` as the argument a caller would
   /// write.
-  String get spacingThemeCode {
-    final p = _contentPadding;
-    return 'spacingTheme: const FolderViewSpacingTheme(\n'
-        '  contentPadding: EdgeInsets.fromLTRB('
-        '${_num(p.left)}, ${_num(p.top)}, ${_num(p.right)}, ${_num(p.bottom)}),\n'
-        '),';
-  }
+  String get spacingThemeCode =>
+      'spacingTheme: const FolderViewSpacingTheme(\n'
+      '  contentPadding: ${_edgeCode(_contentPadding)},\n'
+      '),';
 
   /// `FlutterFolderViewTheme.nodeStyleTheme` as the argument a caller would
   /// write.
@@ -264,6 +338,20 @@ class EverySettingDemo extends ChangeNotifier {
   set lineColor(Color value) => _setTheme(() => _lineColor = value);
   set lineWidth(double value) => _setTheme(() => _lineWidth = value);
   set lineStyle(LineStyle value) => _setTheme(() => _lineStyle = value);
+  set expandIconSample(bool value) =>
+      _setTheme(() => _expandIconSample = value);
+  set expandIconWidth(double value) =>
+      _setTheme(() => _expandIconWidth = value);
+  set expandIconHeight(double value) =>
+      _setTheme(() => _expandIconHeight = value);
+  set expandIconPadding(EdgeInsets value) =>
+      _setTheme(() => _expandIconPadding = value);
+  set expandIconMargin(EdgeInsets value) =>
+      _setTheme(() => _expandIconMargin = value);
+  set expandIconColor(Color? value) =>
+      _setTheme(() => _expandIconColor = value);
+  set expandIconExpandedColor(Color? value) =>
+      _setTheme(() => _expandIconExpandedColor = value);
 
   /// `onScaleChanged`: applies the proposed Scale, clamped to [minScale] ..
   /// [maxScale].
