@@ -37,4 +37,5 @@ Applies the caller's **Scale** factor uniformly to every content-spatial propert
 - [tree-lines](tree-lines.md) — line width scales with `lineTheme`.
 
 ## Known holes
+- **Probed on 2026-10-19: a style returned by `textStyleResolver` is not scaled.** Each tier theme's `scale` multiplies its own `textStyle`. The resolver is a function and passes through unchanged, so what it returns is drawn at its own size. At Scale 2, a Folder with `textStyle: TextStyle(fontSize: 16)` drew 32 px, and one whose resolver returned the same style drew 16 px. All three tier themes share this shape (ADR-0005). The example's Scale interactions on Folder label and Parent label say so (#82, #83). Tracked: #127.
 - `scale` must be > 0 (a constructor `assert`). There is no upper bound, and the library proposes values without clamping ([scale-input](scale-input.md)).

@@ -283,11 +283,13 @@ class EverySettingDemo extends ChangeNotifier {
   );
   static const sampleFolderStyle = TextStyle(
     color: Color(0xFF00897B),
+    fontSize: 16,
     fontWeight: FontWeight.bold,
   );
 
-  /// The colours the Folder label and ink controls offer; the first two are
-  /// `light()`'s and `dark()`'s.
+  /// The colours the Folder label and ink controls offer. For text and hover
+  /// the first two are `light()`'s and `dark()`'s; for splash and highlight
+  /// the first is both factories'.
   static const folderTextColors = <Color?>[
     Color(0xDD000000),
     Color(0xB3FFFFFF),
@@ -380,6 +382,119 @@ class EverySettingDemo extends ChangeNotifier {
     fontWeight: _folderBold ? FontWeight.bold : null,
   );
 
+  /// The samples the Parent icon controls install. They have no colour of
+  /// their own, so the ambient icon colour reaches them.
+  static const sampleParentIcon = Icon(Icons.account_tree_outlined, size: 20);
+  static const sampleParentOpenIcon = Icon(Icons.schema_outlined, size: 20);
+
+  /// What the Parent resolver samples return for a Parent that holds two
+  /// Children; every other Parent gets `null`, so the static field applies.
+  static const sampleTwoChildIcon = Icon(Icons.looks_two, size: 20);
+  static const sampleTwoChildOpenIcon = Icon(
+    Icons.looks_two_outlined,
+    size: 20,
+  );
+  static const sampleParentStyle = TextStyle(
+    color: Color(0xFF6A1B9A),
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
+
+  /// The colours the Parent label and ink controls offer. For text and hover
+  /// the first two are `light()`'s and `dark()`'s; for splash and highlight
+  /// the first is both factories'.
+  static const parentTextColors = <Color?>[
+    Color(0xDD000000),
+    Color(0xB3FFFFFF),
+    Color(0xFFD32F2F),
+    Color(0xFF1976D2),
+  ];
+  static const parentHoverColors = <Color?>[
+    Color(0xFFEEEEEE),
+    Color(0xFF424242),
+    Color(0xFFE1BEE7),
+    null,
+  ];
+  static final parentSplashColors = <Color?>[
+    Colors.blue.withValues(alpha: 0.3),
+    Colors.red.withValues(alpha: 0.3),
+    Colors.green.withValues(alpha: 0.3),
+    null,
+  ];
+  static final parentHighlightColors = <Color?>[
+    Colors.blue.withValues(alpha: 0.1),
+    Colors.red.withValues(alpha: 0.1),
+    Colors.green.withValues(alpha: 0.1),
+    null,
+  ];
+
+  /// The font sizes the Parent label offers; `null` is the ambient size.
+  static const parentFontSizes = <double?>[null, 12, 14, 16, 18, 20];
+
+  static Widget? _twoChildIcon(Node<String> node) =>
+      node.children.length == 2 ? sampleTwoChildIcon : null;
+  static Widget? _twoChildOpenIcon(Node<String> node) =>
+      node.children.length == 2 ? sampleTwoChildOpenIcon : null;
+  static TextStyle? _twoChildStyle(Node<String> node) =>
+      node.children.length == 2 ? sampleParentStyle : null;
+  static String? _childCountLabel(Node<String> node) =>
+      '${node.label} (${node.children.length})';
+
+  // The defaults are `FlutterFolderViewTheme.light().parentTheme`'s.
+  bool _parentWidgetSample = false;
+  bool get parentWidgetSample => _parentWidgetSample;
+
+  ParentOpenWidget _parentOpenWidget = ParentOpenWidget.factory;
+  ParentOpenWidget get parentOpenWidget => _parentOpenWidget;
+
+  bool _parentWidgetResolver = false;
+  bool get parentWidgetResolver => _parentWidgetResolver;
+
+  bool _parentOpenWidgetResolver = false;
+  bool get parentOpenWidgetResolver => _parentOpenWidgetResolver;
+
+  double _parentWidth = 20;
+  double get parentWidth => _parentWidth;
+
+  double _parentHeight = 20;
+  double get parentHeight => _parentHeight;
+
+  EdgeInsets _parentPadding = EdgeInsets.zero;
+  EdgeInsets get parentPadding => _parentPadding;
+
+  EdgeInsets _parentMargin = EdgeInsets.zero;
+  EdgeInsets get parentMargin => _parentMargin;
+
+  Color? _parentTextColor = parentTextColors.first;
+  Color? get parentTextColor => _parentTextColor;
+
+  double? _parentFontSize;
+  double? get parentFontSize => _parentFontSize;
+
+  bool _parentBold = false;
+  bool get parentBold => _parentBold;
+
+  bool _parentTextStyleResolver = false;
+  bool get parentTextStyleResolver => _parentTextStyleResolver;
+
+  bool _parentLabelResolver = false;
+  bool get parentLabelResolver => _parentLabelResolver;
+
+  Color? _parentHoverColor = parentHoverColors.first;
+  Color? get parentHoverColor => _parentHoverColor;
+
+  Color? _parentSplashColor = parentSplashColors.first;
+  Color? get parentSplashColor => _parentSplashColor;
+
+  Color? _parentHighlightColor = parentHighlightColors.first;
+  Color? get parentHighlightColor => _parentHighlightColor;
+
+  TextStyle get _parentTextStyle => TextStyle(
+    color: _parentTextColor,
+    fontSize: _parentFontSize,
+    fontWeight: _parentBold ? FontWeight.bold : null,
+  );
+
   FlutterFolderViewTheme<String>? _theme;
 
   /// The `FolderView.theme` the settings describe: one instance until a theme
@@ -448,6 +563,23 @@ class EverySettingDemo extends ChangeNotifier {
     _folderHoverColor = d.hoverColor;
     _folderSplashColor = d.splashColor;
     _folderHighlightColor = d.highlightColor;
+    final q = f.parentTheme;
+    _parentWidgetSample = false;
+    _parentOpenWidget = ParentOpenWidget.factory;
+    _parentWidgetResolver = false;
+    _parentOpenWidgetResolver = false;
+    _parentWidth = q.width;
+    _parentHeight = q.height;
+    _parentPadding = q.padding;
+    _parentMargin = q.margin;
+    _parentTextColor = q.textStyle?.color;
+    _parentFontSize = q.textStyle?.fontSize;
+    _parentBold = q.textStyle?.fontWeight == FontWeight.bold;
+    _parentTextStyleResolver = false;
+    _parentLabelResolver = false;
+    _parentHoverColor = q.hoverColor;
+    _parentSplashColor = q.splashColor;
+    _parentHighlightColor = q.highlightColor;
     _theme = null;
     notifyListeners();
   }
@@ -481,7 +613,8 @@ class EverySettingDemo extends ChangeNotifier {
         _trackWidth == b.trackWidth &&
         _trackRadius == b.trackRadius &&
         _trackVisibility == b.trackVisibility &&
-        _folderMatches(f.folderTheme);
+        _folderMatches(f.folderTheme) &&
+        _parentMatches(f.parentTheme);
   }
 
   bool _folderMatches(FolderNodeTheme<String> d) =>
@@ -501,6 +634,24 @@ class EverySettingDemo extends ChangeNotifier {
       _folderHoverColor == d.hoverColor &&
       _folderSplashColor == d.splashColor &&
       _folderHighlightColor == d.highlightColor;
+
+  bool _parentMatches(ParentNodeTheme<String> q) =>
+      !_parentWidgetSample &&
+      _parentOpenWidget == ParentOpenWidget.factory &&
+      !_parentWidgetResolver &&
+      !_parentOpenWidgetResolver &&
+      _parentWidth == q.width &&
+      _parentHeight == q.height &&
+      _parentPadding == q.padding &&
+      _parentMargin == q.margin &&
+      _parentTextColor == q.textStyle?.color &&
+      _parentFontSize == q.textStyle?.fontSize &&
+      _parentBold == (q.textStyle?.fontWeight == FontWeight.bold) &&
+      !_parentTextStyleResolver &&
+      !_parentLabelResolver &&
+      _parentHoverColor == q.hoverColor &&
+      _parentSplashColor == q.splashColor &&
+      _parentHighlightColor == q.highlightColor;
 
   /// `FolderViewTheme.data`'s path, as the code a caller would write.
   String get injectionCode => switch (_injection) {
@@ -556,6 +707,30 @@ class EverySettingDemo extends ChangeNotifier {
         splashColor: _folderSplashColor,
         highlightColor: _folderHighlightColor,
         tooltipTheme: base.folderTheme.tooltipTheme,
+      ),
+      parentTheme: ParentNodeTheme<String>(
+        widget: _parentWidgetSample
+            ? sampleParentIcon
+            : base.parentTheme.widget,
+        widgetResolver: _parentWidgetResolver ? _twoChildIcon : null,
+        openWidget: switch (_parentOpenWidget) {
+          ParentOpenWidget.factory => base.parentTheme.openWidget,
+          ParentOpenWidget.sample => sampleParentOpenIcon,
+        },
+        openWidgetResolver: _parentOpenWidgetResolver
+            ? _twoChildOpenIcon
+            : null,
+        width: _parentWidth,
+        height: _parentHeight,
+        padding: _parentPadding,
+        margin: _parentMargin,
+        textStyle: _parentTextStyle,
+        textStyleResolver: _parentTextStyleResolver ? _twoChildStyle : null,
+        labelResolver: _parentLabelResolver ? _childCountLabel : null,
+        hoverColor: _parentHoverColor,
+        splashColor: _parentSplashColor,
+        highlightColor: _parentHighlightColor,
+        tooltipTheme: base.parentTheme.tooltipTheme,
       ),
       rowHeight: _rowHeight,
       rowSpacing: _rowSpacing,
@@ -627,11 +802,42 @@ class EverySettingDemo extends ChangeNotifier {
         '  padding: ${_edgeCode(_folderPadding)},\n'
         '  margin: ${_edgeCode(_folderMargin)},\n'
         '  textStyle: TextStyle($style),\n'
-        '${_folderTextStyleResolver ? '  textStyleResolver: (node) => node.children.length == 1\n      ? const TextStyle(color: Color(0xFF00897B), fontWeight: FontWeight.bold)\n      : null,\n' : ''}'
+        '${_folderTextStyleResolver ? '  textStyleResolver: (node) => node.children.length == 1\n      ? const TextStyle(color: Color(0xFF00897B), fontSize: 16, fontWeight: FontWeight.bold)\n      : null,\n' : ''}'
         '${_folderLabelResolver ? "  labelResolver: (node) => '\${node.label} (\${node.children.length})',\n" : ''}'
         '${_colorLine('hoverColor', _folderHoverColor)}'
         '${_inkLine('splashColor', _folderSplashColor, folderSplashColors, 0.3)}'
         '${_inkLine('highlightColor', _folderHighlightColor, folderHighlightColors, 0.1)}'
+        '),';
+  }
+
+  /// `FlutterFolderViewTheme.parentTheme` as the argument a caller would
+  /// write. The tooltip theme is left out: its knobs belong to the tooltip
+  /// features.
+  String get parentThemeCode {
+    final grey = switch (_base) {
+      ThemePreset.light => 'shade700',
+      ThemePreset.dark => 'shade400',
+    };
+    final style = [
+      if (_parentTextColor != null) 'color: ${_colorCode(_parentTextColor!)}',
+      if (_parentFontSize != null) 'fontSize: ${_num(_parentFontSize!)}',
+      if (_parentBold) 'fontWeight: FontWeight.bold',
+    ].join(', ');
+    return 'parentTheme: ParentNodeTheme<String>(\n'
+        '  widget: ${_parentWidgetSample ? 'const Icon(Icons.account_tree_outlined, size: 20)' : 'Icon(Icons.account_tree, color: Colors.grey.$grey, size: 20)'},\n'
+        '${_parentWidgetResolver ? '  widgetResolver: (node) => node.children.length == 2\n      ? const Icon(Icons.looks_two, size: 20)\n      : null,\n' : ''}'
+        '${_parentOpenWidget == ParentOpenWidget.sample ? '  openWidget: const Icon(Icons.schema_outlined, size: 20),\n' : ''}'
+        '${_parentOpenWidgetResolver ? '  openWidgetResolver: (node) => node.children.length == 2\n      ? const Icon(Icons.looks_two_outlined, size: 20)\n      : null,\n' : ''}'
+        '  width: ${_num(_parentWidth)},\n'
+        '  height: ${_num(_parentHeight)},\n'
+        '  padding: ${_edgeCode(_parentPadding)},\n'
+        '  margin: ${_edgeCode(_parentMargin)},\n'
+        '  textStyle: TextStyle($style),\n'
+        '${_parentTextStyleResolver ? '  textStyleResolver: (node) => node.children.length == 2\n      ? const TextStyle(color: Color(0xFF6A1B9A), fontSize: 16, fontWeight: FontWeight.bold)\n      : null,\n' : ''}'
+        '${_parentLabelResolver ? "  labelResolver: (node) => '\${node.label} (\${node.children.length})',\n" : ''}'
+        '${_colorLine('hoverColor', _parentHoverColor)}'
+        '${_inkLine('splashColor', _parentSplashColor, parentSplashColors, 0.3)}'
+        '${_inkLine('highlightColor', _parentHighlightColor, parentHighlightColors, 0.1)}'
         '),';
   }
 
@@ -798,6 +1004,33 @@ class EverySettingDemo extends ChangeNotifier {
       _setTheme(() => _folderSplashColor = value);
   set folderHighlightColor(Color? value) =>
       _setTheme(() => _folderHighlightColor = value);
+  set parentWidgetSample(bool value) =>
+      _setTheme(() => _parentWidgetSample = value);
+  set parentOpenWidget(ParentOpenWidget value) =>
+      _setTheme(() => _parentOpenWidget = value);
+  set parentWidgetResolver(bool value) =>
+      _setTheme(() => _parentWidgetResolver = value);
+  set parentOpenWidgetResolver(bool value) =>
+      _setTheme(() => _parentOpenWidgetResolver = value);
+  set parentWidth(double value) => _setTheme(() => _parentWidth = value);
+  set parentHeight(double value) => _setTheme(() => _parentHeight = value);
+  set parentPadding(EdgeInsets value) =>
+      _setTheme(() => _parentPadding = value);
+  set parentMargin(EdgeInsets value) => _setTheme(() => _parentMargin = value);
+  set parentTextColor(Color? value) =>
+      _setTheme(() => _parentTextColor = value);
+  set parentFontSize(double? value) => _setTheme(() => _parentFontSize = value);
+  set parentBold(bool value) => _setTheme(() => _parentBold = value);
+  set parentTextStyleResolver(bool value) =>
+      _setTheme(() => _parentTextStyleResolver = value);
+  set parentLabelResolver(bool value) =>
+      _setTheme(() => _parentLabelResolver = value);
+  set parentHoverColor(Color? value) =>
+      _setTheme(() => _parentHoverColor = value);
+  set parentSplashColor(Color? value) =>
+      _setTheme(() => _parentSplashColor = value);
+  set parentHighlightColor(Color? value) =>
+      _setTheme(() => _parentHighlightColor = value);
 
   /// `onScaleChanged`: applies the proposed Scale, clamped to [minScale] ..
   /// [maxScale].
@@ -933,6 +1166,10 @@ enum ThemeInjection { parameter, ancestor }
 /// The Folder `openWidget`: the factory's, the sample, or none, which falls
 /// back to `widget`.
 enum FolderOpenWidget { factory, sample, none }
+
+/// The Parent `openWidget`: the factory's, which both factories leave unset,
+/// or the sample. A Parent shows it only in Tree Mode.
+enum ParentOpenWidget { factory, sample }
 
 /// The curves the panel offers a `WheelMotion.curve`.
 enum WheelCurveOption {

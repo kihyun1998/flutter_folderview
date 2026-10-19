@@ -72,7 +72,19 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - In the mobile frame (view 390 px, cap 1170), the long Folder's row measured 1194.3 px. It was clamped to 1170, and the label, which needs 1154.3 px, was laid out at 1130 and cut, whatever the measurement said.
   - In the tablet frame (view 834 px, cap 2502), the same row fits.
 
-  The resolver tests run in the tablet frame and assert both edges first, through `_expectFitsInWindow`: the label is wider than the view, and well under the cap. On desktop, the `lib/` mutations that measure `node.label` instead of the resolved label, or `textStyle` instead of the resolved style, survived. In the tablet frame they redden, and switching the frame to mobile fails the cap edge.
+  The resolver tests run in the tablet frame and assert both edges first, through `_expectFitsInWindow`: the label is wider than the view, and well under the cap. On desktop, the `lib/` mutation that measures `node.label` instead of the resolved label survived. In the tablet frame it reddens, and switching the frame to mobile fails the cap edge.
+  - The style half was not true yet at #82, because a bold-only sample cannot change a width (see below).
+  - Since #83 the sample also sets `fontSize: 16`, and a `maxWidth` that ignores the Folder style resolver reddens.
+  - The #82 mutation that reddened then also changed the rendered style.
+- **"Parent tier" (#83) mirrors the Folder tier**, with its own `_parent*` fields, `ParentOpenWidget` and swatch lists (ADR-0005).
+  - **A Parent shows `openWidget` only in Tree Mode** (`useOpenState: mode == ViewMode.tree`). Both factories leave it unset, so the Factory choice means none, and the openWidget test runs in Tree Mode.
+  - **The resolver samples act on a Parent that holds two Children**: 1-2 and 3-1 in the demo data, counted first.
+  - **The Parent tests assert no measurement.** They check the resolved text and style only. A window does exist for the label alone: the widest Parent label is 527.3 px, past the 390 px mobile view. But a Parent row never sets the content width (two bullets down), so a short measurement of it cuts nothing.
+- **The test font is as wide bold as regular.** Bold left the long Folder label at exactly 1097.3 px, so a bold-only style resolver can never change a width in a widget test. The tier resolver samples therefore also set `fontSize: 16`. With that, the Folder test catches a `maxWidth` that ignores the Folder style resolver.
+- **A Parent's measurement is not testable from the shell, for its label or its style.** `maxWidth` walks every Node, including collapsed ones, and the demo's long Folder 3 row is always the widest. A Parent row never sets the content width, so under-measuring it cuts nothing. Generated labels give no window either.
+  - Two measurement-only `lib/` mutations survive the Parent tests for this reason (classified: vacuous window): `_rowWidth` measuring `node.label`, and `maxWidth` ignoring the Parent style resolver.
+  - A mutation of `RowMetrics.label` does redden, but through the rendered text, not the measurement.
+  - The Folder tests cover the shared label path and the Folder branch of the style switch.
 - **"Scrollbars" (#85).**
   - **The bars show only on hover.** At `light()`'s `nonHoverOpacity` of 0 they are hidden until the pointer is over the tree, so `scrollbar_test` drives a mouse pointer.
   - The thumb is asserted where it is painted: the `Scrollbar`'s `drawRRect` carries `thumbColor`, and its rect is `thickness` wide with `radius` corners.
@@ -108,6 +120,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/lib/app/every_setting.dart` — `ThemePreset`, `ThemeInjection`, `EverySettingDemo.applyPreset`, `EverySettingDemo.activePreset`, `EverySettingDemo.injectionCode`, `EverySettingStage`
 - `example/lib/app/every_setting_host.dart` — `EverySettingHost.presets`, `EverySettingHost.applyPreset`
 - `example/lib/app/every_setting.dart` — `FolderOpenWidget`, `EverySettingDemo.folderThemeCode`, `EverySettingDemo._folderMatches`, `EverySettingDemo.sampleFolderIcon`
+- `example/lib/app/every_setting.dart` — `ParentOpenWidget`, `EverySettingDemo.parentThemeCode`, `EverySettingDemo._parentMatches`
+- `example/test/parent_tier_test.dart` — Parent glyphs per row (openWidget in Tree Mode), the icon box, label style and resolvers (in the mobile frame), the ink, presets, the code text
 - `example/test/folder_tier_test.dart` — Folder glyphs per row, the icon box, the label style and resolvers (in the tablet frame), the ink, presets, the code text
 - `example/test/theme_injection_test.dart` — presets reset and release, both injection paths under Dark, the code text, the shell untouched
 - `example/test/scrollbar_test.dart` — hover fade, the track box, the painted thumb, Material's track, the bar at Scale 2, the code text
