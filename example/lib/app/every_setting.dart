@@ -157,6 +157,26 @@ class EverySettingDemo extends ChangeNotifier {
   double _borderRadius = 8;
   double get borderRadius => _borderRadius;
 
+  /// The colours the `lineColor` control offers; the first is `light()`'s.
+  static const lineColors = [
+    Color(0xFF9E9E9E),
+    Color(0xFF2196F3),
+    Color(0xFF4CAF50),
+    Color(0xFFFF9800),
+    Color(0xFFF44336),
+    Color(0xFF9C27B0),
+    Color(0xDD000000),
+  ];
+
+  Color _lineColor = lineColors.first;
+  Color get lineColor => _lineColor;
+
+  double _lineWidth = 1.5;
+  double get lineWidth => _lineWidth;
+
+  LineStyle _lineStyle = LineStyle.connector;
+  LineStyle get lineStyle => _lineStyle;
+
   FlutterFolderViewTheme<String>? _theme;
 
   /// The `FolderView.theme` the settings describe: one instance until a theme
@@ -168,7 +188,22 @@ class EverySettingDemo extends ChangeNotifier {
         animationDuration: _animationDuration,
         spacingTheme: FolderViewSpacingTheme(contentPadding: _contentPadding),
         nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _borderRadius),
+        lineTheme: FolderViewLineTheme(
+          lineColor: _lineColor,
+          lineWidth: _lineWidth,
+          lineStyle: _lineStyle,
+        ),
       );
+
+  /// `FlutterFolderViewTheme.lineTheme` as the argument a caller would write.
+  String get lineThemeCode {
+    final argb = _lineColor.toARGB32().toRadixString(16).padLeft(8, '0');
+    return 'lineTheme: const FolderViewLineTheme(\n'
+        '  lineColor: Color(0x${argb.toUpperCase()}),\n'
+        '  lineWidth: ${_num(_lineWidth)},\n'
+        '  lineStyle: LineStyle.${_lineStyle.name},\n'
+        '),';
+  }
 
   /// `FlutterFolderViewTheme.spacingTheme` as the argument a caller would
   /// write.
@@ -226,6 +261,9 @@ class EverySettingDemo extends ChangeNotifier {
   set contentPadding(EdgeInsets value) =>
       _setTheme(() => _contentPadding = value);
   set borderRadius(double value) => _setTheme(() => _borderRadius = value);
+  set lineColor(Color value) => _setTheme(() => _lineColor = value);
+  set lineWidth(double value) => _setTheme(() => _lineWidth = value);
+  set lineStyle(LineStyle value) => _setTheme(() => _lineStyle = value);
 
   /// `onScaleChanged`: applies the proposed Scale, clamped to [minScale] ..
   /// [maxScale].

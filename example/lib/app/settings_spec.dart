@@ -70,6 +70,41 @@ const settingsSpec = <SettingGroup>[
           ),
         ],
       ),
+      SettingFeature(
+        id: 'lines',
+        title: 'Tree lines',
+        options: [
+          'FlutterFolderViewTheme.lineTheme',
+          'FolderViewLineTheme.lineStyle',
+          'FolderViewLineTheme.lineColor',
+          'FolderViewLineTheme.lineWidth',
+        ],
+        interactions: [
+          Interaction(
+            otherFeatureId: 'scale',
+            effect:
+                'The Scale multiplies lineWidth, and the column a line sits '
+                'in, which is the expand icon strip.',
+            evidence:
+                'lib/themes/folder_view_line_theme.dart: '
+                'FolderViewLineTheme.scale; lib/widgets/node_widget.dart: '
+                'TreeLines takes metrics.expandStripWidth as its column width',
+          ),
+          Interaction(
+            otherFeatureId: 'viewMode',
+            effect:
+                'Tree Mode draws the lines of the projected tree. Its root '
+                'rows, the lifted Parents, get no connector, so only Children '
+                'draw one.',
+            evidence:
+                'lib/services/view_mode_projection.dart: '
+                'ViewModeProjection.project returns the lifted Parents as the '
+                'roots; lib/services/flatten_service.dart flattens them with '
+                'isRoot: true; lib/widgets/tree_lines.dart: '
+                'TreeLinePlan.forRow gives a root row no connector',
+          ),
+        ],
+      ),
     ],
   ),
 ];

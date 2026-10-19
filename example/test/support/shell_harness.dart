@@ -32,6 +32,7 @@ Future<void> openFeature(WidgetTester tester, String title) async {
     matching: find.text(title),
   );
   await tester.ensureVisible(entry.first);
+  await tester.pumpAndSettle();
   await tester.tap(entry.first);
   await tester.pumpAndSettle();
 }

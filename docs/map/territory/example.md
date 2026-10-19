@@ -50,6 +50,11 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - `contentPadding` is one control with a slider per side, because the field is a single `EdgeInsets`.
   - **`FlutterFolderViewTheme.animationDuration` changes nothing on screen**, because the library reads it nowhere ([theme-composition](theme-composition.md) Known holes). The slider is there for coverage, and the panel note says so.
   - The rest is visible in the rendered rows' `ListView`: `itemExtent` is `rowHeight + rowSpacing`, and `padding` is `contentPadding`. `borderRadius` rounds the `Ink` and `InkWell` of every row.
+- **"Tree lines" (#80) asserts what is painted.** `lines_test` records the rendered `FolderView`'s `drawLine` calls with `flutter_test`'s `paints` matcher.
+  - Each knob is checked against the strokes drawn: a `connector` draws a horizontal stub, `scope` draws verticals only, and `none` draws no line at all. The same holds in Tree Mode, where the lifted Parents are roots and draw no connector, so only Children do.
+  - `lineColor` is a row of swatches: the template has no colour control, so the swatches follow the legacy panel's `colorRow`. The first swatch is `light()`'s grey.
+  - **Compare a painted colour by `toARGB32()`, not `==`.** `Paint` stores its colour as Float32, so `paint.color == Color(0xFF9E9E9E)` is false even though both print the same channels. Measured at #80.
+- **`openFeature` settles after `ensureVisible`, before it taps.** Without the settle, an entry low in the feature list is tapped where it was before the scroll. With a feature open, the list pane ends at y = 527.5 on a 1000 px window, so "Tree lines" sat at 533–546, under the detail pane. Measured at #80. Earlier tests passed only because their entries were already in view.
 - The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).
 
 ## Code
@@ -68,6 +73,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/lib/app/every_setting.dart` — `WheelMotionKind`, `WheelCurveOption`, `EverySettingDemo.wheelMotion`, `EverySettingDemo.wheelMotionCode`
 - `example/lib/app/every_setting.dart` — `ModifierScrollBlock`, `EverySettingDemo.handleScaleChanged`, `EverySettingDemo.blockModifierScroll`
 - `example/lib/app/every_setting.dart` — `EverySettingDemo.theme`, `EverySettingDemo.spacingThemeCode`, `EverySettingDemo.nodeStyleThemeCode`
+- `example/lib/app/every_setting.dart` — `EverySettingDemo.lineColors`, `EverySettingDemo.lineThemeCode`
+- `example/test/lines_test.dart` — the line knobs reach the painted strokes in both View Modes; the `lineTheme` code text
 - `example/test/layout_test.dart` — the Layout controls reach the rendered theme and rows; the theme instance is kept; the container code text
 - `example/test/scale_test.dart` — the Scale controls reach the rendered `FolderView`; Ctrl+wheel proposes, the handler clamps, blocking decides scroll versus Scale
 - `example/test/room_test.dart` — the Room draws a `FolderView` at 1:1, desktop scales it down
