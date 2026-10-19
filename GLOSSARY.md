@@ -61,7 +61,7 @@ A uniform zoom factor applied to the **content** of the **FolderView**. All spat
 _Avoid_: Zoom, magnification, size factor.
 
 **Scale Modifier**:
-The platform-aware keyboard modifier (Ctrl on Windows/Linux, Cmd on macOS) that, when held during mouse-wheel scrolling, signals a **Scale** change request rather than a normal scroll.
+The platform-aware keyboard modifier (Ctrl on Windows/Linux, Cmd on macOS) that, when held during mouse-wheel scrolling, can turn the wheel over the rows into a **Scale** change request instead of a normal scroll. Whether it does is set by `blockModifierScroll`. While the modifier scroll is blocked, the wheel proposes a **Scale** if `onScaleChanged` is provided. Otherwise it scrolls as usual.
 _Avoid_: Zoom key, ctrl-scroll.
 
 ## Relationships
@@ -75,7 +75,7 @@ _Avoid_: Zoom key, ctrl-scroll.
 - **Expansion** and **Selection** are independent and apply to disjoint tiers: **Folders** and **Parents** expand; **Children** are selected. A single **Node** is therefore either expandable or selectable, never both.
 - In `tree` **View Mode**, a **Folder**'s membership in the **Expanded Set** has no defined effect — the **Folder** is not rendered in that projection.
 - **Scale** applies uniformly to all content-spatial properties. **Scrollbars** (see ADR-0001) and **tooltips** (see ADR-0004) are classified as chrome and excluded. Non-spatial properties (colors, durations) are excluded by nature.
-- When `onScaleChanged` is provided, the library detects **Scale Modifier** + wheel events and proposes a new **Scale** value; the caller applies it. This follows the same caller-controlled-state pattern as the **Expanded Set** and the **Selected Set**.
+- When `onScaleChanged` is provided and `blockModifierScroll` is not `false`, the library detects **Scale Modifier** + wheel events and proposes a new **Scale** value; the caller applies it. With `blockModifierScroll: false` the same events scroll, and nothing is proposed. This follows the same caller-controlled-state pattern as the **Expanded Set** and the **Selected Set**.
 - **Scale** is independent of **View Mode**, **Expansion**, and **Selection** — changing **Scale** does not change which **Nodes** are visible or selected.
 - Violations of the tier rules (e.g. a **Child** at the root in `folder` **View Mode**, or a **Folder** nested inside a **Parent**) produce undefined visible behavior — the library does not enforce them at runtime.
 

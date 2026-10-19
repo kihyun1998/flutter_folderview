@@ -139,9 +139,17 @@ final scaledTheme = myTheme.scaledForContext(context, 1.5);
 final scaledTheme = myTheme.scale(factor: 1.5, defaultFontSize: 14.0);
 ```
 
-Ctrl (Windows/Linux) or Cmd (macOS) + scroll wheel is blocked by default (`blockModifierScroll: true`) so zoom-by-scroll works without unintended scrolling. Set `blockModifierScroll: false` to allow normal scrolling while the modifier key is held.
+While you pass `onScaleChanged`, Ctrl (Windows/Linux) or Cmd (macOS) + scroll wheel proposes a Scale and does not scroll the rows. `blockModifierScroll` overrides that. It defaults to `null`, which follows `onScaleChanged`:
 
-The library also exports `isScaleModifierPressed()` — a platform-aware helper that returns `true` when Ctrl (Windows/Linux) or Cmd (macOS) is pressed. Use it to implement custom zoom logic:
+| `blockModifierScroll` | With `onScaleChanged` | Without it |
+|---|---|---|
+| `null` (default) | proposes a Scale, no scroll | scrolls |
+| `true` | proposes a Scale, no scroll | no scroll, no Scale |
+| `false` | scrolls, **no Scale proposed** | scrolls |
+
+So `false` turns zoom-by-wheel off as well: `onScaleChanged` is called only while the modifier scroll is blocked. The block covers the rows. A wheel over the vertical scrollbar still scrolls the view, because the scrollbar is a scroll view of its own.
+
+The library also exports `isScaleModifierPressed()` — a platform-aware helper that returns `true` when Ctrl (Windows/Linux) or Cmd (macOS) is pressed. Use it to implement custom zoom logic. Pass `blockModifierScroll: true`, or the same wheel event also scrolls the view:
 
 ```dart
 Listener(
@@ -155,18 +163,9 @@ Listener(
     data: nodes,
     mode: ViewMode.folder,
     scale: _scale,
+    blockModifierScroll: true, // no onScaleChanged, so block explicitly
     expandedNodeIds: expandedIds,
   ),
-)
-```
-
-```dart
-FolderView(
-  data: nodes,
-  mode: ViewMode.folder,
-  scale: 1.5,
-  blockModifierScroll: true, // default: true
-  expandedNodeIds: expandedIds,
 )
 ```
 
@@ -197,7 +196,7 @@ FolderView(
 
 - Only the mouse wheel animates. Trackpad scrolling, dragging a scrollbar, and the jumps that keep a Node in place on expand, collapse or a Scale change move the view at once, and stop a motion in progress.
 - A wheel turned over a scrollbar moves the view at once too: the scrollbar is a scroll view of its own.
-- Ctrl+wheel (Cmd+wheel on macOS) still changes the Scale and, while `blockModifierScroll` is in effect, does not scroll.
+- Ctrl+wheel (Cmd+wheel on macOS) over the rows still proposes a Scale and, while `blockModifierScroll` is in effect, does not scroll.
 - How far one notch travels is not a `FolderView` setting. It is app-wide, through `SmoothWheelBinding` in `flutter_smooth_wheel_scroll`, which this package does not install.
 
 ## Tooltip

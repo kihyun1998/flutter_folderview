@@ -2,7 +2,7 @@
 
 - **feat**: a mouse-wheel notch over the view animates to its target instead of jumping ([#100](https://github.com/kihyun1998/flutter_folderview/issues/100)). The main vertical and horizontal scroll controllers are now `SmoothScrollController`s from `flutter_smooth_wheel_scroll`, moving as `WheelMotion.spring()`: 400 ms, no bounce. The scrollbars follow the list on every frame of a motion. Trackpad scrolling, dragging, the scrollbar and programmatic jumps behave as before.
   - **What a consumer sees differently.** After a wheel notch, the scroll offset reaches its target over several frames, not at once. A widget test that wheel-scrolls and reads the offset after a single `pump` now has to pump until the motion settles.
-  - The Scale Modifier + wheel still proposes a Scale and, while `blockModifierScroll` is in effect, does not scroll.
+  - The Scale Modifier + wheel over the rows still proposes a Scale and, while `blockModifierScroll` is in effect, does not scroll.
 - **feat**: `FolderView.wheelMotion` chooses how the wheel moves the view ([#101](https://github.com/kihyun1998/flutter_folderview/issues/101)). The default is `WheelMotion.spring()`. Other options are `WheelMotion.spring(duration:, bounce:)`, `WheelMotion.curve(duration:, curve:)` with any `Curve`, and `WheelMotion.lerp(timeConstant:)`. `null` moves the view at once on every notch, as before 0.12.0.
   - It can change at runtime. The next notch uses the new motion, and the scroll position is kept.
   - `WheelMotion` is re-exported, so no import of `flutter_smooth_wheel_scroll` is needed. How far a notch travels is app-wide, through `SmoothWheelBinding` in that package, and this one does not install it.
@@ -10,6 +10,7 @@
   - **What a consumer sees differently.** On Flutter 3.13–3.31 this version does not resolve, and `pub` stays on the previous version. No class, method or field changed because of the floor.
   - **Why.** This package now depends on [`flutter_smooth_wheel_scroll`](https://pub.dev/packages/flutter_smooth_wheel_scroll) `^0.1.3`, which declares Flutter `>=3.32.0` / Dart `^3.8.0`. It uses `SpringDescription.withDurationAndBounce` (flutter#164411), and 3.32.0 is the first stable release to carry it. The floor is the max of what the dependencies demand: `max(3.13, 3.32)`.
   - **The source was reformatted, with no behaviour change.** `dart format` picks its style from the package's language version, and from Dart 3.7 that is the tall style. That reformat is a separate, mechanical commit.
+- **docs**: `blockModifierScroll: false` also turns zoom-by-wheel off ([#112](https://github.com/kihyun1998/flutter_folderview/issues/112)). `onScaleChanged` is called only while the modifier scroll is blocked, so with `false` Ctrl/Cmd+wheel scrolls and proposes no Scale. The `onScaleChanged`, `scaleStep` and `blockModifierScroll` dartdocs, the README and `GLOSSARY.md` now say so, and the README gives all six cases. The README's default was also wrong: it is `null`, following `onScaleChanged`, not `true`. Its custom-zoom recipe with `isScaleModifierPressed()` now passes `blockModifierScroll: true`. Without it, the same wheel event zoomed and also scrolled the view. No behaviour change.
 
 ## 0.11.3
 
