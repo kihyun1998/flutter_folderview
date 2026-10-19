@@ -35,5 +35,5 @@ The public theming surface. `FlutterFolderViewTheme` aggregates eight sub-themes
 - [label-tooltip](label-tooltip.md) — `tooltipTheme` is a field on each tier theme.
 
 ## Known holes
-- **`FlutterFolderViewTheme.animationDuration` is read nowhere in `lib/`.** It is carried through `copyWith`, `lerp` and `==` but drives no animation. Read from the code.
+- **`FlutterFolderViewTheme.animationDuration` is read nowhere in `lib/`.** It is carried through `copyWith`, `lerp` and `==` but drives no animation. Read from the code. It went dead in `51d86a8`, the flat-list rewrite, which removed the `AnimationController` that read it. The example's Layout slider for it changes nothing on screen (#79). Tracked: #116.
 - `FolderViewNodeStyleTheme` and `FolderViewSpacingTheme` each box one field (`borderRadius`, `contentPadding`). Tracked: [#16](https://github.com/kihyun1998/flutter_folderview/issues/16). That issue's third item, a hand-rolled `lerpDouble`, no longer holds: every theme imports `dart:ui`'s. Its line citation into `node_widget.dart` points past the end of the current file.
