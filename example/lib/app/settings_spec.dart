@@ -43,6 +43,7 @@ const settingsSpec = <SettingGroup>[
   _folderTier,
   _parentTier,
   _childTier,
+  _nodeTooltips,
   SettingGroup(
     id: 'layout',
     title: 'Layout',
@@ -536,6 +537,47 @@ const _childTier = SettingGroup(
               'lib/widgets/custom_ink_well.dart: CustomInkWell; CHANGELOG.md '
               '0.11.3: "without onDoubleNodeTap, every tap on a Child row '
               'fires onNodeTap" (#95)',
+        ),
+      ],
+    ),
+  ],
+);
+
+const _nodeTooltips = SettingGroup(
+  id: 'nodeTooltips',
+  title: 'Node tooltips',
+  features: [
+    SettingFeature(
+      id: 'tooltipPlacement',
+      title: 'Tooltip placement',
+      options: [
+        'tooltipTier',
+        'FolderNodeTheme.tooltipTheme',
+        'ParentNodeTheme.tooltipTheme',
+        'ChildNodeTheme.tooltipTheme',
+        'NodeTooltipTheme.useTooltip',
+        'NodeTooltipTheme.direction',
+        'NodeTooltipTheme.alignment',
+        'NodeTooltipTheme.anchor',
+        'NodeTooltipTheme.offset',
+        'NodeTooltipTheme.crossAxisOffset',
+        'NodeTooltipTheme.screenMargin',
+        'NodeTooltipTheme.showArrow',
+        'NodeTooltipTheme.arrowBaseWidth',
+        'NodeTooltipTheme.arrowLength',
+        'NodeTooltipTheme.arrowPositionRatio',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'Tooltips keep their size at every Scale: no placement, arrow '
+              'or margin setting is multiplied.',
+          evidence:
+              'docs/adr/0004-tooltips-excluded-from-scale.md; '
+              'lib/themes/node_tooltip_theme.dart: NodeTooltipTheme has no '
+              'scale method, and FolderNodeTheme.scale, ParentNodeTheme.scale '
+              'and ChildNodeTheme.scale pass tooltipTheme through',
         ),
       ],
     ),

@@ -57,6 +57,9 @@ dev_dependencies:
   # The test reads the rendered FolderView.wheelMotion's subtype and fields,
   # which the library's re-export of WheelMotion alone does not name.
   flutter_smooth_wheel_scroll: ^0.1.3
+  # The tooltip tests read the rendered JustTooltip's fields, which the
+  # library's re-export of just_tooltip's types alone does not name.
+  just_tooltip: ^0.4.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

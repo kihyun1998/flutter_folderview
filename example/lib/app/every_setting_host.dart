@@ -3,6 +3,7 @@ import 'package:flutter_example_template/flutter_example_template.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 
 import 'every_setting.dart';
+import 'tooltip_settings.dart';
 import 'settings_spec.dart';
 
 /// The shell's settings panel over [EverySettingDemo].
@@ -721,6 +722,125 @@ class EverySettingHost extends SettingsHost {
       indent: false,
       onChanged: (v) => demo.childClickInterval = v.round(),
     ),
+    'tooltipTier' => buildDropdownRow<TooltipTier>(
+      id: settingId,
+      label: 'Tier',
+      value: demo.tooltipTier,
+      items: TooltipTier.values,
+      itemLabel: (t) => switch (t) {
+        TooltipTier.folder => 'Folder',
+        TooltipTier.parent => 'Parent',
+        TooltipTier.child => 'Child',
+      },
+      onChanged: (t) => demo.tooltipTier = t,
+    ),
+    'FolderNodeTheme.tooltipTheme' => _codeControl(
+      settingId,
+      'Folder tooltipTheme',
+      demo.folderTooltip.code(
+        EverySettingDemo.tooltipMessage(TooltipTier.folder),
+      ),
+    ),
+    'ParentNodeTheme.tooltipTheme' => _codeControl(
+      settingId,
+      'Parent tooltipTheme',
+      demo.parentTooltip.code(
+        EverySettingDemo.tooltipMessage(TooltipTier.parent),
+      ),
+    ),
+    'ChildNodeTheme.tooltipTheme' => _codeControl(
+      settingId,
+      'Child tooltipTheme',
+      demo.childTooltip.code(
+        EverySettingDemo.tooltipMessage(TooltipTier.child),
+      ),
+    ),
+    'NodeTooltipTheme.useTooltip' => buildSwitchTile(
+      id: settingId,
+      label: 'useTooltip',
+      value: demo.tooltip.useTooltip,
+      onChanged: (on) => demo.editTooltip((t) => t.useTooltip = on),
+    ),
+    'NodeTooltipTheme.direction' => buildDropdownRow<TooltipDirection>(
+      id: settingId,
+      label: 'Direction',
+      value: demo.tooltip.direction,
+      items: TooltipDirection.values,
+      itemLabel: (d) => d.name,
+      onChanged: (d) => demo.editTooltip((t) => t.direction = d),
+      indent: true,
+    ),
+    'NodeTooltipTheme.alignment' => buildDropdownRow<TooltipAlignment>(
+      id: settingId,
+      label: 'Alignment',
+      value: demo.tooltip.alignment,
+      items: TooltipAlignment.values,
+      itemLabel: (a) => a.name,
+      onChanged: (a) => demo.editTooltip((t) => t.alignment = a),
+      indent: true,
+    ),
+    'NodeTooltipTheme.anchor' => buildDropdownRow<TooltipAnchor>(
+      id: settingId,
+      label: 'Anchor',
+      value: demo.tooltip.anchor,
+      items: TooltipAnchor.values,
+      itemLabel: (a) => a.name,
+      onChanged: (a) => demo.editTooltip((t) => t.anchor = a),
+      indent: true,
+    ),
+    'NodeTooltipTheme.offset' => _pxSlider(
+      settingId,
+      'Offset',
+      demo.tooltip.offset,
+      0,
+      40,
+      (v) => demo.editTooltip((t) => t.offset = v),
+    ),
+    'NodeTooltipTheme.crossAxisOffset' => _pxSlider(
+      settingId,
+      'Cross-axis offset',
+      demo.tooltip.crossAxisOffset,
+      -40,
+      40,
+      (v) => demo.editTooltip((t) => t.crossAxisOffset = v),
+    ),
+    'NodeTooltipTheme.screenMargin' => _pxSlider(
+      settingId,
+      'Screen margin',
+      demo.tooltip.screenMargin,
+      0,
+      40,
+      (v) => demo.editTooltip((t) => t.screenMargin = v),
+    ),
+    'NodeTooltipTheme.showArrow' => buildSwitchTile(
+      id: settingId,
+      label: 'Arrow',
+      value: demo.tooltip.showArrow,
+      onChanged: (on) => demo.editTooltip((t) => t.showArrow = on),
+      indent: true,
+    ),
+    'NodeTooltipTheme.arrowBaseWidth' => _pxSlider(
+      settingId,
+      'Arrow base width',
+      demo.tooltip.arrowBaseWidth,
+      4,
+      32,
+      (v) => demo.editTooltip((t) => t.arrowBaseWidth = v),
+    ),
+    'NodeTooltipTheme.arrowLength' => _pxSlider(
+      settingId,
+      'Arrow length',
+      demo.tooltip.arrowLength,
+      2,
+      20,
+      (v) => demo.editTooltip((t) => t.arrowLength = v),
+    ),
+    'NodeTooltipTheme.arrowPositionRatio' => _opacitySlider(
+      settingId,
+      'Arrow position',
+      demo.tooltip.arrowPositionRatio,
+      (v) => demo.editTooltip((t) => t.arrowPositionRatio = v),
+    ),
     'FlutterFolderViewTheme.scrollbarTheme' => _codeControl(
       settingId,
       'scrollbarTheme',
@@ -1026,6 +1146,7 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'parentLabel') return _parentLabelExtras();
     if (featureId == 'childSelection') return _childSelectionExtras();
     if (featureId == 'childInk') return _childInkExtras();
+    if (featureId == 'tooltipPlacement') return _tooltipPlacementExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -1086,6 +1207,23 @@ class EverySettingHost extends SettingsHost {
       'ADR-0004). The preview frames shrink the whole stage; choose the Room '
       'to see a Scale at real pixels.',
       key: Key('scale-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Tooltip placement controls do not show on their own.
+  List<Widget> _tooltipPlacementExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'Tier picks which Tier\'s tooltipTheme the controls edit; one set of '
+      'controls serves all three. A label tooltip needs content to show at '
+      'all: until the content settings arrive, a Tier with useTooltip on shows '
+      'a fixed message. Hover the label\'s glyphs, not the rest of the row. '
+      'Anchor child aims at the label; pointer aims where the pointer was when '
+      'the tooltip opened. Tooltips keep their size at every Scale (ADR-0004). '
+      'In the Room the tooltip paints in the app\'s root Overlay, so the '
+      'window, not the stage, bounds it.',
+      key: Key('tooltip-placement-note'),
       style: TextStyle(fontSize: 12),
     ),
   ];

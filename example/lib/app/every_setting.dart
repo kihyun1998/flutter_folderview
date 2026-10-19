@@ -4,6 +4,7 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 
 import '../data/theme_demo_data.dart';
 import 'every_setting_host.dart';
+import 'tooltip_settings.dart';
 import 'tree_generator.dart';
 
 /// Where the "Every setting" stage takes its nodes from.
@@ -634,6 +635,35 @@ class EverySettingDemo extends ChangeNotifier {
     fontWeight: _childSelectedBold ? FontWeight.bold : null,
   );
 
+  /// The per-Tier node-label tooltip settings, and the Tier the tooltip
+  /// controls edit.
+  final folderTooltip = TooltipSettings();
+  final parentTooltip = TooltipSettings();
+  final childTooltip = TooltipSettings();
+
+  TooltipTier _tooltipTier = TooltipTier.folder;
+  TooltipTier get tooltipTier => _tooltipTier;
+  set tooltipTier(TooltipTier value) => _set(() => _tooltipTier = value);
+
+  /// The chosen Tier's tooltip settings.
+  TooltipSettings get tooltip => switch (_tooltipTier) {
+    TooltipTier.folder => folderTooltip,
+    TooltipTier.parent => parentTooltip,
+    TooltipTier.child => childTooltip,
+  };
+
+  /// Applies [change] to the chosen Tier's tooltip settings.
+  void editTooltip(void Function(TooltipSettings tooltip) change) =>
+      _setTheme(() => change(tooltip));
+
+  /// The message each Tier's tooltip shows while the content settings are not
+  /// in the panel yet.
+  static String tooltipMessage(TooltipTier tier) => switch (tier) {
+    TooltipTier.folder => 'Folder tooltip',
+    TooltipTier.parent => 'Parent tooltip',
+    TooltipTier.child => 'Child tooltip',
+  };
+
   FlutterFolderViewTheme<String>? _theme;
 
   /// The `FolderView.theme` the settings describe: one instance until a theme
@@ -739,6 +769,9 @@ class EverySettingDemo extends ChangeNotifier {
     _childSplashColor = c.splashColor;
     _childHighlightColor = c.highlightColor;
     _childClickInterval = c.clickInterval;
+    folderTooltip.reset();
+    parentTooltip.reset();
+    childTooltip.reset();
     _theme = null;
     notifyListeners();
   }
@@ -774,7 +807,10 @@ class EverySettingDemo extends ChangeNotifier {
         _trackVisibility == b.trackVisibility &&
         _folderMatches(f.folderTheme) &&
         _parentMatches(f.parentTheme) &&
-        _childMatches(f.childTheme);
+        _childMatches(f.childTheme) &&
+        folderTooltip.matchesFactory &&
+        parentTooltip.matchesFactory &&
+        childTooltip.matchesFactory;
   }
 
   bool _folderMatches(FolderNodeTheme<String> d) =>
@@ -888,7 +924,7 @@ class EverySettingDemo extends ChangeNotifier {
         hoverColor: _folderHoverColor,
         splashColor: _folderSplashColor,
         highlightColor: _folderHighlightColor,
-        tooltipTheme: base.folderTheme.tooltipTheme,
+        tooltipTheme: folderTooltip.theme(tooltipMessage(TooltipTier.folder)),
       ),
       parentTheme: ParentNodeTheme<String>(
         widget: _parentWidgetSample
@@ -912,7 +948,7 @@ class EverySettingDemo extends ChangeNotifier {
         hoverColor: _parentHoverColor,
         splashColor: _parentSplashColor,
         highlightColor: _parentHighlightColor,
-        tooltipTheme: base.parentTheme.tooltipTheme,
+        tooltipTheme: parentTooltip.theme(tooltipMessage(TooltipTier.parent)),
       ),
       childTheme: ChildNodeTheme<String>(
         widget: _childWidgetSample ? sampleChildIcon : base.childTheme.widget,
@@ -933,7 +969,7 @@ class EverySettingDemo extends ChangeNotifier {
         splashColor: _childSplashColor,
         highlightColor: _childHighlightColor,
         clickInterval: _childClickInterval,
-        tooltipTheme: base.childTheme.tooltipTheme,
+        tooltipTheme: childTooltip.theme(tooltipMessage(TooltipTier.child)),
       ),
       rowHeight: _rowHeight,
       rowSpacing: _rowSpacing,

@@ -138,7 +138,7 @@ packages:
     source: hosted
     version: "4.9.0"
   just_tooltip:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: just_tooltip
       sha256: f4f7fe69f386b53ed06ae7fd365fd8ade26aef9e40696f1e97b61e742f6030f1
