@@ -15,6 +15,32 @@ class EverySettingHost extends SettingsHost {
   List<SettingGroup> get spec => settingsSpec;
 
   @override
+  List<PresetSummary> get presets => const [
+    PresetSummary(
+      id: 'light',
+      title: 'Light',
+      lookFor:
+          'Every theme setting is FlutterFolderViewTheme.light()\'s. The '
+          "shell's own light/dark button themes the shell, not the tree.",
+    ),
+    PresetSummary(
+      id: 'dark',
+      title: 'Dark',
+      lookFor:
+          'Every theme setting is FlutterFolderViewTheme.dark()\'s: white70 '
+          "labels, grey400 icons and thumb. The shell's own light/dark button "
+          'themes the shell, not the tree.',
+    ),
+  ];
+
+  @override
+  String? get activePresetId => demo.activePreset?.name;
+
+  @override
+  void applyPreset(String presetId) =>
+      demo.applyPreset(ThemePreset.values.byName(presetId));
+
+  @override
   bool isOn(String switchId) => throw ArgumentError.value(switchId, 'switchId');
 
   @override
@@ -291,6 +317,22 @@ class EverySettingHost extends SettingsHost {
       demo.lineColor,
       EverySettingDemo.lineColors,
       (c) => demo.lineColor = c!,
+    ),
+    'FolderView.theme' => buildDropdownRow<ThemeInjection>(
+      id: settingId,
+      label: 'Inject via',
+      value: demo.injection,
+      items: ThemeInjection.values,
+      itemLabel: (i) => switch (i) {
+        ThemeInjection.parameter => 'theme: param',
+        ThemeInjection.ancestor => 'Ancestor',
+      },
+      onChanged: (i) => demo.injection = i,
+    ),
+    'FolderViewTheme.data' => _codeControl(
+      settingId,
+      'FolderViewTheme.data',
+      demo.injectionCode,
     ),
     'FlutterFolderViewTheme.scrollbarTheme' => _codeControl(
       settingId,
@@ -590,6 +632,7 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'layout') return _layoutExtras();
     if (featureId == 'expandIcon') return _expandIconExtras();
     if (featureId == 'scrollbars') return _scrollbarExtras();
+    if (featureId == 'themeInjection') return _themeInjectionExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -654,6 +697,22 @@ class EverySettingHost extends SettingsHost {
     ),
   ];
 
+  /// What the Theme injection controls do not show on their own.
+  List<Widget> _themeInjectionExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'Both paths hand the view the same theme instance. FolderView prefers '
+      'its theme parameter, so the ancestor is read only while the parameter '
+      'is null. The ancestor must name the data type: FolderViewTheme<String> '
+      'for a FolderView<String>. An untyped FolderViewTheme(data: '
+      'FlutterFolderViewTheme.dark()) is a FolderViewTheme<dynamic>, which '
+      'the view does not find, and it falls back to light() without a word. '
+      'The presets above reset every theme setting to light() or dark().',
+      key: Key('theme-injection-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
   /// What the Scrollbar controls do not show on their own.
   List<Widget> _scrollbarExtras() => const [
     SizedBox(height: 12),
@@ -682,7 +741,8 @@ class EverySettingHost extends SettingsHost {
       'inside it, at any other Scale it is fitted to the box. The icon turns '
       '90° when its row is expanded. '
       'color and expandedColor reach the icon through IconTheme, so they '
-      "have no effect on light()'s chevron, which sets its own grey. Turn on "
+      "have no effect on the factory's chevron (light()'s or dark()'s), which "
+      'sets its own grey. Turn on '
       'the sample widget to see them: expanded rows take expandedColor, or '
       'color when it is not set.',
       key: Key('expand-icon-note'),

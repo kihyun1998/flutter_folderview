@@ -45,6 +45,26 @@ const settingsSpec = <SettingGroup>[
     title: 'Layout',
     features: [
       SettingFeature(
+        id: 'themeInjection',
+        title: 'Theme injection',
+        options: ['FolderView.theme', 'FolderViewTheme.data'],
+        interactions: [
+          Interaction(
+            otherFeatureId: 'layout',
+            effect:
+                'Every theme setting reaches the view the same way on either '
+                'path. The theme parameter wins over a FolderViewTheme '
+                'ancestor, which is read only while the parameter is null.',
+            evidence:
+                'lib/widgets/folder_view.dart: _FolderViewState.build resolves '
+                'widget.theme ?? FolderViewTheme.of<T>(context); '
+                'lib/themes/folder_view_theme.dart: FolderViewTheme.of '
+                'looks up FolderViewTheme<T> by exact type and falls back to '
+                'FlutterFolderViewTheme.light()',
+          ),
+        ],
+      ),
+      SettingFeature(
         id: 'layout',
         title: 'Rows & padding',
         options: [

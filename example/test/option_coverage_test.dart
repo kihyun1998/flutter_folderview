@@ -43,8 +43,6 @@ const notYetCovered = <String, int>{
   'FolderNodeTheme.width': 82,
   'FolderView.rowTooltipBuilder': 89,
   'FolderView.rowTooltipTheme': 89,
-  'FolderView.theme': 90,
-  'FolderViewTheme.data': 90,
   'NodeTooltipTheme.alignment': 86,
   'NodeTooltipTheme.anchor': 86,
   'NodeTooltipTheme.animation': 88,
