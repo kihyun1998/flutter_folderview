@@ -42,6 +42,7 @@ const settingsSpec = <SettingGroup>[
   _interaction,
   _folderTier,
   _parentTier,
+  _childTier,
   SettingGroup(
     id: 'layout',
     title: 'Layout',
@@ -426,6 +427,116 @@ const _parentTier = SettingGroup(
         'ParentNodeTheme.hoverColor',
         'ParentNodeTheme.splashColor',
         'ParentNodeTheme.highlightColor',
+      ],
+    ),
+  ],
+);
+
+const _childTier = SettingGroup(
+  id: 'childTier',
+  title: 'Child tier',
+  features: [
+    SettingFeature(
+      id: 'childIcons',
+      title: 'Child icons',
+      options: [
+        'FlutterFolderViewTheme.childTheme',
+        'ChildNodeTheme.widget',
+        'ChildNodeTheme.widgetResolver',
+        'ChildNodeTheme.width',
+        'ChildNodeTheme.height',
+        'ChildNodeTheme.padding',
+        'ChildNodeTheme.margin',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'The Scale multiplies width, height, padding and margin. At a '
+              'Scale other than 1 the icon is fitted into the scaled box.',
+          evidence:
+              'lib/themes/child_node_theme.dart: ChildNodeTheme.scale; '
+              'lib/widgets/node_render_parts.dart: NodeIconBox',
+        ),
+      ],
+    ),
+    SettingFeature(
+      id: 'childLabel',
+      title: 'Child label',
+      options: [
+        'ChildNodeTheme.textStyle',
+        'childFontSize',
+        'childBold',
+        'ChildNodeTheme.textStyleResolver',
+        'ChildNodeTheme.labelResolver',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'The Scale multiplies the textStyle font size; an unset size '
+              'starts from the ambient bodyMedium. A style returned by '
+              'textStyleResolver is not scaled.',
+          evidence:
+              'lib/themes/child_node_theme.dart: ChildNodeTheme.scale; '
+              'lib/themes/_scale_text_style.dart: scaleTextStyle',
+        ),
+      ],
+    ),
+    SettingFeature(
+      id: 'childSelection',
+      title: 'Child selection',
+      options: [
+        'ChildNodeTheme.selectedTextStyle',
+        'childSelectedBold',
+        'ChildNodeTheme.selectedTextStyleResolver',
+        'ChildNodeTheme.selectedBackgroundColor',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'interaction',
+          effect:
+              'The selection styling shows on the Children in the Selected '
+              'Set, which only the caller changes; tapping a Child selects it '
+              'through the example handler. Folders and Parents never show it.',
+          evidence:
+              'docs/adr/0003-selection-is-tier-bound-to-child.md; '
+              'lib/widgets/child_node_renderer.dart: ChildNodeRenderer.build '
+              'merges selectedTextStyleResolver ?? selectedTextStyle over the '
+              'label style when the Node is in selectedNodeIds',
+        ),
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'The Scale multiplies selectedTextStyle\'s sizes; a style '
+              'returned by selectedTextStyleResolver is not scaled.',
+          evidence:
+              'lib/themes/child_node_theme.dart: ChildNodeTheme.scale scales '
+              'selectedTextStyle and passes the resolver through',
+        ),
+      ],
+    ),
+    SettingFeature(
+      id: 'childInk',
+      title: 'Child ink',
+      options: [
+        'ChildNodeTheme.hoverColor',
+        'ChildNodeTheme.splashColor',
+        'ChildNodeTheme.highlightColor',
+        'ChildNodeTheme.clickInterval',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'interaction',
+          effect:
+              'clickInterval is the double-tap window, and only with an '
+              'onDoubleNodeTap handler: without one every tap is a single '
+              'tap.',
+          evidence:
+              'lib/widgets/custom_ink_well.dart: CustomInkWell; CHANGELOG.md '
+              '0.11.3: "without onDoubleNodeTap, every tap on a Child row '
+              'fires onNodeTap" (#95)',
+        ),
       ],
     ),
   ],

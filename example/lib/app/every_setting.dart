@@ -495,6 +495,145 @@ class EverySettingDemo extends ChangeNotifier {
     fontWeight: _parentBold ? FontWeight.bold : null,
   );
 
+  /// The sample the Child icon control installs. It has no colour of its own,
+  /// so the ambient icon colour reaches it.
+  static const sampleChildIcon = Icon(Icons.description_outlined, size: 20);
+
+  /// What the Child resolver samples return for a Child whose label ends in
+  /// "(Future)"; every other Child gets `null`, so the static field applies.
+  static const sampleFutureIcon = Icon(Icons.schedule, size: 20);
+  static const sampleChildStyle = TextStyle(
+    color: Color(0xFF757575),
+    fontSize: 16,
+    fontStyle: FontStyle.italic,
+  );
+  static const sampleSelectedStyle = TextStyle(
+    color: Color(0xFFE65100),
+    decoration: TextDecoration.underline,
+  );
+
+  /// The colours the Child controls offer. For text and hover the first two
+  /// are `light()`'s and `dark()`'s; for splash and highlight the first is
+  /// both factories'; for the selected background the first two are the
+  /// factories'.
+  static const childTextColors = <Color?>[
+    Color(0xDD000000),
+    Color(0xB3FFFFFF),
+    Color(0xFFD32F2F),
+    Color(0xFF1976D2),
+  ];
+  static const childSelectedColors = <Color?>[
+    null,
+    Color(0xFF1565C0),
+    Color(0xFFC62828),
+    Color(0xFF2E7D32),
+  ];
+  static final childSelectedBackgrounds = <Color?>[
+    Colors.blue.shade50,
+    Colors.blue.shade900.withValues(alpha: 0.3),
+    Colors.amber.shade100,
+    null,
+  ];
+  static const childHoverColors = <Color?>[
+    Color(0xFFEEEEEE),
+    Color(0xFF424242),
+    Color(0xFFC8E6C9),
+    null,
+  ];
+  static final childSplashColors = <Color?>[
+    Colors.blue.withValues(alpha: 0.3),
+    Colors.red.withValues(alpha: 0.3),
+    Colors.green.withValues(alpha: 0.3),
+    null,
+  ];
+  static final childHighlightColors = <Color?>[
+    Colors.blue.withValues(alpha: 0.1),
+    Colors.red.withValues(alpha: 0.1),
+    Colors.green.withValues(alpha: 0.1),
+    null,
+  ];
+
+  /// The font sizes the Child label offers; `null` is the ambient size.
+  static const childFontSizes = <double?>[null, 12, 14, 16, 18, 20];
+
+  static bool _isFuture(Node<String> node) => node.label.endsWith('(Future)');
+  static Widget? _futureIcon(Node<String> node) =>
+      _isFuture(node) ? sampleFutureIcon : null;
+  static TextStyle? _futureStyle(Node<String> node) =>
+      _isFuture(node) ? sampleChildStyle : null;
+  static TextStyle? _futureSelectedStyle(Node<String> node) =>
+      _isFuture(node) ? sampleSelectedStyle : null;
+  static String? _idLabel(Node<String> node) => '${node.label} · ${node.id}';
+
+  // The defaults are `FlutterFolderViewTheme.light().childTheme`'s.
+  bool _childWidgetSample = false;
+  bool get childWidgetSample => _childWidgetSample;
+
+  bool _childWidgetResolver = false;
+  bool get childWidgetResolver => _childWidgetResolver;
+
+  double _childWidth = 20;
+  double get childWidth => _childWidth;
+
+  double _childHeight = 20;
+  double get childHeight => _childHeight;
+
+  EdgeInsets _childPadding = EdgeInsets.zero;
+  EdgeInsets get childPadding => _childPadding;
+
+  EdgeInsets _childMargin = EdgeInsets.zero;
+  EdgeInsets get childMargin => _childMargin;
+
+  Color? _childTextColor = childTextColors.first;
+  Color? get childTextColor => _childTextColor;
+
+  double? _childFontSize;
+  double? get childFontSize => _childFontSize;
+
+  bool _childBold = false;
+  bool get childBold => _childBold;
+
+  bool _childTextStyleResolver = false;
+  bool get childTextStyleResolver => _childTextStyleResolver;
+
+  bool _childLabelResolver = false;
+  bool get childLabelResolver => _childLabelResolver;
+
+  Color? _childSelectedColor;
+  Color? get childSelectedColor => _childSelectedColor;
+
+  bool _childSelectedBold = true;
+  bool get childSelectedBold => _childSelectedBold;
+
+  bool _childSelectedTextStyleResolver = false;
+  bool get childSelectedTextStyleResolver => _childSelectedTextStyleResolver;
+
+  Color? _childSelectedBackground = childSelectedBackgrounds.first;
+  Color? get childSelectedBackground => _childSelectedBackground;
+
+  Color? _childHoverColor = childHoverColors.first;
+  Color? get childHoverColor => _childHoverColor;
+
+  Color? _childSplashColor = childSplashColors.first;
+  Color? get childSplashColor => _childSplashColor;
+
+  Color? _childHighlightColor = childHighlightColors.first;
+  Color? get childHighlightColor => _childHighlightColor;
+
+  int _childClickInterval = 300;
+  int get childClickInterval => _childClickInterval;
+
+  TextStyle get _childTextStyle => TextStyle(
+    color: _childTextColor,
+    fontSize: _childFontSize,
+    fontWeight: _childBold ? FontWeight.bold : null,
+  );
+
+  TextStyle get _childSelectedTextStyle => TextStyle(
+    color: _childSelectedColor,
+    fontWeight: _childSelectedBold ? FontWeight.bold : null,
+  );
+
   FlutterFolderViewTheme<String>? _theme;
 
   /// The `FolderView.theme` the settings describe: one instance until a theme
@@ -580,6 +719,26 @@ class EverySettingDemo extends ChangeNotifier {
     _parentHoverColor = q.hoverColor;
     _parentSplashColor = q.splashColor;
     _parentHighlightColor = q.highlightColor;
+    final c = f.childTheme;
+    _childWidgetSample = false;
+    _childWidgetResolver = false;
+    _childWidth = c.width;
+    _childHeight = c.height;
+    _childPadding = c.padding;
+    _childMargin = c.margin;
+    _childTextColor = c.textStyle?.color;
+    _childFontSize = c.textStyle?.fontSize;
+    _childBold = c.textStyle?.fontWeight == FontWeight.bold;
+    _childTextStyleResolver = false;
+    _childLabelResolver = false;
+    _childSelectedColor = c.selectedTextStyle?.color;
+    _childSelectedBold = c.selectedTextStyle?.fontWeight == FontWeight.bold;
+    _childSelectedTextStyleResolver = false;
+    _childSelectedBackground = c.selectedBackgroundColor;
+    _childHoverColor = c.hoverColor;
+    _childSplashColor = c.splashColor;
+    _childHighlightColor = c.highlightColor;
+    _childClickInterval = c.clickInterval;
     _theme = null;
     notifyListeners();
   }
@@ -614,7 +773,8 @@ class EverySettingDemo extends ChangeNotifier {
         _trackRadius == b.trackRadius &&
         _trackVisibility == b.trackVisibility &&
         _folderMatches(f.folderTheme) &&
-        _parentMatches(f.parentTheme);
+        _parentMatches(f.parentTheme) &&
+        _childMatches(f.childTheme);
   }
 
   bool _folderMatches(FolderNodeTheme<String> d) =>
@@ -652,6 +812,28 @@ class EverySettingDemo extends ChangeNotifier {
       _parentHoverColor == q.hoverColor &&
       _parentSplashColor == q.splashColor &&
       _parentHighlightColor == q.highlightColor;
+
+  bool _childMatches(ChildNodeTheme<String> c) =>
+      !_childWidgetSample &&
+      !_childWidgetResolver &&
+      _childWidth == c.width &&
+      _childHeight == c.height &&
+      _childPadding == c.padding &&
+      _childMargin == c.margin &&
+      _childTextColor == c.textStyle?.color &&
+      _childFontSize == c.textStyle?.fontSize &&
+      _childBold == (c.textStyle?.fontWeight == FontWeight.bold) &&
+      !_childTextStyleResolver &&
+      !_childLabelResolver &&
+      _childSelectedColor == c.selectedTextStyle?.color &&
+      _childSelectedBold ==
+          (c.selectedTextStyle?.fontWeight == FontWeight.bold) &&
+      !_childSelectedTextStyleResolver &&
+      _childSelectedBackground == c.selectedBackgroundColor &&
+      _childHoverColor == c.hoverColor &&
+      _childSplashColor == c.splashColor &&
+      _childHighlightColor == c.highlightColor &&
+      _childClickInterval == c.clickInterval;
 
   /// `FolderViewTheme.data`'s path, as the code a caller would write.
   String get injectionCode => switch (_injection) {
@@ -731,6 +913,27 @@ class EverySettingDemo extends ChangeNotifier {
         splashColor: _parentSplashColor,
         highlightColor: _parentHighlightColor,
         tooltipTheme: base.parentTheme.tooltipTheme,
+      ),
+      childTheme: ChildNodeTheme<String>(
+        widget: _childWidgetSample ? sampleChildIcon : base.childTheme.widget,
+        widgetResolver: _childWidgetResolver ? _futureIcon : null,
+        width: _childWidth,
+        height: _childHeight,
+        padding: _childPadding,
+        margin: _childMargin,
+        textStyle: _childTextStyle,
+        textStyleResolver: _childTextStyleResolver ? _futureStyle : null,
+        labelResolver: _childLabelResolver ? _idLabel : null,
+        selectedTextStyle: _childSelectedTextStyle,
+        selectedTextStyleResolver: _childSelectedTextStyleResolver
+            ? _futureSelectedStyle
+            : null,
+        selectedBackgroundColor: _childSelectedBackground,
+        hoverColor: _childHoverColor,
+        splashColor: _childSplashColor,
+        highlightColor: _childHighlightColor,
+        clickInterval: _childClickInterval,
+        tooltipTheme: base.childTheme.tooltipTheme,
       ),
       rowHeight: _rowHeight,
       rowSpacing: _rowSpacing,
@@ -838,6 +1041,54 @@ class EverySettingDemo extends ChangeNotifier {
         '${_colorLine('hoverColor', _parentHoverColor)}'
         '${_inkLine('splashColor', _parentSplashColor, parentSplashColors, 0.3)}'
         '${_inkLine('highlightColor', _parentHighlightColor, parentHighlightColors, 0.1)}'
+        '),';
+  }
+
+  /// `FlutterFolderViewTheme.childTheme` as the argument a caller would write.
+  /// The tooltip theme is left out: its knobs belong to the tooltip features.
+  String get childThemeCode {
+    final grey = switch (_base) {
+      ThemePreset.light => 'shade700',
+      ThemePreset.dark => 'shade400',
+    };
+    final style = [
+      if (_childTextColor != null) 'color: ${_colorCode(_childTextColor!)}',
+      if (_childFontSize != null) 'fontSize: ${_num(_childFontSize!)}',
+      if (_childBold) 'fontWeight: FontWeight.bold',
+    ].join(', ');
+    final selected = [
+      if (_childSelectedColor != null)
+        'color: ${_colorCode(_childSelectedColor!)}',
+      if (_childSelectedBold) 'fontWeight: FontWeight.bold',
+    ].join(', ');
+    const backgrounds = [
+      'Colors.blue.shade50',
+      'Colors.blue.shade900.withValues(alpha: 0.3)',
+      'Colors.amber.shade100',
+    ];
+    final bgIndex = childSelectedBackgrounds.indexOf(_childSelectedBackground);
+    final background = _childSelectedBackground == null
+        ? ''
+        : bgIndex >= 0 && bgIndex < backgrounds.length
+        ? '  selectedBackgroundColor: ${backgrounds[bgIndex]},\n'
+        : _colorLine('selectedBackgroundColor', _childSelectedBackground);
+    return 'childTheme: ChildNodeTheme<String>(\n'
+        '  widget: ${_childWidgetSample ? 'const Icon(Icons.description_outlined, size: 20)' : 'Icon(Icons.insert_drive_file, color: Colors.grey.$grey, size: 20)'},\n'
+        '${_childWidgetResolver ? "  widgetResolver: (node) => node.label.endsWith('(Future)')\n      ? const Icon(Icons.schedule, size: 20)\n      : null,\n" : ''}'
+        '  width: ${_num(_childWidth)},\n'
+        '  height: ${_num(_childHeight)},\n'
+        '  padding: ${_edgeCode(_childPadding)},\n'
+        '  margin: ${_edgeCode(_childMargin)},\n'
+        '  textStyle: TextStyle($style),\n'
+        '${_childTextStyleResolver ? "  textStyleResolver: (node) => node.label.endsWith('(Future)')\n      ? const TextStyle(color: Color(0xFF757575), fontSize: 16, fontStyle: FontStyle.italic)\n      : null,\n" : ''}'
+        '${_childLabelResolver ? "  labelResolver: (node) => '\${node.label} · \${node.id}',\n" : ''}'
+        '  selectedTextStyle: TextStyle($selected),\n'
+        '${_childSelectedTextStyleResolver ? "  selectedTextStyleResolver: (node) => node.label.endsWith('(Future)')\n      ? const TextStyle(color: Color(0xFFE65100), decoration: TextDecoration.underline)\n      : null,\n" : ''}'
+        '$background'
+        '${_colorLine('hoverColor', _childHoverColor)}'
+        '${_inkLine('splashColor', _childSplashColor, childSplashColors, 0.3)}'
+        '${_inkLine('highlightColor', _childHighlightColor, childHighlightColors, 0.1)}'
+        '  clickInterval: $_childClickInterval,\n'
         '),';
   }
 
@@ -1031,6 +1282,37 @@ class EverySettingDemo extends ChangeNotifier {
       _setTheme(() => _parentSplashColor = value);
   set parentHighlightColor(Color? value) =>
       _setTheme(() => _parentHighlightColor = value);
+  set childWidgetSample(bool value) =>
+      _setTheme(() => _childWidgetSample = value);
+  set childWidgetResolver(bool value) =>
+      _setTheme(() => _childWidgetResolver = value);
+  set childWidth(double value) => _setTheme(() => _childWidth = value);
+  set childHeight(double value) => _setTheme(() => _childHeight = value);
+  set childPadding(EdgeInsets value) => _setTheme(() => _childPadding = value);
+  set childMargin(EdgeInsets value) => _setTheme(() => _childMargin = value);
+  set childTextColor(Color? value) => _setTheme(() => _childTextColor = value);
+  set childFontSize(double? value) => _setTheme(() => _childFontSize = value);
+  set childBold(bool value) => _setTheme(() => _childBold = value);
+  set childTextStyleResolver(bool value) =>
+      _setTheme(() => _childTextStyleResolver = value);
+  set childLabelResolver(bool value) =>
+      _setTheme(() => _childLabelResolver = value);
+  set childSelectedColor(Color? value) =>
+      _setTheme(() => _childSelectedColor = value);
+  set childSelectedBold(bool value) =>
+      _setTheme(() => _childSelectedBold = value);
+  set childSelectedTextStyleResolver(bool value) =>
+      _setTheme(() => _childSelectedTextStyleResolver = value);
+  set childSelectedBackground(Color? value) =>
+      _setTheme(() => _childSelectedBackground = value);
+  set childHoverColor(Color? value) =>
+      _setTheme(() => _childHoverColor = value);
+  set childSplashColor(Color? value) =>
+      _setTheme(() => _childSplashColor = value);
+  set childHighlightColor(Color? value) =>
+      _setTheme(() => _childHighlightColor = value);
+  set childClickInterval(int value) =>
+      _setTheme(() => _childClickInterval = value);
 
   /// `onScaleChanged`: applies the proposed Scale, clamped to [minScale] ..
   /// [maxScale].

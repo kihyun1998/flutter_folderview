@@ -80,6 +80,12 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - **A Parent shows `openWidget` only in Tree Mode** (`useOpenState: mode == ViewMode.tree`). Both factories leave it unset, so the Factory choice means none, and the openWidget test runs in Tree Mode.
   - **The resolver samples act on a Parent that holds two Children**: 1-2 and 3-1 in the demo data, counted first.
   - **The Parent tests assert no measurement.** They check the resolved text and style only. A window does exist for the label alone: the widest Parent label is 527.3 px, past the 390 px mobile view. But a Parent row never sets the content width (two bullets down), so a short measurement of it cuts nothing.
+- **"Child tier" (#84) completes the mirror**, with its own `_child*` fields (ADR-0005). It has four features: Child icons, Child label, Child selection and Child ink.
+  - A Child has no `openWidget`.
+  - **`selectedTextStyle` is merged over the Child's own style**, and `selectedTextStyleResolver`, where it returns a style, is merged instead. The test proves the merge with a non-default label size: 18 is kept when selected. Under a renderer that replaced the style, the size fell back to 14, so the test reddens.
+  - The resolver samples act on a Child whose label ends in "(Future)" (1-1-2 and 1-1-3).
+  - `clickInterval` is tested through the Taps & state log. Two taps 200 ms apart are a double tap at 300 ms and two single taps at 100 ms.
+  - **A Child never sets the content width either.** The widest Child label is 570 px, so its row is about 650 px, under Folder 3's 1137 px. The Child tests assert drawn text and style only, as the Parent tests do.
 - **The test font is as wide bold as regular.** Bold left the long Folder label at exactly 1097.3 px, so a bold-only style resolver can never change a width in a widget test. The tier resolver samples therefore also set `fontSize: 16`. With that, the Folder test catches a `maxWidth` that ignores the Folder style resolver.
 - **A Parent's measurement is not testable from the shell, for its label or its style.** `maxWidth` walks every Node, including collapsed ones, and the demo's long Folder 3 row is always the widest. A Parent row never sets the content width, so under-measuring it cuts nothing. Generated labels give no window either.
   - Two measurement-only `lib/` mutations survive the Parent tests for this reason (classified: vacuous window): `_rowWidth` measuring `node.label`, and `maxWidth` ignoring the Parent style resolver.
@@ -121,6 +127,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/lib/app/every_setting_host.dart` — `EverySettingHost.presets`, `EverySettingHost.applyPreset`
 - `example/lib/app/every_setting.dart` — `FolderOpenWidget`, `EverySettingDemo.folderThemeCode`, `EverySettingDemo._folderMatches`, `EverySettingDemo.sampleFolderIcon`
 - `example/lib/app/every_setting.dart` — `ParentOpenWidget`, `EverySettingDemo.parentThemeCode`, `EverySettingDemo._parentMatches`
+- `example/lib/app/every_setting.dart` — `EverySettingDemo.childThemeCode`, `EverySettingDemo._childMatches`, `EverySettingDemo.sampleChildIcon`
+- `example/test/child_tier_test.dart` — Child glyphs per row, the icon box, label style and resolvers, the selection merge and background, the ink, clickInterval through the tap log, presets, the code text
 - `example/test/parent_tier_test.dart` — Parent glyphs per row (openWidget in Tree Mode), the icon box, label style and resolvers (in the mobile frame), the ink, presets, the code text
 - `example/test/folder_tier_test.dart` — Folder glyphs per row, the icon box, the label style and resolvers (in the tablet frame), the ink, presets, the code text
 - `example/test/theme_injection_test.dart` — presets reset and release, both injection paths under Dark, the code text, the shell untouched
