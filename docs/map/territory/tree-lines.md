@@ -29,4 +29,5 @@ None recorded.
 - [scale](scale.md) — line width and column width both scale.
 
 ## Known holes
-- Nothing recorded. `TreeLinePlan` is the unit-tested core (`test/widgets/tree_lines_test.dart`).
+- **Probed on 2026-10-19: with `rowSpacing > 0` the connector stub sits above the label's centre.** The `ListView`'s `itemExtent` is `rowHeight + rowSpacing`, and it overrides `NodeWidget`'s `SizedBox(rowHeight)`, so the row and its painter are the full extent tall. The painter puts the horizontal stub, and a last child's vertical end, at `rowHeight / 2`. The content is centred in the full extent. With a 40 px `rowHeight`, `rowSpacing` 0 put the stub and the label centre both at y = 20. `rowSpacing` 10 gave a 50 px row with the stub still at y = 20 and the label centre at y = 25, so it is off by `rowSpacing / 2`. Tracked: #118.
+- `TreeLinePlan` is the unit-tested core (`test/widgets/tree_lines_test.dart`).

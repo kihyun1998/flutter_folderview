@@ -266,8 +266,68 @@ class EverySettingHost extends SettingsHost {
       indent: true,
       onChanged: (v) => demo.borderRadius = v.roundToDouble(),
     ),
+    'FlutterFolderViewTheme.lineTheme' => _codeControl(
+      settingId,
+      'lineTheme',
+      demo.lineThemeCode,
+    ),
+    'FolderViewLineTheme.lineStyle' => buildDropdownRow<LineStyle>(
+      id: settingId,
+      label: 'Style',
+      value: demo.lineStyle,
+      items: LineStyle.values,
+      itemLabel: (s) => s.name,
+      onChanged: (s) => demo.lineStyle = s,
+      indent: true,
+    ),
+    'FolderViewLineTheme.lineColor' => _colorControl(settingId),
+    'FolderViewLineTheme.lineWidth' => _slider(
+      settingId,
+      'Width',
+      demo.lineWidth,
+      min: 0.5,
+      max: 5,
+      divisions: 9,
+      format: (v) => '${v.toStringAsFixed(1)} px',
+      enabled: true,
+      onChanged: (v) => demo.lineWidth = v,
+    ),
     _ => throw ArgumentError.value(settingId, 'settingId'),
   };
+
+  /// `lineColor`: one swatch per colour in `EverySettingDemo.lineColors`.
+  SettingsControl _colorControl(String id) => SettingsControl(
+    id: id,
+    label: 'Color',
+    indent: true,
+    child: Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        const Text('Color'),
+        for (final (i, c) in EverySettingDemo.lineColors.indexed)
+          InkWell(
+            key: ValueKey('$id.$i'),
+            onTap: () => demo.lineColor = c,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: c,
+                border: Border.all(
+                  color: c == demo.lineColor
+                      ? Colors.black
+                      : Colors.grey.shade300,
+                  width: c == demo.lineColor ? 2 : 1,
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+      ],
+    ),
+  );
 
   /// A theme container, shown as the argument a caller would write.
   SettingsControl _codeControl(String id, String label, String code) =>
