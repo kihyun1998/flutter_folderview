@@ -579,6 +579,148 @@ class EverySettingHost extends SettingsHost {
       EverySettingDemo.parentHighlightColors,
       (c) => demo.parentHighlightColor = c,
     ),
+    'FlutterFolderViewTheme.childTheme' => _codeControl(
+      settingId,
+      'childTheme',
+      demo.childThemeCode,
+    ),
+    'ChildNodeTheme.widget' => buildSwitchTile(
+      id: settingId,
+      label: 'Sample widget (outlined page)',
+      value: demo.childWidgetSample,
+      onChanged: (on) => demo.childWidgetSample = on,
+      indent: true,
+    ),
+    'ChildNodeTheme.widgetResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'widgetResolver sample',
+      value: demo.childWidgetResolver,
+      onChanged: (on) => demo.childWidgetResolver = on,
+      indent: true,
+    ),
+    'ChildNodeTheme.width' => _pxSlider(
+      settingId,
+      'Width',
+      demo.childWidth,
+      8,
+      40,
+      (v) => demo.childWidth = v,
+    ),
+    'ChildNodeTheme.height' => _pxSlider(
+      settingId,
+      'Height',
+      demo.childHeight,
+      8,
+      40,
+      (v) => demo.childHeight = v,
+    ),
+    'ChildNodeTheme.padding' => _edgeControl(
+      settingId,
+      'Padding',
+      demo.childPadding,
+      (p) => demo.childPadding = p,
+    ),
+    'ChildNodeTheme.margin' => _edgeControl(
+      settingId,
+      'Margin',
+      demo.childMargin,
+      (p) => demo.childMargin = p,
+    ),
+    'ChildNodeTheme.textStyle' => _colorControl(
+      settingId,
+      'Text color',
+      demo.childTextColor,
+      EverySettingDemo.childTextColors,
+      (c) => demo.childTextColor = c,
+    ),
+    'childFontSize' => buildDropdownRow<double?>(
+      id: settingId,
+      label: 'Font size',
+      value: demo.childFontSize,
+      items: EverySettingDemo.childFontSizes,
+      itemLabel: (s) => s == null ? 'default' : '${s.round()}',
+      onChanged: (s) => demo.childFontSize = s,
+      indent: true,
+    ),
+    'childBold' => buildSwitchTile(
+      id: settingId,
+      label: 'Bold',
+      value: demo.childBold,
+      onChanged: (on) => demo.childBold = on,
+      indent: true,
+    ),
+    'ChildNodeTheme.textStyleResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'textStyleResolver sample',
+      value: demo.childTextStyleResolver,
+      onChanged: (on) => demo.childTextStyleResolver = on,
+    ),
+    'ChildNodeTheme.labelResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'labelResolver sample',
+      value: demo.childLabelResolver,
+      onChanged: (on) => demo.childLabelResolver = on,
+    ),
+    'ChildNodeTheme.selectedTextStyle' => _colorControl(
+      settingId,
+      'Selected text color',
+      demo.childSelectedColor,
+      EverySettingDemo.childSelectedColors,
+      (c) => demo.childSelectedColor = c,
+    ),
+    'childSelectedBold' => buildSwitchTile(
+      id: settingId,
+      label: 'Selected bold',
+      value: demo.childSelectedBold,
+      onChanged: (on) => demo.childSelectedBold = on,
+      indent: true,
+    ),
+    'ChildNodeTheme.selectedTextStyleResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'selectedTextStyleResolver sample',
+      value: demo.childSelectedTextStyleResolver,
+      onChanged: (on) => demo.childSelectedTextStyleResolver = on,
+    ),
+    'ChildNodeTheme.selectedBackgroundColor' => _colorControl(
+      settingId,
+      'Selected background',
+      demo.childSelectedBackground,
+      EverySettingDemo.childSelectedBackgrounds,
+      (c) => demo.childSelectedBackground = c,
+    ),
+    'ChildNodeTheme.hoverColor' => _colorControl(
+      settingId,
+      'Hover',
+      demo.childHoverColor,
+      EverySettingDemo.childHoverColors,
+      (c) => demo.childHoverColor = c,
+    ),
+    'ChildNodeTheme.splashColor' => _colorControl(
+      settingId,
+      'Splash',
+      demo.childSplashColor,
+      EverySettingDemo.childSplashColors,
+      (c) => demo.childSplashColor = c,
+    ),
+    'ChildNodeTheme.highlightColor' => _colorControl(
+      settingId,
+      'Highlight',
+      demo.childHighlightColor,
+      EverySettingDemo.childHighlightColors,
+      (c) => demo.childHighlightColor = c,
+    ),
+    'ChildNodeTheme.clickInterval' => _slider(
+      settingId,
+      'Double-tap window',
+      demo.childClickInterval.toDouble(),
+      min: 0,
+      max: 1000,
+      divisions: 20,
+      format: (v) => '${v.round()} ms',
+      enabled: true,
+      indent: false,
+      onChanged: (v) => demo.childClickInterval = v.round(),
+    ),
     'FlutterFolderViewTheme.scrollbarTheme' => _codeControl(
       settingId,
       'scrollbarTheme',
@@ -882,6 +1024,8 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'folderLabel') return _folderLabelExtras();
     if (featureId == 'parentIcons') return _parentIconsExtras();
     if (featureId == 'parentLabel') return _parentLabelExtras();
+    if (featureId == 'childSelection') return _childSelectionExtras();
+    if (featureId == 'childInk') return _childInkExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -942,6 +1086,38 @@ class EverySettingHost extends SettingsHost {
       'ADR-0004). The preview frames shrink the whole stage; choose the Room '
       'to see a Scale at real pixels.',
       key: Key('scale-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Child selection controls do not show on their own.
+  List<Widget> _childSelectionExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'Select a Child by tapping it (Taps & state decides single or multiple). '
+      'selectedTextStyle is merged over the Child\'s own style, so a size or '
+      'colour it leaves unset is kept; selectedTextStyleResolver, where it '
+      'returns a style, is merged instead of selectedTextStyle. The sample '
+      'underlines a selected Child whose label ends in "(Future)". Only '
+      'Children take part in Selection (ADR-0003). A background left unset '
+      'is not transparent: the row falls back to the colour scheme\'s '
+      'primaryContainer.',
+      key: Key('child-selection-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Child ink controls do not show on their own.
+  List<Widget> _childInkExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'The double-tap window is clickInterval: a second tap on a Child '
+      'within it fires onDoubleNodeTap. With no onDoubleNodeTap handler there '
+      'is no window, and every tap is a single tap (see Taps & state). An ink '
+      'colour left unset falls back to the colour scheme: '
+      'surfaceContainerHighest for hover, primary at 0.3 for splash and at '
+      '0.1 for highlight.',
+      key: Key('child-ink-note'),
       style: TextStyle(fontSize: 12),
     ),
   ];
