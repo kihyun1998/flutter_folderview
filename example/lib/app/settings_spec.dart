@@ -40,6 +40,38 @@ const settingsSpec = <SettingGroup>[
     ],
   ),
   _interaction,
+  SettingGroup(
+    id: 'layout',
+    title: 'Layout',
+    features: [
+      SettingFeature(
+        id: 'layout',
+        title: 'Rows & padding',
+        options: [
+          'FlutterFolderViewTheme.rowHeight',
+          'FlutterFolderViewTheme.rowSpacing',
+          'FlutterFolderViewTheme.animationDuration',
+          'FlutterFolderViewTheme.spacingTheme',
+          'FolderViewSpacingTheme.contentPadding',
+          'FlutterFolderViewTheme.nodeStyleTheme',
+          'FolderViewNodeStyleTheme.borderRadius',
+        ],
+        interactions: [
+          Interaction(
+            otherFeatureId: 'scale',
+            effect:
+                'The Scale multiplies rowHeight, rowSpacing, contentPadding '
+                'and borderRadius. animationDuration is not scaled.',
+            evidence:
+                'lib/themes/flutter_folder_view_theme.dart: '
+                'FlutterFolderViewTheme.scale multiplies rowHeight and '
+                'rowSpacing and delegates to spacingTheme.scale and '
+                'nodeStyleTheme.scale',
+          ),
+        ],
+      ),
+    ],
+  ),
 ];
 
 const _interaction = SettingGroup(

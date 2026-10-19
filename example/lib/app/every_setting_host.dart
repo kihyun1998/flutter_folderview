@@ -207,13 +207,118 @@ class EverySettingHost extends SettingsHost {
       },
       onChanged: (b) => demo.modifierScrollBlock = b,
     ),
+    'FlutterFolderViewTheme.rowHeight' => _slider(
+      settingId,
+      'Row height',
+      demo.rowHeight,
+      min: 20,
+      max: 80,
+      divisions: 60,
+      format: (v) => '${v.round()} px',
+      enabled: true,
+      indent: false,
+      onChanged: (v) => demo.rowHeight = v.roundToDouble(),
+    ),
+    'FlutterFolderViewTheme.rowSpacing' => _slider(
+      settingId,
+      'Row spacing',
+      demo.rowSpacing,
+      min: 0,
+      max: 20,
+      divisions: 20,
+      format: (v) => '${v.round()} px',
+      enabled: true,
+      indent: false,
+      onChanged: (v) => demo.rowSpacing = v.roundToDouble(),
+    ),
+    'FlutterFolderViewTheme.animationDuration' => _slider(
+      settingId,
+      'Animation duration',
+      demo.animationDuration.toDouble(),
+      min: 0,
+      max: 1000,
+      divisions: 50,
+      format: (v) => '${v.round()} ms',
+      enabled: true,
+      indent: false,
+      onChanged: (v) => demo.animationDuration = v.round(),
+    ),
+    'FlutterFolderViewTheme.spacingTheme' => _codeControl(
+      settingId,
+      'spacingTheme',
+      demo.spacingThemeCode,
+    ),
+    'FolderViewSpacingTheme.contentPadding' => _paddingControl(settingId),
+    'FlutterFolderViewTheme.nodeStyleTheme' => _codeControl(
+      settingId,
+      'nodeStyleTheme',
+      demo.nodeStyleThemeCode,
+    ),
+    'FolderViewNodeStyleTheme.borderRadius' => _slider(
+      settingId,
+      'Border radius',
+      demo.borderRadius,
+      min: 0,
+      max: 20,
+      divisions: 20,
+      format: (v) => '${v.round()} px',
+      enabled: true,
+      indent: true,
+      onChanged: (v) => demo.borderRadius = v.roundToDouble(),
+    ),
     _ => throw ArgumentError.value(settingId, 'settingId'),
   };
+
+  /// A theme container, shown as the argument a caller would write.
+  SettingsControl _codeControl(String id, String label, String code) =>
+      SettingsControl(
+        id: id,
+        label: label,
+        child: SelectableText(
+          code,
+          style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+        ),
+      );
+
+  /// `contentPadding`: one slider per side, 0 to 40 px.
+  SettingsControl _paddingControl(String id) {
+    final p = demo.contentPadding;
+    Widget side(String name, double value, EdgeInsets Function(double) with_) =>
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('$name: ${value.round()} px'),
+            Slider(
+              key: ValueKey('$id.$name'),
+              value: value,
+              min: 0,
+              max: 40,
+              divisions: 40,
+              onChanged: (v) => demo.contentPadding = with_(v.roundToDouble()),
+            ),
+          ],
+        );
+    return SettingsControl(
+      id: id,
+      label: 'Content padding',
+      indent: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          side('left', p.left, (v) => p.copyWith(left: v)),
+          side('top', p.top, (v) => p.copyWith(top: v)),
+          side('right', p.right, (v) => p.copyWith(right: v)),
+          side('bottom', p.bottom, (v) => p.copyWith(bottom: v)),
+        ],
+      ),
+    );
+  }
 
   @override
   List<Widget> extrasAfterOptions(String featureId, BuildContext context) {
     if (featureId == 'wheel') return _wheelExtras();
     if (featureId == 'scale') return _scaleExtras();
+    if (featureId == 'layout') return _layoutExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -274,6 +379,24 @@ class EverySettingHost extends SettingsHost {
       'ADR-0004). The preview frames shrink the whole stage; choose the Room '
       'to see a Scale at real pixels.',
       key: Key('scale-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Layout controls do not show on their own.
+  List<Widget> _layoutExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'Each row is rowHeight + rowSpacing tall. Left and right content '
+      'padding widen the content and can bring in the horizontal scrollbar; '
+      'top and bottom pad the list. borderRadius rounds the hover, splash and '
+      'highlight of every row and the selected background of a Child: hover '
+      'a row or select a Child to see it. '
+      'FlutterFolderViewTheme.animationDuration is read nowhere in the '
+      'library: expand and collapse are not animated, so this slider changes '
+      'nothing on screen. The Scale multiplies every value here except '
+      'animationDuration.',
+      key: Key('layout-note'),
       style: TextStyle(fontSize: 12),
     ),
   ];

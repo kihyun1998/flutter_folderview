@@ -10,6 +10,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - **`Node`'s five fields are covered by a recipe, not the settings panel** (#76). They are the data's shape, not knobs. The maintainer was also shown the alternative, a read-only "control" in the panel, and chose the recipe. So `Building a tree` became the first recipe, and the first-recipe seam rules from #74 landed with it.
 - **Generated data is strictly Folder → Parent → Child** (#76). The count of each is a setting. The legacy generator's nested-Folder depth was dropped on purpose: the maintainer chose the containment rule in `GLOSSARY.md` over keeping that option.
 - **Chrome-excluded-from-Scale is a panel note under Scale, not yet an interaction** (#78). The note is the Scale feature's `extrasAfterOptions` text (`scale-note`, pinned by `scale_test`), because the template's `SettingFeature` has no note field, so `settings_spec.dart` itself does not carry the rule. An `Interaction` must name another feature, and at #78 no scrollbar or tooltip feature existed. The maintainer was shown three options: a note now with the interaction handed to #85 / #86 / #89; a note only; or empty Scrollbar and Tooltip features created early. They chose the first. The interaction is added by whichever of those tickets creates the feature, pointing at `scale`.
+- **A theme container id is covered by a code-text control** (#79). Examples are `FlutterFolderViewTheme.spacingTheme` and `.nodeStyleTheme`. The control is read-only and shows the sub-theme as the argument a caller writes, as Smooth wheel shows `wheelMotion`. The maintainer was shown two alternatives: changing the guard to count a container as covered once its fields are, which reopens the #75 mechanical rule, or a theming recipe. They chose the control. This is the convention for the container ids in #80–#85. It does not cover the Tier `tooltipTheme` containers, which #86 binds through its Tier selector.
 - **Windows window size** is 1200×600, wider than `ShellPage.narrowBreakpoint` (900), so the desktop run opens in the three-region layout. Whether `window_manager` stays at all is decided in #91.
 
 ## Design model
@@ -43,6 +44,12 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - **On blocks the modifier scroll with no handler**, so Ctrl+wheel does nothing at all.
   - The interaction with Smooth wheel: a blocked notch never reaches `SmoothScrollController.pointerScroll` ([scale-input](scale-input.md)).
   The dropdown labels are short because the knob region is 279 px wide at a 1600 px window, and the template's `buildDropdownRow` is a `Row` that overflowed by 21 px with "Block modifier scroll" / "Follow onScaleChanged" (measured at #78).
+- **"Layout" (#79) is the first feature to pass `FolderView.theme`.** The stage used to pass none, and the view fell back to `FlutterFolderViewTheme.light()`. The knobs start at `light()`'s values, and the theme is `light().copyWith(...)`, so opening the page changes nothing on screen.
+  - **The theme is one instance until a theme knob changes.** The view re-measures content width whenever the effective theme is a new instance ([row-geometry](row-geometry.md)). A theme built per rebuild would re-measure on every tap and every unrelated knob. `layout_test` pins the identity across a non-theme knob (Scale's step): rebuilding without the cache reddens only that test. Every theme knob a later category adds has to clear the cache through `EverySettingDemo._setTheme`, or the stage keeps drawing the stale theme.
+  - **What this leaves #90 (theme injection).** The stage passes `theme:`, and `FolderView` prefers `widget.theme` over `FolderViewTheme.of` (`_FolderViewState.build`). An InheritedWidget path therefore needs the stage to pass `theme: null`. A dark preset replaces the `light()` base of `EverySettingDemo.theme`.
+  - `contentPadding` is one control with a slider per side, because the field is a single `EdgeInsets`.
+  - **`FlutterFolderViewTheme.animationDuration` changes nothing on screen**, because the library reads it nowhere ([theme-composition](theme-composition.md) Known holes). The slider is there for coverage, and the panel note says so.
+  - The rest is visible in the rendered rows' `ListView`: `itemExtent` is `rowHeight + rowSpacing`, and `padding` is `contentPadding`. `borderRadius` rounds the `Ink` and `InkWell` of every row.
 - The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).
 
 ## Code
@@ -60,6 +67,8 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/test/interaction_test.dart` — tap callbacks, handler switches, Selected and Expanded Set
 - `example/lib/app/every_setting.dart` — `WheelMotionKind`, `WheelCurveOption`, `EverySettingDemo.wheelMotion`, `EverySettingDemo.wheelMotionCode`
 - `example/lib/app/every_setting.dart` — `ModifierScrollBlock`, `EverySettingDemo.handleScaleChanged`, `EverySettingDemo.blockModifierScroll`
+- `example/lib/app/every_setting.dart` — `EverySettingDemo.theme`, `EverySettingDemo.spacingThemeCode`, `EverySettingDemo.nodeStyleThemeCode`
+- `example/test/layout_test.dart` — the Layout controls reach the rendered theme and rows; the theme instance is kept; the container code text
 - `example/test/scale_test.dart` — the Scale controls reach the rendered `FolderView`; Ctrl+wheel proposes, the handler clamps, blocking decides scroll versus Scale
 - `example/test/room_test.dart` — the Room draws a `FolderView` at 1:1, desktop scales it down
 - `example/test/smooth_wheel_test.dart` — the Motion dropdown and knobs reach the rendered `wheelMotion`, and the code text matches

@@ -140,6 +140,55 @@ class EverySettingDemo extends ChangeNotifier {
     ModifierScrollBlock.off => false,
   };
 
+  // The defaults are `FlutterFolderViewTheme.light()`'s, the theme a
+  // FolderView with no `theme` falls back to.
+  double _rowHeight = 40;
+  double get rowHeight => _rowHeight;
+
+  double _rowSpacing = 0;
+  double get rowSpacing => _rowSpacing;
+
+  int _animationDuration = 200;
+  int get animationDuration => _animationDuration;
+
+  EdgeInsets _contentPadding = EdgeInsets.zero;
+  EdgeInsets get contentPadding => _contentPadding;
+
+  double _borderRadius = 8;
+  double get borderRadius => _borderRadius;
+
+  FlutterFolderViewTheme<String>? _theme;
+
+  /// The `FolderView.theme` the settings describe: one instance until a theme
+  /// setting changes.
+  FlutterFolderViewTheme<String> get theme =>
+      _theme ??= FlutterFolderViewTheme<String>.light().copyWith(
+        rowHeight: _rowHeight,
+        rowSpacing: _rowSpacing,
+        animationDuration: _animationDuration,
+        spacingTheme: FolderViewSpacingTheme(contentPadding: _contentPadding),
+        nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _borderRadius),
+      );
+
+  /// `FlutterFolderViewTheme.spacingTheme` as the argument a caller would
+  /// write.
+  String get spacingThemeCode {
+    final p = _contentPadding;
+    return 'spacingTheme: const FolderViewSpacingTheme(\n'
+        '  contentPadding: EdgeInsets.fromLTRB('
+        '${_num(p.left)}, ${_num(p.top)}, ${_num(p.right)}, ${_num(p.bottom)}),\n'
+        '),';
+  }
+
+  /// `FlutterFolderViewTheme.nodeStyleTheme` as the argument a caller would
+  /// write.
+  String get nodeStyleThemeCode =>
+      'nodeStyleTheme: const FolderViewNodeStyleTheme(borderRadius: '
+      '${_num(_borderRadius)}),';
+
+  static String _num(double v) =>
+      v == v.roundToDouble() ? v.round().toString() : v.toString();
+
   final List<String> _log = [];
 
   /// The tap callbacks that fired, newest first, at most [logLength].
@@ -169,6 +218,14 @@ class EverySettingDemo extends ChangeNotifier {
   set scaleStep(double value) => _set(() => _scaleStep = value);
   set modifierScrollBlock(ModifierScrollBlock value) =>
       _set(() => _modifierScrollBlock = value);
+
+  set rowHeight(double value) => _setTheme(() => _rowHeight = value);
+  set rowSpacing(double value) => _setTheme(() => _rowSpacing = value);
+  set animationDuration(int value) =>
+      _setTheme(() => _animationDuration = value);
+  set contentPadding(EdgeInsets value) =>
+      _setTheme(() => _contentPadding = value);
+  set borderRadius(double value) => _setTheme(() => _borderRadius = value);
 
   /// `onScaleChanged`: applies the proposed Scale, clamped to [minScale] ..
   /// [maxScale].
@@ -236,6 +293,12 @@ class EverySettingDemo extends ChangeNotifier {
 
   void _set(void Function() change) {
     change();
+    notifyListeners();
+  }
+
+  void _setTheme(void Function() change) {
+    change();
+    _theme = null;
     notifyListeners();
   }
 
@@ -319,6 +382,7 @@ class EverySettingStage extends StatelessWidget {
         onScaleChanged: demo.scaleHandlerOn ? demo.handleScaleChanged : null,
         scaleStep: demo.scaleStep,
         blockModifierScroll: demo.blockModifierScroll,
+        theme: demo.theme,
       ),
     );
   }
