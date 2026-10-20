@@ -44,6 +44,7 @@ const settingsSpec = <SettingGroup>[
   _parentTier,
   _childTier,
   _nodeTooltips,
+  _rowCard,
   SettingGroup(
     id: 'layout',
     title: 'Layout',
@@ -706,6 +707,105 @@ const _nodeTooltips = SettingGroup(
               'a GestureDetector with onTap when enableTap; as the innermost '
               'tap recognizer it wins the gesture arena over the row; lib/widgets/node_render_parts.dart: '
               'wrapWithNodeTooltip wraps only the label',
+        ),
+      ],
+    ),
+  ],
+);
+
+const _rowCard = SettingGroup(
+  id: 'rowCard',
+  title: 'Row card',
+  features: [
+    SettingFeature(
+      id: 'rowCardPlacement',
+      title: 'Row card placement & surface',
+      options: [
+        'FolderView.rowTooltipBuilder',
+        'FolderView.rowTooltipTheme',
+        'RowTooltipTheme.direction',
+        'RowTooltipTheme.alignment',
+        'RowTooltipTheme.offset',
+        'RowTooltipTheme.crossAxisOffset',
+        'RowTooltipTheme.screenMargin',
+        'RowTooltipTheme.surface',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'The row card keeps its size at every Scale: no placement or '
+              'surface setting is multiplied.',
+          evidence:
+              'docs/adr/0004-tooltips-excluded-from-scale.md; '
+              'lib/themes/row_tooltip_theme.dart: RowTooltipTheme has no '
+              'scale method',
+        ),
+        Interaction(
+          otherFeatureId: 'tooltipPlacement',
+          effect:
+              'Where the Node\'s label tooltip has content, the label tooltip '
+              'shows and the row card is hidden while the pointer is on the '
+              'label; elsewhere on the row the card shows.',
+          evidence:
+              'lib/widgets/folder_view_content.dart: _wrapWithRowTooltip wraps '
+              'the NodeWidget, so the label tooltip nests inside the card; '
+              'just_tooltip 0.4.4 just_tooltip.dart: _syncSuppression claims '
+              'every ancestor while the pointer is inside a tooltip that '
+              '_hasContent',
+        ),
+      ],
+    ),
+    SettingFeature(
+      id: 'rowCardBehaviour',
+      title: 'Row card behaviour & animation',
+      options: [
+        'RowTooltipTheme.interactive',
+        'RowTooltipTheme.waitDuration',
+        'RowTooltipTheme.showDuration',
+        'RowTooltipTheme.enableHover',
+        'RowTooltipTheme.onShow',
+        'RowTooltipTheme.onHide',
+        'RowTooltipTheme.animation',
+        'RowTooltipTheme.animationCurve',
+        'RowTooltipTheme.animationDuration',
+        'RowTooltipTheme.fadeBegin',
+        'RowTooltipTheme.scaleBegin',
+        'RowTooltipTheme.slideOffset',
+        'RowTooltipTheme.rotationBegin',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'rowCardPlacement',
+          effect:
+              'Nothing here acts until rowTooltipBuilder builds a card for '
+              'the row.',
+          evidence:
+              'lib/widgets/folder_view_content.dart: _wrapWithRowTooltip '
+              'returns the row unwrapped when rowTooltipBuilder is null or '
+              'returns null',
+        ),
+        Interaction(
+          otherFeatureId: 'interaction',
+          effect:
+              'onShow and onHide write to the same event log as the tap '
+              'callbacks; the card never takes a row tap.',
+          evidence:
+              'lib/widgets/folder_view_content.dart: _wrapWithRowTooltip '
+              'passes onShow and onHide and no enableTap, so JustTooltip '
+              'keeps its enableTap default of false and adds no '
+              'GestureDetector',
+        ),
+        Interaction(
+          otherFeatureId: 'tooltipBehaviour',
+          effect:
+              'A label tooltip with enableHover off never sees the pointer, '
+              'so it does not hide the card on the label.',
+          evidence:
+              'just_tooltip 0.4.4 just_tooltip.dart: build adds the '
+              'MouseRegion that sets _pointerInside only when enableHover, '
+              'and _syncSuppression claims ancestors only with '
+              '_pointerInside',
         ),
       ],
     ),

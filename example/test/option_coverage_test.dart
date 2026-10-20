@@ -5,30 +5,7 @@ import 'support/library_options.dart';
 
 /// Library options not yet exposed by the example, each with the issue that
 /// owns exposing it. An entry leaves this map in the change that covers it.
-const notYetCovered = <String, int>{
-  'FolderView.rowTooltipBuilder': 89,
-  'FolderView.rowTooltipTheme': 89,
-  'NodeTooltipTheme.controller': 133,
-  'RowTooltipTheme.alignment': 89,
-  'RowTooltipTheme.animation': 89,
-  'RowTooltipTheme.animationCurve': 89,
-  'RowTooltipTheme.animationDuration': 89,
-  'RowTooltipTheme.crossAxisOffset': 89,
-  'RowTooltipTheme.direction': 89,
-  'RowTooltipTheme.enableHover': 89,
-  'RowTooltipTheme.fadeBegin': 89,
-  'RowTooltipTheme.interactive': 89,
-  'RowTooltipTheme.offset': 89,
-  'RowTooltipTheme.onHide': 89,
-  'RowTooltipTheme.onShow': 89,
-  'RowTooltipTheme.rotationBegin': 89,
-  'RowTooltipTheme.scaleBegin': 89,
-  'RowTooltipTheme.screenMargin': 89,
-  'RowTooltipTheme.showDuration': 89,
-  'RowTooltipTheme.slideOffset': 89,
-  'RowTooltipTheme.surface': 89,
-  'RowTooltipTheme.waitDuration': 89,
-};
+const notYetCovered = <String, int>{'NodeTooltipTheme.controller': 133};
 
 /// Every `Class.field` id the example claims to cover.
 Set<String> coveredOptions() => {

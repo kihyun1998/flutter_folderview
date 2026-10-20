@@ -4,6 +4,7 @@ import 'package:flutter_example_template/flutter_example_template.dart';
 import '../pages/theme_demo_page.dart';
 import '../recipes/building_a_tree_recipe.dart';
 import '../scenarios/large_tree_scenario.dart';
+import '../scenarios/row_card_scenarios.dart';
 import 'every_setting.dart';
 
 /// The destinations this example shows in the shell, and the demo state
@@ -37,6 +38,20 @@ class FolderViewDestinations implements ShellDestinations {
       label: 'A hundred thousand children',
       category: ShellCategory.scenarios,
       stage: (context) => LargeTreeStage(demo: _largeTree),
+      knobs: (context) => const SizedBox.shrink(),
+    ),
+    StageDestination(
+      id: 'scenario/row-card-nesting',
+      label: 'Row card and label tooltip',
+      category: ShellCategory.scenarios,
+      stage: (context) => const RowCardNestingStage(),
+      knobs: (context) => const SizedBox.shrink(),
+    ),
+    StageDestination(
+      id: 'scenario/wide-row',
+      label: 'A row wider than the viewport',
+      category: ShellCategory.scenarios,
+      stage: (context) => const WideRowStage(),
       knobs: (context) => const SizedBox.shrink(),
     ),
     RouteDestination(

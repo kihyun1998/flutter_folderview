@@ -14,6 +14,7 @@ The row-wide tooltip raised by `FolderView.rowTooltipBuilder` and styled by `Row
 - `surface` defaults to `JustTooltipTheme.bare()` because a card draws its own. This is a **default, not a law**: a caller may return chrome or set `surface`.
 - `interactive` defaults to `true`, the opposite of the label tooltip, and deliberately so (see the `RowTooltipTheme.interactive` dartdoc).
 - Wraps `NodeWidget` from outside, so every label tooltip nests inside it ([innermost-tooltip-wins](../invariant/innermost-tooltip-wins.md)).
+- Its hover region is reachable across the whole visible row only because the row's translate sits inside the viewport-wide `OverflowBox` ([scroll-sync](scroll-sync.md), #136). The example's wide-row scenario (#89) is what found it.
 
 ## Code
 - `lib/widgets/folder_view_content.dart` — `_FolderViewContentState._wrapWithRowTooltip`

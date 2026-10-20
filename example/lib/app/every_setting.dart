@@ -4,6 +4,7 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 
 import '../data/theme_demo_data.dart';
 import 'every_setting_host.dart';
+import 'row_card_settings.dart';
 import 'tooltip_settings.dart';
 import 'tree_generator.dart';
 
@@ -676,6 +677,14 @@ class EverySettingDemo extends ChangeNotifier {
   /// Applies [change] to the chosen Tier's tooltip settings.
   void editTooltip(void Function(TooltipSettings tooltip) change) =>
       _setTheme(() => change(tooltip));
+
+  /// The row-card settings. They are `FolderView` parameters, not part of
+  /// the theme, so a theme preset leaves them alone.
+  late final rowCard = RowCardSettings(record: _recordTooltipEvent);
+
+  /// Applies [change] to the row-card settings.
+  void editRowCard(void Function(RowCardSettings rowCard) change) =>
+      _set(() => change(rowCard));
 
   FlutterFolderViewTheme<String>? _theme;
 
@@ -1554,6 +1563,8 @@ class EverySettingStage extends StatelessWidget {
         onScaleChanged: demo.scaleHandlerOn ? demo.handleScaleChanged : null,
         scaleStep: demo.scaleStep,
         blockModifierScroll: demo.blockModifierScroll,
+        rowTooltipBuilder: demo.rowCard.builder,
+        rowTooltipTheme: demo.rowCard.theme,
         theme: theme,
       );
 }
