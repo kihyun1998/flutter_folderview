@@ -126,7 +126,7 @@ void main() {
       expect(tip.theme.borderWidth, 0);
       expect(tip.theme.boxShadow, isNull);
       expect(tip.theme.textStyle, isNull);
-      expect(tip.hideOnEmptyMessage, isTrue);
+      expect(tip.hideOnEmptyMessage, isTrue, reason: 'just_tooltip default');
     });
 
     testWidgets('its Tier dropdown is the Tooltip placement one: choosing a '
@@ -171,7 +171,6 @@ void main() {
       await _tapSwatch(tester, 'NodeTooltipTheme.borderColor', 3);
       await setSlider(tester, 'NodeTooltipTheme.borderWidth', 3);
       await _toggle(tester, 'NodeTooltipTheme.boxShadow');
-      await _toggle(tester, 'NodeTooltipTheme.hideOnEmptyMessage');
 
       final tip = _tip(tester, _p1);
       expect(tip.message, startsWith('A longer tooltip'));
@@ -183,19 +182,16 @@ void main() {
       expect(tip.theme.borderColor, Colors.redAccent);
       expect(tip.theme.borderWidth, 3);
       expect(tip.theme.boxShadow, hasLength(1));
-      expect(tip.hideOnEmptyMessage, isFalse);
     });
 
     testWidgets('an empty or unset message with no builder leaves the label '
-        'without a tooltip, whatever hideOnEmptyMessage says', (tester) async {
+        'without a tooltip', (tester) async {
       await _open(tester);
-      await _toggle(tester, 'NodeTooltipTheme.hideOnEmptyMessage');
       await chooseDropdown(tester, 'NodeTooltipTheme.message', 'empty');
       final tooltipTheme = renderedFolderView(
         tester,
       ).theme!.folderTheme.tooltipTheme!;
       expect(tooltipTheme.message, '');
-      expect(tooltipTheme.hideOnEmptyMessage, isFalse);
       expect(_tooltipOf(_f1), findsNothing);
 
       await chooseDropdown(tester, 'NodeTooltipTheme.message', 'null');
@@ -352,7 +348,6 @@ void main() {
       await _setSide(tester, 'NodeTooltipTheme.padding', 'left', 20);
       await _tapSwatch(tester, 'NodeTooltipTheme.borderColor', 3);
       await setSlider(tester, 'NodeTooltipTheme.borderWidth', 3);
-      await _toggle(tester, 'NodeTooltipTheme.hideOnEmptyMessage');
       await openFeature(tester, 'Tooltip placement');
 
       final code = _code(tester, 'ChildNodeTheme.tooltipTheme');
@@ -369,7 +364,6 @@ void main() {
         '  padding: EdgeInsets.fromLTRB(20, 8, 12, 8),\n',
         '  borderColor: Color(0xFFFF5252),\n',
         '  borderWidth: 3,\n',
-        '  hideOnEmptyMessage: false,\n',
       ]) {
         expect(code, contains(line));
       }

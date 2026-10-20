@@ -908,12 +908,6 @@ class EverySettingHost extends SettingsHost {
       6,
       (v) => demo.editTooltip((t) => t.borderWidth = v),
     ),
-    'NodeTooltipTheme.hideOnEmptyMessage' => buildSwitchTile(
-      id: settingId,
-      label: 'hideOnEmptyMessage',
-      value: demo.tooltip.hideOnEmptyMessage ?? true,
-      onChanged: (on) => demo.editTooltip((t) => t.hideOnEmptyMessage = on),
-    ),
     'tooltipBehaviourTier' => _tierDropdown(settingId),
     'NodeTooltipTheme.enableTap' => buildSwitchTile(
       id: settingId,
@@ -1602,8 +1596,7 @@ class EverySettingHost extends SettingsHost {
       'Folder with a single Parent, a Parent with two Children, or a Child '
       'whose label ends in "(Future)"; every other Node falls back. With no '
       'builder and an empty or unset message the label has no tooltip at '
-      'all, and with a builder there is always content, so hideOnEmptyMessage '
-      'has no visible effect through FolderView. boxShadow, when set, replaces '
+      'all. boxShadow, when set, replaces '
       'the elevation shadow. A border shows only once borderWidth is above 0. '
       'A setting left unset takes the library\'s fallback: a slider or the '
       'padding shows it, a colour shows the empty swatch. With showArrow on '
