@@ -722,38 +722,21 @@ class EverySettingHost extends SettingsHost {
       indent: false,
       onChanged: (v) => demo.childClickInterval = v.round(),
     ),
-    'tooltipTier' => buildDropdownRow<TooltipTier>(
-      id: settingId,
-      label: 'Tier',
-      value: demo.tooltipTier,
-      items: TooltipTier.values,
-      itemLabel: (t) => switch (t) {
-        TooltipTier.folder => 'Folder',
-        TooltipTier.parent => 'Parent',
-        TooltipTier.child => 'Child',
-      },
-      onChanged: (t) => demo.tooltipTier = t,
-    ),
+    'tooltipTier' => _tierDropdown(settingId),
     'FolderNodeTheme.tooltipTheme' => _codeControl(
       settingId,
       'Folder tooltipTheme',
-      demo.folderTooltip.code(
-        EverySettingDemo.tooltipMessage(TooltipTier.folder),
-      ),
+      demo.folderTooltip.code,
     ),
     'ParentNodeTheme.tooltipTheme' => _codeControl(
       settingId,
       'Parent tooltipTheme',
-      demo.parentTooltip.code(
-        EverySettingDemo.tooltipMessage(TooltipTier.parent),
-      ),
+      demo.parentTooltip.code,
     ),
     'ChildNodeTheme.tooltipTheme' => _codeControl(
       settingId,
       'Child tooltipTheme',
-      demo.childTooltip.code(
-        EverySettingDemo.tooltipMessage(TooltipTier.child),
-      ),
+      demo.childTooltip.code,
     ),
     'NodeTooltipTheme.useTooltip' => buildSwitchTile(
       id: settingId,
@@ -840,6 +823,95 @@ class EverySettingHost extends SettingsHost {
       'Arrow position',
       demo.tooltip.arrowPositionRatio,
       (v) => demo.editTooltip((t) => t.arrowPositionRatio = v),
+    ),
+    'tooltipSurfaceTier' => _tierDropdown(settingId),
+    'NodeTooltipTheme.message' => buildDropdownRow<TooltipMessage>(
+      id: settingId,
+      label: 'Message',
+      value: demo.tooltip.messageChoice,
+      items: TooltipMessage.values,
+      itemLabel: (m) => switch (m) {
+        TooltipMessage.sample => 'sample',
+        TooltipMessage.long => 'long',
+        TooltipMessage.empty => 'empty',
+        TooltipMessage.unset => 'null',
+      },
+      onChanged: (m) => demo.editTooltip((t) => t.messageChoice = m),
+    ),
+    'NodeTooltipTheme.textStyle' => _colorControl(
+      settingId,
+      'Text color',
+      demo.tooltip.textColor,
+      TooltipSettings.textColors,
+      (c) => demo.editTooltip((t) => t.textColor = c),
+    ),
+    'NodeTooltipTheme.tooltipBuilder' => buildSwitchTile(
+      id: settingId,
+      label: 'tooltipBuilder sample',
+      value: demo.tooltip.builder,
+      onChanged: (on) => demo.editTooltip((t) => t.builder = on),
+    ),
+    'NodeTooltipTheme.tooltipBuilderResolver' => buildSwitchTile(
+      id: settingId,
+      label: 'tooltipBuilderResolver sample',
+      value: demo.tooltip.resolver,
+      onChanged: (on) => demo.editTooltip((t) => t.resolver = on),
+    ),
+    'NodeTooltipTheme.backgroundColor' => _colorControl(
+      settingId,
+      'Background',
+      demo.tooltip.backgroundColor,
+      TooltipSettings.backgroundColors,
+      (c) => demo.editTooltip((t) => t.backgroundColor = c),
+    ),
+    'NodeTooltipTheme.elevation' => _pxSlider(
+      settingId,
+      'Elevation',
+      demo.tooltip.elevation ?? TooltipSettings.fallbackElevation,
+      0,
+      16,
+      (v) => demo.editTooltip((t) => t.elevation = v),
+    ),
+    'NodeTooltipTheme.boxShadow' => buildSwitchTile(
+      id: settingId,
+      label: 'boxShadow sample',
+      value: demo.tooltip.boxShadow,
+      onChanged: (on) => demo.editTooltip((t) => t.boxShadow = on),
+    ),
+    'NodeTooltipTheme.borderRadius' => _pxSlider(
+      settingId,
+      'Border radius',
+      demo.tooltip.borderRadius ?? TooltipSettings.fallbackRadius,
+      0,
+      20,
+      (v) => demo.editTooltip((t) => t.borderRadius = v),
+    ),
+    'NodeTooltipTheme.padding' => _edgeControl(
+      settingId,
+      'Padding',
+      demo.tooltip.padding ?? TooltipSettings.fallbackPadding,
+      (p) => demo.editTooltip((t) => t.padding = p),
+    ),
+    'NodeTooltipTheme.borderColor' => _colorControl(
+      settingId,
+      'Border color',
+      demo.tooltip.borderColor,
+      TooltipSettings.borderColors,
+      (c) => demo.editTooltip((t) => t.borderColor = c),
+    ),
+    'NodeTooltipTheme.borderWidth' => _pxSlider(
+      settingId,
+      'Border width',
+      demo.tooltip.borderWidth ?? TooltipSettings.fallbackBorderWidth,
+      0,
+      6,
+      (v) => demo.editTooltip((t) => t.borderWidth = v),
+    ),
+    'NodeTooltipTheme.hideOnEmptyMessage' => buildSwitchTile(
+      id: settingId,
+      label: 'hideOnEmptyMessage',
+      value: demo.tooltip.hideOnEmptyMessage ?? true,
+      onChanged: (on) => demo.editTooltip((t) => t.hideOnEmptyMessage = on),
     ),
     'FlutterFolderViewTheme.scrollbarTheme' => _codeControl(
       settingId,
@@ -1003,6 +1075,21 @@ class EverySettingHost extends SettingsHost {
     _ => throw ArgumentError.value(settingId, 'settingId'),
   };
 
+  /// The Tier the tooltip controls edit. Each tooltip feature shows one,
+  /// and all of them move together.
+  SettingsControl _tierDropdown(String id) => buildDropdownRow<TooltipTier>(
+    id: id,
+    label: 'Tier',
+    value: demo.tooltipTier,
+    items: TooltipTier.values,
+    itemLabel: (t) => switch (t) {
+      TooltipTier.folder => 'Folder',
+      TooltipTier.parent => 'Parent',
+      TooltipTier.child => 'Child',
+    },
+    onChanged: (t) => demo.tooltipTier = t,
+  );
+
   /// One swatch per colour in [colors]; a `null` colour is drawn as an empty
   /// box and means "not set".
   SettingsControl _colorControl(
@@ -1147,6 +1234,7 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'childSelection') return _childSelectionExtras();
     if (featureId == 'childInk') return _childInkExtras();
     if (featureId == 'tooltipPlacement') return _tooltipPlacementExtras();
+    if (featureId == 'tooltipSurface') return _tooltipSurfaceExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -1217,13 +1305,34 @@ class EverySettingHost extends SettingsHost {
     Text(
       'Tier picks which Tier\'s tooltipTheme the controls edit; one set of '
       'controls serves all three. A label tooltip needs content to show at '
-      'all: until the content settings arrive, a Tier with useTooltip on shows '
-      'a fixed message. Hover the label\'s glyphs, not the rest of the row. '
+      'all: Tooltip content & surface sets it. Hover the label\'s glyphs, not the rest of the row. '
       'Anchor child aims at the label; pointer aims where the pointer was when '
       'the tooltip opened. Tooltips keep their size at every Scale (ADR-0004). '
       'In the Room the tooltip paints in the app\'s root Overlay, so the '
       'window, not the stage, bounds it.',
       key: Key('tooltip-placement-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Tooltip content & surface controls do not show on their own.
+  List<Widget> _tooltipSurfaceExtras() => const [
+    SizedBox(height: 12),
+    Text(
+      'Tier is the Tooltip placement Tier: choosing one in either feature '
+      'moves both, and useTooltip there turns the Tier\'s tooltip on. Content '
+      'is chosen in order: tooltipBuilderResolver, where it returns a builder, '
+      'then tooltipBuilder, then message. The resolver sample builds for a '
+      'Folder with a single Parent, a Parent with two Children, or a Child '
+      'whose label ends in "(Future)"; every other Node falls back. With no '
+      'builder and an empty or unset message the label has no tooltip at '
+      'all, and with a builder there is always content, so hideOnEmptyMessage '
+      'has no visible effect through FolderView. boxShadow, when set, replaces '
+      'the elevation shadow. A border shows only once borderWidth is above 0. '
+      'A setting left unset takes the library\'s fallback: a slider or the '
+      'padding shows it, a colour shows the empty swatch. With showArrow on '
+      'the surface is painted together with the arrow.',
+      key: Key('tooltip-surface-note'),
       style: TextStyle(fontSize: 12),
     ),
   ];

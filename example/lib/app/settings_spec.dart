@@ -581,6 +581,63 @@ const _nodeTooltips = SettingGroup(
         ),
       ],
     ),
+    SettingFeature(
+      id: 'tooltipSurface',
+      title: 'Tooltip content & surface',
+      options: [
+        'tooltipSurfaceTier',
+        'NodeTooltipTheme.message',
+        'NodeTooltipTheme.textStyle',
+        'NodeTooltipTheme.tooltipBuilder',
+        'NodeTooltipTheme.tooltipBuilderResolver',
+        'NodeTooltipTheme.backgroundColor',
+        'NodeTooltipTheme.elevation',
+        'NodeTooltipTheme.boxShadow',
+        'NodeTooltipTheme.borderRadius',
+        'NodeTooltipTheme.padding',
+        'NodeTooltipTheme.borderColor',
+        'NodeTooltipTheme.borderWidth',
+        'NodeTooltipTheme.hideOnEmptyMessage',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'tooltipPlacement',
+          effect:
+              'Nothing here is drawn until useTooltip is on for the Tier; '
+              'with no builder and an empty or unset message the label gets '
+              'no tooltip at all, whatever hideOnEmptyMessage says.',
+          evidence:
+              'lib/widgets/node_render_parts.dart: wrapWithNodeTooltip returns '
+              'the child unwrapped when useTooltip is off, or when no builder '
+              'resolves and message is null or empty; just_tooltip 0.4.4 '
+              'JustTooltip._hasContentOf counts a tooltipBuilder as content',
+        ),
+        Interaction(
+          otherFeatureId: 'tooltipPlacement',
+          effect:
+              'With showArrow on, the background, border and shadow are '
+              'painted as one shape with the arrow instead of a Material '
+              'box, and textStyle becomes the default style of '
+              'tooltipBuilder content too.',
+          evidence:
+              'just_tooltip 0.4.4 just_tooltip_overlay.dart: build picks '
+              '_buildArrowBox over _buildMaterialBox when theme.showArrow, '
+              'and _buildArrowBox wraps the content in DefaultTextStyle; '
+              'tooltip_shape_painter.dart paints boxShadow, elevation and '
+              'border',
+        ),
+        Interaction(
+          otherFeatureId: 'scale',
+          effect:
+              'The surface keeps its size at every Scale: padding, radius, '
+              'border and text are not multiplied.',
+          evidence:
+              'docs/adr/0004-tooltips-excluded-from-scale.md; '
+              'lib/themes/node_tooltip_theme.dart: NodeTooltipTheme has no '
+              'scale method',
+        ),
+      ],
+    ),
   ],
 );
 
