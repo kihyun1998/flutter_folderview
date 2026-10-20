@@ -1,4 +1,3 @@
-import 'package:example/main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+
+import '../test/support/shell_harness.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -19,22 +20,16 @@ void main() {
   testWidgets('example app: expand, select, zoom, and switch view mode', (
     tester,
   ) async {
-    // MyApp without main(), then the legacy panel: the demo whose controls this
-    // journey drives.
-    tester.view.physicalSize = const Size(1600, 1000);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-    await tester.pumpWidget(const MyApp());
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Legacy panel').first);
-    await tester.pumpAndSettle();
+    // MyApp without main(): the shell, which opens on "Every setting", over
+    // the demo data. Its tap handler expands containers and selects Children.
+    await pumpShell(tester);
     expect(folderView, findsOneWidget);
     expect(row('Theme System Architecture'), findsOneWidget);
 
     // --- Expand -----------------------------------------------------------
     // 'FolderViewTheme (InheritedWidget)' (id 1-2) is collapsed at boot, so its
     // child 'of(context) method' is not rendered. A single tap toggles expand
-    // (the example wires onNodeTap -> toggleNode for expandable rows).
+    // ("Every setting" wires onNodeTap to expand a container).
     expect(row('of(context) method'), findsNothing);
     await tester.tap(row('FolderViewTheme (InheritedWidget)'));
     await tester.pumpAndSettle();
@@ -42,7 +37,8 @@ void main() {
 
     // --- Select -----------------------------------------------------------
     // Tapping a child selects it; the selected child renders in the theme's
-    // selectedTextStyle (bold), while its base style carries no weight.
+    // selectedTextStyle (bold by default), while its base style carries no
+    // weight.
     FontWeight? weightOf(String label) =>
         tester.widget<Text>(row(label)).style?.fontWeight;
     expect(weightOf('FolderViewLineTheme'), isNot(FontWeight.bold));
@@ -52,8 +48,9 @@ void main() {
     expect(weightOf('FolderViewLineTheme'), FontWeight.bold); // selected
 
     // --- Zoom (Ctrl+wheel) ------------------------------------------------
-    // The example wires onScaleChanged -> setScale, so ctrl+wheel-up grows the
-    // whole layout. Measure a stable row's rendered height before and after.
+    // "Every setting" has its onScaleChanged handler on by default, so
+    // ctrl+wheel-up grows the whole layout. Measure a stable row's rendered
+    // height before and after.
     double labelHeight() =>
         tester.getSize(row('Theme System Architecture')).height;
     final before = labelHeight();
@@ -77,12 +74,14 @@ void main() {
     }
 
     expect(labelHeight(), greaterThan(before)); // layout scaled up
+    expect(renderedFolderView(tester).scale, greaterThan(1.0));
 
     // --- Switch View Mode -------------------------------------------------
-    // The SegmentedButton flips folder <-> tree. In tree mode Folders are
+    // The View Mode control flips folder <-> tree. In tree mode Folders are
     // hidden and their Parents lifted, so the root Folder label disappears.
-    await tester.tap(find.text('Tree'));
-    await tester.pumpAndSettle();
+    await openFeature(tester, 'View Mode');
+    await chooseDropdown(tester, 'FolderView.mode', 'tree');
+    expect(renderedFolderView(tester).mode, ViewMode.tree);
     expect(row('Theme System Architecture'), findsNothing); // re-projected
   });
 }

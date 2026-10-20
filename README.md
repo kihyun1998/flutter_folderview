@@ -363,12 +363,22 @@ The one place the card cannot appear is over the glyphs themselves. On the tree'
 
 ## Example
 
-See [example/](example/) for complete examples including:
-- Theme customization
-- Dynamic styling with resolver functions
-- Data generation for testing
+[example/](example/) is a gallery app built on [`flutter_example_template`](https://pub.dev/packages/flutter_example_template). A menu on the left lists its destinations, the middle shows the running example, and the panel on the right holds its settings.
 
 ```bash
 cd example
 flutter run
 ```
+
+- **Every setting.** This is a `FolderView` with a control for every public option of the package except `NodeTooltipTheme.controller` ([#133](https://github.com/kihyun1998/flutter_folderview/issues/133)). The controls are grouped as:
+  - Data & View Mode, Layout, and Interaction (Taps & state, **Smooth wheel**, Scale);
+  - the Folder, Parent and Child tiers;
+  - Node tooltips and the Row card.
+
+  Each option shows the code it produces. A test fails when a new public option has neither a control nor an issue that tracks it.
+- **Recipes.** These are self-contained files you can copy into an app. **Building a tree** shows its own source in the Code pane, and it imports only `flutter_folderview` and Flutter.
+- **Scenarios:**
+  - **A hundred thousand children** is a large generated tree.
+  - **Row card and label tooltip** shows that the innermost tooltip under the pointer wins.
+  - **A row wider than the viewport** shows the row card opening beside the pointer after a horizontal scroll.
+- **Viewports.** The bar above the example shows it in a desktop, tablet or mobile frame, or all three at once on the Device Wall. A frame is scaled down to fit. **The Room** shows the example at 1:1, at the size of the area it is given. Use it to judge real pixel sizes, such as a tooltip's.

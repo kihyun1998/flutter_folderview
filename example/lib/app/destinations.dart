@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
 
-import '../pages/theme_demo_page.dart';
 import '../recipes/building_a_tree_recipe.dart';
 import '../scenarios/large_tree_scenario.dart';
 import '../scenarios/row_card_scenarios.dart';
@@ -53,12 +52,6 @@ class FolderViewDestinations implements ShellDestinations {
       category: ShellCategory.scenarios,
       stage: (context) => const WideRowStage(),
       knobs: (context) => const SizedBox.shrink(),
-    ),
-    RouteDestination(
-      id: 'legacy-panel',
-      label: 'Legacy panel',
-      category: ShellCategory.pages,
-      open: (context) => const ThemeDemoPage(),
     ),
   ];
 
