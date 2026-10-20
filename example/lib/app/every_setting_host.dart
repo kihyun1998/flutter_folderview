@@ -3,6 +3,7 @@ import 'package:flutter_example_template/flutter_example_template.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 
 import 'every_setting.dart';
+import 'row_card_settings.dart';
 import 'tooltip_settings.dart';
 import 'settings_spec.dart';
 
@@ -1012,6 +1013,161 @@ class EverySettingHost extends SettingsHost {
       enabled: true,
       onChanged: (v) => demo.editTooltip((t) => t.rotationBegin = v),
     ),
+    'FolderView.rowTooltipBuilder' => buildDropdownRow<RowCardContent>(
+      id: settingId,
+      label: 'rowTooltipBuilder',
+      value: demo.rowCard.content,
+      items: RowCardContent.values,
+      itemLabel: (c) => switch (c) {
+        RowCardContent.off => 'null',
+        RowCardContent.everyNode => 'every Node',
+        RowCardContent.containersOnly => 'Folders and Parents',
+      },
+      onChanged: (c) => demo.editRowCard((r) => r.content = c),
+    ),
+    'FolderView.rowTooltipTheme' => _codeControl(
+      settingId,
+      'rowTooltipTheme',
+      demo.rowCard.themeCode,
+    ),
+    'RowTooltipTheme.direction' => buildDropdownRow<TooltipDirection>(
+      id: settingId,
+      label: 'Direction',
+      value: demo.rowCard.direction,
+      items: TooltipDirection.values,
+      itemLabel: (d) => d.name,
+      onChanged: (d) => demo.editRowCard((r) => r.direction = d),
+    ),
+    'RowTooltipTheme.alignment' => buildDropdownRow<TooltipAlignment>(
+      id: settingId,
+      label: 'Alignment',
+      value: demo.rowCard.alignment,
+      items: TooltipAlignment.values,
+      itemLabel: (a) => a.name,
+      onChanged: (a) => demo.editRowCard((r) => r.alignment = a),
+    ),
+    'RowTooltipTheme.offset' => _pxSlider(
+      settingId,
+      'Offset',
+      demo.rowCard.offset,
+      0,
+      40,
+      (v) => demo.editRowCard((r) => r.offset = v),
+    ),
+    'RowTooltipTheme.crossAxisOffset' => _pxSlider(
+      settingId,
+      'Cross-axis offset',
+      demo.rowCard.crossAxisOffset,
+      -40,
+      40,
+      (v) => demo.editRowCard((r) => r.crossAxisOffset = v),
+    ),
+    'RowTooltipTheme.screenMargin' => _pxSlider(
+      settingId,
+      'Screen margin',
+      demo.rowCard.screenMargin,
+      0,
+      40,
+      (v) => demo.editRowCard((r) => r.screenMargin = v),
+    ),
+    'RowTooltipTheme.surface' => buildSwitchTile(
+      id: settingId,
+      label: 'surface sample',
+      value: demo.rowCard.surface,
+      onChanged: (on) => demo.editRowCard((r) => r.surface = on),
+    ),
+    'RowTooltipTheme.interactive' => buildSwitchTile(
+      id: settingId,
+      label: 'interactive',
+      value: demo.rowCard.interactive,
+      onChanged: (on) => demo.editRowCard((r) => r.interactive = on),
+    ),
+    'RowTooltipTheme.waitDuration' => _msSlider(
+      settingId,
+      'Wait',
+      demo.rowCard.waitMs,
+      (v) => demo.editRowCard((r) => r.waitMs = v),
+    ),
+    'RowTooltipTheme.showDuration' => _msSlider(
+      settingId,
+      'Auto-hide after',
+      demo.rowCard.showMs,
+      (v) => demo.editRowCard((r) => r.showMs = v),
+    ),
+    'RowTooltipTheme.enableHover' => buildSwitchTile(
+      id: settingId,
+      label: 'enableHover',
+      value: demo.rowCard.enableHover,
+      onChanged: (on) => demo.editRowCard((r) => r.enableHover = on),
+    ),
+    'RowTooltipTheme.onShow' => buildSwitchTile(
+      id: settingId,
+      label: 'onShow logs',
+      value: demo.rowCard.logShow,
+      onChanged: (on) => demo.editRowCard((r) => r.logShow = on),
+    ),
+    'RowTooltipTheme.onHide' => buildSwitchTile(
+      id: settingId,
+      label: 'onHide logs',
+      value: demo.rowCard.logHide,
+      onChanged: (on) => demo.editRowCard((r) => r.logHide = on),
+    ),
+    'RowTooltipTheme.animation' => buildDropdownRow<TooltipAnimation>(
+      id: settingId,
+      label: 'Animation',
+      value: demo.rowCard.animation,
+      items: TooltipAnimation.values,
+      itemLabel: (a) => a.name,
+      onChanged: (a) => demo.editRowCard((r) => r.animation = a),
+    ),
+    'RowTooltipTheme.animationCurve' => buildDropdownRow<TooltipCurve>(
+      id: settingId,
+      label: 'Curve',
+      value: demo.rowCard.curve,
+      items: TooltipCurve.values,
+      itemLabel: (c) => c == TooltipCurve.unset ? 'null' : c.name,
+      onChanged: (c) => demo.editRowCard((r) => r.curve = c),
+    ),
+    'RowTooltipTheme.animationDuration' => _slider(
+      settingId,
+      'Duration',
+      demo.rowCard.animationMs,
+      min: 0,
+      max: 1000,
+      divisions: 20,
+      format: (v) => '${v.round()} ms',
+      enabled: true,
+      onChanged: (v) => demo.editRowCard((r) => r.animationMs = v),
+    ),
+    'RowTooltipTheme.fadeBegin' => _opacitySlider(
+      settingId,
+      'Fade from',
+      demo.rowCard.fadeBegin,
+      (v) => demo.editRowCard((r) => r.fadeBegin = v),
+    ),
+    'RowTooltipTheme.scaleBegin' => _opacitySlider(
+      settingId,
+      'Scale from',
+      demo.rowCard.scaleBegin,
+      (v) => demo.editRowCard((r) => r.scaleBegin = v),
+    ),
+    'RowTooltipTheme.slideOffset' => _opacitySlider(
+      settingId,
+      'Slide distance',
+      demo.rowCard.slideOffset,
+      (v) => demo.editRowCard((r) => r.slideOffset = v),
+    ),
+    'RowTooltipTheme.rotationBegin' => _slider(
+      settingId,
+      'Rotate from',
+      demo.rowCard.rotationBegin,
+      min: -0.5,
+      max: 0.5,
+      divisions: 20,
+      format: (v) => '${v.toStringAsFixed(2)} turns',
+      enabled: true,
+      onChanged: (v) => demo.editRowCard((r) => r.rotationBegin = v),
+    ),
     'FlutterFolderViewTheme.scrollbarTheme' => _codeControl(
       settingId,
       'scrollbarTheme',
@@ -1353,6 +1509,8 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'tooltipPlacement') return _tooltipPlacementExtras();
     if (featureId == 'tooltipSurface') return _tooltipSurfaceExtras();
     if (featureId == 'tooltipBehaviour') return _tooltipBehaviourExtras();
+    if (featureId == 'rowCardPlacement') return _rowCardPlacementExtras();
+    if (featureId == 'rowCardBehaviour') return _rowCardBehaviourExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -1452,6 +1610,64 @@ class EverySettingHost extends SettingsHost {
       'the surface is painted together with the arrow.',
       key: Key('tooltip-surface-note'),
       style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Row card placement & surface controls do not show on their own,
+  /// and the rowTooltipBuilder sample as code.
+  List<Widget> _rowCardPlacementExtras() => [
+    const SizedBox(height: 12),
+    SelectableText(
+      demo.rowCard.builderCode,
+      key: const Key('row-card-builder-code'),
+      style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+    ),
+    const SizedBox(height: 12),
+    const Text(
+      'The row card is one tooltip for the whole FolderView, not per Tier, '
+      'and its hover region is the whole rendered row. It always anchors at '
+      'the pointer, where the pointer was when the card opened: a row is as '
+      'wide as the tree\'s content, so its visible centre is the centre of '
+      'the view, not where you are looking. Direction, alignment and the '
+      'offsets place the '
+      'card around that point. A builder that returns null for a Node leaves '
+      'its row unwrapped. The surface is drawn by nothing until surface is '
+      'set, because the sample returns a Card; with both, both draw. Where '
+      'a label tooltip has content, it wins over the card while the pointer '
+      'is on the label. In a preview frame the card stays inside the frame; '
+      'in the Room, inside the window. The card keeps its size at every '
+      'Scale (ADR-0004).',
+      key: Key('row-card-placement-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Row card behaviour & animation controls do not show on their
+  /// own, and the event log the onShow / onHide samples write to.
+  List<Widget> _rowCardBehaviourExtras() => [
+    const SizedBox(height: 12),
+    const Text(
+      'Nothing here acts until rowTooltipBuilder builds a card. interactive '
+      'is on by default, the opposite of a label tooltip: the card sits '
+      'beside the pointer, and its content may be worth reaching. With '
+      'enableHover off nothing opens the card. The card has no enableTap and '
+      'never takes a row tap (a label tooltip with enableTap on still takes '
+      'the label\'s). Wait delays the card; with '
+      'Auto-hide set, the countdown hides it, not leaving the row. The '
+      'animation settings work as for a label tooltip. onShow and onHide '
+      'log to the same event log as the tap callbacks.',
+      key: Key('row-card-behaviour-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+    const SizedBox(height: 12),
+    const Text('Event log', style: TextStyle(fontWeight: FontWeight.w600)),
+    Column(
+      key: const Key('row-card-log'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final entry in demo.log)
+          Text(entry, style: const TextStyle(fontSize: 12)),
+      ],
     ),
   ];
 
