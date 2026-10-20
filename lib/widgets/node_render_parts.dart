@@ -155,7 +155,6 @@ Widget wrapWithNodeTooltip<T>({
     interactive: tooltipTheme.interactive ?? false,
     waitDuration: tooltipTheme.waitDuration,
     showDuration: tooltipTheme.showDuration,
-    hideOnEmptyMessage: tooltipTheme.hideOnEmptyMessage ?? true,
     message: resolvedBuilder == null ? message : null,
     tooltipBuilder: resolvedBuilder,
     child: child,

@@ -143,9 +143,6 @@ class NodeTooltipTheme<T> {
   /// Starting rotation in turns for rotation animation
   final double? rotationBegin;
 
-  /// Whether to suppress tooltip when message is empty (default: true)
-  final bool? hideOnEmptyMessage;
-
   /// Creates a [NodeTooltipTheme]
   const NodeTooltipTheme({
     this.useTooltip = false,
@@ -185,7 +182,6 @@ class NodeTooltipTheme<T> {
     this.scaleBegin,
     this.slideOffset,
     this.rotationBegin,
-    this.hideOnEmptyMessage,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -227,7 +223,6 @@ class NodeTooltipTheme<T> {
     double? scaleBegin,
     double? slideOffset,
     double? rotationBegin,
-    bool? hideOnEmptyMessage,
   }) {
     return NodeTooltipTheme<T>(
       useTooltip: useTooltip ?? this.useTooltip,
@@ -268,7 +263,6 @@ class NodeTooltipTheme<T> {
       scaleBegin: scaleBegin ?? this.scaleBegin,
       slideOffset: slideOffset ?? this.slideOffset,
       rotationBegin: rotationBegin ?? this.rotationBegin,
-      hideOnEmptyMessage: hideOnEmptyMessage ?? this.hideOnEmptyMessage,
     );
   }
 
@@ -329,7 +323,6 @@ class NodeTooltipTheme<T> {
       scaleBegin: lerpDouble(a.scaleBegin, b.scaleBegin, t),
       slideOffset: lerpDouble(a.slideOffset, b.slideOffset, t),
       rotationBegin: lerpDouble(a.rotationBegin, b.rotationBegin, t),
-      hideOnEmptyMessage: t < 0.5 ? a.hideOnEmptyMessage : b.hideOnEmptyMessage,
     );
   }
 }

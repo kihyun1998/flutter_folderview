@@ -598,7 +598,6 @@ const _nodeTooltips = SettingGroup(
         'NodeTooltipTheme.padding',
         'NodeTooltipTheme.borderColor',
         'NodeTooltipTheme.borderWidth',
-        'NodeTooltipTheme.hideOnEmptyMessage',
       ],
       interactions: [
         Interaction(
@@ -606,12 +605,11 @@ const _nodeTooltips = SettingGroup(
           effect:
               'Nothing here is drawn until useTooltip is on for the Tier; '
               'with no builder and an empty or unset message the label gets '
-              'no tooltip at all, whatever hideOnEmptyMessage says.',
+              'no tooltip at all.',
           evidence:
               'lib/widgets/node_render_parts.dart: wrapWithNodeTooltip returns '
               'the child unwrapped when useTooltip is off, or when no builder '
-              'resolves and message is null or empty; just_tooltip 0.4.4 '
-              'JustTooltip._hasContentOf counts a tooltipBuilder as content',
+              'resolves and message is null or empty',
         ),
         Interaction(
           otherFeatureId: 'tooltipPlacement',

@@ -137,7 +137,6 @@ class TooltipSettings {
   EdgeInsets? padding;
   Color? borderColor;
   double? borderWidth;
-  bool? hideOnEmptyMessage;
 
   bool? enableTap;
   bool? enableHover;
@@ -189,7 +188,6 @@ class TooltipSettings {
     padding = null;
     borderColor = null;
     borderWidth = null;
-    hideOnEmptyMessage = null;
     enableTap = null;
     enableHover = null;
     interactive = null;
@@ -247,7 +245,6 @@ class TooltipSettings {
           padding: padding,
           borderColor: borderColor,
           borderWidth: borderWidth,
-          hideOnEmptyMessage: hideOnEmptyMessage,
           enableTap: enableTap,
           enableHover: enableHover,
           interactive: interactive,
@@ -300,7 +297,6 @@ class TooltipSettings {
         '${p == null ? '' : '  padding: EdgeInsets.fromLTRB(${_n(p.left)}, ${_n(p.top)}, ${_n(p.right)}, ${_n(p.bottom)}),\n'}'
         '${borderColor == null ? '' : '  borderColor: ${_color(borderColor!)},\n'}'
         '${borderWidth == null ? '' : '  borderWidth: ${_n(borderWidth!)},\n'}'
-        '${hideOnEmptyMessage == null ? '' : '  hideOnEmptyMessage: $hideOnEmptyMessage,\n'}'
         '${enableTap == null ? '' : '  enableTap: $enableTap,\n'}'
         '${enableHover == null ? '' : '  enableHover: $enableHover,\n'}'
         '${interactive == null ? '' : '  interactive: $interactive,\n'}'

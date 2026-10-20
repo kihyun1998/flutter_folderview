@@ -273,7 +273,6 @@ FolderView(
 | `scaleBegin` | `double?` | Starting scale for scale animations (default: `0.0`) |
 | `slideOffset` | `double?` | Slide distance as fraction of tooltip size (default: `0.3`) |
 | `rotationBegin` | `double?` | Starting rotation in turns (default: `-0.05`) |
-| `hideOnEmptyMessage` | `bool?` | Suppress tooltip when message is empty (default: `true`) |
 
 ### Anchoring to the cursor
 
