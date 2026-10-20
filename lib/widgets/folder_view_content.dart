@@ -327,25 +327,21 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     // This preserves ListView virtualization completely.
     // ValueListenableBuilder ensures only individual items rebuild on scroll,
     // not the entire widget tree.
-    // Apply horizontal offset via Transform.translate instead of
-    // wrapping the entire ListView in a SingleChildScrollView.
-    // This preserves ListView virtualization completely.
     if (!widget.needsHorizontalScroll) {
       return nodeWidget;
     }
 
-    return ValueListenableBuilder<double>(
-      valueListenable: _horizontalOffset,
-      child: OverflowBox(
-        alignment: Alignment.centerLeft,
-        maxWidth: widget.contentWidth,
-        minWidth: widget.contentWidth,
-        child: SizedBox(width: widget.contentWidth, child: nodeWidget),
+    final row = SizedBox(width: widget.contentWidth, child: nodeWidget);
+    return OverflowBox(
+      alignment: Alignment.centerLeft,
+      maxWidth: widget.contentWidth,
+      minWidth: widget.contentWidth,
+      child: ValueListenableBuilder<double>(
+        valueListenable: _horizontalOffset,
+        child: row,
+        builder: (context, offset, child) =>
+            Transform.translate(offset: Offset(-offset, 0), child: child),
       ),
-      builder: (context, offset, child) {
-        if (offset == 0.0) return child!;
-        return Transform.translate(offset: Offset(-offset, 0), child: child);
-      },
     );
   }
 
