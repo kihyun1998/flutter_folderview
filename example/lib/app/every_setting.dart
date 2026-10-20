@@ -637,19 +637,25 @@ class EverySettingDemo extends ChangeNotifier {
 
   /// The per-Tier node-label tooltip settings, and the Tier the tooltip
   /// controls edit.
-  final folderTooltip = TooltipSettings(
+  late final folderTooltip = TooltipSettings(
+    tierLabel: 'Folder',
+    record: _recordTooltipEvent,
     sampleMessage: 'Folder tooltip',
     resolves: (node) => node.children.length == 1,
     resolvesCode: 'node.children.length == 1',
     resolvedText: 'Holds a single Parent',
   );
-  final parentTooltip = TooltipSettings(
+  late final parentTooltip = TooltipSettings(
+    tierLabel: 'Parent',
+    record: _recordTooltipEvent,
     sampleMessage: 'Parent tooltip',
     resolves: (node) => node.children.length == 2,
     resolvesCode: 'node.children.length == 2',
     resolvedText: 'Holds two Children',
   );
-  final childTooltip = TooltipSettings(
+  late final childTooltip = TooltipSettings(
+    tierLabel: 'Child',
+    record: _recordTooltipEvent,
     sampleMessage: 'Child tooltip',
     resolves: _isFuture,
     resolvesCode: "node.label.endsWith('(Future)')",
@@ -1207,7 +1213,7 @@ class EverySettingDemo extends ChangeNotifier {
 
   final List<String> _log = [];
 
-  /// The tap callbacks that fired, newest first, at most [logLength].
+  /// The callbacks that fired, newest first, at most [logLength].
   List<String> get log => List.unmodifiable(_log);
   static const logLength = 20;
 
@@ -1420,6 +1426,9 @@ class EverySettingDemo extends ChangeNotifier {
     _log.insert(0, entry);
     if (_log.length > logLength) _log.removeLast();
   }
+
+  /// Logs an onShow / onHide sample; the tooltip calls it outside a build.
+  void _recordTooltipEvent(String entry) => _set(() => _record(entry));
 
   void _set(void Function() change) {
     change();
