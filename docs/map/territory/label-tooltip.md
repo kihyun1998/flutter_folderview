@@ -36,3 +36,5 @@ Compared against upstream `just_tooltip`, but not pinned. #42's hover probes wer
 ## Known holes
 - The defaults are duplicated as literals in `wrapWithNodeTooltip` (`8.0`, `0xFF616161`, `150ms`, …) rather than living on the theme. Not a defect, but the place to look when a default "does not change".
 - `hideOnEmptyMessage` is passed through but cannot act: with no builder and an empty message `wrapWithNodeTooltip` returns the bare child before `JustTooltip` sees it, and a builder always counts as content (#87, [example](example.md)).
+- `controller` is one `JustTooltipController` on a Tier theme, so every Node of the Tier attaches to it; the second attach fails just_tooltip's one-tooltip assertion. Usable only for a Tier with a single built Node; nothing tests it (#133, #88).
+- `enableTap` wraps the label in a `GestureDetector`, whose innermost recognizer takes the label's tap from the row: no `onNodeTap`, and a Child is not selected from its label (#134, [example](example.md)).

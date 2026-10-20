@@ -7,6 +7,20 @@ enum TooltipTier { folder, parent, child }
 /// The `message` choices: the Tier's sample, a long one, empty, and unset.
 enum TooltipMessage { sample, long, empty, unset }
 
+/// The `animationCurve` choices; [unset] leaves it `null`, the raw linear
+/// animation.
+enum TooltipCurve {
+  unset(null),
+  easeOut(Curves.easeOut),
+  easeInOut(Curves.easeInOut),
+  easeOutBack(Curves.easeOutBack),
+  bounceOut(Curves.bounceOut);
+
+  const TooltipCurve(this.curve);
+
+  final Curve? curve;
+}
+
 /// One Tier's node-label tooltip settings. `NodeTooltipTheme` is one class
 /// shared by the three Tier themes, so the example keeps one of these per Tier
 /// and binds a single set of controls to the chosen one.
@@ -21,7 +35,15 @@ class TooltipSettings {
     required this.resolves,
     required this.resolvesCode,
     required this.resolvedText,
+    required this.tierLabel,
+    required this.record,
   });
+
+  /// The Tier's name, as the event log shows it.
+  final String tierLabel;
+
+  /// Adds an entry to the event log; the onShow / onHide samples call it.
+  final void Function(String entry) record;
 
   /// The message the Tier starts with.
   final String sampleMessage;
@@ -72,6 +94,18 @@ class TooltipSettings {
   );
   static const fallbackBorderWidth = 0.0;
 
+  /// The library's fallbacks for the behaviour and animation settings left
+  /// `null`, which their controls show.
+  static const fallbackEnableTap = false;
+  static const fallbackEnableHover = true;
+  static const fallbackInteractive = false;
+  static const fallbackAnimation = TooltipAnimation.fade;
+  static const fallbackAnimationMs = 150.0;
+  static const fallbackFadeBegin = 0.0;
+  static const fallbackScaleBegin = 0.0;
+  static const fallbackSlideOffset = 0.3;
+  static const fallbackRotationBegin = -0.05;
+
   bool useTooltip = false;
   TooltipDirection direction = TooltipDirection.top;
   TooltipAlignment alignment = TooltipAlignment.center;
@@ -105,6 +139,28 @@ class TooltipSettings {
   double? borderWidth;
   bool? hideOnEmptyMessage;
 
+  bool? enableTap;
+  bool? enableHover;
+  bool? interactive;
+
+  /// `waitDuration` and `showDuration` in milliseconds; 0 leaves it `null`.
+  int waitMs = 0;
+  int showMs = 0;
+  bool logShow = false;
+  bool logHide = false;
+  TooltipAnimation? animation;
+  TooltipCurve curve = TooltipCurve.unset;
+  double? animationMs;
+  double? fadeBegin;
+  double? scaleBegin;
+  double? slideOffset;
+  double? rotationBegin;
+
+  static Duration? _ms(int ms) => ms == 0 ? null : Duration(milliseconds: ms);
+
+  void _onShow() => record('onShow · $tierLabel tooltip');
+  void _onHide() => record('onHide · $tierLabel tooltip');
+
   /// Whether the Tier renders as a factory theme leaves it: no tooltip. The
   /// other settings are not drawn while [useTooltip] is off.
   bool get matchesFactory => !useTooltip;
@@ -134,6 +190,20 @@ class TooltipSettings {
     borderColor = null;
     borderWidth = null;
     hideOnEmptyMessage = null;
+    enableTap = null;
+    enableHover = null;
+    interactive = null;
+    waitMs = 0;
+    showMs = 0;
+    logShow = false;
+    logHide = false;
+    animation = null;
+    curve = TooltipCurve.unset;
+    animationMs = null;
+    fadeBegin = null;
+    scaleBegin = null;
+    slideOffset = null;
+    rotationBegin = null;
   }
 
   static Widget _builtContent(BuildContext context) => const Row(
@@ -178,6 +248,22 @@ class TooltipSettings {
           borderColor: borderColor,
           borderWidth: borderWidth,
           hideOnEmptyMessage: hideOnEmptyMessage,
+          enableTap: enableTap,
+          enableHover: enableHover,
+          interactive: interactive,
+          waitDuration: _ms(waitMs),
+          showDuration: _ms(showMs),
+          onShow: logShow ? _onShow : null,
+          onHide: logHide ? _onHide : null,
+          animation: animation,
+          animationCurve: curve.curve,
+          animationDuration: animationMs == null
+              ? null
+              : Duration(milliseconds: animationMs!.round()),
+          fadeBegin: fadeBegin,
+          scaleBegin: scaleBegin,
+          slideOffset: slideOffset,
+          rotationBegin: rotationBegin,
         )
       : null;
 
@@ -215,6 +301,20 @@ class TooltipSettings {
         '${borderColor == null ? '' : '  borderColor: ${_color(borderColor!)},\n'}'
         '${borderWidth == null ? '' : '  borderWidth: ${_n(borderWidth!)},\n'}'
         '${hideOnEmptyMessage == null ? '' : '  hideOnEmptyMessage: $hideOnEmptyMessage,\n'}'
+        '${enableTap == null ? '' : '  enableTap: $enableTap,\n'}'
+        '${enableHover == null ? '' : '  enableHover: $enableHover,\n'}'
+        '${interactive == null ? '' : '  interactive: $interactive,\n'}'
+        '${waitMs == 0 ? '' : '  waitDuration: const Duration(milliseconds: $waitMs),\n'}'
+        '${showMs == 0 ? '' : '  showDuration: const Duration(milliseconds: $showMs),\n'}'
+        '${logShow ? "  onShow: () => debugPrint('onShow · $tierLabel tooltip'),\n" : ''}'
+        '${logHide ? "  onHide: () => debugPrint('onHide · $tierLabel tooltip'),\n" : ''}'
+        '${animation == null ? '' : '  animation: TooltipAnimation.${animation!.name},\n'}'
+        '${curve.curve == null ? '' : '  animationCurve: Curves.${curve.name},\n'}'
+        '${animationMs == null ? '' : '  animationDuration: const Duration(milliseconds: ${animationMs!.round()}),\n'}'
+        '${fadeBegin == null ? '' : '  fadeBegin: ${_n(fadeBegin!)},\n'}'
+        '${scaleBegin == null ? '' : '  scaleBegin: ${_n(scaleBegin!)},\n'}'
+        '${slideOffset == null ? '' : '  slideOffset: ${_n(slideOffset!)},\n'}'
+        '${rotationBegin == null ? '' : '  rotationBegin: ${_n(rotationBegin!)},\n'}'
         '),';
   }
 }

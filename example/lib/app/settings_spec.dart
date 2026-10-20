@@ -638,6 +638,77 @@ const _nodeTooltips = SettingGroup(
         ),
       ],
     ),
+    SettingFeature(
+      id: 'tooltipBehaviour',
+      title: 'Tooltip behaviour & animation',
+      options: [
+        'tooltipBehaviourTier',
+        'NodeTooltipTheme.enableTap',
+        'NodeTooltipTheme.enableHover',
+        'NodeTooltipTheme.interactive',
+        'NodeTooltipTheme.waitDuration',
+        'NodeTooltipTheme.showDuration',
+        'NodeTooltipTheme.onShow',
+        'NodeTooltipTheme.onHide',
+        'NodeTooltipTheme.animation',
+        'NodeTooltipTheme.animationCurve',
+        'NodeTooltipTheme.animationDuration',
+        'NodeTooltipTheme.fadeBegin',
+        'NodeTooltipTheme.scaleBegin',
+        'NodeTooltipTheme.slideOffset',
+        'NodeTooltipTheme.rotationBegin',
+      ],
+      interactions: [
+        Interaction(
+          otherFeatureId: 'tooltipPlacement',
+          effect:
+              'Nothing here acts until useTooltip is on for the Tier and the '
+              'Tier has content; a slide animation starts further out in the '
+              'Direction, the flipped one where the tooltip flipped, and '
+              'slides in toward the label.',
+          evidence:
+              'lib/widgets/node_render_parts.dart: wrapWithNodeTooltip returns '
+              'the child unwrapped when useTooltip is off or there is no '
+              'content; just_tooltip 0.4.4 tooltip_transitions.dart: '
+              '_slideOffset picks its begin offset from spec.direction, which '
+              'just_tooltip.dart passes as _resolvedDirection ?? direction',
+        ),
+        Interaction(
+          otherFeatureId: 'tooltipSurface',
+          effect:
+              'With no builder and an empty or unset message there is no '
+              'tooltip, so no timing, animation or callback here has anything '
+              'to act on.',
+          evidence:
+              'lib/widgets/node_render_parts.dart: wrapWithNodeTooltip returns '
+              'the child unwrapped when no builder resolves and message is '
+              'null or empty',
+        ),
+        Interaction(
+          otherFeatureId: 'interaction',
+          effect:
+              'onShow and onHide write to the same event log as the tap '
+              'callbacks.',
+          evidence:
+              'lib/widgets/node_render_parts.dart: wrapWithNodeTooltip passes '
+              'onShow and onHide to JustTooltip unchanged; just_tooltip 0.4.4 '
+              'just_tooltip.dart: _show calls onShow, _onAnimationStatus '
+              'calls onHide once the reverse animation is dismissed',
+        ),
+        Interaction(
+          otherFeatureId: 'interaction',
+          effect:
+              'With enableTap on, a tap on the label opens the tooltip and '
+              'never reaches onNodeTap, so a Child is not selected from its '
+              'label; a tap elsewhere on the row still is.',
+          evidence:
+              'just_tooltip 0.4.4 just_tooltip.dart: build wraps the child in '
+              'a GestureDetector with onTap when enableTap; as the innermost '
+              'tap recognizer it wins the gesture arena over the row; lib/widgets/node_render_parts.dart: '
+              'wrapWithNodeTooltip wraps only the label',
+        ),
+      ],
+    ),
   ],
 );
 

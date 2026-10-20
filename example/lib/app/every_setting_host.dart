@@ -913,6 +913,105 @@ class EverySettingHost extends SettingsHost {
       value: demo.tooltip.hideOnEmptyMessage ?? true,
       onChanged: (on) => demo.editTooltip((t) => t.hideOnEmptyMessage = on),
     ),
+    'tooltipBehaviourTier' => _tierDropdown(settingId),
+    'NodeTooltipTheme.enableTap' => buildSwitchTile(
+      id: settingId,
+      label: 'enableTap',
+      value: demo.tooltip.enableTap ?? TooltipSettings.fallbackEnableTap,
+      onChanged: (on) => demo.editTooltip((t) => t.enableTap = on),
+    ),
+    'NodeTooltipTheme.enableHover' => buildSwitchTile(
+      id: settingId,
+      label: 'enableHover',
+      value: demo.tooltip.enableHover ?? TooltipSettings.fallbackEnableHover,
+      onChanged: (on) => demo.editTooltip((t) => t.enableHover = on),
+    ),
+    'NodeTooltipTheme.interactive' => buildSwitchTile(
+      id: settingId,
+      label: 'interactive',
+      value: demo.tooltip.interactive ?? TooltipSettings.fallbackInteractive,
+      onChanged: (on) => demo.editTooltip((t) => t.interactive = on),
+    ),
+    'NodeTooltipTheme.waitDuration' => _msSlider(
+      settingId,
+      'Wait',
+      demo.tooltip.waitMs,
+      (v) => demo.editTooltip((t) => t.waitMs = v),
+    ),
+    'NodeTooltipTheme.showDuration' => _msSlider(
+      settingId,
+      'Auto-hide after',
+      demo.tooltip.showMs,
+      (v) => demo.editTooltip((t) => t.showMs = v),
+    ),
+    'NodeTooltipTheme.onShow' => buildSwitchTile(
+      id: settingId,
+      label: 'onShow logs',
+      value: demo.tooltip.logShow,
+      onChanged: (on) => demo.editTooltip((t) => t.logShow = on),
+    ),
+    'NodeTooltipTheme.onHide' => buildSwitchTile(
+      id: settingId,
+      label: 'onHide logs',
+      value: demo.tooltip.logHide,
+      onChanged: (on) => demo.editTooltip((t) => t.logHide = on),
+    ),
+    'NodeTooltipTheme.animation' => buildDropdownRow<TooltipAnimation>(
+      id: settingId,
+      label: 'Animation',
+      value: demo.tooltip.animation ?? TooltipSettings.fallbackAnimation,
+      items: TooltipAnimation.values,
+      itemLabel: (a) => a.name,
+      onChanged: (a) => demo.editTooltip((t) => t.animation = a),
+    ),
+    'NodeTooltipTheme.animationCurve' => buildDropdownRow<TooltipCurve>(
+      id: settingId,
+      label: 'Curve',
+      value: demo.tooltip.curve,
+      items: TooltipCurve.values,
+      itemLabel: (c) => c == TooltipCurve.unset ? 'null' : c.name,
+      onChanged: (c) => demo.editTooltip((t) => t.curve = c),
+    ),
+    'NodeTooltipTheme.animationDuration' => _slider(
+      settingId,
+      'Duration',
+      demo.tooltip.animationMs ?? TooltipSettings.fallbackAnimationMs,
+      min: 0,
+      max: 1000,
+      divisions: 20,
+      format: (v) => '${v.round()} ms',
+      enabled: true,
+      onChanged: (v) => demo.editTooltip((t) => t.animationMs = v),
+    ),
+    'NodeTooltipTheme.fadeBegin' => _opacitySlider(
+      settingId,
+      'Fade from',
+      demo.tooltip.fadeBegin ?? TooltipSettings.fallbackFadeBegin,
+      (v) => demo.editTooltip((t) => t.fadeBegin = v),
+    ),
+    'NodeTooltipTheme.scaleBegin' => _opacitySlider(
+      settingId,
+      'Scale from',
+      demo.tooltip.scaleBegin ?? TooltipSettings.fallbackScaleBegin,
+      (v) => demo.editTooltip((t) => t.scaleBegin = v),
+    ),
+    'NodeTooltipTheme.slideOffset' => _opacitySlider(
+      settingId,
+      'Slide distance',
+      demo.tooltip.slideOffset ?? TooltipSettings.fallbackSlideOffset,
+      (v) => demo.editTooltip((t) => t.slideOffset = v),
+    ),
+    'NodeTooltipTheme.rotationBegin' => _slider(
+      settingId,
+      'Rotate from',
+      demo.tooltip.rotationBegin ?? TooltipSettings.fallbackRotationBegin,
+      min: -0.5,
+      max: 0.5,
+      divisions: 20,
+      format: (v) => '${v.toStringAsFixed(2)} turns',
+      enabled: true,
+      onChanged: (v) => demo.editTooltip((t) => t.rotationBegin = v),
+    ),
     'FlutterFolderViewTheme.scrollbarTheme' => _codeControl(
       settingId,
       'scrollbarTheme',
@@ -1152,6 +1251,24 @@ class EverySettingHost extends SettingsHost {
     onChanged: (v) => onChanged(v.roundToDouble()),
   );
 
+  /// A milliseconds slider from 0 to 3000 in steps of 100; 0 reads "unset".
+  SettingsControl _msSlider(
+    String id,
+    String label,
+    int value,
+    void Function(int) onChanged,
+  ) => _slider(
+    id,
+    label,
+    value.toDouble(),
+    min: 0,
+    max: 3000,
+    divisions: 30,
+    format: (v) => v == 0 ? 'null' : '${v.round()} ms',
+    enabled: true,
+    onChanged: (v) => onChanged(v.round()),
+  );
+
   /// An opacity slider from 0 to 1 in steps of 0.05.
   SettingsControl _opacitySlider(
     String id,
@@ -1235,6 +1352,7 @@ class EverySettingHost extends SettingsHost {
     if (featureId == 'childInk') return _childInkExtras();
     if (featureId == 'tooltipPlacement') return _tooltipPlacementExtras();
     if (featureId == 'tooltipSurface') return _tooltipSurfaceExtras();
+    if (featureId == 'tooltipBehaviour') return _tooltipBehaviourExtras();
     if (featureId != 'interaction') return const [];
     return [
       const SizedBox(height: 12),
@@ -1334,6 +1452,42 @@ class EverySettingHost extends SettingsHost {
       'the surface is painted together with the arrow.',
       key: Key('tooltip-surface-note'),
       style: TextStyle(fontSize: 12),
+    ),
+  ];
+
+  /// What the Tooltip behaviour & animation controls do not show on their
+  /// own, and the event log the onShow / onHide samples write to.
+  List<Widget> _tooltipBehaviourExtras() => [
+    const SizedBox(height: 12),
+    const Text(
+      'Tier is the Tooltip placement Tier, and useTooltip there turns the '
+      'Tier\'s tooltip on. With enableHover and enableTap both off nothing '
+      'opens the tooltip. With enableTap on, a tap on the label opens the '
+      'tooltip instead of reaching onNodeTap: tap beside the label to select '
+      'a Child. Wait delays a hover; it does not delay a tap. With '
+      'Auto-hide set, leaving the label no longer hides the tooltip: the '
+      'countdown does. interactive keeps the tooltip open while the pointer '
+      'crosses onto it. fadeBegin applies to fade, fadeScale, fadeSlide and '
+      'rotation; scaleBegin to scale and fadeScale; rotationBegin to rotation. '
+      'slide and fadeSlide start slideOffset times the tooltip size further '
+      'out in the Direction and slide in toward the label. A null curve is '
+      'linear. onShow '
+      'logs when the tooltip opens, and onHide once it has finished closing; '
+      'neither is told which Node. NodeTooltipTheme.controller is not offered '
+      'here: one JustTooltipController drives one tooltip, and a Tier theme '
+      'reaches every Node of the Tier.',
+      key: Key('tooltip-behaviour-note'),
+      style: TextStyle(fontSize: 12),
+    ),
+    const SizedBox(height: 12),
+    const Text('Event log', style: TextStyle(fontWeight: FontWeight.w600)),
+    Column(
+      key: const Key('tooltip-log'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final entry in demo.log)
+          Text(entry, style: const TextStyle(fontSize: 12)),
+      ],
     ),
   ];
 
