@@ -1,4 +1,3 @@
-import 'package:example/pages/theme_demo_page.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -67,27 +66,11 @@ void main() {
     );
   });
 
-  testWidgets('the legacy panel opens the previous demo, unchanged', (
-    tester,
-  ) async {
+  testWidgets('the menu offers no legacy panel', (tester) async {
     await pumpShell(tester);
 
-    await openDestination(tester, 'Legacy panel');
-
-    expect(find.byType(ShellMenu), findsNothing);
-    expect(find.byType(ThemeDemoPage), findsOneWidget);
-    expect(
-      find.descendant(
-        of: find.byType(ThemeDemoPage),
-        matching: find.text('Theme System Architecture'),
-      ),
-      findsOneWidget,
-    );
-
-    await tester.pageBack();
-    await tester.pumpAndSettle();
-
-    expect(find.byType(ThemeDemoPage), findsNothing);
     expect(find.byType(ShellMenu), findsOneWidget);
+    expect(find.text('Every setting'), findsWidgets);
+    expect(find.text('Legacy panel'), findsNothing);
   });
 }

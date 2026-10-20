@@ -1,22 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
-import 'package:window_manager/window_manager.dart';
 
 import 'app/destinations.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  if (Platform.isWindows) {
-    await windowManager.ensureInitialized();
-    await windowManager.setSize(const Size(1200, 600));
-    await windowManager.center();
-  }
-
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 /// The example app: the shell over [FolderViewDestinations].
 class MyApp extends StatefulWidget {

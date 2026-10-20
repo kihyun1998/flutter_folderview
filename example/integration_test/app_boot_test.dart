@@ -10,7 +10,7 @@ void main() {
     tester,
   ) async {
     // MyApp without main(): the shell over the example's destinations, with
-    // the "Every setting" stage open. main() adds the Windows window setup.
+    // the "Every setting" stage open. main() only runs it.
     await tester.pumpWidget(const MyApp());
     await tester.pumpAndSettle();
 
