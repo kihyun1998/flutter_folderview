@@ -637,9 +637,24 @@ class EverySettingDemo extends ChangeNotifier {
 
   /// The per-Tier node-label tooltip settings, and the Tier the tooltip
   /// controls edit.
-  final folderTooltip = TooltipSettings();
-  final parentTooltip = TooltipSettings();
-  final childTooltip = TooltipSettings();
+  final folderTooltip = TooltipSettings(
+    sampleMessage: 'Folder tooltip',
+    resolves: (node) => node.children.length == 1,
+    resolvesCode: 'node.children.length == 1',
+    resolvedText: 'Holds a single Parent',
+  );
+  final parentTooltip = TooltipSettings(
+    sampleMessage: 'Parent tooltip',
+    resolves: (node) => node.children.length == 2,
+    resolvesCode: 'node.children.length == 2',
+    resolvedText: 'Holds two Children',
+  );
+  final childTooltip = TooltipSettings(
+    sampleMessage: 'Child tooltip',
+    resolves: _isFuture,
+    resolvesCode: "node.label.endsWith('(Future)')",
+    resolvedText: 'Not built yet',
+  );
 
   TooltipTier _tooltipTier = TooltipTier.folder;
   TooltipTier get tooltipTier => _tooltipTier;
@@ -655,14 +670,6 @@ class EverySettingDemo extends ChangeNotifier {
   /// Applies [change] to the chosen Tier's tooltip settings.
   void editTooltip(void Function(TooltipSettings tooltip) change) =>
       _setTheme(() => change(tooltip));
-
-  /// The message each Tier's tooltip shows while the content settings are not
-  /// in the panel yet.
-  static String tooltipMessage(TooltipTier tier) => switch (tier) {
-    TooltipTier.folder => 'Folder tooltip',
-    TooltipTier.parent => 'Parent tooltip',
-    TooltipTier.child => 'Child tooltip',
-  };
 
   FlutterFolderViewTheme<String>? _theme;
 
@@ -924,7 +931,7 @@ class EverySettingDemo extends ChangeNotifier {
         hoverColor: _folderHoverColor,
         splashColor: _folderSplashColor,
         highlightColor: _folderHighlightColor,
-        tooltipTheme: folderTooltip.theme(tooltipMessage(TooltipTier.folder)),
+        tooltipTheme: folderTooltip.theme,
       ),
       parentTheme: ParentNodeTheme<String>(
         widget: _parentWidgetSample
@@ -948,7 +955,7 @@ class EverySettingDemo extends ChangeNotifier {
         hoverColor: _parentHoverColor,
         splashColor: _parentSplashColor,
         highlightColor: _parentHighlightColor,
-        tooltipTheme: parentTooltip.theme(tooltipMessage(TooltipTier.parent)),
+        tooltipTheme: parentTooltip.theme,
       ),
       childTheme: ChildNodeTheme<String>(
         widget: _childWidgetSample ? sampleChildIcon : base.childTheme.widget,
@@ -969,7 +976,7 @@ class EverySettingDemo extends ChangeNotifier {
         splashColor: _childSplashColor,
         highlightColor: _childHighlightColor,
         clickInterval: _childClickInterval,
-        tooltipTheme: childTooltip.theme(tooltipMessage(TooltipTier.child)),
+        tooltipTheme: childTooltip.theme,
       ),
       rowHeight: _rowHeight,
       rowSpacing: _rowSpacing,
