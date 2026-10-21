@@ -90,13 +90,8 @@ class TreeLinePlan {
 class TreeLinesPainter extends CustomPainter {
   final TreeLinePlan plan;
   final FolderViewLineTheme lineTheme;
-  final double rowHeight;
 
-  const TreeLinesPainter({
-    required this.plan,
-    required this.lineTheme,
-    required this.rowHeight,
-  });
+  const TreeLinesPainter({required this.plan, required this.lineTheme});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -115,20 +110,20 @@ class TreeLinesPainter extends CustomPainter {
 
     final cx = plan.connectorX;
     if (cx == null) return;
+    final midY = size.height / 2;
 
     switch (lineTheme.lineStyle) {
       case LineStyle.connector:
         // Vertical: top to mid-row (last child) or full height otherwise.
         canvas.drawLine(
           Offset(cx, 0),
-          Offset(cx, plan.connectorIsLast ? rowHeight / 2 : size.height),
+          Offset(cx, plan.connectorIsLast ? midY : size.height),
           paint,
         );
         // Horizontal stub into the content column.
-        final connectorY = rowHeight / 2;
         canvas.drawLine(
-          Offset(cx, connectorY),
-          Offset(plan.connectorEndX, connectorY),
+          Offset(cx, midY),
+          Offset(plan.connectorEndX, midY),
           paint,
         );
         break;
@@ -142,28 +137,24 @@ class TreeLinesPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant TreeLinesPainter oldDelegate) {
-    return oldDelegate.plan != plan ||
-        oldDelegate.lineTheme != lineTheme ||
-        oldDelegate.rowHeight != rowHeight;
+    return oldDelegate.plan != plan || oldDelegate.lineTheme != lineTheme;
   }
 }
 
 /// Renders the tree lines (connector + ancestor continuations) for one row.
 ///
-/// Small interface — a [FlatNode] plus line theme, row height and column width
+/// Small interface — a [FlatNode] plus line theme and column width
 /// — over the whole line-geometry implementation. Place it in a [Stack] behind
 /// the row content (e.g. via `Positioned.fill`).
 class TreeLines extends StatelessWidget {
   final FlatNode flatNode;
   final FolderViewLineTheme lineTheme;
-  final double rowHeight;
   final double lineWidth;
 
   const TreeLines({
     super.key,
     required this.flatNode,
     required this.lineTheme,
-    required this.rowHeight,
     required this.lineWidth,
   });
 
@@ -173,7 +164,6 @@ class TreeLines extends StatelessWidget {
       painter: TreeLinesPainter(
         plan: TreeLinePlan.forRow(row: flatNode, lineWidth: lineWidth),
         lineTheme: lineTheme,
-        rowHeight: rowHeight,
       ),
     );
   }

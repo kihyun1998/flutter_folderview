@@ -92,6 +92,17 @@ const settingsSpec = <SettingGroup>[
                 'rowSpacing and delegates to spacingTheme.scale and '
                 'nodeStyleTheme.scale',
           ),
+          Interaction(
+            otherFeatureId: 'lines',
+            effect:
+                'rowSpacing adds to every row\'s height; the row\'s content '
+                'and its tree lines stay centred in it.',
+            evidence:
+                'lib/widgets/tree_lines.dart: TreeLinesPainter draws the '
+                'connector stub and a last child\'s end at half the size it '
+                'paints, and the row is laid out at rowHeight + rowSpacing; '
+                'test/widgets/tree_lines_row_spacing_test.dart',
+          ),
         ],
       ),
       SettingFeature(

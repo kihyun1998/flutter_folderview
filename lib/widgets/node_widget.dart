@@ -59,7 +59,6 @@ class NodeWidget<T> extends StatelessWidget {
               child: TreeLines(
                 flatNode: flatNode,
                 lineTheme: theme.lineTheme,
-                rowHeight: theme.rowHeight,
                 lineWidth: lineWidth,
               ),
             ),
