@@ -287,7 +287,7 @@ FolderView(
 
 ### Anchoring to the cursor
 
-A node's tooltip attaches to its icon-and-label content, not to the whole rendered row. But a row is as wide as the tree's longest label, and each label grows to fill its row — so a long label's rect spans the row, and a tooltip anchored to that rect appears at the row's centre, far from where the user is actually pointing. `TooltipAnchor.pointer` keeps the same hover region but places the tooltip at the cursor:
+A node's tooltip attaches to its icon-and-label content, not to the whole rendered row. But a row is as wide as the tree's longest label, and each label grows to fill its row — so a long label's rect spans the row, and a tooltip anchored to that rect appears at the centre of its visible part, far from where the user is actually pointing. `TooltipAnchor.pointer` keeps the same hover region but places the tooltip at the cursor:
 
 ```dart
 NodeTooltipTheme(
@@ -325,7 +325,7 @@ FolderView(
 
 The card supplies its own surface, so by default the tooltip around it draws no background, padding, or elevation. Give it a `Card`, not a bare `Text`.
 
-It is anchored at the pointer, and that is the one knob you cannot change. A row is laid out at the tree's content width rather than the viewport's, so anchoring to the row's rect would aim at a centre that leaves the screen the moment the view scrolls horizontally.
+It is anchored at the pointer, and that is the one knob you cannot change. A row is laid out at the tree's content width rather than the viewport's, so the visible part of its rect spans the view. Anchored to the row, the card would open at the view's centre wherever you hover; at the pointer, it opens where you are looking.
 
 ### Styling the card
 

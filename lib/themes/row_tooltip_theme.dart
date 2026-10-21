@@ -14,8 +14,8 @@ import 'package:just_tooltip/just_tooltip.dart';
 /// fixes them:
 ///
 ///  * **the anchor** is always the pointer. A row is laid out at the tree's
-///    content width, so anchoring to the row's rect would aim at a centre that
-///    leaves the screen as soon as the view scrolls horizontally.
+///    content width, so its visible part spans the view, and that part's
+///    centre is not where the user is looking.
 ///  * **the content** comes from `rowTooltipBuilder`, so there is no `message`
 ///    or builder here.
 ///
