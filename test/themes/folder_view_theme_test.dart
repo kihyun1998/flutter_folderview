@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -96,6 +96,116 @@ void main() {
       );
       expect(a.updateShouldNotify(same), isFalse); // identical data instance
       expect(a.updateShouldNotify(changed), isTrue);
+    });
+  });
+
+  group('FolderViewTheme type mismatch (#124)', () {
+    setUp(FolderViewTheme.debugResetTypeMismatchWarnings);
+
+    List<Node<String>> data() => [
+      Node<String>(id: 'f', label: 'folder', type: NodeType.folder),
+    ];
+
+    /// Pumps [tree] [times] times and returns what `debugPrint` received.
+    Future<List<String>> printed(
+      WidgetTester tester,
+      Widget Function(int pass) tree, {
+      int times = 1,
+    }) async {
+      final logs = <String>[];
+      final original = debugPrint;
+      debugPrint = (message, {wrapWidth}) => logs.add(message ?? '');
+      try {
+        for (var i = 0; i < times; i++) {
+          await tester.pumpWidget(MaterialApp(home: Scaffold(body: tree(i))));
+        }
+      } finally {
+        debugPrint = original;
+      }
+      return logs;
+    }
+
+    Color labelColor(WidgetTester tester) =>
+        tester.widget<Text>(find.text('folder')).style!.color!;
+
+    testWidgets('an untyped ancestor is reported once, naming both types', (
+      tester,
+    ) async {
+      final logs = await printed(
+        tester,
+        (_) => FolderViewTheme(
+          data: FlutterFolderViewTheme.dark(),
+          child: FolderView<String>(data: data(), mode: ViewMode.folder),
+        ),
+      );
+
+      expect(logs, hasLength(1));
+      expect(logs.single, contains('FolderViewTheme<dynamic>'));
+      expect(logs.single, contains('FolderViewTheme<String>'));
+      // The lookup is unchanged: the view still falls back to light().
+      expect(
+        labelColor(tester),
+        FlutterFolderViewTheme<String>.light().folderTheme.textStyle!.color,
+      );
+    });
+
+    testWidgets('rebuilding the mismatched tree reports nothing more', (
+      tester,
+    ) async {
+      final logs = await printed(
+        tester,
+        (pass) => FolderViewTheme(
+          data: FlutterFolderViewTheme.dark().copyWith(rowHeight: 30.0 + pass),
+          child: FolderView<String>(data: data(), mode: ViewMode.folder),
+        ),
+        times: 3,
+      );
+
+      expect(logs, hasLength(1));
+    });
+
+    testWidgets('a matching ancestor reports nothing and is used', (
+      tester,
+    ) async {
+      final logs = await printed(
+        tester,
+        (_) => FolderViewTheme<String>(
+          data: FlutterFolderViewTheme<String>.dark(),
+          child: FolderView<String>(data: data(), mode: ViewMode.folder),
+        ),
+      );
+
+      expect(logs, isEmpty);
+      expect(
+        labelColor(tester),
+        FlutterFolderViewTheme<String>.dark().folderTheme.textStyle!.color,
+      );
+    });
+
+    testWidgets('no ancestor at all reports nothing', (tester) async {
+      final logs = await printed(
+        tester,
+        (_) => FolderView<String>(data: data(), mode: ViewMode.folder),
+      );
+
+      expect(logs, isEmpty);
+    });
+
+    testWidgets('maybeOf reports a mismatch too', (tester) async {
+      final logs = await printed(
+        tester,
+        (_) => FolderViewTheme(
+          data: FlutterFolderViewTheme.dark(),
+          child: Builder(
+            builder: (ctx) {
+              FolderViewTheme.maybeOf<String>(ctx);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+
+      expect(logs, hasLength(1));
     });
   });
 }

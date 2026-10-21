@@ -1780,7 +1780,8 @@ class EverySettingHost extends SettingsHost {
       'is null. The ancestor must name the data type: FolderViewTheme<String> '
       'for a FolderView<String>. An untyped FolderViewTheme(data: '
       'FlutterFolderViewTheme.dark()) is a FolderViewTheme<dynamic>, which '
-      'the view does not find, and it falls back to light() without a word. '
+      'the view does not find, and it falls back to light(). In a debug '
+      'build that is reported once on the console. '
       'The presets above reset every theme setting to light() or dark().',
       key: Key('theme-injection-note'),
       style: TextStyle(fontSize: 12),
