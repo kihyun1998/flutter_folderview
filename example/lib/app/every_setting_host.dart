@@ -939,6 +939,29 @@ class EverySettingHost extends SettingsHost {
       value: demo.tooltip.logHide,
       onChanged: (on) => demo.editTooltip((t) => t.logHide = on),
     ),
+    'NodeTooltipTheme.controllerResolver' => SettingsControl(
+      id: settingId,
+      label: 'controllerResolver sample',
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        children: [
+          const Text('Per-Node controllers'),
+          Switch(
+            value: demo.tooltip.controllers,
+            onChanged: (on) => demo.editTooltip((t) => t.controllers = on),
+          ),
+          TextButton(
+            onPressed: demo.tooltip.controllers ? demo.tooltip.showNext : null,
+            child: const Text('Show next'),
+          ),
+          TextButton(
+            onPressed: demo.tooltip.controllers ? demo.tooltip.hideAll : null,
+            child: const Text('Hide'),
+          ),
+        ],
+      ),
+    ),
     'NodeTooltipTheme.animation' => buildDropdownRow<TooltipAnimation>(
       id: settingId,
       label: 'Animation',
@@ -1663,9 +1686,10 @@ class EverySettingHost extends SettingsHost {
       'out in the Direction and slide in toward the label. A null curve is '
       'linear. onShow '
       'logs when the tooltip opens, and onHide once it has finished closing; '
-      'neither is told which Node. NodeTooltipTheme.controller is not offered '
-      'here: one JustTooltipController drives one tooltip, and a Tier theme '
-      'reaches every Node of the Tier.',
+      'neither is told which Node. Per-Node controllers give each Node the '
+      'resolver sample picks its own JustTooltipController, since one '
+      'controller drives one tooltip; Show next shows the next one, and as '
+      'only one tooltip shows at a time, the last one closes.',
       key: Key('tooltip-behaviour-note'),
       style: TextStyle(fontSize: 12),
     ),

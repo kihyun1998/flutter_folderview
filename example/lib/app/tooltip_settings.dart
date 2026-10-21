@@ -147,6 +147,35 @@ class TooltipSettings {
   int showMs = 0;
   bool logShow = false;
   bool logHide = false;
+
+  /// Whether the `controllerResolver` sample is on: each Node [resolves]
+  /// picks gets its own controller, and every other Node gets `null`.
+  bool controllers = false;
+
+  /// The sample's controllers, by Node id; one per Node, kept across builds.
+  final _controllers = <String, JustTooltipController>{};
+
+  JustTooltipController? _controllerFor(Node<String> node) => resolves(node)
+      ? _controllers.putIfAbsent(node.id, JustTooltipController.new)
+      : null;
+
+  int _next = 0;
+
+  /// Shows the next Node's tooltip through its controller, in the order the
+  /// Nodes were built. One tooltip shows at a time, so the last one closes.
+  void showNext() {
+    final all = _controllers.values.toList();
+    if (all.isEmpty) return;
+    all[_next++ % all.length].show();
+  }
+
+  /// Hides whichever of them is showing.
+  void hideAll() {
+    for (final c in _controllers.values) {
+      c.hide();
+    }
+  }
+
   TooltipAnimation? animation;
   TooltipCurve curve = TooltipCurve.unset;
   double? animationMs;
@@ -195,6 +224,7 @@ class TooltipSettings {
     showMs = 0;
     logShow = false;
     logHide = false;
+    controllers = false;
     animation = null;
     curve = TooltipCurve.unset;
     animationMs = null;
@@ -252,6 +282,7 @@ class TooltipSettings {
           showDuration: _ms(showMs),
           onShow: logShow ? _onShow : null,
           onHide: logHide ? _onHide : null,
+          controllerResolver: controllers ? _controllerFor : null,
           animation: animation,
           animationCurve: curve.curve,
           animationDuration: animationMs == null
@@ -304,6 +335,7 @@ class TooltipSettings {
         '${showMs == 0 ? '' : '  showDuration: const Duration(milliseconds: $showMs),\n'}'
         '${logShow ? "  onShow: () => debugPrint('onShow · $tierLabel tooltip'),\n" : ''}'
         '${logHide ? "  onHide: () => debugPrint('onHide · $tierLabel tooltip'),\n" : ''}'
+        '${controllers ? '  controllerResolver: (node) => $resolvesCode\n      ? controllers.putIfAbsent(node.id, JustTooltipController.new)\n      : null,\n' : ''}'
         '${animation == null ? '' : '  animation: TooltipAnimation.${animation!.name},\n'}'
         '${curve.curve == null ? '' : '  animationCurve: Curves.${curve.name},\n'}'
         '${animationMs == null ? '' : '  animationDuration: const Duration(milliseconds: ${animationMs!.round()}),\n'}'

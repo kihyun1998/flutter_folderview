@@ -658,6 +658,7 @@ const _nodeTooltips = SettingGroup(
         'NodeTooltipTheme.showDuration',
         'NodeTooltipTheme.onShow',
         'NodeTooltipTheme.onHide',
+        'NodeTooltipTheme.controllerResolver',
         'NodeTooltipTheme.animation',
         'NodeTooltipTheme.animationCurve',
         'NodeTooltipTheme.animationDuration',

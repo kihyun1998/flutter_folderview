@@ -37,7 +37,8 @@ class NodeTooltipTheme<T> {
   ///
   /// The anchor is captured when the tooltip is shown and does not follow the
   /// pointer, so [interactive] tooltips stay reachable. Tap-triggered tooltips
-  /// anchor at the tap; a [controller]-driven show with no pointer present
+  /// anchor at the tap; a show driven by a [controllerResolver] controller
+  /// with no pointer present
   /// falls back to the child's rect. Against a point there are no target edges
   /// to align to, so [alignment] then selects which of the tooltip's *own*
   /// edges lands on the pointer.
@@ -77,8 +78,18 @@ class NodeTooltipTheme<T> {
   /// Padding inside the tooltip
   final EdgeInsets? padding;
 
-  /// Controller for programmatic tooltip control
-  final JustTooltipController? controller;
+  /// Resolver for the controller that shows and hides a Node's label tooltip
+  /// programmatically. If returns null, the Node's tooltip has no controller.
+  ///
+  /// A `JustTooltipController` drives one tooltip, and attaching it to a
+  /// second fails an assertion. So return a distinct controller per Node, and
+  /// the same one for a Node on every call, since this runs on every build:
+  /// for example `(node) => controllers.putIfAbsent(node.id, JustTooltipController.new)`.
+  ///
+  /// A label is built only while its row is in view, and a controller drives
+  /// it only then; a `show()` made before the row is built is applied once it
+  /// is.
+  final JustTooltipController? Function(Node<T> node)? controllerResolver;
 
   /// Whether tap triggers the tooltip
   final bool? enableTap;
@@ -160,7 +171,7 @@ class NodeTooltipTheme<T> {
     this.boxShadow,
     this.borderRadius,
     this.padding,
-    this.controller,
+    this.controllerResolver,
     this.enableTap,
     this.enableHover,
     this.animationDuration,
@@ -201,7 +212,7 @@ class NodeTooltipTheme<T> {
     List<BoxShadow>? boxShadow,
     BorderRadius? borderRadius,
     EdgeInsets? padding,
-    JustTooltipController? controller,
+    JustTooltipController? Function(Node<T> node)? controllerResolver,
     bool? enableTap,
     bool? enableHover,
     Duration? animationDuration,
@@ -241,7 +252,7 @@ class NodeTooltipTheme<T> {
       boxShadow: boxShadow ?? this.boxShadow,
       borderRadius: borderRadius ?? this.borderRadius,
       padding: padding ?? this.padding,
-      controller: controller ?? this.controller,
+      controllerResolver: controllerResolver ?? this.controllerResolver,
       enableTap: enableTap ?? this.enableTap,
       enableHover: enableHover ?? this.enableHover,
       animationDuration: animationDuration ?? this.animationDuration,
@@ -297,7 +308,7 @@ class NodeTooltipTheme<T> {
       boxShadow: BoxShadow.lerpList(a.boxShadow ?? [], b.boxShadow ?? [], t),
       borderRadius: BorderRadius.lerp(a.borderRadius, b.borderRadius, t),
       padding: EdgeInsets.lerp(a.padding, b.padding, t),
-      controller: t < 0.5 ? a.controller : b.controller,
+      controllerResolver: t < 0.5 ? a.controllerResolver : b.controllerResolver,
       enableTap: t < 0.5 ? a.enableTap : b.enableTap,
       enableHover: t < 0.5 ? a.enableHover : b.enableHover,
       animationDuration: t < 0.5 ? a.animationDuration : b.animationDuration,

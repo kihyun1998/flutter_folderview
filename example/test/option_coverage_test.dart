@@ -5,7 +5,7 @@ import 'support/library_options.dart';
 
 /// Library options not yet exposed by the example, each with the issue that
 /// owns exposing it. An entry leaves this map in the change that covers it.
-const notYetCovered = <String, int>{'NodeTooltipTheme.controller': 133};
+const notYetCovered = <String, int>{};
 
 /// Every `Class.field` id the example claims to cover.
 Set<String> coveredOptions() => {
