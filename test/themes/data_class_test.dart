@@ -137,7 +137,7 @@ void main() {
     test('lerp picks rowHeight by t threshold (not interpolated)', () {
       final a = FlutterFolderViewTheme<String>.light().copyWith(rowHeight: 10);
       final b = FlutterFolderViewTheme<String>.light().copyWith(rowHeight: 20);
-      // rowHeight/rowSpacing/animationDuration are t<0.5 ? a : b, not lerped.
+      // rowHeight/rowSpacing are t<0.5 ? a : b, not lerped.
       expect(FlutterFolderViewTheme.lerp(a, b, 0.25).rowHeight, 10);
       expect(FlutterFolderViewTheme.lerp(a, b, 0.75).rowHeight, 20);
     });

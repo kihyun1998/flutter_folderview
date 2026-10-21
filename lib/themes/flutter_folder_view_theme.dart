@@ -40,9 +40,6 @@ class FlutterFolderViewTheme<T> {
   /// Theme for node visual styling
   final FolderViewNodeStyleTheme nodeStyleTheme;
 
-  /// Animation duration for expand/collapse animations in milliseconds
-  final int animationDuration;
-
   /// Height of each row/node in pixels
   final double rowHeight;
 
@@ -59,7 +56,6 @@ class FlutterFolderViewTheme<T> {
     this.expandIconTheme = const ExpandIconTheme(),
     this.spacingTheme = const FolderViewSpacingTheme(),
     this.nodeStyleTheme = const FolderViewNodeStyleTheme(),
-    this.animationDuration = 200,
     this.rowHeight = 40.0,
     this.rowSpacing = 0.0,
   });
@@ -181,7 +177,6 @@ class FlutterFolderViewTheme<T> {
   ///
   /// **Deliberately omitted from delegation** (per ADR-0001):
   /// [scrollbarTheme] is preserved as-is — scrollbars are chrome, not content.
-  /// [animationDuration] is preserved as-is — time is not a length.
   ///
   /// [defaultFontSize] is used to resolve null [TextStyle.fontSize] values
   /// before scaling. Widget callers should prefer [scaledForContext] which
@@ -238,7 +233,6 @@ class FlutterFolderViewTheme<T> {
     ExpandIconTheme? expandIconTheme,
     FolderViewSpacingTheme? spacingTheme,
     FolderViewNodeStyleTheme? nodeStyleTheme,
-    int? animationDuration,
     double? rowHeight,
     double? rowSpacing,
   }) {
@@ -251,7 +245,6 @@ class FlutterFolderViewTheme<T> {
       expandIconTheme: expandIconTheme ?? this.expandIconTheme,
       spacingTheme: spacingTheme ?? this.spacingTheme,
       nodeStyleTheme: nodeStyleTheme ?? this.nodeStyleTheme,
-      animationDuration: animationDuration ?? this.animationDuration,
       rowHeight: rowHeight ?? this.rowHeight,
       rowSpacing: rowSpacing ?? this.rowSpacing,
     );
@@ -294,7 +287,6 @@ class FlutterFolderViewTheme<T> {
         b.nodeStyleTheme,
         t,
       ),
-      animationDuration: t < 0.5 ? a.animationDuration : b.animationDuration,
       rowHeight: t < 0.5 ? a.rowHeight : b.rowHeight,
       rowSpacing: t < 0.5 ? a.rowSpacing : b.rowSpacing,
     );
@@ -313,7 +305,6 @@ class FlutterFolderViewTheme<T> {
         other.expandIconTheme == expandIconTheme &&
         other.spacingTheme == spacingTheme &&
         other.nodeStyleTheme == nodeStyleTheme &&
-        other.animationDuration == animationDuration &&
         other.rowHeight == rowHeight &&
         other.rowSpacing == rowSpacing;
   }
@@ -328,7 +319,6 @@ class FlutterFolderViewTheme<T> {
     expandIconTheme,
     spacingTheme,
     nodeStyleTheme,
-    animationDuration,
     Object.hash(rowHeight, rowSpacing),
   );
 
@@ -343,7 +333,6 @@ class FlutterFolderViewTheme<T> {
         'expandIconTheme: $expandIconTheme, '
         'spacingTheme: $spacingTheme, '
         'nodeStyleTheme: $nodeStyleTheme, '
-        'animationDuration: $animationDuration, '
         'rowHeight: $rowHeight, '
         'rowSpacing: $rowSpacing'
         ')';

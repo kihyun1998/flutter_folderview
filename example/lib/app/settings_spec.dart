@@ -75,7 +75,6 @@ const settingsSpec = <SettingGroup>[
         options: [
           'FlutterFolderViewTheme.rowHeight',
           'FlutterFolderViewTheme.rowSpacing',
-          'FlutterFolderViewTheme.animationDuration',
           'FlutterFolderViewTheme.spacingTheme',
           'FolderViewSpacingTheme.contentPadding',
           'FlutterFolderViewTheme.nodeStyleTheme',
@@ -86,7 +85,7 @@ const settingsSpec = <SettingGroup>[
             otherFeatureId: 'scale',
             effect:
                 'The Scale multiplies rowHeight, rowSpacing, contentPadding '
-                'and borderRadius. animationDuration is not scaled.',
+                'and borderRadius.',
             evidence:
                 'lib/themes/flutter_folder_view_theme.dart: '
                 'FlutterFolderViewTheme.scale multiplies rowHeight and '
