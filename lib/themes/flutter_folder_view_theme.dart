@@ -43,7 +43,9 @@ class FlutterFolderViewTheme<T> {
   /// Height of each row/node in pixels
   final double rowHeight;
 
-  /// Vertical spacing between rows in pixels
+  /// Extra height, in pixels, added to every row: each row is
+  /// `rowHeight + rowSpacing` tall, and its content and tree lines are
+  /// centred in that height. It is not an empty gap between rows.
   final double rowSpacing;
 
   /// Creates a [FlutterFolderViewTheme] with the given properties

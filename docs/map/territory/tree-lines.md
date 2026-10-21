@@ -29,5 +29,9 @@ None recorded.
 - [scale](scale.md) — line width and column width both scale.
 
 ## Known holes
-- **Probed on 2026-10-19: with `rowSpacing > 0` the connector stub sits above the label's centre.** The `ListView`'s `itemExtent` is `rowHeight + rowSpacing`, and it overrides `NodeWidget`'s `SizedBox(rowHeight)`, so the row and its painter are the full extent tall. The painter puts the horizontal stub, and a last child's vertical end, at `rowHeight / 2`. The content is centred in the full extent. With a 40 px `rowHeight`, `rowSpacing` 0 put the stub and the label centre both at y = 20. `rowSpacing` 10 gave a 50 px row with the stub still at y = 20 and the label centre at y = 25, so it is off by `rowSpacing / 2`. Tracked: #118.
+- **Fixed in #118: the stub and a last child's vertical end follow the row's extent.**
+  - **The cause.** The `ListView`'s `itemExtent` is `rowHeight + rowSpacing`, and it overrides `NodeWidget`'s `SizedBox(rowHeight)`, so the row and its painter are the full extent tall. The content is centred in that extent, but the painter put the stub and a last child's vertical end at `rowHeight / 2`. At a 40 px `rowHeight` and `rowSpacing` 10, that left the stub at y = 20 against a label centred at y = 25.
+  - **The fix.** The painter now uses half the size it paints, and it no longer takes a `rowHeight` input, so it cannot drift from the extent again.
+  - **The decision.** By the maintainer's call at triage, `rowSpacing` means extra height added to every row, as content, ink and hit areas already treated it, not an empty gap. Its dartdoc says so.
+  - **Pinned** by `test/widgets/tree_lines_row_spacing_test.dart`, at `rowSpacing` 0 and 10, through `FolderView`.
 - `TreeLinePlan` is the unit-tested core (`test/widgets/tree_lines_test.dart`).
