@@ -319,6 +319,60 @@ void main() {
       );
     });
 
+    testWidgets('the controllerResolver sample gives each picked Node its own '
+        'controller, and Show and Hide drive them', (tester) async {
+      await _open(tester, tier: 'Child');
+      const future1 = 'FolderViewNodeTheme (Future)';
+      const future2 = 'FolderViewTextTheme (Future)';
+      expect(_tip(tester, future1).controller, isNull);
+
+      await _toggle(tester, 'NodeTooltipTheme.controllerResolver');
+      final a = _tip(tester, future1).controller;
+      final b = _tip(tester, future2).controller;
+      expect(a, isNotNull);
+      expect(b, isNotNull);
+      expect(identical(a, b), isFalse);
+      expect(_tip(tester, _c1).controller, isNull);
+      Finder button(String text) => find.descendant(
+        of: _control('NodeTooltipTheme.controllerResolver'),
+        matching: find.widgetWithText(TextButton, text),
+      );
+      // The label just below the one visible tooltip, which opens above it.
+      String shown() {
+        final y = tester.getCenter(find.text('Child tooltip')).dy;
+        double below(String l) {
+          final d = tester.getCenter(_labelFinder(l)).dy - y;
+          return d > 0 ? d : double.infinity;
+        }
+
+        return below(future1) < below(future2) ? future1 : future2;
+      }
+
+      await tester.tap(button('Show next'));
+      await tester.pumpAndSettle();
+      expect(find.text('Child tooltip'), findsOneWidget);
+      final first = shown();
+
+      await tester.tap(button('Show next'));
+      await tester.pumpAndSettle();
+      expect(find.text('Child tooltip'), findsOneWidget);
+      expect(shown(), isNot(first));
+
+      await tester.tap(button('Hide'));
+      await tester.pumpAndSettle();
+      expect(find.text('Child tooltip'), findsNothing);
+
+      await openFeature(tester, 'Tooltip placement');
+      expect(
+        _code(tester, 'ChildNodeTheme.tooltipTheme'),
+        contains(
+          "  controllerResolver: (node) => node.label.endsWith('(Future)')\n"
+          '      ? controllers.putIfAbsent(node.id, JustTooltipController.new)\n'
+          '      : null,\n',
+        ),
+      );
+    });
+
     testWidgets('the code shows each setting once it is set', (tester) async {
       await _open(tester);
       await openFeature(tester, 'Tooltip placement');

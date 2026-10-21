@@ -268,7 +268,7 @@ FolderView(
 | `waitDuration` | `Duration?` | Delay before showing on hover |
 | `showDuration` | `Duration?` | Auto-hide after duration (resets on re-enter) |
 | `animationDuration` | `Duration?` | Show/hide animation duration |
-| `controller` | `JustTooltipController?` | Programmatic show/hide control |
+| `controllerResolver` | `JustTooltipController? Function(Node<T>)?` | Per-Node programmatic show/hide; return a distinct, stable controller per Node |
 | `onShow` | `VoidCallback?` | Callback when shown |
 | `onHide` | `VoidCallback?` | Callback when hidden |
 | `showArrow` | `bool?` | Show arrow on tooltip (default: `false`) |
@@ -297,7 +297,7 @@ NodeTooltipTheme(
 )
 ```
 
-The anchor is captured when the tooltip is shown and does not follow the pointer, so `interactive` tooltips stay reachable. Tap-triggered tooltips anchor at the tap, and a `controller`-driven show with no pointer present falls back to the label's rect.
+The anchor is captured when the tooltip is shown and does not follow the pointer, so `interactive` tooltips stay reachable. Tap-triggered tooltips anchor at the tap, and a show driven by a `controllerResolver` controller with no pointer present falls back to the label's rect.
 
 Against a point there are no target edges to align to, so under `TooltipAnchor.pointer` the `alignment` field selects which of the tooltip's *own* edges lands on the pointer.
 
@@ -380,7 +380,7 @@ cd example
 flutter run
 ```
 
-- **Every setting.** This is a `FolderView` with a control for every public option of the package except `NodeTooltipTheme.controller` ([#133](https://github.com/kihyun1998/flutter_folderview/issues/133)). The controls are grouped as:
+- **Every setting.** This is a `FolderView` with a control for every public option of the package. The controls are grouped as:
   - Data & View Mode, Layout, and Interaction (Taps & state, **Smooth wheel**, Scale);
   - the Folder, Parent and Child tiers;
   - Node tooltips and the Row card.
