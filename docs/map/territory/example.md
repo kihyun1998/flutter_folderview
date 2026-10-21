@@ -128,11 +128,11 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - The Folder tests cover the shared label path and the Folder branch of the style switch.
 - **"Scrollbars" (#85).**
   - **The bars show only on hover.** At `light()`'s `nonHoverOpacity` of 0 they are hidden until the pointer is over the tree, so `scrollbar_test` drives a mouse pointer.
-  - The thumb is asserted where it is painted: the `Scrollbar`'s `drawRRect` carries `thumbColor`, and its rect is `thickness` wide with `radius` corners.
+  - The thumb is asserted where it is painted: the `Scrollbar`'s `drawRRect` carries `thumbColor`, and its rect is `thickness` wide with `radius` corners. With `thickness` above `trackWidth` the rect stays inside the track box (#122).
   - **The data must scroll for a thumb to exist**, so the tests take Generated data and Expand all first.
-  - The note states the two tracks plainly ([scroll-sync](scroll-sync.md) Known holes).
+  - The track box is the only track: no `drawRect` with any alpha comes from the `Scrollbar` (#122, [scroll-sync](scroll-sync.md)).
 - **"Expand icon" (#81).**
-  - **The widget switch installs an uncoloured `Icons.arrow_right`.** `light()`'s chevron sets its own grey, so `color` and `expandedColor` don't reach it ([tier-rendering](tier-rendering.md) Known holes). The panel note says so, and `expand_icon_test` pins both sides: with the sample, expanded rows take `expandedColor` and the others take `color`; `light()`'s chevron stays grey whatever they say. The colour swatches start with `null`, meaning not set.
+  - **The widget switch installs an uncoloured `Icons.arrow_right`**, a custom widget in place of the factory chevron. Since #120 the factory chevron is uncoloured too, with its grey in `color`, so `color` and `expandedColor` reach both ([tier-rendering](tier-rendering.md)). `expand_icon_test` pins that light()'s chevron starts grey and follows both swatches. The colour swatches are `null` (not set), then `light()`'s and `dark()`'s greys, then four colours.
   - Width, horizontal padding and horizontal margin are asserted by one rule: each moves a Child's label by the same amount, because their sum is the indent unit. Height does not move it.
   - **A painted glyph is read per row, not per widget.** `const Icon` instances are one object, so `find.byWidget(icon)` matches every row. Read each `RichText` whose text is the glyph, then pick the one nearest the row.
 - **`openFeature` scrolls the lazy feature list from the top until the entry is built** (#81). With "Expand icon" ahead of it, "Tree lines" was no longer built while a feature was open, so `ensureVisible` found nothing.
@@ -176,7 +176,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
 - `example/test/parent_tier_test.dart` — Parent glyphs per row (openWidget in Tree Mode), the icon box, label style and resolvers (in the mobile frame), the ink, presets, the code text
 - `example/test/folder_tier_test.dart` — Folder glyphs per row, the icon box, the label style and resolvers (in the tablet frame), the ink, presets, the code text
 - `example/test/theme_injection_test.dart` — presets reset and release, both injection paths under Dark, the code text, the shell untouched
-- `example/test/scrollbar_test.dart` — hover fade, the track box, the painted thumb, Material's track, the bar at Scale 2, the code text
+- `example/test/scrollbar_test.dart` — hover fade, the track box, the painted thumb, the one track, the thickness cap, the bar at Scale 2, the code text
 - `example/test/expand_icon_test.dart` — glyph colours per row, the indent unit, the sample switch, the code text
 - `example/test/lines_test.dart` — the line knobs reach the painted strokes in both View Modes; the `lineTheme` code text
 - `example/test/layout_test.dart` — the Layout controls reach the rendered theme and rows; the theme instance is kept; the container code text

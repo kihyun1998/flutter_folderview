@@ -12,7 +12,11 @@ class FolderViewScrollbarTheme {
   /// The color of the scrollbar track background
   final Color trackColor;
 
-  /// The thickness of the scrollbar thumb
+  /// The thickness of the scrollbar thumb.
+  ///
+  /// Capped where the bar is painted so the thumb, with Material's cross-axis
+  /// margin for the platform (0 on Android, 2 elsewhere), fits in
+  /// [trackWidth]; the theme keeps the value it was given.
   final double thickness;
 
   /// The radius of the scrollbar thumb corners
@@ -38,9 +42,6 @@ class FolderViewScrollbarTheme {
   /// The radius of the scrollbar track corners
   final double trackRadius;
 
-  /// Whether the scrollbar track is visible
-  final bool trackVisibility;
-
   /// Creates a [FolderViewScrollbarTheme] with the given properties
   const FolderViewScrollbarTheme({
     required this.thumbColor,
@@ -53,7 +54,6 @@ class FolderViewScrollbarTheme {
     this.hoverAnimationDuration = const Duration(milliseconds: 200),
     this.trackWidth = 16.0,
     this.trackRadius = 8.0,
-    this.trackVisibility = false,
   });
 
   /// Creates a copy of this theme with the given fields replaced with new values
@@ -68,7 +68,6 @@ class FolderViewScrollbarTheme {
     Duration? hoverAnimationDuration,
     double? trackWidth,
     double? trackRadius,
-    bool? trackVisibility,
   }) {
     return FolderViewScrollbarTheme(
       thumbColor: thumbColor ?? this.thumbColor,
@@ -82,7 +81,6 @@ class FolderViewScrollbarTheme {
           hoverAnimationDuration ?? this.hoverAnimationDuration,
       trackWidth: trackWidth ?? this.trackWidth,
       trackRadius: trackRadius ?? this.trackRadius,
-      trackVisibility: trackVisibility ?? this.trackVisibility,
     );
   }
 
@@ -114,7 +112,6 @@ class FolderViewScrollbarTheme {
           : b.hoverAnimationDuration,
       trackWidth: lerpDouble(a.trackWidth, b.trackWidth, t)!,
       trackRadius: lerpDouble(a.trackRadius, b.trackRadius, t)!,
-      trackVisibility: t < 0.5 ? a.trackVisibility : b.trackVisibility,
     );
   }
 
@@ -132,8 +129,7 @@ class FolderViewScrollbarTheme {
         other.nonHoverOpacity == nonHoverOpacity &&
         other.hoverAnimationDuration == hoverAnimationDuration &&
         other.trackWidth == trackWidth &&
-        other.trackRadius == trackRadius &&
-        other.trackVisibility == trackVisibility;
+        other.trackRadius == trackRadius;
   }
 
   @override
@@ -148,7 +144,6 @@ class FolderViewScrollbarTheme {
     hoverAnimationDuration,
     trackWidth,
     trackRadius,
-    trackVisibility,
   );
 
   @override
@@ -163,8 +158,7 @@ class FolderViewScrollbarTheme {
         'nonHoverOpacity: $nonHoverOpacity, '
         'hoverAnimationDuration: $hoverAnimationDuration, '
         'trackWidth: $trackWidth, '
-        'trackRadius: $trackRadius, '
-        'trackVisibility: $trackVisibility'
+        'trackRadius: $trackRadius'
         ')';
   }
 }

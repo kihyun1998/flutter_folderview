@@ -265,9 +265,6 @@ class EverySettingDemo extends ChangeNotifier {
   double _trackRadius = 8;
   double get trackRadius => _trackRadius;
 
-  bool _trackVisibility = false;
-  bool get trackVisibility => _trackVisibility;
-
   /// The samples the Folder icon controls install. They have no colour of
   /// their own, so the ambient icon colour reaches them.
   static const sampleFolderIcon = Icon(Icons.folder_outlined, size: 20);
@@ -735,7 +732,6 @@ class EverySettingDemo extends ChangeNotifier {
     _hoverAnimationMs = b.hoverAnimationDuration.inMilliseconds;
     _trackWidth = b.trackWidth;
     _trackRadius = b.trackRadius;
-    _trackVisibility = b.trackVisibility;
     final d = f.folderTheme;
     _folderWidgetSample = false;
     _folderOpenWidget = FolderOpenWidget.factory;
@@ -824,7 +820,6 @@ class EverySettingDemo extends ChangeNotifier {
         _hoverAnimationMs == b.hoverAnimationDuration.inMilliseconds &&
         _trackWidth == b.trackWidth &&
         _trackRadius == b.trackRadius &&
-        _trackVisibility == b.trackVisibility &&
         _folderMatches(f.folderTheme) &&
         _parentMatches(f.parentTheme) &&
         _childMatches(f.childTheme) &&
@@ -1011,7 +1006,6 @@ class EverySettingDemo extends ChangeNotifier {
         hoverAnimationDuration: Duration(milliseconds: _hoverAnimationMs),
         trackWidth: _trackWidth,
         trackRadius: _trackRadius,
-        trackVisibility: _trackVisibility,
       ),
     );
   }
@@ -1030,7 +1024,6 @@ class EverySettingDemo extends ChangeNotifier {
       '  hoverAnimationDuration: Duration(milliseconds: $_hoverAnimationMs),\n'
       '  trackWidth: ${_num(_trackWidth)},\n'
       '  trackRadius: ${_num(_trackRadius)},\n'
-      '  trackVisibility: $_trackVisibility,\n'
       '),';
 
   /// `FlutterFolderViewTheme.folderTheme` as the argument a caller would
@@ -1276,7 +1269,6 @@ class EverySettingDemo extends ChangeNotifier {
   set hoverAnimationMs(int value) => _setTheme(() => _hoverAnimationMs = value);
   set trackWidth(double value) => _setTheme(() => _trackWidth = value);
   set trackRadius(double value) => _setTheme(() => _trackRadius = value);
-  set trackVisibility(bool value) => _setTheme(() => _trackVisibility = value);
   set folderWidgetSample(bool value) =>
       _setTheme(() => _folderWidgetSample = value);
   set folderOpenWidget(FolderOpenWidget value) =>

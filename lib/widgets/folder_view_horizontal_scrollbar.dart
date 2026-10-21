@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../themes/folder_view_scrollbar_theme.dart';
+import 'folder_view_scrollbar_thumb.dart';
 import 'modifier_wheel_guard.dart';
 
 class FolderViewHorizontalScrollbar extends StatelessWidget {
@@ -41,16 +42,11 @@ class FolderViewHorizontalScrollbar extends StatelessWidget {
           ),
           child: Theme(
             data: Theme.of(context).copyWith(
-              scrollbarTheme: ScrollbarThemeData(
-                thumbColor: WidgetStateProperty.all(scrollbarTheme.thumbColor),
-                radius: Radius.circular(scrollbarTheme.radius),
-                thickness: WidgetStateProperty.all(scrollbarTheme.thickness),
-              ),
+              scrollbarTheme: folderViewThumbTheme(context, scrollbarTheme),
             ),
             child: Scrollbar(
               controller: horizontalScrollbarController,
               thumbVisibility: scrollbarTheme.thumbVisibility,
-              trackVisibility: scrollbarTheme.trackVisibility,
               child: SingleChildScrollView(
                 controller: horizontalScrollbarController,
                 scrollDirection: Axis.horizontal,
