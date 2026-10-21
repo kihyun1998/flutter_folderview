@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../themes/folder_view_scrollbar_theme.dart';
+import 'modifier_wheel_guard.dart';
 
 class FolderViewHorizontalScrollbar extends StatelessWidget {
   final bool isHover;
@@ -9,12 +10,16 @@ class FolderViewHorizontalScrollbar extends StatelessWidget {
   final double contentWidth;
   final FolderViewScrollbarTheme scrollbarTheme;
 
+  /// Whether a Scale Modifier + wheel over the bar is kept from scrolling.
+  final bool blockModifierWheel;
+
   const FolderViewHorizontalScrollbar({
     super.key,
     required this.isHover,
     required this.horizontalScrollbarController,
     required this.contentWidth,
     required this.scrollbarTheme,
+    this.blockModifierWheel = false,
   });
 
   @override
@@ -49,9 +54,12 @@ class FolderViewHorizontalScrollbar extends StatelessWidget {
               child: SingleChildScrollView(
                 controller: horizontalScrollbarController,
                 scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: contentWidth,
-                  height: scrollbarTheme.trackWidth,
+                child: ModifierWheelGuard(
+                  enabled: blockModifierWheel,
+                  child: SizedBox(
+                    width: contentWidth,
+                    height: scrollbarTheme.trackWidth,
+                  ),
                 ),
               ),
             ),
