@@ -336,7 +336,7 @@ const _folderTier = SettingGroup(
           effect:
               'The Scale multiplies the textStyle font size; an unset size '
               'starts from the ambient bodyMedium. A style returned by '
-              'textStyleResolver is not scaled.',
+              'textStyleResolver is scaled by the same rule.',
           evidence:
               'lib/themes/folder_node_theme.dart: FolderNodeTheme.scale; '
               'lib/themes/_scale_text_style.dart: scaleTextStyle',
@@ -424,7 +424,7 @@ const _parentTier = SettingGroup(
           effect:
               'The Scale multiplies the textStyle font size; an unset size '
               'starts from the ambient bodyMedium. A style returned by '
-              'textStyleResolver is not scaled.',
+              'textStyleResolver is scaled by the same rule.',
           evidence:
               'lib/themes/parent_node_theme.dart: ParentNodeTheme.scale; '
               'lib/themes/_scale_text_style.dart: scaleTextStyle',
@@ -487,7 +487,7 @@ const _childTier = SettingGroup(
           effect:
               'The Scale multiplies the textStyle font size; an unset size '
               'starts from the ambient bodyMedium. A style returned by '
-              'textStyleResolver is not scaled.',
+              'textStyleResolver is scaled by the same rule.',
           evidence:
               'lib/themes/child_node_theme.dart: ChildNodeTheme.scale; '
               'lib/themes/_scale_text_style.dart: scaleTextStyle',
@@ -519,11 +519,11 @@ const _childTier = SettingGroup(
         Interaction(
           otherFeatureId: 'scale',
           effect:
-              'The Scale multiplies selectedTextStyle\'s sizes; a style '
-              'returned by selectedTextStyleResolver is not scaled.',
+              'The Scale multiplies selectedTextStyle\'s sizes, and those of a '
+              'style returned by selectedTextStyleResolver.',
           evidence:
               'lib/themes/child_node_theme.dart: ChildNodeTheme.scale scales '
-              'selectedTextStyle and passes the resolver through',
+              'selectedTextStyle and wraps selectedTextStyleResolver',
         ),
       ],
     ),

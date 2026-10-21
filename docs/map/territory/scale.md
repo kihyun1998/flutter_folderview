@@ -37,5 +37,10 @@ Applies the caller's **Scale** factor uniformly to every content-spatial propert
 - [tree-lines](tree-lines.md) — line width scales with `lineTheme`.
 
 ## Known holes
-- **Probed on 2026-10-19: a style returned by `textStyleResolver` is not scaled.** Each tier theme's `scale` multiplies its own `textStyle`. The resolver is a function and passes through unchanged, so what it returns is drawn at its own size. At Scale 2, a Folder with `textStyle: TextStyle(fontSize: 16)` drew 32 px, and one whose resolver returned the same style drew 16 px. All three tier themes share this shape (ADR-0005). The example's Scale interactions on Folder label and Parent label say so (#82, #83). Tracked: #127.
+- **Fixed in #127: a style a resolver returns is scaled.**
+  - **The cause.** Each tier theme's `scale` multiplied its own `textStyle`, but its resolvers are functions and passed through `copyWith` unchanged. Probed on 2026-10-19: at Scale 2, a Folder with `textStyle: TextStyle(fontSize: 16)` drew 32 px, and one whose resolver returned the same style drew 16 px. `ChildNodeTheme.selectedTextStyleResolver` had the same shape; triage found it.
+  - **The fix.** At a factor other than 1, each tier's `scale` wraps its resolver. `textStyleResolver` goes through `scaleTextStyle`, `textStyle`'s rule. `selectedTextStyleResolver` goes through `scaleOptionalTextStyle`, `selectedTextStyle`'s rule, so a selected style with no size keeps inheriting. A `null` result stays `null`, so `resolver ?? field` still falls back to the scaled field. Each tier is changed on its own (ADR-0005).
+  - **Why wrapping is enough.** Scaling twice wraps twice and multiplies, as it does for `textStyle`. The measurement cache keys on the unscaled theme's identity and on the Scale, so the fresh closure a scaled theme carries does not invalidate it.
+  - **The decision.** The maintainer's, at triage on 2026-10-21, over documenting the resolvers as unscaled or passing the Scale into them.
+  - **Pinned** by `test/widgets/resolver_scale_test.dart`, through `FolderView`, on all three tiers, the selected resolver and measurement.
 - `scale` must be > 0 (a constructor `assert`). There is no upper bound, and the library proposes values without clamping ([scale-input](scale-input.md)).
