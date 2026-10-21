@@ -1208,13 +1208,6 @@ class EverySettingHost extends SettingsHost {
       16,
       (v) => demo.trackRadius = v,
     ),
-    'FolderViewScrollbarTheme.trackVisibility' => buildSwitchTile(
-      id: settingId,
-      label: "Material's own track",
-      value: demo.trackVisibility,
-      onChanged: (on) => demo.trackVisibility = on,
-      indent: true,
-    ),
     'FolderViewScrollbarTheme.hoverOpacity' => _opacitySlider(
       settingId,
       'Opacity on hover',
@@ -1801,12 +1794,11 @@ class EverySettingHost extends SettingsHost {
       'The bars fade to "Opacity on hover" while the pointer is over the '
       'tree and to "Opacity otherwise" when it leaves; at the default 0 they '
       'are hidden until you hover. The horizontal bar appears only when the '
-      'content is wider than the view. There are two tracks: trackColor, '
-      'trackWidth and trackRadius style the box the bar sits in, while '
-      "trackVisibility turns on Material's own track inside it, drawn in "
-      "Material's colour, not trackColor. A thickness above trackWidth paints "
-      'the thumb past the box, over the rows. Scrollbars keep their size at '
-      'every Scale (ADR-0001).',
+      'content is wider than the view. trackColor, trackWidth and '
+      'trackRadius style the box the bar sits in, which is its only track. '
+      'The thumb is capped to fit in that box: a thickness above trackWidth, '
+      "less Material's 2 px edge margin off Android, is painted at what "
+      'fits. Scrollbars keep their size at every Scale (ADR-0001).',
       key: Key('scrollbar-note'),
       style: TextStyle(fontSize: 12),
     ),

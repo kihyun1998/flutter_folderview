@@ -23,6 +23,7 @@ Scrolls the content vertically and horizontally while keeping the vertical `List
 - `lib/widgets/folder_view_content.dart` — `_FolderViewContentState._buildItem`, `_FolderViewContentState._onHorizontalScroll`
 - `lib/widgets/folder_view_vertical_scrollbar.dart` — `FolderViewVerticalScrollbar`
 - `lib/widgets/folder_view_horizontal_scrollbar.dart` — `FolderViewHorizontalScrollbar`
+- `lib/widgets/folder_view_scrollbar_thumb.dart` — `folderViewThumbTheme`
 - `lib/themes/folder_view_scrollbar_theme.dart` — `FolderViewScrollbarTheme`
 
 ## Reference behaviour
@@ -41,11 +42,13 @@ The motion never passes an end, and that rests on upstream clamping twice: the t
 - [scale-input](scale-input.md) — the `ListView` physics are swapped to block modifier-wheel scrolling.
 
 ## Known holes
-- **Probed on 2026-10-19: `FolderViewScrollbarTheme` styles two different tracks.**
-  - `trackColor`, `trackWidth` and `trackRadius` style the `Container` the bar sits in.
-  - `trackVisibility` turns on the Material `Scrollbar`'s own track inside it. That track is painted in Material's colour (a `0x081D1B20` rect and a `0x1A1D1B20` edge line) and never in `trackColor`.
-  - The `ScrollbarThemeData` the bar builds sets only thumb colour, radius and thickness.
-  - With `trackColor` green, the `Scrollbar` painted no green in either state. The green is the `Container`'s.
-- **Probed on 2026-10-19: a `thickness` above `trackWidth` paints the thumb past its box, over the rows.** Setup: `thickness` 20, `trackWidth` 8. The thumb's rect ran from x = −12 to 8 in the 8 px bar box, and no clip sits above it. Nothing clamps `thickness` to `trackWidth`. Tracked, with the two tracks: #122.
+- **Fixed in #122: a bar has one track, and its thumb stays in it.**
+  - **Two tracks, before.** `trackColor`, `trackWidth` and `trackRadius` styled the `Container` the bar sits in, while `trackVisibility` turned on the Material `Scrollbar`'s own track inside it, in Material's colour (a `0x081D1B20` rect and a `0x1A1D1B20` edge line), never `trackColor`. `trackVisibility` is removed; the `Container` is the only track. Feeding `trackColor` into Material's track was rejected: the same colour over the same colour would have made the field a switch with almost no visible effect.
+  - **The overflow, before.** With `thickness` 20 and `trackWidth` 8, the thumb's rect ran from x = −12 to 8 on Android, and from −14 on Windows. No clip sits above the bar.
+  - **The margin is the trap.** Material places the thumb at `width − thickness − crossAxisMargin` (`widgets/scrollbar.dart`), and the margin is 0 on Android but 2 elsewhere (`material/scrollbar.dart`). The probe behind the decision ran on the test default, Android, so a cap at `trackWidth` alone would still have overflowed 2 px on desktop.
+  - **The fix.** `folderViewThumbTheme` sets `crossAxisMargin` explicitly to Material's own platform default, and paints `min(thickness, trackWidth − margin)`, floored at 0. The value capped against is the value painted, and the default look is unchanged. The theme keeps the `thickness` it was given.
+  - **The decisions.** Both are the maintainer's, at triage and at the confirm stop on 2026-10-21. The margin-aware cap was chosen once the margin finding was shown.
+  - **Pinned** by `test/widgets/folder_view_scrollbar_track_test.dart`, through `FolderView`, on Android and Windows.
+- **Not covered: iOS.** There Material's `Scrollbar` builds a `CupertinoScrollbar` from its own constructor arguments. The bars pass thickness, radius and thumb colour only through `ScrollbarThemeData`, so on iOS those three are ignored (read from the code, not probed).
 - **A wheel turned over a scrollbar is not animated.** The bar is its own `Scrollable` with a plain controller. Upstream documents the same limit.
 - **A notch during a programmatic `jumpTo` is lost.** Scroll anchoring's post-frame `jumpTo` (expand/collapse, Scale change) ends a running motion, and the remaining distance of that notch goes with it. Read from the code, not probed.

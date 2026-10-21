@@ -192,25 +192,37 @@ void main() {
       },
     );
 
-    testWidgets("Material's track is drawn only with trackVisibility, and "
-        'never in trackColor', (tester) async {
+    testWidgets('the box in trackColor is the only track', (tester) async {
       await _openScrollbars(tester);
       await _hover(tester);
-      final trackColor = _barTheme(tester).trackColor.toARGB32();
+      await _tapSwatch(tester, 'FolderViewScrollbarTheme.trackColor', 2);
 
-      bool drawsTrack() => _painted(
-        tester,
-      ).calls.any((c) => c.$1 == #drawRect && (c.$2 >> 24) != 0);
-      expect(_scrollbar(tester).trackVisibility, isFalse);
-      expect(drawsTrack(), isFalse);
-
-      await _toggle(tester, 'FolderViewScrollbarTheme.trackVisibility');
-      expect(_scrollbar(tester).trackVisibility, isTrue);
-      expect(drawsTrack(), isTrue);
+      expect(_scrollbar(tester).trackVisibility, isNot(true));
       expect(
-        _painted(tester).calls.where((c) => c.$1 == #drawRect).map((c) => c.$2),
-        isNot(contains(trackColor)),
+        _painted(
+          tester,
+        ).calls.where((c) => c.$1 == #drawRect && (c.$2 >> 24) != 0),
+        isEmpty,
       );
+      expect(
+        _track(tester).color!.toARGB32(),
+        EverySettingDemo.scrollbarTrackColors[2].toARGB32(),
+      );
+    });
+
+    testWidgets('a thickness above the track width is painted at what fits', (
+      tester,
+    ) async {
+      await _openScrollbars(tester);
+      await _hover(tester);
+      await setSlider(tester, 'FolderViewScrollbarTheme.trackWidth', 8);
+      await setSlider(tester, 'FolderViewScrollbarTheme.thickness', 20);
+
+      expect(_barTheme(tester).thickness, 20);
+      expect(_trackWidth(tester), 8);
+      final thumb = _painted(tester).thumb!;
+      expect(thumb.left, greaterThanOrEqualTo(0));
+      expect(thumb.right, lessThanOrEqualTo(8));
     });
 
     testWidgets('thumbVisibility reaches the Material scrollbar', (
@@ -278,7 +290,6 @@ void main() {
     ) async {
       await _openScrollbars(tester);
       await setSlider(tester, 'FolderViewScrollbarTheme.thickness', 6);
-      await _toggle(tester, 'FolderViewScrollbarTheme.trackVisibility');
 
       final code = tester
           .widget<SelectableText>(
@@ -305,7 +316,6 @@ void main() {
         '  hoverAnimationDuration: Duration(milliseconds: 200),\n'
         '  trackWidth: 16,\n'
         '  trackRadius: 8,\n'
-        '  trackVisibility: true,\n'
         '),',
       );
     });

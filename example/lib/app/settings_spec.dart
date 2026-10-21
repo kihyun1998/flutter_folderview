@@ -154,7 +154,6 @@ const settingsSpec = <SettingGroup>[
           'FolderViewScrollbarTheme.trackColor',
           'FolderViewScrollbarTheme.trackWidth',
           'FolderViewScrollbarTheme.trackRadius',
-          'FolderViewScrollbarTheme.trackVisibility',
           'FolderViewScrollbarTheme.hoverOpacity',
           'FolderViewScrollbarTheme.nonHoverOpacity',
           'FolderViewScrollbarTheme.hoverAnimationDuration',
