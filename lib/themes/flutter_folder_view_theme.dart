@@ -107,11 +107,8 @@ class FlutterFolderViewTheme<T> {
         highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       expandIconTheme: ExpandIconTheme(
-        widget: Icon(
-          Icons.chevron_right,
-          color: Colors.grey.shade700,
-          size: 20,
-        ),
+        widget: const Icon(Icons.chevron_right, size: 20),
+        color: Colors.grey.shade700,
       ),
       spacingTheme: const FolderViewSpacingTheme(),
     );
@@ -162,11 +159,8 @@ class FlutterFolderViewTheme<T> {
         highlightColor: Colors.blue.withValues(alpha: 0.1),
       ),
       expandIconTheme: ExpandIconTheme(
-        widget: Icon(
-          Icons.chevron_right,
-          color: Colors.grey.shade400,
-          size: 20,
-        ),
+        widget: const Icon(Icons.chevron_right, size: 20),
+        color: Colors.grey.shade400,
       ),
       spacingTheme: const FolderViewSpacingTheme(),
     );

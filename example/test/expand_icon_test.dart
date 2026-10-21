@@ -63,6 +63,31 @@ double _childX(WidgetTester tester) {
   return view.globalToLocal(label).dx;
 }
 
+/// The index of the swatch [id] shows as selected.
+int _selectedSwatch(WidgetTester tester, String id) {
+  final count = EverySettingDemo.expandIconColors.length;
+  final selected = [
+    for (var i = 0; i < count; i++)
+      if (((tester
+                              .widget<Container>(
+                                find.descendant(
+                                  of: find.byKey(ValueKey('$id.$i')),
+                                  matching: find.byType(Container),
+                                ),
+                              )
+                              .decoration!
+                          as BoxDecoration)
+                      .border!
+                  as Border)
+              .top
+              .width ==
+          2)
+        i,
+  ];
+  expect(selected, hasLength(1), reason: 'one selected swatch on $id');
+  return selected.single;
+}
+
 Future<void> _tapSwatch(WidgetTester tester, String id, int index) async {
   final swatch = find.byKey(ValueKey('$id.$index'));
   await tester.ensureVisible(swatch);
@@ -103,7 +128,14 @@ void main() {
       expect(theme.height, light.height);
       expect(theme.padding, light.padding);
       expect(theme.margin, light.margin);
-      expect(theme.color, isNull);
+      expect(theme.color, light.color);
+      expect(theme.color, Colors.grey.shade700);
+      expect(_selectedSwatch(tester, 'ExpandIconTheme.color'), 1);
+      expect(_selectedSwatch(tester, 'ExpandIconTheme.expandedColor'), 0);
+      expect(
+        EverySettingDemo.expandIconColors[2],
+        FlutterFolderViewTheme<String>.dark().expandIconTheme.color,
+      );
       expect(theme.expandedColor, isNull);
       expect((theme.widget! as Icon).icon, Icons.chevron_right);
       expect(_glyphCount(tester, Icons.chevron_right), greaterThan(0));
@@ -125,16 +157,16 @@ void main() {
       await _openExpandIcon(tester);
       await _toggle(tester, 'ExpandIconTheme.widget');
 
-      await _tapSwatch(tester, 'ExpandIconTheme.color', 1);
+      await _tapSwatch(tester, 'ExpandIconTheme.color', 3);
       final color = _expandTheme(tester).color!;
-      expect(color, EverySettingDemo.expandIconColors[1]);
+      expect(color, EverySettingDemo.expandIconColors[3]);
       // Without expandedColor, every row takes color.
       expect(
         _glyphColorOn(tester, _expandedFolder, Icons.arrow_right),
         color.toARGB32(),
       );
 
-      await _tapSwatch(tester, 'ExpandIconTheme.expandedColor', 2);
+      await _tapSwatch(tester, 'ExpandIconTheme.expandedColor', 4);
       final expanded = _expandTheme(tester).expandedColor!;
       expect(
         _glyphColorOn(tester, _expandedFolder, Icons.arrow_right),
@@ -146,18 +178,25 @@ void main() {
       );
     });
 
-    testWidgets("light()'s chevron keeps its own grey whatever color says", (
-      tester,
-    ) async {
+    testWidgets("light()'s chevron starts grey and follows color and "
+        'expandedColor', (tester) async {
       await _openExpandIcon(tester);
-
-      await _tapSwatch(tester, 'ExpandIconTheme.color', 1);
-      await _tapSwatch(tester, 'ExpandIconTheme.expandedColor', 2);
       final grey = Colors.grey.shade700.toARGB32();
       expect(_glyphColorOn(tester, _expandedFolder, Icons.chevron_right), grey);
       expect(
         _glyphColorOn(tester, _collapsedParent, Icons.chevron_right),
         grey,
+      );
+
+      await _tapSwatch(tester, 'ExpandIconTheme.color', 3);
+      await _tapSwatch(tester, 'ExpandIconTheme.expandedColor', 4);
+      expect(
+        _glyphColorOn(tester, _expandedFolder, Icons.chevron_right),
+        EverySettingDemo.expandIconColors[4]!.toARGB32(),
+      );
+      expect(
+        _glyphColorOn(tester, _collapsedParent, Icons.chevron_right),
+        EverySettingDemo.expandIconColors[3]!.toARGB32(),
       );
     });
 
@@ -195,9 +234,8 @@ void main() {
       expect(_childX(tester), closeTo(base, 0.01));
     });
 
-    testWidgets("the code text writes light()'s chevron without const", (
-      tester,
-    ) async {
+    testWidgets("the code text writes light()'s grey as color, not on the "
+        'chevron', (tester) async {
       await _openExpandIcon(tester);
 
       final code = tester
@@ -215,12 +253,12 @@ void main() {
       expect(
         code,
         startsWith(
-          'expandIconTheme: ExpandIconTheme(\n'
-          '  widget: Icon(Icons.chevron_right, color: Colors.grey.shade700, '
-          'size: 20),\n',
+          'expandIconTheme: const ExpandIconTheme(\n'
+          '  widget: Icon(Icons.chevron_right, size: 20),\n',
         ),
       );
-      expect(code, isNot(contains('color: Color(')));
+      expect(code, contains('  color: Color(0xFF616161),\n'));
+      expect(code, isNot(contains('expandedColor')));
     });
 
     testWidgets('the expandIconTheme control shows the sub-theme as code', (
@@ -229,7 +267,7 @@ void main() {
       await _openExpandIcon(tester);
       await _toggle(tester, 'ExpandIconTheme.widget');
       await setSlider(tester, 'ExpandIconTheme.width', 24);
-      await _tapSwatch(tester, 'ExpandIconTheme.color', 1);
+      await _tapSwatch(tester, 'ExpandIconTheme.color', 3);
 
       final code = tester
           .widget<SelectableText>(
@@ -243,7 +281,7 @@ void main() {
             ),
           )
           .data!;
-      final argb = EverySettingDemo.expandIconColors[1]!
+      final argb = EverySettingDemo.expandIconColors[3]!
           .toARGB32()
           .toRadixString(16)
           .toUpperCase();

@@ -178,10 +178,13 @@ class EverySettingDemo extends ChangeNotifier {
   LineStyle _lineStyle = LineStyle.connector;
   LineStyle get lineStyle => _lineStyle;
 
-  /// The colours the expand icon's `color` and `expandedColor` controls offer;
-  /// `null` is `light()`'s.
+  /// The colours the expand icon's `color` and `expandedColor` controls offer.
+  /// `null` is the ambient icon colour, and both factories' `expandedColor`;
+  /// the next two are `light()`'s and `dark()`'s `color`.
   static const expandIconColors = <Color?>[
     null,
+    Color(0xFF616161),
+    Color(0xFFBDBDBD),
     Color(0xFFF44336),
     Color(0xFF4CAF50),
     Color(0xFF2196F3),
@@ -207,7 +210,7 @@ class EverySettingDemo extends ChangeNotifier {
   EdgeInsets _expandIconMargin = EdgeInsets.zero;
   EdgeInsets get expandIconMargin => _expandIconMargin;
 
-  Color? _expandIconColor;
+  Color? _expandIconColor = expandIconColors[1];
   Color? get expandIconColor => _expandIconColor;
 
   Color? _expandIconExpandedColor;
@@ -1149,12 +1152,8 @@ class EverySettingDemo extends ChangeNotifier {
   String get expandIconThemeCode {
     final widget = _expandIconSample
         ? 'Icon(Icons.arrow_right, size: 20)'
-        : 'Icon(Icons.chevron_right, color: Colors.grey.${switch (_base) {
-            ThemePreset.light => 'shade700',
-            ThemePreset.dark => 'shade400',
-          }}, size: 20)';
-    return 'expandIconTheme: ${_expandIconSample ? 'const ' : ''}'
-        'ExpandIconTheme(\n'
+        : 'Icon(Icons.chevron_right, size: 20)';
+    return 'expandIconTheme: const ExpandIconTheme(\n'
         '  widget: $widget,\n'
         '  width: ${_num(_expandIconWidth)},\n'
         '  height: ${_num(_expandIconHeight)},\n'
