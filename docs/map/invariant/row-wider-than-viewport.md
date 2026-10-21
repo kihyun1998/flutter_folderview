@@ -1,7 +1,9 @@
 # A row can be wider than the viewport
 
 ## The fact
-Every rendered row is laid out at `contentWidth`, the widest row in the tree up to 3× the viewport. It is then shifted by the horizontal offset. Once `contentWidth > viewportWidth`, a row's rect, and a long label's rect inside it, extends past the visible area. **Anything positioned against a row's or label's rect aims at a point that may be off screen.** The pointer is the only position guaranteed to be inside the view.
+Every rendered row is laid out at `contentWidth`, the widest row in the tree up to 3× the viewport. It is then shifted by the horizontal offset. Once `contentWidth > viewportWidth`, a row's rect, and a long label's rect inside it, extends past the visible area. **Anything positioned against a row's or label's raw rect aims at a point that may be off screen.** The pointer is the only position guaranteed to be inside the view.
+
+The tooltips are not exposed to that, but to a milder form of it. just_tooltip anchors `TooltipAnchor.child` to the *visible* part of the child's rect, since 0.4.2. For a wide row that part spans the view, so a rect-anchored tooltip opens at the view's centre: on screen, but not where the user is looking. That is why the row card and the README's wide-label recipe use `TooltipAnchor.pointer` (#138). Code here that reads a row's rect directly still meets the off-screen form.
 
 ## Why it is cross-cutting
 The width is decided in measurement, the shift in scrolling, and the consequence lands in overlays. The overlay code never calls the measurement or the scroll code. Each tooltip surface only sees a `RenderBox` and trusts its rect. No blast edge between the tooltip territories and the scrolling territory could carry the fact, because they share an assumption, not a call.

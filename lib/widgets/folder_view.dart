@@ -94,8 +94,10 @@ class FolderView<T> extends StatefulWidget {
   ///
   /// The card is anchored at the pointer, and that is the one thing
   /// [rowTooltipTheme] cannot change: a row is as wide as the tree's content,
-  /// which can exceed the viewport, so anchoring to the row's rect would aim at
-  /// a centre that is off screen once the view scrolls horizontally.
+  /// which can exceed the viewport, so the visible part of the row's rect is
+  /// the whole width of the view, and its centre is not where the user is
+  /// looking. Anchored to the row, the card would open mid-view wherever the
+  /// row is hovered.
   ///
   /// By default the tooltip draws no surface of its own — no background,
   /// padding, or elevation — because a card draws one. Return a `Card`, not a

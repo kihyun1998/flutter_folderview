@@ -38,9 +38,10 @@ decisions in **`docs/adr/`**.
   visible behavior, by contract.
 - **Consumes `just_tooltip`** (the barrel re-exports it). Two surfaces — a
   node-label tooltip and a row-card tooltip; nesting is arbitrated **upstream**
-  (innermost wins), so this package holds no priority logic. The row card uses
-  `TooltipAnchor.pointer` as a **correctness requirement** (a row goes off screen
-  once it scrolls wider than the viewport), not a workaround. On `^0.4.4`. Read
+  (innermost wins), so this package holds no priority logic. The row card is
+  fixed to `TooltipAnchor.pointer` as a **usability default**: a row can be
+  wider than the viewport, and the centre of its visible part is not where the
+  user is looking (#138). On `^0.4.4`. Read
   `../` sibling `flutter_table_plus` and the upstream source, not pub docs.
 
 ## Agent skills
