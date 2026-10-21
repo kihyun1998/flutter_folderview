@@ -1821,11 +1821,10 @@ class EverySettingHost extends SettingsHost {
       'height size the icon box: at Scale 1 the icon keeps its own size '
       'inside it, at any other Scale it is fitted to the box. The icon turns '
       '90° when its row is expanded. '
-      'color and expandedColor reach the icon through IconTheme, so they '
-      "have no effect on the factory's chevron (light()'s or dark()'s), which "
-      'sets its own grey. Turn on '
-      'the sample widget to see them: expanded rows take expandedColor, or '
-      'color when it is not set.',
+      'color and expandedColor reach the icon through IconTheme: expanded '
+      'rows take expandedColor, or color when it is not set. Each factory '
+      'puts its grey in color, so its chevron follows both. A widget with a '
+      'colour of its own keeps it.',
       key: Key('expand-icon-note'),
       style: TextStyle(fontSize: 12),
     ),

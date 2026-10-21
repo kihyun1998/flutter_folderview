@@ -20,10 +20,16 @@ class ExpandIconTheme {
   /// Margin around the icon widget
   final EdgeInsets margin;
 
-  /// Color of the icon when collapsed
+  /// Color of the icon when collapsed, and when expanded if [expandedColor]
+  /// is null.
+  ///
+  /// Applied through an ambient [IconTheme], so it colours a [widget] that
+  /// has no colour of its own; an `Icon` with its own `color` keeps it.
   final Color? color;
 
-  /// Color of the icon when expanded
+  /// Color of the icon when expanded; null falls back to [color].
+  ///
+  /// Like [color], it colours only a [widget] without a colour of its own.
   final Color? expandedColor;
 
   /// Creates an [ExpandIconTheme]

@@ -37,5 +37,10 @@ Draws one row for one `FlatNode`. It builds a tier-agnostic scaffold (fixed row 
 - [view-mode-projection](view-mode-projection.md) — the Parent open-state icon depends on the mode.
 
 ## Known holes
-- **Probed on 2026-10-19: `FlutterFolderViewTheme.light()`'s expand icon ignores `ExpandIconTheme.color` and `expandedColor`.** The renderer applies them through an `IconTheme` around the icon box. `light()`'s `widget` is `Icon(Icons.chevron_right, color: Colors.grey.shade700, size: 20)`, and an `Icon` with its own `color` ignores `IconTheme`. With `color` red and `expandedColor` green on `light()`, all three chevrons rendered `0xFF616161`. With an `Icon` that has no colour, the expanded Folder's glyph rendered green and both collapsed rows red. Tracked: #120.
+- **Fixed in #120: the factories' expand icon follows `ExpandIconTheme.color` and `expandedColor`.**
+  - **The cause.** The renderer applies both through an `IconTheme` around the icon box, and Flutter's `Icon` takes `color ?? IconTheme.color` (`widgets/icon.dart`). `light()` and `dark()` gave the chevron its own grey, so on the default themes both fields did nothing: probed on 2026-10-19 with `color` red and `expandedColor` green, every chevron rendered `0xFF616161`.
+  - **The fix.** Each factory's chevron is an uncoloured `Icon(Icons.chevron_right, size: 20)`, and its grey is the factory's `ExpandIconTheme.color` (`grey.shade700` light, `grey.shade400` dark). `expandedColor` stays `null`. The rendered colour is unchanged; what moved is where the value lives, so `light().expandIconTheme.color` is no longer `null`.
+  - **The rule it leaves.** A default colour belongs in the theme field meant to override it, never on the default widget; a widget's own colour silently wins over the field. A caller's own coloured `widget` still ignores both fields, by Flutter's precedence, and the dartdoc says so.
+  - **The decision.** The maintainer's, at triage on 2026-10-21, over documenting the limitation instead.
+  - **Pinned** by `test/widgets/expand_icon_color_test.dart`, through `FolderView`, on both factories.
 - `ChildNodeRenderer` merges `selectedTextStyle` itself, outside `RowMetrics`, so it is the one width input the two paths do not share ([row-geometry](row-geometry.md)).

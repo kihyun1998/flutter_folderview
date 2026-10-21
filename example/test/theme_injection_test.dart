@@ -83,10 +83,7 @@ void main() {
       expect(theme.rowHeight, dark.rowHeight);
       expect(theme.lineTheme, dark.lineTheme);
       expect(theme.scrollbarTheme, dark.scrollbarTheme);
-      expect(
-        (theme.expandIconTheme.widget! as Icon).color,
-        (dark.expandIconTheme.widget! as Icon).color,
-      );
+      expect(theme.expandIconTheme.color, dark.expandIconTheme.color);
     });
 
     testWidgets('moving a theme knob leaves the preset; Light resets it', (
@@ -164,7 +161,7 @@ void main() {
             ),
           )
           .data!;
-      expect(code, contains('color: Colors.grey.shade400'));
+      expect(code, contains('  color: Color(0xFFBDBDBD),\n'));
     });
 
     testWidgets('the FolderViewTheme.data control writes the chosen path', (
