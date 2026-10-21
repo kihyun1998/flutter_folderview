@@ -92,37 +92,40 @@ void main() {
     return (thumb: thumb!, rects: rects, box: box.size);
   }
 
-  final platforms = TargetPlatformVariant.only(TargetPlatform.android)
-    ..values.add(TargetPlatform.windows);
-
-  testWidgets(
-    'a thickness above trackWidth keeps each thumb inside its bar',
-    (tester) async {
-      await pump(tester, thickness: 20, trackWidth: 8);
-
-      final vertical = painted(tester, 0);
-      expect(vertical.box.width, 8);
-      expect(vertical.thumb.left, greaterThanOrEqualTo(0));
-      expect(vertical.thumb.right, lessThanOrEqualTo(8));
-
-      final horizontal = painted(tester, 1);
-      expect(horizontal.box.height, 8);
-      expect(horizontal.thumb.top, greaterThanOrEqualTo(0));
-      expect(horizontal.thumb.bottom, lessThanOrEqualTo(8));
-    },
-    variant: platforms,
+  // Material's thumb margin is 0 on Android and 2 on desktop.
+  void bothTest(String description, WidgetTesterCallback body) => testWidgets(
+    description,
+    body,
+    variant: TargetPlatformVariant(const {
+      TargetPlatform.android,
+      TargetPlatform.windows,
+    }),
   );
 
-  testWidgets('a thickness that fits is painted as given', (tester) async {
+  bothTest('a thickness above trackWidth keeps each thumb in its bar', (
+    tester,
+  ) async {
+    await pump(tester, thickness: 20, trackWidth: 8);
+
+    final vertical = painted(tester, 0);
+    expect(vertical.box.width, 8);
+    expect(vertical.thumb.left, greaterThanOrEqualTo(0));
+    expect(vertical.thumb.right, lessThanOrEqualTo(8));
+
+    final horizontal = painted(tester, 1);
+    expect(horizontal.box.height, 8);
+    expect(horizontal.thumb.top, greaterThanOrEqualTo(0));
+    expect(horizontal.thumb.bottom, lessThanOrEqualTo(8));
+  });
+
+  bothTest('a thickness that fits is painted as given', (tester) async {
     await pump(tester, thickness: 6, trackWidth: 16);
 
     expect(painted(tester, 0).thumb.width, 6);
     expect(painted(tester, 1).thumb.height, 6);
-  }, variant: platforms);
+  });
 
-  testWidgets("neither bar's Scrollbar paints a track of its own", (
-    tester,
-  ) async {
+  bothTest("neither bar's Scrollbar paints a track of its own", (tester) async {
     await pump(tester, thickness: 12, trackWidth: 16);
 
     for (final bar in [0, 1]) {
@@ -145,5 +148,5 @@ void main() {
               as BoxDecoration;
       expect(track.color, const Color(0xFF00FF00));
     }
-  }, variant: platforms);
+  });
 }
