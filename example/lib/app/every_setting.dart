@@ -150,9 +150,6 @@ class EverySettingDemo extends ChangeNotifier {
   double _rowSpacing = 0;
   double get rowSpacing => _rowSpacing;
 
-  int _animationDuration = 200;
-  int get animationDuration => _animationDuration;
-
   EdgeInsets _contentPadding = EdgeInsets.zero;
   EdgeInsets get contentPadding => _contentPadding;
 
@@ -711,7 +708,6 @@ class EverySettingDemo extends ChangeNotifier {
     _base = preset;
     _rowHeight = f.rowHeight;
     _rowSpacing = f.rowSpacing;
-    _animationDuration = f.animationDuration;
     _contentPadding = f.spacingTheme.contentPadding;
     _borderRadius = f.nodeStyleTheme.borderRadius;
     _lineColor = f.lineTheme.lineColor;
@@ -803,7 +799,6 @@ class EverySettingDemo extends ChangeNotifier {
     final b = f.scrollbarTheme;
     return _rowHeight == f.rowHeight &&
         _rowSpacing == f.rowSpacing &&
-        _animationDuration == f.animationDuration &&
         _contentPadding == f.spacingTheme.contentPadding &&
         _borderRadius == f.nodeStyleTheme.borderRadius &&
         _lineColor == f.lineTheme.lineColor &&
@@ -995,7 +990,6 @@ class EverySettingDemo extends ChangeNotifier {
       ),
       rowHeight: _rowHeight,
       rowSpacing: _rowSpacing,
-      animationDuration: _animationDuration,
       spacingTheme: FolderViewSpacingTheme(contentPadding: _contentPadding),
       nodeStyleTheme: FolderViewNodeStyleTheme(borderRadius: _borderRadius),
       lineTheme: FolderViewLineTheme(
@@ -1252,8 +1246,6 @@ class EverySettingDemo extends ChangeNotifier {
 
   set rowHeight(double value) => _setTheme(() => _rowHeight = value);
   set rowSpacing(double value) => _setTheme(() => _rowSpacing = value);
-  set animationDuration(int value) =>
-      _setTheme(() => _animationDuration = value);
   set contentPadding(EdgeInsets value) =>
       _setTheme(() => _contentPadding = value);
   set borderRadius(double value) => _setTheme(() => _borderRadius = value);

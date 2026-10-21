@@ -259,18 +259,6 @@ class EverySettingHost extends SettingsHost {
       indent: false,
       onChanged: (v) => demo.rowSpacing = v.roundToDouble(),
     ),
-    'FlutterFolderViewTheme.animationDuration' => _slider(
-      settingId,
-      'Animation duration',
-      demo.animationDuration.toDouble(),
-      min: 0,
-      max: 1000,
-      divisions: 50,
-      format: (v) => '${v.round()} ms',
-      enabled: true,
-      indent: false,
-      onChanged: (v) => demo.animationDuration = v.round(),
-    ),
     'FlutterFolderViewTheme.spacingTheme' => _codeControl(
       settingId,
       'spacingTheme',
@@ -1851,11 +1839,8 @@ class EverySettingHost extends SettingsHost {
       'padding widen the content and can bring in the horizontal scrollbar; '
       'top and bottom pad the list. borderRadius rounds the hover, splash and '
       'highlight of every row and the selected background of a Child: hover '
-      'a row or select a Child to see it. '
-      'FlutterFolderViewTheme.animationDuration is read nowhere in the '
-      'library: expand and collapse are not animated, so this slider changes '
-      'nothing on screen. The Scale multiplies every value here except '
-      'animationDuration.',
+      'a row or select a Child to see it. The Scale multiplies every value '
+      'here.',
       key: Key('layout-note'),
       style: TextStyle(fontSize: 12),
     ),

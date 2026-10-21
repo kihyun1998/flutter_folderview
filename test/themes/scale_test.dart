@@ -271,12 +271,6 @@ void main() {
   });
 
   group('Non-spatial preservation', () {
-    test('animationDuration is not scaled (time is not space)', () {
-      final theme = FlutterFolderViewTheme<String>.light();
-      final scaled = theme.scale(factor: 2.0, defaultFontSize: defaultFontSize);
-      expect(scaled.animationDuration, theme.animationDuration);
-    });
-
     test('Colors are not scaled', () {
       const t = ChildNodeTheme<String>(
         hoverColor: Color(0xFFAABBCC),

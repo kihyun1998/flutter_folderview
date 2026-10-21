@@ -10,7 +10,7 @@ The public theming surface. `FlutterFolderViewTheme` aggregates eight sub-themes
 
 ## Design model
 - Resolution is `widget.theme ?? FolderViewTheme.of<T>(context)`. `of` falls back to `FlutterFolderViewTheme.light()`. `FolderViewTheme` notifies on `data !=`, so it rebuilds dependents.
-- `lerp` interpolates the sub-themes and snaps `rowHeight`, `rowSpacing` and `animationDuration` at `t < 0.5`.
+- `lerp` interpolates the sub-themes and snaps `rowHeight` and `rowSpacing` at `t < 0.5`.
 - Adding a field means editing the constructor, `copyWith`, `lerp`, `==`, `hashCode`, `toString`, and `scale` if the field is spatial. For a tier field, repeat that three times. `test/themes/data_class_test.dart`, `lerp_test.dart` and `scale_test.dart` are the guards.
 
 ## Code
@@ -36,5 +36,5 @@ The public theming surface. `FlutterFolderViewTheme` aggregates eight sub-themes
 
 ## Known holes
 - **Probed on 2026-10-19: an untyped `FolderViewTheme` is silently ignored.** `FolderViewTheme.of<T>` looks up `FolderViewTheme<T>` by exact type. `FolderViewTheme(data: FlutterFolderViewTheme.dark())` infers `FolderViewTheme<dynamic>`, so a `FolderView<String>` below it does not find it and falls back to `light()`. Its Folder label rendered `0xDD000000`, where `FolderViewTheme<String>` gave dark's `0xB3FFFFFF`. Nothing warns. The class dartdoc's example passes `FlutterFolderViewTheme<MyDataType>.light()`, which infers the right type. Tracked: #124.
-- **`FlutterFolderViewTheme.animationDuration` is read nowhere in `lib/`.** It is carried through `copyWith`, `lerp` and `==` but drives no animation. Read from the code. It went dead in `51d86a8`, the flat-list rewrite, which removed the `AnimationController` that read it. The example's Layout slider for it changes nothing on screen (#79). Tracked: #116.
+- **`FlutterFolderViewTheme.animationDuration` was removed in 0.12.0 (#116), by the maintainer's call at triage.** It had been read nowhere since `51d86a8`, the flat-list rewrite, which removed the `AnimationController` that read it. The library has no expand/collapse animation. Adding one later would be a new field, which is additive and not breaking. The tooltip themes' own `animationDuration` fields are live and unaffected.
 - `FolderViewNodeStyleTheme` and `FolderViewSpacingTheme` each box one field (`borderRadius`, `contentPadding`). Tracked: [#16](https://github.com/kihyun1998/flutter_folderview/issues/16). That issue's third item, a hand-rolled `lerpDouble`, no longer holds: every theme imports `dart:ui`'s. Its line citation into `node_widget.dart` points past the end of the current file.

@@ -71,7 +71,6 @@ void main() {
       final theme = _theme(tester);
       expect(theme.rowHeight, light.rowHeight);
       expect(theme.rowSpacing, light.rowSpacing);
-      expect(theme.animationDuration, light.animationDuration);
       expect(
         theme.spacingTheme.contentPadding,
         light.spacingTheme.contentPadding,
@@ -132,13 +131,6 @@ void main() {
       expect(_inkRadius(tester), BorderRadius.circular(12));
     });
 
-    testWidgets('Animation duration sets animationDuration', (tester) async {
-      await _openLayout(tester);
-
-      await setSlider(tester, 'FlutterFolderViewTheme.animationDuration', 500);
-      expect(_theme(tester).animationDuration, 500);
-    });
-
     testWidgets('the container controls show the sub-themes as code', (
       tester,
     ) async {
@@ -179,15 +171,6 @@ void main() {
       await openFeature(tester, 'Rows & padding');
       await setSlider(tester, 'FlutterFolderViewTheme.rowHeight', 50);
       expect(identical(_theme(tester), before), isFalse);
-    });
-
-    testWidgets('the note says animationDuration drives nothing', (
-      tester,
-    ) async {
-      await _openLayout(tester);
-
-      final note = tester.widget<Text>(find.byKey(const Key('layout-note')));
-      expect(note.data, contains('animationDuration is read nowhere'));
     });
   });
 }
