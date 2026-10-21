@@ -196,7 +196,7 @@ FolderView(
 
 - Only the mouse wheel animates. Trackpad scrolling, dragging a scrollbar, and the jumps that keep a Node in place on expand, collapse or a Scale change move the view at once, and stop a motion in progress.
 - A wheel turned over a scrollbar moves the view at once too: the scrollbar is a scroll view of its own.
-- Ctrl+wheel (Cmd+wheel on macOS) over the rows still proposes a Scale and, while `blockModifierScroll` is in effect, does not scroll.
+- Ctrl+wheel (Cmd+wheel on macOS) anywhere over the view, the scrollbars included, still proposes a Scale and, while `blockModifierScroll` is in effect, does not scroll.
 - How far one notch travels is not a `FolderView` setting. It is app-wide, through `SmoothWheelBinding` in `flutter_smooth_wheel_scroll`, which this package does not install.
 
 ## Tooltip

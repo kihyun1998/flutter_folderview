@@ -418,6 +418,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                     contentHeight: widget.contentHeight,
                     needsHorizontalScroll: widget.needsHorizontalScroll,
                     scrollbarTheme: widget.theme.scrollbarTheme,
+                    blockModifierWheel: widget.blockModifierScroll,
                   ),
                 ),
 
@@ -432,6 +433,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                             widget.horizontalBarController,
                         contentWidth: widget.contentWidth,
                         scrollbarTheme: widget.theme.scrollbarTheme,
+                        blockModifierWheel: widget.blockModifierScroll,
                       ),
                 ),
             ],

@@ -61,7 +61,7 @@ A uniform zoom factor applied to the **content** of the **FolderView**. All spat
 _Avoid_: Zoom, magnification, size factor.
 
 **Scale Modifier**:
-The platform-aware keyboard modifier (Ctrl on Windows/Linux, Cmd on macOS) that, when held during mouse-wheel scrolling, can turn the wheel over the rows into a **Scale** change request instead of a normal scroll. Whether it does is set by `blockModifierScroll`. While the modifier scroll is blocked, the wheel proposes a **Scale** if `onScaleChanged` is provided. Otherwise it scrolls as usual.
+The platform-aware keyboard modifier (Ctrl on Windows/Linux, Cmd on macOS) that, when held during mouse-wheel scrolling, can turn the wheel over the view, scrollbars included, into a **Scale** change request instead of a normal scroll. Whether it does is set by `blockModifierScroll`. While the modifier scroll is blocked, the wheel proposes a **Scale** if `onScaleChanged` is provided. Otherwise it scrolls as usual.
 _Avoid_: Zoom key, ctrl-scroll.
 
 ## Relationships
