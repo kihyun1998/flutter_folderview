@@ -49,6 +49,8 @@ class FolderNodeTheme<T> implements ExpandableNodeThemeView<T> {
 
   /// Resolver function to dynamically determine the text style based on node data
   /// If returns null, falls back to [textStyle]
+  ///
+  /// The style it returns is scaled like [textStyle].
   final TextStyle? Function(Node<T> node)? textStyleResolver;
 
   /// Resolver function to dynamically determine the label text based on node data
@@ -94,7 +96,8 @@ class FolderNodeTheme<T> implements ExpandableNodeThemeView<T> {
   /// by [factor].
   ///
   /// Scales: [width], [height], [padding], [margin], [textStyle] (font size +
-  /// letter spacing).
+  /// letter spacing), and the style [textStyleResolver] returns, by the same
+  /// rule. A null from the resolver stays null, so the fallback is unchanged.
   /// **Does NOT scale**: [tooltipTheme]. Tooltips are classified as chrome
   /// and excluded from Scale — see ADR-0004.
   ///
@@ -111,6 +114,14 @@ class FolderNodeTheme<T> implements ExpandableNodeThemeView<T> {
       padding: padding * factor,
       margin: margin * factor,
       textStyle: scaleTextStyle(textStyle, factor, defaultFontSize),
+      textStyleResolver: textStyleResolver == null
+          ? null
+          : (node) {
+              final style = textStyleResolver!(node);
+              return style == null
+                  ? null
+                  : scaleTextStyle(style, factor, defaultFontSize);
+            },
       // tooltipTheme intentionally not delegated — ADR-0004 (chrome).
     );
   }

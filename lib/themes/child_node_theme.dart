@@ -33,6 +33,8 @@ class ChildNodeTheme<T> {
 
   /// Resolver function to dynamically determine the text style based on node data
   /// If returns null, falls back to [textStyle]
+  ///
+  /// The style it returns is scaled like [textStyle].
   final TextStyle? Function(Node<T> node)? textStyleResolver;
 
   /// Resolver function to dynamically determine the label text based on node data
@@ -44,6 +46,8 @@ class ChildNodeTheme<T> {
 
   /// Resolver function to dynamically determine the selected text style based on node data
   /// If returns null, falls back to [selectedTextStyle]
+  ///
+  /// The style it returns is scaled like [selectedTextStyle].
   final TextStyle? Function(Node<T> node)? selectedTextStyleResolver;
 
   /// Background color for selected child nodes
@@ -90,7 +94,8 @@ class ChildNodeTheme<T> {
   /// by [factor]. See [FolderNodeTheme.scale] for shared contract details.
   ///
   /// Scales: [width], [height], [padding], [margin], [textStyle],
-  /// [selectedTextStyle] (preserves null).
+  /// [selectedTextStyle] (preserves null), and the styles
+  /// [textStyleResolver] and [selectedTextStyleResolver] return.
   /// **Does NOT scale**: [tooltipTheme] — see ADR-0004.
   /// Identity: `scale(1.0, defaultFontSize: …)` returns `this`.
   ChildNodeTheme<T> scale(double factor, {required double defaultFontSize}) {
@@ -102,11 +107,26 @@ class ChildNodeTheme<T> {
       padding: padding * factor,
       margin: margin * factor,
       textStyle: scaleTextStyle(textStyle, factor, defaultFontSize),
+      textStyleResolver: textStyleResolver == null
+          ? null
+          : (node) {
+              final style = textStyleResolver!(node);
+              return style == null
+                  ? null
+                  : scaleTextStyle(style, factor, defaultFontSize);
+            },
       selectedTextStyle: scaleOptionalTextStyle(
         selectedTextStyle,
         factor,
         defaultFontSize,
       ),
+      selectedTextStyleResolver: selectedTextStyleResolver == null
+          ? null
+          : (node) => scaleOptionalTextStyle(
+              selectedTextStyleResolver!(node),
+              factor,
+              defaultFontSize,
+            ),
       // tooltipTheme intentionally not delegated — ADR-0004 (chrome).
     );
   }
