@@ -110,6 +110,17 @@ FolderView(
 )
 ```
 
+Or provide it from an ancestor. `FolderView` reads `FolderViewTheme` only while its `theme` is null, and the lookup is by exact type, so name the data type:
+
+```dart
+FolderViewTheme<String>(
+  data: FlutterFolderViewTheme<String>.dark(),
+  child: FolderView<String>(data: nodes, mode: ViewMode.folder),
+)
+```
+
+An untyped `FolderViewTheme(data: FlutterFolderViewTheme.dark())` is a `FolderViewTheme<dynamic>`. A `FolderView<String>` does not find it and falls back to `light()`; in debug builds this is reported once.
+
 ## Scale
 
 Scale all content proportionally. **Scrollbars** and **tooltips** are not affected — they are treated as chrome (interactive overlays sized for input devices, not for content density).
