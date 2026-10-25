@@ -11,9 +11,10 @@ The width is decided in measurement, the shift in scrolling, and the consequence
 ## Territories it holds in
 - [row-geometry](../territory/row-geometry.md) — `RowMetrics.maxWidth` and `SizeService.clampContentWidth` produce the width.
 - [scroll-sync](../territory/scroll-sync.md) — `_buildItem` sizes each row to `contentWidth` and translates it, inside the viewport-wide `OverflowBox`, so that the whole visible row stays hit-testable (#136).
-- [tap-and-selection](../territory/tap-and-selection.md) — a tap reaches a row only where hit testing reaches it.
+- [taps](../territory/taps.md) — a tap reaches a row only where hit testing reaches it.
 - [label-tooltip](../territory/label-tooltip.md) — a `child`-anchored tooltip aims at the label rect's centre. The `pointer` anchor is the opt-in escape.
 - [row-card](../territory/row-card.md) — the anchor is fixed to `pointer` for this reason.
+- [example](../territory/example.md) — the "A row wider than the viewport" scenario (#89) found #136 and pins the card beside the pointer on a scrolled wide row.
 
 ## What a violation looks like
 A tooltip or overlay drawn far from the cursor, or outside the `FolderView` entirely. Or a part of the row that looks normal but takes no pointer input: any wrapper between the row and the list that is sized to the viewport must not sit inside the translate. It only reproduces **after horizontal scrolling, with a label longer than the viewport**. At rest, with short labels, every rect-anchored overlay looks correct, which is why this was found three times rather than fixed once.
@@ -24,7 +25,6 @@ A test that reproduces such a row goes through the public `FolderView`, not the 
 - #42 — a label tooltip appeared at the row centre, far from the pointer. `NodeTooltipTheme.anchor` was added with `pointer` as an opt-in.
 - #47 — a label tooltip was painted outside the view. The cause was first written as "the label is ellipsized"; the probe showed `didExceedMaxLines == false`, and the real condition was `contentWidth > viewportWidth`. It was fixed upstream by clip-aware placement (`just_tooltip 0.4.2`).
 - #44/#45 — the row card. "What if the row is wider than the viewport?" was opened as a measurement task (#45) and closed because `flutter_table_plus` had already answered it with `anchor: pointer`.
-
 - #136 — after horizontal scrolling, the visible part of a row past the first viewport-width took no tap and no hover. The row was painted shifted, but `Transform.translate` sat outside the viewport-wide `OverflowBox`: `RenderTransform` skips its own size check, and the `OverflowBox` rejected every point past its width. Found by the example's wide-row scenario (#89), when the row card did not open. Fixed by putting the translate inside the `OverflowBox`.
 
 Four discoveries, at four sites. The first three were about where an overlay aims; the fourth was about whether the row is reachable at all.

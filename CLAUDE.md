@@ -51,3 +51,9 @@ A comment says what the code is. Why it is this way, what it deliberately leaves
 out, the trap and the measured value go to the territory note under `docs/map/`;
 history goes to the commit message. The map's entry point and reading protocol:
 `docs/map/README.md`.
+
+- **Before the design is committed** (`read-it`): open the territory notes for the
+  change and work their Blast radius and Cross-cutting invariants as a checklist.
+- **After it lands** (`sweep`): bring those notes back in line, and ask whether the
+  fact the fix revealed holds at every site that shares the same assumption. If
+  it does, the fix lands with an invariant note.

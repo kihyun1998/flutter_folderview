@@ -18,7 +18,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - **Not covered by that call.** On a screen smaller than 1600×1000 logical, the window is larger than the screen. Every size is wider than `ShellPage.narrowBreakpoint` (900), so the desktop run opens in the three-region layout.
 
 ## Design model
-- **Expand–contract, completed in #91.** The old single-page demo lived on as the "Legacy panel" `RouteDestination` until every option had a home in the shell. Removing it earlier would have taken controls away mid-migration. #91 removed `lib/pages/` and `lib/providers/`. `lib/data/theme_demo_data.dart` stays, because Every setting's demo data comes from it. `widget_test` pins that the menu offers no Legacy panel. The user-journey integration test (expand, select, zoom, view mode) now runs against Every setting.
+- **Expand–contract, completed in #91.** The old single-page demo lived on as a "Legacy panel" until every option had a home in the shell, so no control was taken away mid-migration. `lib/data/theme_demo_data.dart` stays, because Every setting's demo data comes from it. `widget_test` pins that the menu offers no Legacy panel, and the user-journey integration test (expand, select, zoom, view mode) runs against Every setting.
 - **The guard is empty since #133.** By the maintainer's call (#91) it had kept one entry, `NodeTooltipTheme.controller`, owned by #133. #74's completion condition became "only entries owned by a library issue remain". #133 replaced the field with `controllerResolver`, which the example covers, so the entry left.
 - **Coverage guard (`option_coverage_test`).** It reads the library's options from source, because Dart has no reflection. It reddens in four cases:
   - an option that is neither covered nor listed;
@@ -61,9 +61,9 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - The swatch lists hold both factories' colours, so a reset never lands on a colour the control cannot show.
   - **Injection is a dropdown.** On `theme:` param the stage passes `theme:`. On Ancestor it passes `theme: null` and wraps the view in `FolderViewTheme<String>(data: theme)`, because `FolderView` prefers its parameter.
   - **Switching the path remounts the view.** The `FolderViewTheme` parent comes and goes at the view's slot, so `FolderView`'s state starts over: scroll and hover are lost. A `GlobalKey` would keep it, but Every setting allows the Device Wall, which builds the stage three times, so one key would collide. The remount is accepted.
-  - **Compare the two paths under Dark.** Under Light, an ancestor the view failed to find falls back to `light()` and would look identical. `theme_injection_test` therefore asserts the dark label colour on the ancestor path. Mutating the ancestor to `FolderViewTheme<dynamic>` reddens it ([theme-composition](theme-composition.md) Known holes).
+  - **Compare the two paths under Dark.** Under Light, an ancestor the view failed to find falls back to `light()` and would look identical. `theme_injection_test` therefore asserts the dark label colour on the ancestor path. Mutating the ancestor to `FolderViewTheme<dynamic>` reddens it ([theme-composition](theme-composition.md), Design model).
   - `contentPadding` is one control with a slider per side, because the field is a single `EdgeInsets`.
-  - **`FlutterFolderViewTheme.animationDuration` changed nothing on screen, and #116 removed it from the library.** Its slider and note went with it ([theme-composition](theme-composition.md) Known holes).
+  - **`FlutterFolderViewTheme.animationDuration` changed nothing on screen, and #116 removed it from the library.** Its slider and note went with it ([theme-composition](theme-composition.md), Design model).
   - The rest is visible in the rendered rows' `ListView`: `itemExtent` is `rowHeight + rowSpacing`, and `padding` is `contentPadding`. `borderRadius` rounds the `Ink` and `InkWell` of every row.
 - **"Tree lines" (#80) asserts what is painted.** `lines_test` records the rendered `FolderView`'s `drawLine` calls with `flutter_test`'s `paints` matcher.
   - Each knob is checked against the strokes drawn: a `connector` draws a horizontal stub, `scope` draws verticals only, and `none` draws no line at all. The same holds in Tree Mode, where the lifted Parents are roots and draw no connector, so only Children do.
@@ -132,14 +132,14 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - **The bars show only on hover.** At `light()`'s `nonHoverOpacity` of 0 they are hidden until the pointer is over the tree, so `scrollbar_test` drives a mouse pointer.
   - The thumb is asserted where it is painted: the `Scrollbar`'s `drawRRect` carries `thumbColor`, and its rect is `thickness` wide with `radius` corners. With `thickness` above `trackWidth` the rect stays inside the track box (#122).
   - **The data must scroll for a thumb to exist**, so the tests take Generated data and Expand all first.
-  - The track box is the only track: no `drawRect` with any alpha comes from the `Scrollbar` (#122, [scroll-sync](scroll-sync.md)).
+  - The track box is the only track: no `drawRect` with any alpha comes from the `Scrollbar` (#122, [scrollbars](scrollbars.md)).
 - **"Expand icon" (#81).**
   - **The widget switch installs an uncoloured `Icons.arrow_right`**, a custom widget in place of the factory chevron. Since #120 the factory chevron is uncoloured too, with its grey in `color`, so `color` and `expandedColor` reach both ([tier-rendering](tier-rendering.md)). `expand_icon_test` pins that light()'s chevron starts grey and follows both swatches. The colour swatches are `null` (not set), then `light()`'s and `dark()`'s greys, then four colours.
   - Width, horizontal padding and horizontal margin are asserted by one rule: each moves a Child's label by the same amount, because their sum is the indent unit. Height does not move it.
   - **A painted glyph is read per row, not per widget.** `const Icon` instances are one object, so `find.byWidget(icon)` matches every row. Read each `RichText` whose text is the glyph, then pick the one nearest the row.
 - **`openFeature` scrolls the lazy feature list from the top until the entry is built** (#81). With "Expand icon" ahead of it, "Tree lines" was no longer built while a feature was open, so `ensureVisible` found nothing.
 - **`openFeature` settles after `ensureVisible`, before it taps.** Without the settle, an entry low in the feature list is tapped where it was before the scroll. With a feature open, the list pane ends at y = 527.5 on a 1000 px window, so "Tree lines" sat at 533–546, under the detail pane. Measured at #80. Earlier tests passed only because their entries were already in view.
-- The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` ([row-wider-than-viewport](../invariant/row-wider-than-viewport.md)).
+- The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `example/test/support/shell_harness.dart`, never `FolderViewContent` ([row-wider-than-viewport](../invariant/row-wider-than-viewport.md)).
 
 ## Code
 - `example/lib/main.dart` — `MyApp`
@@ -200,14 +200,18 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - In the spec, it is the Scrollbars feature's interaction with `scale` (#85). `scrollbar_test` pins the bar's width at Scale 2, and a mutation that scales `scrollbarTheme` reddens it.
   - The label-tooltip half is the Tooltip placement feature's interaction with `scale` (#86). The row card's half becomes one in #89.
 - [innermost-tooltip-wins](../invariant/innermost-tooltip-wins.md) and [row-wider-than-viewport](../invariant/row-wider-than-viewport.md) — the row-card scenarios (#89) demonstrate both.
+- [measured-equals-rendered](../invariant/measured-equals-rendered.md) — the Folder tier tests assert it in the tablet frame's window (#82).
 
 ## Blast radius
 - **Every public field in `lib/`.** Adding, renaming or removing one reddens the example's coverage guard. That is the point, and the change that makes it has to either expose the option or list it with an owning issue.
 - [ci-gates](ci-gates.md) — the guard and the seam run in the `example` job. `integration_test/` stays outside it.
-- [dependency-floor-release](dependency-floor-release.md) — the example's Flutter floor is the library's (3.32.0), above the shell's (3.27.0).
+- [dependency-floor](dependency-floor.md) — the example's Flutter floor is the library's (3.32.0), above the shell's (3.27.0).
+- [release](release.md) — the coverage guard counts every public field of every class the barrel exports.
+- [taps](taps.md) and [selection](selection.md) — "Taps & state" shows their behaviour through the event log.
+- [wheel-motion](wheel-motion.md) — "Smooth wheel" feeds `FolderView.wheelMotion`.
 - [label-tooltip](label-tooltip.md) and [row-card](row-card.md) — both render inside the preview stage's own overlay.
 
-## Known holes
+## Known holes / open
 - **Measured on 2026-10-20: the integration tests on Windows run one file at a time.**
   - `flutter test -d windows integration_test` builds and starts the app once per file. The second start fails with "Unable to start the app on the device" ("Error waiting for a debug connection").
   - It fails the same way on `main` before #91, so it is the tool, not this example.
