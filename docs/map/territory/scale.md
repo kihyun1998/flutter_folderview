@@ -9,11 +9,13 @@ Applies the caller's **Scale** factor uniformly to every content-spatial propert
 - [ADR-0004](../../adr/0004-tooltips-excluded-from-scale.md): tooltips excluded, encoded structurally (no `scale` method).
 
 ## Design model
-- `FolderView.scale` → `FlutterFolderViewTheme.scaledForContext`, which returns `this` at 1.0 and otherwise takes `defaultFontSize` from Material `bodyMedium` → `FlutterFolderViewTheme.scale`. That method multiplies `rowHeight` and `rowSpacing` and delegates to each sub-theme's `scale`, **except** `scrollbarTheme`.
-- Each tier theme's `scale` does not delegate to its `tooltipTheme`. `NodeTooltipTheme` and `RowTooltipTheme` have no `scale` method.
-- Text: `scaleTextStyle` materializes a null style from `defaultFontSize`. `scaleOptionalTextStyle` keeps opt-in styles null.
-- User-supplied `Widget`s cannot be rescaled. `NodeIconBox` wraps them in `FittedBox` when `scale != 1`, which is approximate by design (`GLOSSARY.md` flagged ambiguity).
-- Because each tier theme hand-lists its fields ([ADR-0005](../../adr/0005-tier-theme-boilerplate-not-extracted.md)), a new spatial field has to be added to `scale` in every class that has it, or it silently stays unscaled.
+Read from the theme `scale` methods and `_FolderViewState.build`.
+- `FolderView.scale` → `FlutterFolderViewTheme.scaledForContext`, which returns `this` at 1.0 and otherwise takes `defaultFontSize` from Material `bodyMedium` (fallback 14) → `FlutterFolderViewTheme.scale`. That method multiplies `rowHeight` and `rowSpacing` and delegates to each sub-theme's `scale`, **except** `scrollbarTheme`.
+- Each tier theme's `scale` does not delegate to its `tooltipTheme` (marked `// ADR-0004`). `NodeTooltipTheme` and `RowTooltipTheme` have no `scale` method.
+- Text: `scaleTextStyle` materializes a null style from `defaultFontSize`; `scaleOptionalTextStyle` keeps opt-in styles (`selectedTextStyle`) null.
+- **A style a resolver returns is scaled by its field's rule** (#127). At a factor other than 1, each tier's `scale` wraps `textStyleResolver` through `scaleTextStyle` and `selectedTextStyleResolver` through `scaleOptionalTextStyle`; a `null` result stays `null`, so `resolver ?? field` still falls back to the scaled field. Scaling twice wraps twice and multiplies, as for `textStyle`. Measurement keys on the *unscaled* theme's identity and on the Scale ([row-geometry](row-geometry.md)), so the fresh closure a scaled theme carries does not invalidate it. Decided by the maintainer at triage, 2026-10-21, over documenting the resolvers as unscaled or passing the Scale into them. Before the fix, at Scale 2 a Folder with `textStyle: TextStyle(fontSize: 16)` drew 32 px and one whose resolver returned the same style drew 16 px (probed 2026-10-19, #127). Pinned by `test/widgets/resolver_scale_test.dart`.
+- User-supplied `Widget`s cannot be rescaled. `NodeIconBox` wraps them in `FittedBox` when `scale != 1`, which is approximate by design (`GLOSSARY.md`, Flagged ambiguities).
+- Each tier theme hand-lists its fields ([ADR-0005](../../adr/0005-tier-theme-boilerplate-not-extracted.md)), so a new spatial field has to be added to `scale` in every class that has it, or it silently stays at 1×.
 
 ## Code
 - `lib/themes/flutter_folder_view_theme.dart` — `FlutterFolderViewTheme.scale`, `FlutterFolderViewTheme.scaledForContext`
@@ -21,6 +23,10 @@ Applies the caller's **Scale** factor uniformly to every content-spatial propert
 - `lib/themes/folder_node_theme.dart` — `FolderNodeTheme.scale`
 - `lib/themes/parent_node_theme.dart` — `ParentNodeTheme.scale`
 - `lib/themes/child_node_theme.dart` — `ChildNodeTheme.scale`
+- `lib/themes/expand_icon_theme.dart` — `ExpandIconTheme.scale`
+- `lib/themes/folder_view_line_theme.dart` — `FolderViewLineTheme.scale`
+- `lib/themes/folder_view_spacing_theme.dart` — `FolderViewSpacingTheme.scale`
+- `lib/themes/folder_view_node_style_theme.dart` — `FolderViewNodeStyleTheme.scale`
 - `lib/widgets/node_render_parts.dart` — `NodeIconBox`
 
 ## Reference behaviour
@@ -34,13 +40,7 @@ Applies the caller's **Scale** factor uniformly to every content-spatial propert
 - [scroll-anchoring](scroll-anchoring.md) — a Scale change re-anchors both axes.
 - [theme-composition](theme-composition.md) — every new theme field is a Scale decision.
 - [scale-input](scale-input.md) — the gesture that proposes the new value.
-- [tree-lines](tree-lines.md) — line width scales with `lineTheme`.
+- [tree-lines](tree-lines.md) — line width scales with `lineTheme`, and the column width with `expandIconTheme`.
 
-## Known holes
-- **Fixed in #127: a style a resolver returns is scaled.**
-  - **The cause.** Each tier theme's `scale` multiplied its own `textStyle`, but its resolvers are functions and passed through `copyWith` unchanged. Probed on 2026-10-19: at Scale 2, a Folder with `textStyle: TextStyle(fontSize: 16)` drew 32 px, and one whose resolver returned the same style drew 16 px. `ChildNodeTheme.selectedTextStyleResolver` had the same shape; triage found it.
-  - **The fix.** At a factor other than 1, each tier's `scale` wraps its resolver. `textStyleResolver` goes through `scaleTextStyle`, `textStyle`'s rule. `selectedTextStyleResolver` goes through `scaleOptionalTextStyle`, `selectedTextStyle`'s rule, so a selected style with no size keeps inheriting. A `null` result stays `null`, so `resolver ?? field` still falls back to the scaled field. Each tier is changed on its own (ADR-0005).
-  - **Why wrapping is enough.** Scaling twice wraps twice and multiplies, as it does for `textStyle`. The measurement cache keys on the unscaled theme's identity and on the Scale, so the fresh closure a scaled theme carries does not invalidate it.
-  - **The decision.** The maintainer's, at triage on 2026-10-21, over documenting the resolvers as unscaled or passing the Scale into them.
-  - **Pinned** by `test/widgets/resolver_scale_test.dart`, through `FolderView`, on all three tiers, the selected resolver and measurement.
+## Known holes / open
 - `scale` must be > 0 (a constructor `assert`). There is no upper bound, and the library proposes values without clamping ([scale-input](scale-input.md)).

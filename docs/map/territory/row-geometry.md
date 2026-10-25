@@ -1,7 +1,7 @@
 # Row geometry and width measurement
 
 ## What it is
-Works out how wide and tall the content is. Every row is laid out at one `contentWidth`, which is the widest row across the whole tree regardless of expansion, and at a fixed height. The width is measured once from the scaled theme, before any row is built. If the measurement falls short of what a row actually draws, the label is cut with an ellipsis instead of the view gaining a horizontal scroll.
+Works out how wide and tall the content is. Every row is laid out at one `contentWidth`, the widest row across the whole tree regardless of expansion, and at one fixed extent. The width is measured once from the scaled theme, before any row is built. If the measurement falls short of what a row actually draws, the label is cut with an ellipsis instead of the view gaining a horizontal scroll.
 
 ## Governing decisions
 **None.**
@@ -9,15 +9,16 @@ Works out how wide and tall the content is. Every row is laid out at one `conten
 [ADR-0001](../../adr/0001-scrollbars-excluded-from-scale.md) and [ADR-0004](../../adr/0004-tooltips-excluded-from-scale.md) decide what is excluded from Scale. They do not decide how content is measured.
 
 ## Design model
-- `RowMetrics` is the one formula: row width = indent(depth) + expand strip + tier icon box + measured label + right content padding. The renderers read the label (`RowMetrics.label`), its style (`effectiveTextStyle`), the indent and the strip from the same object, so those match by construction. A rule resolved separately on each side is how `labelResolver` went unmeasured until 0.11.3.
-- `maxWidth` walks **all** nodes, including collapsed ones, so expanding never changes `contentWidth`. It adds the left content padding once.
-- Re-measured in `build` whenever any input it was measured from differs: the `data` instance, the *effective* theme instance (from `theme:` or an ancestor `FolderViewTheme`), `scale`, or the ambient `bodyMedium` (by value). The comparison lives in `build`, not `didUpdateWidget`, because an ancestor theme and `bodyMedium` change without this widget's props changing, and `didUpdateWidget` runs only on a prop change. Data and theme compare by identity because callers own them and rebuild them deliberately; equal-but-new instances cost one extra measurement.
-- `SizeService.clampContentWidth` caps the width at 3× the viewport. It is not re-multiplied by Scale. Rows wider than the cap ellipsize.
-- Height is O(1): `itemCount × rowHeight + (itemCount−1) × rowSpacing + vertical padding`. The `ListView` uses a fixed `itemExtent`.
-- Label widths are cached in a **static** map keyed by label, `fontSize`, `fontWeight` and `letterSpacing`. The map is never cleared, and its key does not include `fontFamily` or `fontStyle`.
+Read from `RowMetrics`, `SizeService` and `_FolderViewState.build`.
+- `RowMetrics` is the one formula: row width = indent(depth) + expand strip + tier icon box + measured label + right content padding (`_rowWidth`). The renderers read the label (`RowMetrics.label`), its style (`effectiveTextStyle`), the indent and the strip from the same object, so those match by construction. A rule resolved separately on each side is how `labelResolver` went unmeasured until 0.11.3 (CHANGELOG 0.11.3).
+- `maxWidth` walks **all** nodes, including collapsed ones, so expanding never changes `contentWidth`. It adds the left content padding once. A tier without a per-node `textStyleResolver` merges its style once (`tierStyle`), not per node.
+- Re-measured in `build` whenever an input differs: the `data` instance, the *effective* theme instance (from `theme:` or an ancestor `FolderViewTheme`), `scale`, or the ambient `bodyMedium` (by value). The comparison lives in `build`, not `didUpdateWidget`, because an ancestor theme and `bodyMedium` change without this widget's props changing. Data and theme compare by identity: callers own them and rebuild them deliberately, and an equal-but-new instance costs one extra measurement.
+- `SizeService.clampContentWidth` caps the width at 3× the viewport, and does not re-multiply by Scale (the measured width is already scaled). Rows wider than the cap ellipsize.
+- Height is O(1) in `SizeService.calculateContentHeight`; the `ListView` uses a fixed `itemExtent`. The two disagree by one `rowSpacing` ([row-extent](../invariant/row-extent.md)).
+- Label widths are cached in a **static** map keyed by label, `fontSize`, `fontWeight` and `letterSpacing` (`_textWidthCache`). It is never cleared.
 
 ## Code
-- `lib/services/row_metrics.dart` — `RowMetrics.maxWidth`, `RowMetrics.measureNodeWidth`, `RowMetrics.label`, `RowMetrics.effectiveTextStyle`, `RowMetrics.iconBoxWidth`, `RowMetrics.expandStripWidth`, `RowMetrics._textWidthCache`
+- `lib/services/row_metrics.dart` — `RowMetrics.maxWidth`, `RowMetrics.measureNodeWidth`, `RowMetrics.label`, `RowMetrics.effectiveTextStyle`, `RowMetrics.iconBoxWidth`, `RowMetrics.expandStripWidth`, `RowMetrics.indentWidth`, `RowMetrics._textWidthCache`
 - `lib/services/size_service.dart` — `SizeService.clampContentWidth`, `SizeService.calculateContentHeight`
 - `lib/widgets/folder_view.dart` — `_FolderViewState._precomputedMaxWidth`, `_FolderViewState._measuredTheme`, `_FolderViewState._measuredBaseStyle`
 
@@ -27,16 +28,20 @@ Works out how wide and tall the content is. Every row is laid out at one `conten
 ## Cross-cutting invariants
 - [measured-equals-rendered](../invariant/measured-equals-rendered.md) — this territory is the "measured" half.
 - [row-wider-than-viewport](../invariant/row-wider-than-viewport.md) — `contentWidth` is the source of the width.
+- [row-extent](../invariant/row-extent.md) — `calculateContentHeight` is the site that disagrees.
 
 ## Blast radius
 - [tier-rendering](tier-rendering.md) — anything a renderer draws that widens a row must be measured here, and vice versa.
-- [scroll-sync](scroll-sync.md) — `contentWidth > viewport` is what turns on horizontal scroll and the per-row translate.
-- [scale](scale.md) — a Scale change is one of the four re-measure inputs.
+- [scroll-sync](scroll-sync.md) — `contentWidth > viewport` turns on horizontal scroll and the per-row translate.
+- [scrollbars](scrollbars.md) — `contentHeight` and `contentWidth` are the bars' scroll extents.
+- [scale](scale.md) — a Scale change is one of the four re-measure inputs, and measurement reads the scaled theme.
 - [theme-composition](theme-composition.md) — the effective theme's identity is a trigger, however the theme arrives.
 - [label-tooltip](label-tooltip.md) — whether a label is ellipsized decides the rect a `child`-anchored tooltip aims at.
+- [benchmarks](benchmarks.md) — `max_width_benchmark` times `maxWidth`.
 
-## Known holes
-- **A Child row is measured one expand strip wider than it draws.** `RowMetrics._rowWidth` adds `expandStripWidth` for every tier. `ChildNodeRenderer` draws no expand box, so a Child's content is indent, then icon box, then label. This over-measures rather than under-measures, so nothing is ellipsized. The horizontal scroll extent can still run up to one strip past the widest Child, and the example's expand-icon width knob (#81) widens that gap. Read from the code; not probed.
-- **`selectedTextStyle` is not measured.** It is merged at render time (for example, bold on a selected Child) and never measured, a remaining case of [measured-equals-rendered](../invariant/measured-equals-rendered.md). Read from the code; not probed.
-- The static cache key omits `fontFamily`, so two tiers that differ only in font family share a cached width. Read from the code; not probed.
-- [view-mode-projection](view-mode-projection.md): tree mode is measured at folder-mode depths.
+## Known holes / open
+- **A Child row is measured one expand strip wider than it draws.** `_rowWidth` adds `expandStripWidth` for every tier; `ChildNodeRenderer` draws no expand box. This over-measures, so nothing is ellipsized, but the horizontal scroll extent can run up to one strip past the widest Child, and the example's expand-icon width knob (#81) widens that gap. Read from the code; not probed.
+- **`selectedTextStyle` is not measured.** `ChildNodeRenderer` merges it at render time (for example, bold on a selected Child). A remaining case of [measured-equals-rendered](../invariant/measured-equals-rendered.md). Read from the code; not probed.
+- The static cache key omits `fontFamily` and `fontStyle`, so two styles that differ only there share a cached width. Read from the code; not probed.
+- Tree mode is measured at folder-mode depths ([view-mode-projection](view-mode-projection.md)).
+- `calculateContentHeight` counts `rowSpacing` n−1 times against the list's n ([row-extent](../invariant/row-extent.md)). Not intended (maintainer, 2026-10-25). Read from the code; not probed.
