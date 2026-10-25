@@ -44,4 +44,4 @@ Read from `RowMetrics`, `SizeService` and `_FolderViewState.build`.
 - **`selectedTextStyle` is not measured.** `ChildNodeRenderer` merges it at render time (for example, bold on a selected Child). A remaining case of [measured-equals-rendered](../invariant/measured-equals-rendered.md). Read from the code; not probed.
 - The static cache key omits `fontFamily` and `fontStyle`, so two styles that differ only there share a cached width. Read from the code; not probed.
 - Tree mode is measured at folder-mode depths ([view-mode-projection](view-mode-projection.md)).
-- `calculateContentHeight` counts `rowSpacing` n−1 times against the list's n ([row-extent](../invariant/row-extent.md)). Not intended (maintainer, 2026-10-25). Read from the code; not probed.
+- `calculateContentHeight` counts `rowSpacing` n−1 times against the list's n ([row-extent](../invariant/row-extent.md)). Not intended (maintainer, 2026-10-25). Read from the code; not probed. Tracked: #157.

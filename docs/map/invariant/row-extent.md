@@ -14,7 +14,7 @@ The unit is recomputed at each site from the theme, `theme.rowHeight + theme.row
 - [scrollbars](../territory/scrollbars.md) — the vertical bar's scroll content is `contentHeight` tall.
 
 ## What a violation looks like
-Since #118 one site still disagrees. `calculateContentHeight` returns `n × rowHeight + (n−1) × rowSpacing + padding`, one `rowSpacing` less than the list's extent. With `rowSpacing > 0`, the vertical bar's extent is one `rowSpacing` short of the list's, so the list can scroll past where the bar's mirror clamps; and a list that overflows its view by less than `rowSpacing` gets no vertical bar at all (`needsVerticalScroll` is false). Read from the code; not probed. Not intended (maintainer, 2026-10-25). With `rowSpacing` 0 the sites agree.
+Since #118 one site still disagrees. `calculateContentHeight` returns `n × rowHeight + (n−1) × rowSpacing + padding`, one `rowSpacing` less than the list's extent. With `rowSpacing > 0`, the vertical bar's extent is one `rowSpacing` short of the list's, so the list can scroll past where the bar's mirror clamps; and a list that overflows its view by less than `rowSpacing` gets no vertical bar at all (`needsVerticalScroll` is false). Read from the code; not probed. Not intended (maintainer, 2026-10-25). With `rowSpacing` 0 the sites agree. Tracked: #157.
 
 Before #118, the tree-lines painter drew at `rowHeight / 2`: at `rowHeight` 40 and `rowSpacing` 10 the stub sat at y 20 against a label centred at y 25.
 
