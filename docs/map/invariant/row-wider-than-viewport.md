@@ -18,6 +18,8 @@ The width is decided in measurement, the shift in scrolling, and the consequence
 ## What a violation looks like
 A tooltip or overlay drawn far from the cursor, or outside the `FolderView` entirely. Or a part of the row that looks normal but takes no pointer input: any wrapper between the row and the list that is sized to the viewport must not sit inside the translate. It only reproduces **after horizontal scrolling, with a label longer than the viewport**. At rest, with short labels, every rect-anchored overlay looks correct, which is why this was found three times rather than fixed once.
 
+A test that reproduces such a row goes through the public `FolderView`, not the internal `FolderViewContent`.
+
 ## Discovery history
 - #42 — a label tooltip appeared at the row centre, far from the pointer. `NodeTooltipTheme.anchor` was added with `pointer` as an opt-in.
 - #47 — a label tooltip was painted outside the view. The cause was first written as "the label is ellipsized"; the probe showed `didExceedMaxLines == false`, and the real condition was `contentWidth > viewportWidth`. It was fixed upstream by clip-aware placement (`just_tooltip 0.4.2`).

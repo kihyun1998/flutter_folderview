@@ -6,16 +6,18 @@ Substantive changes follow `thegraph`. Its build is `docs/agents/thegraph.md`;
 what depends on what is `docs/map/`; per-incident evidence is
 `docs/agents/lessons.md` (add new war-stories there).
 
-- Test seam: prefer `FolderView` (public) over `FolderViewContent` (internal)
-  when a test has to reproduce a row wider than the viewport.
-- Record the mutation check in the PR body: which mutation, and what died (or
-  that nothing did).
 - Branch → `fix|feat(<scope>): …` → PR (`Closes #n`) → CI green → squash merge
   `--delete-branch`.
-- `dart pub publish` is run by the maintainer, never by the agent; `--dry-run`
-  must show 0 warnings.
-- Before a release the maintainer runs the example and eyeballs hover; the agent
-  cannot hover.
+- Record the mutation check in the PR body: which mutation, and what died (or
+  that nothing did).
+- The maintainer runs `dart pub publish`; the agent runs only `--dry-run`.
+
+| Read | When |
+|---|---|
+| `docs/map/invariant/row-wider-than-viewport.md` | before writing a test for a row wider than the viewport |
+| `docs/agents/release.md` | before preparing a release, or claiming a hover change works |
+| `docs/agents/issue-tracker.md` | before filing, reading or labelling an issue |
+| `docs/agents/domain.md` | before naming a domain concept, or working in an area an ADR covers |
 
 ## Identity & invariants (the boundary)
 
@@ -30,33 +32,18 @@ decisions in **`docs/adr/`**.
   Set**, and **Scale** are caller-controlled — the library *reads* them, never
   mutates. `onNodeTap` / `onScaleChanged` propose; the caller applies.
 - **Chrome is excluded from Scale.** Scrollbars (ADR-0001) and tooltips (ADR-0004)
-  do not scale — scaling tooltip fields made it visually worse (just_tooltip's
-  text default is unscaled).
+  do not scale.
 - **Tier theme fields are intentionally duplicated (ADR-0005)** — do not extract
   a shared base.
 - **Tier rules are not enforced at runtime** — violations produce undefined
   visible behavior, by contract.
-- **Consumes `just_tooltip`** (the barrel re-exports it). Two surfaces — a
-  node-label tooltip and a row-card tooltip; nesting is arbitrated **upstream**
-  (innermost wins), so this package holds no priority logic. The row card is
-  fixed to `TooltipAnchor.pointer` as a **usability default**: a row can be
-  wider than the viewport, and the centre of its visible part is not where the
-  user is looking (#138). On `^0.4.4`. Read
-  `../` sibling `flutter_table_plus` and the upstream source, not pub docs.
-
-## Agent skills
-
-### Issue tracker
-Issues live in GitHub Issues for `kihyun1998/flutter_folderview`, managed via the
-`gh` CLI. Pull requests are not a triage surface. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-Canonical label strings (`needs-triage`, `needs-info`, `ready-for-agent`,
-`ready-for-human`, `wontfix`) — no overrides. See `docs/agents/triage-labels.md`.
-
-### Domain docs
-Single-context layout: `GLOSSARY.md` + `docs/adr/` at the repo root. See
-`docs/agents/domain.md`.
+- **Consumes `just_tooltip`** (re-exported: `grep export lib/flutter_folderview.dart`;
+  version: `grep just_tooltip pubspec.yaml`). Two surfaces — a node-label tooltip
+  and a row-card tooltip; nesting is arbitrated **upstream** (innermost wins), so
+  this package holds no priority logic. The row card is fixed to
+  `TooltipAnchor.pointer` as a **usability default**: a row can be wider than the
+  viewport, and the centre of its visible part is not where the user is looking
+  (#138).
 
 ## Comments and the map
 

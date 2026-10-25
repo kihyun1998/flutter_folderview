@@ -139,7 +139,7 @@ The `example/` app. It is built on the `flutter_example_template` shell (menu, p
   - **A painted glyph is read per row, not per widget.** `const Icon` instances are one object, so `find.byWidget(icon)` matches every row. Read each `RichText` whose text is the glyph, then pick the one nearest the row.
 - **`openFeature` scrolls the lazy feature list from the top until the entry is built** (#81). With "Expand icon" ahead of it, "Tree lines" was no longer built while a feature was open, so `ensureVisible` found nothing.
 - **`openFeature` settles after `ensureVisible`, before it taps.** Without the settle, an entry low in the feature list is tapped where it was before the scroll. With a feature open, the list pane ends at y = 527.5 on a 1000 px window, so "Tree lines" sat at 533–546, under the detail pane. Measured at #80. Earlier tests passed only because their entries were already in view.
-- The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` (`CLAUDE.md`).
+- The behaviour seam is the public `FolderView`, read through `renderedFolderView` in `test/support/shell_harness.dart`, never `FolderViewContent` ([row-wider-than-viewport](../invariant/row-wider-than-viewport.md)).
 
 ## Code
 - `example/lib/main.dart` — `MyApp`
