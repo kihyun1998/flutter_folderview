@@ -84,6 +84,12 @@ mutation-check 를 PR 본문에 적는다.
 - **#48 (부재 주장은 잘못된 이유로도 통과)**: "카드 없는 Node 는 안 감싼다" 를 `Key('card')`
   부재로 단언했다. `null` 가드를 지워 모든 행이 빈 툴팁으로 감싸여도 카드 키는 없으니 초록.
   `find.ancestor(of: 텍스트, matching: JustTooltip)` 로 **래퍼 자체의 부재**를 단언하니 잡혔다.
+- **just_tooltip 0.5.1 bump (부재 단언의 창은 상류가 정한다)**: "scale 애니메이션엔 fade 가 없다"
+  를 툴팁 텍스트의 **모든** 조상 중 `FadeTransition` 부재로 단언했다. 0.4.4 는 툴팁을 `Overlay`
+  context 에서 지어 조상 사슬이 거기서 끝났기에 맞았다. 0.5.0 이 `OverlayPortal` 로 옮기자 page
+  route 의 `FadeTransition` 넷이 조상이 되어 빨개졌다 — 우리 코드는 그대로인데. 창을 툴팁 자신의
+  positioner(가장 가까운 `CustomSingleChildLayout`)까지로 좁히고, `fadeScale` 로 바꿔 좁힌 단언이
+  여전히 빨개지는지 확인했다. **부재 단언은 찾는 범위를 명시한다.**
 - **`RowTooltipTheme` (같은 키를 이웃이 대신 통과시킴)**: 빌더가 모든 Node 에 `Key('card')`
   를 줬다. 카드는 자기 행 아래 행 위에 그려진다(행 y0–40, 카드 y28–88). 커서를 카드로 옮기면
   다음 행 카드가 떠서 `interactive: false` 인데도 `shown() == true` — `true`/`false` 두

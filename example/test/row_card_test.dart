@@ -156,6 +156,8 @@ void main() {
       expect(card.theme, const JustTooltipTheme.bare());
       expect(card.interactive, isTrue);
       expect(card.enableHover, isTrue);
+      expect(card.tap, isNull);
+      // ignore: deprecated_member_use
       expect(card.enableTap, isFalse);
       expect(card.waitDuration, isNull);
       expect(card.showDuration, isNull);
