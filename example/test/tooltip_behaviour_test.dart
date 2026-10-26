@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:just_tooltip/just_tooltip.dart' show JustTooltip;
+import 'package:just_tooltip/just_tooltip.dart' show JustTooltip, TooltipTap;
 
 import 'support/shell_harness.dart';
 
@@ -111,7 +111,7 @@ Future<void> _setEvery(WidgetTester tester) async {
 
 /// The library's behaviour and animation fallbacks, on [tip].
 void _expectFallbacks(JustTooltip tip) {
-  expect(tip.enableTap, isFalse);
+  expect(tip.tap, TooltipTap.none);
   expect(tip.enableHover, isTrue);
   expect(tip.interactive, isFalse);
   expect(tip.waitDuration, isNull);
@@ -144,7 +144,7 @@ void main() {
       await openFeature(tester, 'Tooltip placement');
       await _toggle(tester, 'NodeTooltipTheme.useTooltip');
 
-      expect(_tip(tester, _c1).enableTap, isTrue);
+      expect(_tip(tester, _c1).tap, TooltipTap.claim);
       expect(
         tester
             .widget<DropdownButton<TooltipTier>>(
@@ -165,7 +165,7 @@ void main() {
       await _setEvery(tester);
 
       final tip = _tip(tester, _f1);
-      expect(tip.enableTap, isTrue);
+      expect(tip.tap, TooltipTap.claim);
       expect(tip.enableHover, isFalse);
       expect(tip.interactive, isTrue);
       expect(tip.waitDuration, const Duration(milliseconds: 500));
@@ -310,10 +310,21 @@ void main() {
         matching: find.byType(ScaleTransition),
       );
       expect(around, findsOneWidget);
+      // The tooltip's own body: the text up to the nearest
+      // CustomSingleChildLayout, which positions it.
+      final body = find
+          .ancestor(
+            of: find.text(_tipText),
+            matching: find.byType(CustomSingleChildLayout),
+          )
+          .first;
       expect(
-        find.ancestor(
-          of: find.text(_tipText),
-          matching: find.byType(FadeTransition),
+        find.descendant(
+          of: body,
+          matching: find.ancestor(
+            of: find.text(_tipText),
+            matching: find.byType(FadeTransition),
+          ),
         ),
         findsNothing,
       );
