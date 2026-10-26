@@ -628,7 +628,7 @@ const _nodeTooltips = SettingGroup(
               'box, and textStyle becomes the default style of '
               'tooltipBuilder content too.',
           evidence:
-              'just_tooltip 0.4.4 just_tooltip_overlay.dart: build picks '
+              'just_tooltip 0.5.1 just_tooltip_overlay.dart: build picks '
               '_buildArrowBox over _buildMaterialBox when theme.showArrow, '
               'and _buildArrowBox wraps the content in DefaultTextStyle; '
               'tooltip_shape_painter.dart paints boxShadow, elevation and '
@@ -678,7 +678,7 @@ const _nodeTooltips = SettingGroup(
           evidence:
               'lib/widgets/node_render_parts.dart: wrapWithNodeTooltip returns '
               'the child unwrapped when useTooltip is off or there is no '
-              'content; just_tooltip 0.4.4 tooltip_transitions.dart: '
+              'content; just_tooltip 0.5.1 tooltip_transitions.dart: '
               '_slideOffset picks its begin offset from spec.direction, which '
               'just_tooltip.dart passes as _resolvedDirection ?? direction',
         ),
@@ -700,7 +700,7 @@ const _nodeTooltips = SettingGroup(
               'callbacks.',
           evidence:
               'lib/widgets/node_render_parts.dart: wrapWithNodeTooltip passes '
-              'onShow and onHide to JustTooltip unchanged; just_tooltip 0.4.4 '
+              'onShow and onHide to JustTooltip unchanged; just_tooltip 0.5.1 '
               'just_tooltip.dart: _show calls onShow, _onAnimationStatus '
               'calls onHide once the reverse animation is dismissed',
         ),
@@ -711,10 +711,11 @@ const _nodeTooltips = SettingGroup(
               'never reaches onNodeTap, so a Child is not selected from its '
               'label; a tap elsewhere on the row still is.',
           evidence:
-              'just_tooltip 0.4.4 just_tooltip.dart: build wraps the child in '
-              'a GestureDetector with onTap when enableTap; as the innermost '
-              'tap recognizer it wins the gesture arena over the row; lib/widgets/node_render_parts.dart: '
-              'wrapWithNodeTooltip wraps only the label',
+              'lib/widgets/node_render_parts.dart: wrapWithNodeTooltip passes '
+              'tap: TooltipTap.claim when enableTap and wraps only the label; '
+              'just_tooltip 0.5.1 just_tooltip.dart: build wraps the child in '
+              'a GestureDetector with onTap under TooltipTap.claim; as the '
+              'innermost tap recognizer it wins the gesture arena over the row',
         ),
       ],
     ),
@@ -758,7 +759,7 @@ const _rowCard = SettingGroup(
           evidence:
               'lib/widgets/folder_view_content.dart: _wrapWithRowTooltip wraps '
               'the NodeWidget, so the label tooltip nests inside the card; '
-              'just_tooltip 0.4.4 just_tooltip.dart: _syncSuppression claims '
+              'just_tooltip 0.5.1 just_tooltip.dart: _syncSuppression claims '
               'every ancestor while the pointer is inside a tooltip that '
               '_hasContent',
         ),
@@ -800,9 +801,9 @@ const _rowCard = SettingGroup(
               'callbacks; the card never takes a row tap.',
           evidence:
               'lib/widgets/folder_view_content.dart: _wrapWithRowTooltip '
-              'passes onShow and onHide and no enableTap, so JustTooltip '
-              'keeps its enableTap default of false and adds no '
-              'GestureDetector',
+              'passes onShow and onHide and neither tap nor enableTap; '
+              'just_tooltip 0.5.1 just_tooltip.dart: _tap then resolves to '
+              'TooltipTap.none, and build adds no gesture detector',
         ),
         Interaction(
           otherFeatureId: 'tooltipBehaviour',
@@ -810,10 +811,11 @@ const _rowCard = SettingGroup(
               'A label tooltip with enableHover off never sees the pointer, '
               'so it does not hide the card on the label.',
           evidence:
-              'just_tooltip 0.4.4 just_tooltip.dart: build adds the '
+              'just_tooltip 0.5.1 just_tooltip.dart: build adds the '
               'MouseRegion that sets _pointerInside only when enableHover, '
-              'and _syncSuppression claims ancestors only with '
-              '_pointerInside',
+              'and _syncSuppression claims ancestors for the pointer only '
+              'with _pointerInside (and for focus only with enableFocus, '
+              'which FolderView never passes)',
         ),
       ],
     ),

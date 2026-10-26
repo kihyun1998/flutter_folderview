@@ -18,7 +18,8 @@ Read from `_FolderViewContentState._wrapWithRowTooltip` and `RowTooltipTheme`.
 - `interactive` defaults to `true`, the opposite of the label tooltip, and deliberately so (`RowTooltipTheme.interactive` dartdoc).
 - Wraps `NodeWidget` from outside, so every label tooltip nests inside it ([innermost-tooltip-wins](../invariant/innermost-tooltip-wins.md)).
 - Its hover region is reachable across the whole visible row only because the row's translate sits inside the viewport-wide `OverflowBox` ([scroll-sync](scroll-sync.md), #136). The example's wide-row scenario (#89) found it.
-- The card has no `enableTap`; a row tap with the card on still selects the Child (pinned in `example/test/row_card_test.dart`).
+- The card has no `enableTap`; it passes neither `tap` nor `enableTap`, so upstream resolves `TooltipTap.none`, and a row tap with the card on still selects the Child (pinned in `example/test/row_card_test.dart`).
+- A screen reader does not hear the card: it is a `tooltipBuilder` tooltip with no `semanticsTooltip` (just_tooltip 0.5.1).
 
 ## Code
 - `lib/widgets/folder_view_content.dart` — `_FolderViewContentState._wrapWithRowTooltip`
