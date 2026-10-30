@@ -10,7 +10,7 @@ what depends on what is `docs/map/`; per-incident evidence is
   `--delete-branch`.
 - Record the mutation check in the PR body: which mutation, and what died (or
   that nothing did).
-- The maintainer runs `dart pub publish`; the agent runs only `--dry-run`.
+- Before a release, run `pub-ready`.
 
 | Read | When |
 |---|---|
@@ -48,9 +48,12 @@ decisions in **`docs/adr/`**.
 ## Comments and the map
 
 A comment says what the code is. Why it is this way, what it deliberately leaves
-out, the trap and the measured value go to the territory note under `docs/map/`;
-history goes to the commit message. The map's entry point and reading protocol:
-`docs/map/README.md`.
+out, the trap and the measured value go to the territory note under `docs/map/`.
+Where none seems to hold it, search the folder and the code symbol first; only
+then start a new note, named for what the system does there, not for the file.
+History goes to the commit message. Comments written before this rule still carry
+the rest: never delete one whose content the map does not yet hold — move it there
+first. The map's entry point and reading protocol: `docs/map/README.md`.
 
 - **Before the design is committed** (`read-it`): open the territory notes for the
   change and work their Blast radius and Cross-cutting invariants as a checklist.

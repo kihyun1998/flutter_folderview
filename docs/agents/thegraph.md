@@ -11,3 +11,6 @@ identity and invariants are in `CLAUDE.md`.
 | flutter_smooth_wheel_scroll | how it works | pub cache `flutter_smooth_wheel_scroll-<ver>/` at the resolved version, or `../flutter_smooth_wheel_scroll` — raw | binding |
 | flutter_table_plus | how it works | `../flutter_table_plus` — raw | example |
 | Flutter framework | how it works | the SDK's `packages/flutter` source — raw | binding |
+
+## Release
+`pub-ready`
