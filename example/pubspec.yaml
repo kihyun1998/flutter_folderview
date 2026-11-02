@@ -34,7 +34,7 @@ dependencies:
   flutter_folderview:
     path: ../
   # The example shell: menu, preview stage, device wall, Code pane, settings panel.
-  flutter_example_template: ^0.3.0
+  flutter_example_template: ^0.4.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -52,10 +52,10 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   # The test reads the rendered FolderView.wheelMotion's subtype and fields,
   # which the library's re-export of WheelMotion alone does not name.
-  flutter_smooth_wheel_scroll: ^0.1.3
+  flutter_smooth_wheel_scroll: ^0.1.5
   # The tooltip tests read the rendered JustTooltip's fields, which the
   # library's re-export of just_tooltip's types alone does not name.
   just_tooltip: ^0.5.1
