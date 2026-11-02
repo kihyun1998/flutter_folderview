@@ -29,7 +29,7 @@ What this package promises consumers about versions: the SDK floor and the `just
 - [wheel-motion](wheel-motion.md) — the motion and its clamps come from the resolved `flutter_smooth_wheel_scroll`.
 - [release](release.md) — the barrel re-exports types from both; an upstream rename is a breaking change here.
 - [ci-gates](ci-gates.md) — CI resolves fresh on `stable`, so it never sees a consumer's older lock or the declared floor.
-- [example](example.md) — the example's Flutter floor is the max of `flutter_example_template`'s (`>=3.27.0`) and this package's (`>=3.32.0`), so it is 3.32.
+- [example](example.md) — the example's Flutter floor is the max of `flutter_example_template`'s (`>=3.32.0` since 0.4.0) and this package's (`>=3.32.0`), so it is 3.32.
 
 ## Known holes / open
 - An upstream fix that lands *inside* the caret still reaches no one. With no root lockfile, Dependabot has nothing to update until the caret is outgrown, so raising the floor to deliver a fix is still a human's job.
