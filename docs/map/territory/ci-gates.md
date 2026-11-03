@@ -32,3 +32,4 @@ None recorded.
 
 ## Known holes / open
 - CI runs only the latest stable Flutter. The declared floor (`>=3.32.0`) is never built.
+- The formatter ships with the SDK, so a local Flutter older than CI's stable can format differently. At 0.12.0, Flutter 3.41.9 (dart_style 3.1.4) reformatted two `benchmark/` files that CI's 3.47.9 passes; the change is dart_style 3.1.10's #1809, which is not language versioned. CI is the reference ([`lessons.md`](../../agents/lessons.md), Step 6/7).

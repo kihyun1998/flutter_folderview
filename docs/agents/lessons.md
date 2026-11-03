@@ -128,3 +128,12 @@ mutation-check 를 PR 본문에 적는다.
   unchanged"* 라 적었다 — 거짓이었다(0.11.3 수정이 `lib/` 를 바꿨다). squash 는 그 셋의 메시지를
   `feat(example)` 하나로 덮었다. **브랜치를 따기 전에 `git log origin/main..main` 이 비었는지,
   PR 본문을 쓰기 전에 `gh pr view --json files` 의 개수가 내 diff 와 같은지 본다.**
+- **0.12.0 릴리즈 (로컬 format 게이트는 CI 와 다른 formatter 다)**: 루트 `dart format
+  --set-exit-if-changed lib test benchmark` 가 로컬(Flutter 3.41.9, dart_style 3.1.4)에서만
+  `benchmark/` 두 파일 때문에 떨어졌고, CI(Flutter 3.47.9)는 통과했다. `test('…', () {…},
+  timeout: …)` 처럼 함수 블록 뒤에 인자가 붙은 호출을 3.1.4 는 인자마다 펼친다. 같은 두 파일을
+  dart_style 3.1.4–3.1.14 로 하나씩 돌리니 3.1.9 까지 "2 changed", 3.1.10 부터 "0 changed" —
+  3.1.10 의 언어 버전과 무관한 수정(#1809, 인자 목록을 필요 없이 펼치던 버그)이다. #159 본문,
+  pub-ready, 사람이 직접 친 `dart format .` 에서 세 번 걸렸다. **CI 가 정답이다: 로컬에서 바뀐
+  `benchmark/` 는 커밋하지 말고 되돌린다.** 다른 formatter 버전은 임시 패키지에 `dart_style:
+  <버전>` 을 넣고 `dart run dart_style:format --language-version=3.8` 로 SDK 를 안 바꾸고 잰다.
