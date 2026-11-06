@@ -144,7 +144,7 @@ void main() {
       await openFeature(tester, 'Tooltip placement');
       await _toggle(tester, 'NodeTooltipTheme.useTooltip');
 
-      expect(_tip(tester, _c1).tap, TooltipTap.claim);
+      expect(_tip(tester, _c1).tap, TooltipTap.observe);
       expect(
         tester
             .widget<DropdownButton<TooltipTier>>(
@@ -165,7 +165,7 @@ void main() {
       await _setEvery(tester);
 
       final tip = _tip(tester, _f1);
-      expect(tip.tap, TooltipTap.claim);
+      expect(tip.tap, TooltipTap.observe);
       expect(tip.enableHover, isFalse);
       expect(tip.interactive, isTrue);
       expect(tip.waitDuration, const Duration(milliseconds: 500));
@@ -246,10 +246,8 @@ void main() {
       expect(find.text(_tipText), findsNothing);
     });
 
-    testWidgets('with enableTap on a Child label tap opens the tooltip '
-        'instead of reaching onNodeTap; the rest of the row still does', (
-      tester,
-    ) async {
+    testWidgets('with enableTap on a Child label tap selects the Child and '
+        'opens the tooltip', (tester) async {
       await _open(tester, tier: 'Child', room: true);
       await _toggle(tester, 'NodeTooltipTheme.enableTap');
 
@@ -257,13 +255,6 @@ void main() {
       await tester.pump(const Duration(milliseconds: 350));
       await tester.pumpAndSettle();
       expect(find.text('Child tooltip'), findsOneWidget);
-      expect(_log(tester), isEmpty);
-      expect(renderedFolderView(tester).selectedNodeIds, isEmpty);
-
-      final label = tester.getRect(_labelFinder(_c1));
-      await tester.tapAt(Offset(label.right + 40, label.center.dy));
-      await tester.pump(const Duration(milliseconds: 350));
-      await tester.pumpAndSettle();
       expect(_log(tester), ['onNodeTap · $_c1']);
       expect(renderedFolderView(tester).selectedNodeIds, {'1-1-1'});
     });

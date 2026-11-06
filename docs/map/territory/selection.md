@@ -29,7 +29,7 @@ Read from `ChildNodeRenderer`.
 ## Blast radius
 - [row-geometry](row-geometry.md) — a selected style that widens a label is not measured.
 - [scale](scale.md) — `selectedTextStyle` and its resolver scale by the optional-style rule.
-- [taps](taps.md) — a Child tap is the caller's usual cue to change the set; `NodeTooltipTheme.enableTap` takes that tap from the label (#134).
+- [taps](taps.md) — a Child tap is the caller's usual cue to change the set, including a tap on its label with `NodeTooltipTheme.enableTap` on.
 - [theme-composition](theme-composition.md) — the `selected*` fields live on `ChildNodeTheme` alone.
 
 ## Known holes / open

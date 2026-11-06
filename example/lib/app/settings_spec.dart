@@ -707,15 +707,14 @@ const _nodeTooltips = SettingGroup(
         Interaction(
           otherFeatureId: 'interaction',
           effect:
-              'With enableTap on, a tap on the label opens the tooltip and '
-              'never reaches onNodeTap, so a Child is not selected from its '
-              'label; a tap elsewhere on the row still is.',
+              'With enableTap on, a tap on the label toggles the tooltip and '
+              'reaches onNodeTap too, so a Child is selected from its label.',
           evidence:
               'lib/widgets/node_render_parts.dart: wrapWithNodeTooltip passes '
-              'tap: TooltipTap.claim when enableTap and wraps only the label; '
-              'just_tooltip 0.5.1 just_tooltip.dart: build wraps the child in '
-              'a GestureDetector with onTap under TooltipTap.claim; as the '
-              'innermost tap recognizer it wins the gesture arena over the row',
+              'tap: TooltipTap.observe when enableTap and wraps only the label; '
+              'just_tooltip 0.5.1 just_tooltip.dart: under TooltipTap.observe '
+              'build adds a recognizer that gives the gesture arena up on '
+              'release and toggles, so the row wins the tap',
         ),
       ],
     ),
