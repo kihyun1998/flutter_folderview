@@ -32,7 +32,7 @@ Read from `CustomInkWell` and the two renderers.
 ## Blast radius
 - [tier-rendering](tier-rendering.md) — the renderers decide what reaches `CustomInkWell`.
 - [selection](selection.md) — a Child tap is the caller's usual cue to change the Selected Set.
-- [label-tooltip](label-tooltip.md) — `enableTap` puts a tap recognizer inside the row's, and the innermost recognizer wins.
+- [label-tooltip](label-tooltip.md) — `enableTap` watches a label's tap without taking it, so the tap arrives here, and a double tap on a Child opens and closes the tooltip.
 - [row-card](row-card.md) — a card over a row must not steal its taps. Hit testing is depth-first, so an ancestor `GestureDetector` cannot take a child `InkWell`'s tap ([lessons](../../agents/lessons.md), #51).
 - [scroll-sync](scroll-sync.md) — the `OverflowBox` order decides where a scrolled row is hit.
 - [scale-input](scale-input.md) — Control is also the Scale Modifier off macOS.
@@ -40,4 +40,3 @@ Read from `CustomInkWell` and the two renderers.
 ## Known holes / open
 - `onDoubleNodeTap` is Child-only by construction: container rows pass `onDoubleTap: null`, which since #95 means no window. The `clickInterval: 0` they also pass has had no effect since then. No record decides it.
 - **Swapping `onDoubleNodeTap` at runtime** (probed 2026-09-23, the lens read on #95). Set-then-removed and removed-then-set between two taps both give `[tap, tap]`. Removing it and setting it back within the window, with no tap in between, keeps the first tap's count, so the second tap is a double: `[tap, dbl]`. Flutter's `GestureDetector` would drop that state. Reachable only by flipping the handler twice inside 300 ms, so it is left as is; the fix, if it ever matters, is to reset the count in `didUpdateWidget` when `onDoubleTap` changes to or from null.
-- `NodeTooltipTheme.enableTap` takes the label's tap from the row: no `onNodeTap` from the label (measured 2026-10-20, example). It maps to `TooltipTap.claim`. Upstream's `TooltipTap.observe` (just_tooltip 0.5.0) would let the row's tap fire too, but it is not used here ([label-tooltip](label-tooltip.md)). Where to fix it is not decided. Tracked: #134.

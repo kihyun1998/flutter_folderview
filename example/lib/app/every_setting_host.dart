@@ -1648,8 +1648,7 @@ class EverySettingHost extends SettingsHost {
       'is on by default, the opposite of a label tooltip: the card sits '
       'beside the pointer, and its content may be worth reaching. With '
       'enableHover off nothing opens the card. The card has no enableTap and '
-      'never takes a row tap (a label tooltip with enableTap on still takes '
-      'the label\'s). Wait delays the card; with '
+      'never takes a row tap. Wait delays the card; with '
       'Auto-hide set, the countdown hides it, not leaving the row. The '
       'animation settings work as for a label tooltip. onShow and onHide '
       'log to the same event log as the tap callbacks.',
@@ -1675,9 +1674,9 @@ class EverySettingHost extends SettingsHost {
     const Text(
       'Tier is the Tooltip placement Tier, and useTooltip there turns the '
       'Tier\'s tooltip on. With enableHover and enableTap both off nothing '
-      'opens the tooltip. With enableTap on, a tap on the label opens the '
-      'tooltip instead of reaching onNodeTap: tap beside the label to select '
-      'a Child. Wait delays a hover; it does not delay a tap. With '
+      'opens the tooltip. With enableTap on, a tap on the label toggles the '
+      'tooltip and reaches onNodeTap too, so it still selects a Child. Wait '
+      'delays a hover; it does not delay a tap. With '
       'Auto-hide set, leaving the label no longer hides the tooltip: the '
       'countdown does. interactive keeps the tooltip open while the pointer '
       'crosses onto it. fadeBegin applies to fade, fadeScale, fadeSlide and '

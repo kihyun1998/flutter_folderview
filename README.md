@@ -262,7 +262,7 @@ FolderView(
 | `boxShadow` | `List<BoxShadow>?` | Custom shadow (overrides elevation) |
 | `borderRadius` | `BorderRadius?` | Corner rounding |
 | `padding` | `EdgeInsets?` | Inner padding |
-| `enableTap` | `bool?` | Tap to show (default: `false`) |
+| `enableTap` | `bool?` | Tap on the label toggles the tooltip, and also reaches the row (default: `false`) |
 | `enableHover` | `bool?` | Hover to show (default: `true`) |
 | `interactive` | `bool?` | Keep visible on tooltip hover |
 | `waitDuration` | `Duration?` | Delay before showing on hover |

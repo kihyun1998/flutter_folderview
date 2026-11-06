@@ -140,7 +140,9 @@ Widget wrapWithNodeTooltip<T>({
       arrowPositionRatio: tooltipTheme.arrowPositionRatio ?? 0.25,
     ),
     controller: tooltipTheme.controllerResolver?.call(node),
-    tap: (tooltipTheme.enableTap ?? false) ? TooltipTap.claim : TooltipTap.none,
+    tap: (tooltipTheme.enableTap ?? false)
+        ? TooltipTap.observe
+        : TooltipTap.none,
     enableHover: tooltipTheme.enableHover ?? true,
     animation: tooltipTheme.animation ?? TooltipAnimation.fade,
     animationCurve: tooltipTheme.animationCurve,

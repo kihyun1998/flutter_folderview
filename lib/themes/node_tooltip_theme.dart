@@ -91,7 +91,16 @@ class NodeTooltipTheme<T> {
   /// is.
   final JustTooltipController? Function(Node<T> node)? controllerResolver;
 
-  /// Whether tap triggers the tooltip
+  /// Whether a tap on the label toggles the tooltip.
+  ///
+  /// The tap also reaches the row, as a tap elsewhere on it does: `onNodeTap`
+  /// fires, and a Child can be selected from its label. Each tap toggles, so a
+  /// double tap toggles twice, and a click on a tooltip open from a hover
+  /// closes it.
+  ///
+  /// A screen reader's tap goes to the row and does not open the tooltip. It
+  /// reads [message] with the label, unless a builder supplies the content:
+  /// then nothing is read.
   final bool? enableTap;
 
   /// Whether hover triggers the tooltip
