@@ -1,0 +1,302 @@
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_folderview/flutter_folderview.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+// A mouse wheel turned over a scrollbar of the public FolderView moves the view
+// the way the same wheel over the body does.
+
+const Duration _frame = Duration(milliseconds: 16);
+const WheelMotion _spring = WheelMotion.spring(
+  duration: Duration(milliseconds: 400),
+);
+
+/// 500 Children under one Parent, one with a long label: taller and wider than
+/// the 400×300 view, so both scrollbars exist.
+final List<Node<String>> _nodes = [
+  Node<String>(
+    id: 'p',
+    label: 'parent',
+    type: NodeType.parent,
+    children: [
+      for (var i = 0; i < 500; i++)
+        Node<String>(
+          id: 'c$i',
+          label: i == 0 ? 'x' * 300 : 'c$i',
+          type: NodeType.child,
+        ),
+    ],
+  ),
+];
+
+final GlobalKey _viewKey = GlobalKey();
+
+Future<void> _pump(WidgetTester tester, WheelMotion? wheelMotion) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: SizedBox(
+            width: 400,
+            height: 300,
+            child: FolderView<String>(
+              key: _viewKey,
+              data: _nodes,
+              mode: ViewMode.tree,
+              expandedNodeIds: const {'p'},
+              wheelMotion: wheelMotion,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+Rect _view(WidgetTester tester) =>
+    tester.getRect(find.byType(FolderView<String>));
+
+Offset _overBody(WidgetTester tester) => _view(tester).center;
+
+Offset _overVerticalBar(WidgetTester tester) =>
+    Offset(_view(tester).right - 3, _view(tester).center.dy);
+
+Offset _overHorizontalBar(WidgetTester tester) =>
+    Offset(_view(tester).center.dx, _view(tester).bottom - 3);
+
+/// Sends one wheel notch of [delta] at [at], without pumping.
+Future<void> _wheel(
+  WidgetTester tester,
+  Offset at,
+  Offset delta, {
+  PointerDeviceKind kind = PointerDeviceKind.mouse,
+}) async {
+  final pointer = TestPointer(1, kind);
+  if (kind == PointerDeviceKind.mouse) {
+    await tester.sendEventToBinding(pointer.hover(at));
+  } else {
+    pointer.addPointer(location: at);
+  }
+  await tester.sendEventToBinding(pointer.scroll(delta));
+}
+
+ScrollPosition _body(WidgetTester tester) =>
+    tester.widget<ListView>(find.byType(ListView)).controller!.position;
+
+/// The scroll view inside the scrollbar of [axis].
+ScrollPosition _bar(WidgetTester tester, Axis axis) => tester
+    .widget<SingleChildScrollView>(
+      find.descendant(
+        of: find.byType(Scrollbar),
+        matching: find.byWidgetPredicate(
+          (w) => w is SingleChildScrollView && w.scrollDirection == axis,
+        ),
+      ),
+    )
+    .controller!
+    .position;
+
+void _winTest(String description, WidgetTesterCallback body) => testWidgets(
+  description,
+  body,
+  variant: TargetPlatformVariant.only(TargetPlatform.windows),
+);
+
+void main() {
+  _winTest('a notch over the vertical scrollbar animates, with the bar on the '
+      'body on every frame', (tester) async {
+    await _pump(tester, _spring);
+
+    await _wheel(tester, _overVerticalBar(tester), const Offset(0, 60));
+    await tester.pump();
+    expect(_body(tester).pixels, 0);
+
+    final seen = <double>[];
+    while (tester.binding.hasScheduledFrame) {
+      await tester.pump(_frame);
+      seen.add(_body(tester).pixels);
+      expect(_bar(tester, Axis.vertical).pixels, _body(tester).pixels);
+    }
+    expect(seen.where((p) => p > 0 && p < 60), isNotEmpty);
+    expect(_body(tester).pixels, 60);
+  });
+
+  _winTest('a sideways notch over the horizontal scrollbar animates', (
+    tester,
+  ) async {
+    await _pump(tester, _spring);
+    final rowStart = tester.getTopLeft(find.text('parent')).dx;
+
+    await _wheel(tester, _overHorizontalBar(tester), const Offset(60, 0));
+    await tester.pump();
+    expect(_bar(tester, Axis.horizontal).pixels, 0);
+
+    final seen = <double>[];
+    while (tester.binding.hasScheduledFrame) {
+      await tester.pump(_frame);
+      seen.add(_bar(tester, Axis.horizontal).pixels);
+    }
+    expect(seen.where((p) => p > 0 && p < 60), isNotEmpty);
+    expect(_bar(tester, Axis.horizontal).pixels, 60);
+    expect(tester.getTopLeft(find.text('parent')).dx, rowStart - 60);
+  });
+
+  _winTest('wheelMotion null moves at once over a scrollbar', (tester) async {
+    await _pump(tester, null);
+
+    await _wheel(tester, _overVerticalBar(tester), const Offset(0, 60));
+    await tester.pump();
+    expect(_body(tester).pixels, 60);
+    expect(_bar(tester, Axis.vertical).pixels, 60);
+  });
+
+  for (final (name, first, second) in [
+    ('the body, then the scrollbar', _overBody, _overVerticalBar),
+    ('the scrollbar, then the body', _overVerticalBar, _overBody),
+    ('the scrollbar twice', _overVerticalBar, _overVerticalBar),
+  ]) {
+    _winTest('notches over $name add to one target', (tester) async {
+      await _pump(tester, _spring);
+
+      await _wheel(tester, first(tester), const Offset(0, 120));
+      await tester.pump();
+      await tester.pump(_frame);
+      await tester.pump(_frame);
+      final mid = _body(tester).pixels;
+      expect(mid, greaterThan(0));
+      expect(mid, lessThan(120));
+
+      await _wheel(tester, second(tester), const Offset(0, 120));
+      await tester.pumpAndSettle();
+      expect(_body(tester).pixels, 240);
+      expect(_bar(tester, Axis.vertical).pixels, 240);
+    });
+  }
+
+  _winTest('changing wheelMotion keeps the offset and applies to the next '
+      'notch over a scrollbar', (tester) async {
+    await _pump(tester, _spring);
+    await _wheel(tester, _overVerticalBar(tester), const Offset(0, 120));
+    await tester.pumpAndSettle();
+    expect(_body(tester).pixels, 120);
+
+    await _pump(tester, null);
+    expect(_body(tester).pixels, 120);
+
+    await _wheel(tester, _overVerticalBar(tester), const Offset(0, 120));
+    await tester.pump();
+    expect(_body(tester).pixels, 240);
+  });
+
+  for (final (name, over) in [
+    ('the scrollbar', _overVerticalBar),
+    ('the body', _overBody),
+  ]) {
+    _winTest('frames running during a thumb drag leave the drag in charge, '
+        'with the motion started over $name', (tester) async {
+      await _pump(tester, _spring);
+      final at = Offset(_overVerticalBar(tester).dx, _view(tester).top + 5);
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(pointer.hover(at));
+      await tester.pumpAndSettle();
+
+      // A second device turns the wheel where [over] says, as the thumb is
+      // pressed by the first.
+      final wheel = TestPointer(2, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(wheel.hover(over(tester)));
+      await tester.sendEventToBinding(wheel.scroll(const Offset(0, 600)));
+      await tester.pump();
+      await tester.pump(_frame);
+      await tester.pump(_frame);
+      expect(_body(tester).pixels, lessThan(600));
+
+      await tester.sendEventToBinding(pointer.down(at));
+      await tester.pump(_frame);
+      await tester.sendEventToBinding(pointer.move(at + const Offset(0, 10)));
+      await tester.pump(_frame);
+      await tester.sendEventToBinding(pointer.move(at + const Offset(0, 20)));
+      await tester.pump(_frame);
+      final before = _body(tester).pixels;
+
+      await tester.sendEventToBinding(pointer.move(at + const Offset(0, 30)));
+      await tester.pump(_frame);
+      final moved = _body(tester).pixels;
+      expect(moved, greaterThan(before + 100));
+
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(_body(tester).pixels, moved);
+      await tester.sendEventToBinding(pointer.up());
+      await tester.pumpAndSettle();
+      expect(_body(tester).pixels, moved);
+      expect(_bar(tester, Axis.vertical).pixels, moved);
+    });
+  }
+
+  _winTest('a track tap during a motion takes over from the motion', (
+    tester,
+  ) async {
+    await _pump(tester, _spring);
+    final at = Offset(_overVerticalBar(tester).dx, _view(tester).bottom - 40);
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(at));
+    await tester.pumpAndSettle();
+
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 6000)));
+    await tester.pump();
+    await tester.pump(_frame);
+    await tester.pump(_frame);
+    final mid = _body(tester).pixels;
+    expect(mid, lessThan(1000));
+
+    await tester.sendEventToBinding(pointer.down(at));
+    await tester.pump(_frame);
+    await tester.sendEventToBinding(pointer.up());
+    await tester.pumpAndSettle();
+
+    final end = _body(tester).pixels;
+    expect(end, greaterThan(mid));
+    expect(end, lessThan(2000), reason: 'the wheel target is 6000');
+    expect(_bar(tester, Axis.vertical).pixels, end);
+  });
+
+  _winTest('a notch over a scrollbar that has faded in animates', (
+    tester,
+  ) async {
+    await _pump(tester, _spring);
+    final at = _overVerticalBar(tester);
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(at));
+    await tester.pumpAndSettle();
+
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 60)));
+    await tester.pump();
+    expect(_body(tester).pixels, 0);
+    await tester.pump(_frame);
+    await tester.pump(_frame);
+    final mid = _body(tester).pixels;
+    expect(mid, greaterThan(0));
+    expect(mid, lessThan(60));
+
+    await tester.pumpAndSettle();
+    expect(_body(tester).pixels, 60);
+    expect(_bar(tester, Axis.vertical).pixels, 60);
+  });
+
+  _winTest('a wheel event that is not from a mouse moves at once over a '
+      'scrollbar, as it does over the body', (tester) async {
+    for (final at in [_overBody, _overVerticalBar]) {
+      await _pump(tester, _spring);
+      final start = _body(tester).pixels;
+
+      await _wheel(
+        tester,
+        at(tester),
+        const Offset(0, 60),
+        kind: PointerDeviceKind.trackpad,
+      );
+      await tester.pump();
+      expect(_body(tester).pixels, start + 60);
+    }
+  });
+}

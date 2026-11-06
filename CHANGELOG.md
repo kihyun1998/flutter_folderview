@@ -1,3 +1,10 @@
+## Unreleased
+
+- **feat**: a mouse wheel over a scrollbar moves the view with `wheelMotion`, as it does over the rows ([#168](https://github.com/kihyun1998/flutter_folderview/issues/168)). Measured with a 400 ms spring: one 60 px notch over the vertical scrollbar moved the view 60 px in the first frame, and now moves it 0 in that frame and settles at 60. No new argument.
+  - **Also fixed:** a notch over a scrollbar during a motion started over the rows no longer loses the rest of that motion. 120 px over the rows, then 120 px over the scrollbar during the motion, settled at about 131 and now settles at 240.
+  - **Also fixed:** a thumb press or a track tap during a wheel's motion now stops the motion. Before, the motion cancelled the drag or the tap and the view ran on to the wheel's target.
+  - **What a consumer sees differently.** A widget test that wheel-scrolls over a scrollbar and reads the offset after one frame needs to pump until settled. With `wheelMotion: null`, nothing changes.
+
 ## 0.12.0
 
 - **feat**: a mouse-wheel notch over the view animates to its target instead of jumping ([#100](https://github.com/kihyun1998/flutter_folderview/issues/100)). The main vertical and horizontal scroll controllers are now `SmoothScrollController`s from `flutter_smooth_wheel_scroll`, moving as `WheelMotion.spring()`: 400 ms, no bounce. The scrollbars follow the list on every frame of a motion. Trackpad scrolling, dragging, the scrollbar and programmatic jumps behave as before.

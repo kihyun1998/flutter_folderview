@@ -130,7 +130,8 @@ class FolderView<T> extends StatefulWidget {
   /// Only the wheel is animated: trackpad scrolling, dragging a scrollbar, and
   /// the jumps that keep a Node in place on expand, collapse or a [scale]
   /// change move the view at once, and stop a motion in progress. A wheel
-  /// turned over a scrollbar moves it at once too.
+  /// turned over a scrollbar moves the view as it does over the rows, and adds
+  /// to the same target.
   ///
   /// How far a notch travels is not set here; that is app-wide, through
   /// `SmoothWheelBinding` in `flutter_smooth_wheel_scroll`.

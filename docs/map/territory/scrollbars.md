@@ -13,7 +13,7 @@ Read from the bar widgets and `folderViewThumbTheme`.
 - **Shown on hover.** `_FolderViewContentState.build` tracks hover of the whole view in `_isHover`; each bar fades between `hoverOpacity` and `nonHoverOpacity` over `hoverAnimationDuration`. With `light()`'s `nonHoverOpacity` of 0 the bars are invisible until the pointer is over the tree.
 - **Layout.** A bar is built only when its axis needs scrolling. When the horizontal bar is present, a `trackWidth`-high spacer is reserved under the list and the vertical bar stops above it.
 - **Unscaled.** `FlutterFolderViewTheme.scale` does not delegate to `scrollbarTheme`, so the bars receive the theme as given ([chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md)).
-- A Scale Modifier + wheel over a bar is claimed by `ModifierWheelGuard` while blocking is in effect ([scale-input](scale-input.md)).
+- A Scale Modifier + wheel over a bar is claimed by `ModifierWheelGuard` while blocking is in effect, until the thumb has faded in ([scale-input](scale-input.md)).
 
 ## Code
 - `lib/widgets/folder_view_vertical_scrollbar.dart` — `FolderViewVerticalScrollbar`
@@ -33,7 +33,7 @@ Material's `Scrollbar` and `widgets/scrollbar.dart` thumb placement, read from t
 - [scroll-sync](scroll-sync.md) — a bar's offset is mirrored to the list, clamped to the bar's own extent.
 - [row-geometry](row-geometry.md) — `contentHeight` and `contentWidth` size the bars' scroll content.
 - [scale-input](scale-input.md) — the guard inside each bar decides whether a modifier wheel scrolls it.
-- [wheel-motion](wheel-motion.md) — a wheel over a bar is not animated, because the bar's controller is a plain `ScrollController`.
+- [wheel-motion](wheel-motion.md) — a wheel over a bar is handed to the main controller of that axis.
 
 ## Known holes / open
 - **Not covered: iOS.** There Material's `Scrollbar` builds a `CupertinoScrollbar` from its own constructor arguments. The bars pass thickness, radius and thumb colour only through `ScrollbarThemeData`, so on iOS those three are ignored, and the #122 cap does not apply. Read from the code, not probed. Tracked: #147.
