@@ -75,10 +75,10 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
     _sc21 = SmoothScrollController(motion: _motion);
 
     /// Vertical scrollbar controller
-    _sc12 = ScrollController(initialScrollOffset: 0.0);
+    _sc12 = _ScrollbarController(main: _sc11!);
 
     /// Horizontal scrollbar controller
-    _sc22 = ScrollController(initialScrollOffset: 0.0);
+    _sc22 = _ScrollbarController(main: _sc21!);
 
     _syncScrollControllers(_sc11!, _sc12!);
     _syncScrollControllers(_sc21!, _sc22!);
@@ -129,4 +129,68 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
   @override
   Widget build(BuildContext context) =>
       widget.builder(context, _sc11, _sc12, _sc21, _sc22);
+}
+
+/// A scrollbar's controller: wheel input goes to [main], and a press or a track
+/// tap stays on this controller and stops [main]'s motion.
+class _ScrollbarController extends ScrollController {
+  _ScrollbarController({required this.main});
+
+  final ScrollController main;
+
+  @override
+  ScrollPosition createScrollPosition(
+    ScrollPhysics physics,
+    ScrollContext context,
+    ScrollPosition? oldPosition,
+  ) {
+    return _ScrollbarPosition(
+      main: main,
+      physics: physics,
+      context: context,
+      initialPixels: initialScrollOffset,
+      keepScrollOffset: keepScrollOffset,
+      oldPosition: oldPosition,
+      debugLabel: debugLabel,
+    );
+  }
+}
+
+class _ScrollbarPosition extends ScrollPositionWithSingleContext {
+  _ScrollbarPosition({
+    required this.main,
+    required super.physics,
+    required super.context,
+    super.initialPixels,
+    super.keepScrollOffset,
+    super.oldPosition,
+    super.debugLabel,
+  });
+
+  final ScrollController main;
+
+  @override
+  void pointerScroll(double delta) {
+    if (main.hasClients) main.position.pointerScroll(delta);
+  }
+
+  @override
+  ScrollHoldController hold(VoidCallback holdCancelCallback) {
+    _stopMainMotion();
+    return super.hold(holdCancelCallback);
+  }
+
+  @override
+  Future<void> animateTo(
+    double to, {
+    required Duration duration,
+    required Curve curve,
+  }) {
+    _stopMainMotion();
+    return super.animateTo(to, duration: duration, curve: curve);
+  }
+
+  void _stopMainMotion() {
+    if (main.hasClients) main.position.jumpTo(main.position.pixels);
+  }
 }

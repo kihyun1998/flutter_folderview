@@ -1545,9 +1545,9 @@ class EverySettingHost extends SettingsHost {
     ),
     const SizedBox(height: 12),
     const Text(
-      'Turn the mouse wheel over the tree. Only the wheel animates: a '
-      'trackpad, a dragged scrollbar, and a wheel turned over a scrollbar '
-      'move the view at once. How far one notch travels is app-wide, through '
+      'Turn the mouse wheel over the tree or a scrollbar. Only the wheel '
+      'animates: a trackpad and a dragged scrollbar move the view at once. '
+      'How far one notch travels is app-wide, through '
       'SmoothWheelBinding in flutter_smooth_wheel_scroll, and is not set '
       'here. Choose Generated data with large counts for room to scroll.',
       key: Key('wheel-note'),
