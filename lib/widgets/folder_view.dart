@@ -81,8 +81,7 @@ class FolderView<T> extends StatefulWidget {
   /// view, and no scale is proposed. `true` with no [onScaleChanged] blocks
   /// the scroll and proposes nothing.
   ///
-  /// The block applies to the rows. A wheel over the vertical scrollbar
-  /// still scrolls the view.
+  /// The block applies to the rows and both scrollbars.
   final bool? blockModifierScroll;
 
   /// Builds a card shown while the pointer is anywhere over a Node's rendered

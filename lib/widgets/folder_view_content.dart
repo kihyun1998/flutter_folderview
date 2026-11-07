@@ -404,6 +404,9 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                 child: SingleChildScrollView(
                   controller: widget.horizontalController,
                   scrollDirection: Axis.horizontal,
+                  physics: widget.blockModifierScroll
+                      ? const _ModifierKeyAwareScrollPhysics()
+                      : null,
                   child: SizedBox(width: widget.contentWidth),
                 ),
               ),
@@ -418,7 +421,6 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                     contentHeight: widget.contentHeight,
                     needsHorizontalScroll: widget.needsHorizontalScroll,
                     scrollbarTheme: widget.theme.scrollbarTheme,
-                    blockModifierWheel: widget.blockModifierScroll,
                   ),
                 ),
 
@@ -433,7 +435,6 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                             widget.horizontalBarController,
                         contentWidth: widget.contentWidth,
                         scrollbarTheme: widget.theme.scrollbarTheme,
-                        blockModifierWheel: widget.blockModifierScroll,
                       ),
                 ),
             ],

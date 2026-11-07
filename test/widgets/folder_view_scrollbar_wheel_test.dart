@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -534,6 +535,205 @@ void main() {
 
     expect(_body(tester).pixels, greaterThan(before));
     expect(_bar(tester, Axis.vertical).pixels, _body(tester).pixels);
+  });
+
+  for (final fadedIn in [false, true]) {
+    _winTest('Shift with a vertical notch over the horizontal scrollbar '
+        'scrolls sideways, ${fadedIn ? 'with' : 'before'} the thumb faded in', (
+      tester,
+    ) async {
+      await _pump(tester, null);
+      final rowStart = tester.getTopLeft(find.text('parent')).dx;
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(
+        pointer.hover(_overHorizontalBar(tester)),
+      );
+      if (fadedIn) await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendEventToBinding(pointer.scroll(const Offset(0, 60)));
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+
+      expect(_bar(tester, Axis.horizontal).pixels, 60);
+      expect(tester.getTopLeft(find.text('parent')).dx, rowStart - 60);
+      expect(_body(tester).pixels, 0);
+    });
+  }
+
+  for (final (name, shift, kind) in [
+    ('without Shift', false, PointerDeviceKind.mouse),
+    ('from a trackpad, with Shift', true, PointerDeviceKind.trackpad),
+  ]) {
+    _winTest('a vertical notch $name over a faded-in horizontal scrollbar '
+        'moves nothing', (tester) async {
+      await _pump(tester, null);
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(
+        pointer.hover(_overHorizontalBar(tester)),
+      );
+      await tester.pumpAndSettle();
+
+      if (shift) await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      final signal = TestPointer(2, kind);
+      if (kind == PointerDeviceKind.mouse) {
+        await tester.sendEventToBinding(
+          signal.hover(_overHorizontalBar(tester)),
+        );
+      } else {
+        signal.addPointer(location: _overHorizontalBar(tester));
+      }
+      await tester.sendEventToBinding(signal.scroll(const Offset(0, 60)));
+      await tester.pumpAndSettle();
+      if (shift) await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+
+      expect(_bar(tester, Axis.horizontal).pixels, 0);
+      expect(_body(tester).pixels, 0);
+    });
+  }
+
+  _winTest('Shift with a vertical notch during a horizontal thumb drag leaves '
+      'the drag in charge', (tester) async {
+    await _pump(tester, null);
+    final thumb = Offset(
+      _view(tester).left + 10,
+      _overHorizontalBar(tester).dy,
+    );
+    final drag = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(drag.hover(thumb));
+    await tester.pumpAndSettle();
+    await tester.sendEventToBinding(drag.down(thumb));
+    await tester.pump(_frame);
+    await tester.sendEventToBinding(drag.move(thumb + const Offset(20, 0)));
+    await tester.pump(_frame);
+    final bar = _bar(tester, Axis.horizontal);
+    final dragged = bar.pixels;
+    expect(dragged, greaterThan(0));
+
+    final wheel = TestPointer(2, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(wheel.hover(_overHorizontalBar(tester)));
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+    await tester.sendEventToBinding(wheel.scroll(const Offset(0, 60)));
+    await tester.pump(_frame);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+    expect(bar.pixels, dragged);
+
+    await tester.sendEventToBinding(drag.move(thumb + const Offset(40, 0)));
+    await tester.pump(_frame);
+    expect(bar.pixels, closeTo(2 * dragged, 0.5));
+    await tester.sendEventToBinding(drag.up());
+    await tester.pumpAndSettle();
+  });
+
+  for (final fadedIn in [false, true]) {
+    _winTest('right to left, Shift with a vertical notch over the horizontal '
+        'scrollbar moves it as Flutter does, ${fadedIn ? 'with' : 'before'} '
+        'the thumb faded in', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Directionality(
+            textDirection: TextDirection.rtl,
+            child: Scaffold(
+              body: Center(
+                child: SizedBox(
+                  width: 400,
+                  height: 300,
+                  child: FolderView<String>(
+                    data: _nodes,
+                    mode: ViewMode.tree,
+                    expandedNodeIds: const {'p'},
+                    wheelMotion: null,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final bar = _bar(tester, Axis.horizontal);
+      bar.jumpTo(300);
+      await tester.pump();
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(
+        pointer.hover(_overHorizontalBar(tester)),
+      );
+      if (fadedIn) await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendEventToBinding(pointer.scroll(const Offset(0, 60)));
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+
+      expect(bar.pixels, 240);
+    });
+  }
+
+  _winTest('Shift with a vertical notch over the horizontal scrollbar at its '
+      'end reaches an enclosing horizontal page', (tester) async {
+    final page = ScrollController();
+    addTearDown(page.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            controller: page,
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 400,
+                  height: 300,
+                  child: FolderView<String>(
+                    data: _nodes,
+                    mode: ViewMode.tree,
+                    expandedNodeIds: const {'p'},
+                    wheelMotion: null,
+                  ),
+                ),
+                const SizedBox(width: 2000),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final bar = _bar(tester, Axis.horizontal);
+    bar.jumpTo(bar.maxScrollExtent);
+    await tester.pump();
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(_overHorizontalBar(tester)));
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 60)));
+    await tester.pumpAndSettle();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+
+    expect(page.offset, 60);
+    expect(bar.pixels, bar.maxScrollExtent);
+  });
+
+  _winTest('Shift with a vertical notch over a faded-in horizontal scrollbar '
+      'animates with wheelMotion', (tester) async {
+    await _pump(tester, _spring);
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(_overHorizontalBar(tester)));
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 60)));
+    await tester.pump();
+    await tester.pump(_frame);
+    await tester.pump(_frame);
+    final mid = _bar(tester, Axis.horizontal).pixels;
+    await tester.pumpAndSettle();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+
+    expect(mid, greaterThan(0));
+    expect(mid, lessThan(60));
+    expect(_bar(tester, Axis.horizontal).pixels, 60);
   });
 
   _winTest('a notch over a scrollbar that has faded in animates', (
