@@ -31,7 +31,11 @@ final List<Node<String>> _nodes = [
 
 final GlobalKey _viewKey = GlobalKey();
 
-Future<void> _pump(WidgetTester tester, WheelMotion? wheelMotion) async {
+Future<void> _pump(
+  WidgetTester tester,
+  WheelMotion? wheelMotion, {
+  double rowSpacing = 0,
+}) async {
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -45,6 +49,9 @@ Future<void> _pump(WidgetTester tester, WheelMotion? wheelMotion) async {
               mode: ViewMode.tree,
               expandedNodeIds: const {'p'},
               wheelMotion: wheelMotion,
+              theme: FlutterFolderViewTheme<String>.light().copyWith(
+                rowSpacing: rowSpacing,
+              ),
             ),
           ),
         ),
@@ -102,6 +109,20 @@ void _winTest(String description, WidgetTesterCallback body) => testWidgets(
   body,
   variant: TargetPlatformVariant.only(TargetPlatform.windows),
 );
+
+/// Presses and releases the mouse at [at], leaving the track tap's animation
+/// to the frames that follow.
+Future<void> _trackClick(
+  WidgetTester tester,
+  TestPointer pointer,
+  Offset at,
+) async {
+  await tester.sendEventToBinding(pointer.hover(at));
+  await tester.pump(_frame);
+  await tester.sendEventToBinding(pointer.down(at));
+  await tester.pump(_frame);
+  await tester.sendEventToBinding(pointer.up());
+}
 
 void main() {
   _winTest('a notch over the vertical scrollbar animates, with the bar on the '
@@ -258,6 +279,261 @@ void main() {
     expect(end, greaterThan(mid));
     expect(end, lessThan(2000), reason: 'the wheel target is 6000');
     expect(_bar(tester, Axis.vertical).pixels, end);
+  });
+
+  _winTest('a notch during a track tap on the vertical scrollbar ends the '
+      'animation and moves on from where the view stands', (tester) async {
+    await _pump(tester, _spring);
+    final at = Offset(_overVerticalBar(tester).dx, _view(tester).bottom - 40);
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(at));
+    await tester.pumpAndSettle();
+
+    await _trackClick(tester, pointer, at);
+    await tester.pump(_frame);
+    await tester.pump(_frame);
+    final bar = _bar(tester, Axis.vertical);
+    expect(bar.isScrollingNotifier.value, isTrue);
+    final mid = _body(tester).pixels;
+    expect(mid, greaterThan(0));
+
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 60)));
+    await tester.pumpAndSettle();
+
+    expect(_body(tester).pixels, closeTo(mid + 60, 0.001));
+    expect(bar.pixels, _body(tester).pixels);
+  });
+
+  _winTest('a notch during a track tap on the horizontal scrollbar ends the '
+      'animation and moves on from where the view stands', (tester) async {
+    await _pump(tester, _spring);
+    final rowStart = tester.getTopLeft(find.text('parent')).dx;
+    final at = Offset(_view(tester).right - 40, _overHorizontalBar(tester).dy);
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(at));
+    await tester.pumpAndSettle();
+
+    await _trackClick(tester, pointer, at);
+    await tester.pump(_frame);
+    await tester.pump(_frame);
+    final bar = _bar(tester, Axis.horizontal);
+    expect(bar.isScrollingNotifier.value, isTrue);
+    final mid = bar.pixels;
+    expect(mid, greaterThan(0));
+
+    await tester.sendEventToBinding(pointer.scroll(const Offset(60, 0)));
+    await tester.pumpAndSettle();
+
+    expect(bar.pixels, closeTo(mid + 60, 0.001));
+    expect(
+      tester.getTopLeft(find.text('parent')).dx,
+      closeTo(rowStart - bar.pixels, 0.001),
+    );
+  });
+
+  group('with rowSpacing, wheeled past the end over the scrollbar', () {
+    Future<TestPointer> pastTheEnd(WidgetTester tester) async {
+      await _pump(tester, _spring, rowSpacing: 8);
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(pointer.hover(_overVerticalBar(tester)));
+      await tester.pumpAndSettle();
+      await tester.sendEventToBinding(pointer.scroll(const Offset(0, 100000)));
+      await tester.pumpAndSettle();
+      return pointer;
+    }
+
+    Future<void> trackTapNearTheTop(
+      WidgetTester tester,
+      TestPointer pointer,
+    ) async {
+      await _trackClick(
+        tester,
+        pointer,
+        Offset(_overVerticalBar(tester).dx, _view(tester).top + 40),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    _winTest('the scrollbar ends where the body ends', (tester) async {
+      await pastTheEnd(tester);
+      final end = _body(tester).maxScrollExtent;
+      expect(_body(tester).pixels, end);
+      expect(_bar(tester, Axis.vertical).pixels, end);
+    });
+
+    _winTest('a track tap moves the body with the scrollbar', (tester) async {
+      final pointer = await pastTheEnd(tester);
+      await trackTapNearTheTop(tester, pointer);
+      expect(_body(tester).pixels, lessThan(_body(tester).maxScrollExtent));
+      expect(_bar(tester, Axis.vertical).pixels, _body(tester).pixels);
+    });
+
+    _winTest('a notch after that track tap moves both by the notch', (
+      tester,
+    ) async {
+      final pointer = await pastTheEnd(tester);
+      await trackTapNearTheTop(tester, pointer);
+      final clicked = _body(tester).pixels;
+      await tester.sendEventToBinding(pointer.scroll(const Offset(0, 60)));
+      await tester.pumpAndSettle();
+      expect(_body(tester).pixels, clicked + 60);
+      expect(_bar(tester, Axis.vertical).pixels, clicked + 60);
+    });
+  });
+
+  group('with rowSpacing, the bar agrees with the list', () {
+    final theme = FlutterFolderViewTheme<String>.light().copyWith(
+      rowSpacing: 8,
+    );
+    List<Node<String>> rows(int count) => [
+      for (var i = 0; i < count; i++)
+        Node<String>(id: 'c$i', label: 'c$i', type: NodeType.parent),
+    ];
+    // One list across pumps: a new one would run the bulk anchor's bar re-sync.
+    final many = rows(40);
+    final few = rows(10);
+    double listHeight(int count) {
+      final padding = theme.spacingTheme.contentPadding;
+      return count * (theme.rowHeight + theme.rowSpacing) + padding.vertical;
+    }
+
+    FolderView<String> view(List<Node<String>> data) => FolderView<String>(
+      data: data,
+      mode: ViewMode.tree,
+      expandedNodeIds: const {},
+      wheelMotion: null,
+      theme: theme,
+    );
+
+    _winTest('a list overflowing by less than rowSpacing has a vertical bar', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 400,
+                height: listHeight(few.length) - 4,
+                child: view(few),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(_body(tester).maxScrollExtent, 4);
+      expect(_bar(tester, Axis.vertical).maxScrollExtent, 4);
+    });
+
+    _winTest('a bar moved after a wheel to the end moves the list', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(width: 400, height: 300, child: view(many)),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await _wheel(tester, _overBody(tester), const Offset(0, 100000));
+      await tester.pumpAndSettle();
+
+      final bar = _bar(tester, Axis.vertical);
+      final end = _body(tester).maxScrollExtent;
+      expect(bar.pixels, end);
+
+      bar.jumpTo(end - 100);
+      await tester.pump();
+      expect(_body(tester).pixels, end - 100);
+    });
+
+    _winTest('inside a page, a notch over the bar at the end, after a resize, '
+        'reaches the page', (tester) async {
+      final page = ScrollController();
+      addTearDown(page.dispose);
+      Widget framed(double height) => MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            controller: page,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 100),
+                  child: SizedBox(height: height, child: view(many)),
+                ),
+                const SizedBox(height: 2000),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpWidget(framed(300));
+      await tester.pumpAndSettle();
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(pointer.hover(_overVerticalBar(tester)));
+      await tester.pumpAndSettle();
+      await tester.sendEventToBinding(pointer.scroll(const Offset(0, 100000)));
+      await tester.pumpAndSettle();
+      page.jumpTo(0);
+
+      await tester.pumpWidget(framed(320));
+      await tester.pumpAndSettle();
+      final end = _body(tester).maxScrollExtent;
+      expect(_body(tester).pixels, end);
+      expect(_bar(tester, Axis.vertical).pixels, end);
+
+      await tester.sendEventToBinding(pointer.scroll(const Offset(0, 40)));
+      await tester.pumpAndSettle();
+      expect(page.offset, 40);
+      expect(_body(tester).pixels, end);
+    });
+  });
+
+  _winTest('a bulk expand from the end leaves the scrollbar on the body', (
+    tester,
+  ) async {
+    List<Node<String>> folders() => [
+      for (var f = 0; f < 100; f++)
+        Node<String>(
+          id: 'f$f',
+          label: 'f$f',
+          type: NodeType.parent,
+          children: [
+            for (var c = 0; c < 20; c++)
+              Node<String>(id: 'f$f-$c', label: 'c$c', type: NodeType.child),
+          ],
+        ),
+    ];
+    Widget view(Set<String> expanded) => MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 400,
+          height: 300,
+          child: FolderView<String>(
+            data: folders(),
+            mode: ViewMode.tree,
+            expandedNodeIds: expanded,
+            wheelMotion: null,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpWidget(view({'f0', 'f1', 'f2'}));
+    await tester.pumpAndSettle();
+    await _wheel(tester, _overBody(tester), const Offset(0, 100000));
+    await tester.pumpAndSettle();
+    final before = _body(tester).pixels;
+
+    await tester.pumpWidget(view({for (var f = 0; f < 100; f++) 'f$f'}));
+    await tester.pumpAndSettle();
+
+    expect(_body(tester).pixels, greaterThan(before));
+    expect(_bar(tester, Axis.vertical).pixels, _body(tester).pixels);
   });
 
   _winTest('a notch over a scrollbar that has faded in animates', (

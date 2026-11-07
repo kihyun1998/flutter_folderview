@@ -276,10 +276,10 @@ class _FolderViewState<T> extends State<FolderView<T>> {
                   change: flattenResult.change,
                 );
 
-                if (!_blockModifierScroll) return content;
-
                 return Listener(
-                  onPointerSignal: _handlePointerSignalForScale,
+                  onPointerSignal: _blockModifierScroll
+                      ? _handlePointerSignalForScale
+                      : null,
                   child: content,
                 );
               },

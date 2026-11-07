@@ -20,4 +20,32 @@ void main() {
       );
     });
   });
+
+  group('SizeService.calculateContentHeight', () {
+    test('counts rowHeight + rowSpacing for every row, plus the padding', () {
+      expect(
+        SizeService.calculateContentHeight(
+          itemCount: 3,
+          rowHeight: 40,
+          rowSpacing: 8,
+          topPadding: 5,
+          bottomPadding: 7,
+        ),
+        3 * 48 + 12,
+      );
+    });
+
+    test('with no rows is the padding alone', () {
+      expect(
+        SizeService.calculateContentHeight(
+          itemCount: 0,
+          rowHeight: 40,
+          rowSpacing: 8,
+          topPadding: 5,
+          bottomPadding: 7,
+        ),
+        12,
+      );
+    });
+  });
 }

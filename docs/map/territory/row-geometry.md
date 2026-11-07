@@ -14,7 +14,7 @@ Read from `RowMetrics`, `SizeService` and `_FolderViewState.build`.
 - `maxWidth` walks **all** nodes, including collapsed ones, so expanding never changes `contentWidth`. It adds the left content padding once. A tier without a per-node `textStyleResolver` merges its style once (`tierStyle`), not per node.
 - Re-measured in `build` whenever an input differs: the `data` instance, the *effective* theme instance (from `theme:` or an ancestor `FolderViewTheme`), `scale`, or the ambient `bodyMedium` (by value). The comparison lives in `build`, not `didUpdateWidget`, because an ancestor theme and `bodyMedium` change without this widget's props changing. Data and theme compare by identity: callers own them and rebuild them deliberately, and an equal-but-new instance costs one extra measurement.
 - `SizeService.clampContentWidth` caps the width at 3× the viewport, and does not re-multiply by Scale (the measured width is already scaled). Rows wider than the cap ellipsize.
-- Height is O(1) in `SizeService.calculateContentHeight`; the `ListView` uses a fixed `itemExtent`. The two disagree by one `rowSpacing` ([row-extent](../invariant/row-extent.md)).
+- Height is O(1) in `SizeService.calculateContentHeight`; the `ListView` uses a fixed `itemExtent`. Both total `rowHeight + rowSpacing` per row ([row-extent](../invariant/row-extent.md)).
 - Label widths are cached in a **static** map keyed by label, `fontSize`, `fontWeight` and `letterSpacing` (`_textWidthCache`). It is never cleared.
 
 ## Code
@@ -28,12 +28,12 @@ Read from `RowMetrics`, `SizeService` and `_FolderViewState.build`.
 ## Cross-cutting invariants
 - [measured-equals-rendered](../invariant/measured-equals-rendered.md) — this territory is the "measured" half.
 - [row-wider-than-viewport](../invariant/row-wider-than-viewport.md) — `contentWidth` is the source of the width.
-- [row-extent](../invariant/row-extent.md) — `calculateContentHeight` is the site that disagrees.
+- [row-extent](../invariant/row-extent.md) — `calculateContentHeight` totals this unit.
 
 ## Blast radius
 - [tier-rendering](tier-rendering.md) — anything a renderer draws that widens a row must be measured here, and vice versa.
 - [scroll-sync](scroll-sync.md) — `contentWidth > viewport` turns on horizontal scroll and the per-row translate.
-- [scrollbars](scrollbars.md) — `contentHeight` and `contentWidth` are the bars' scroll extents.
+- [scrollbars](scrollbars.md) — `contentHeight` and `contentWidth` size the bars' scroll content.
 - [scale](scale.md) — a Scale change is one of the four re-measure inputs, and measurement reads the scaled theme.
 - [theme-composition](theme-composition.md) — the effective theme's identity is a trigger, however the theme arrives.
 - [label-tooltip](label-tooltip.md) — whether a label is ellipsized decides the rect a `child`-anchored tooltip aims at.
@@ -44,4 +44,3 @@ Read from `RowMetrics`, `SizeService` and `_FolderViewState.build`.
 - **`selectedTextStyle` is not measured.** `ChildNodeRenderer` merges it at render time (for example, bold on a selected Child). A remaining case of [measured-equals-rendered](../invariant/measured-equals-rendered.md). Read from the code; not probed.
 - The static cache key omits `fontFamily` and `fontStyle`, so two styles that differ only there share a cached width. Read from the code; not probed.
 - Tree mode is measured at folder-mode depths ([view-mode-projection](view-mode-projection.md)).
-- `calculateContentHeight` counts `rowSpacing` n−1 times against the list's n ([row-extent](../invariant/row-extent.md)). Not intended (maintainer, 2026-10-25). Read from the code; not probed. Tracked: #157.

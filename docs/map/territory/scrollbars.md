@@ -13,7 +13,7 @@ Read from the bar widgets and `folderViewThumbTheme`.
 - **Shown on hover.** `_FolderViewContentState.build` tracks hover of the whole view in `_isHover`; each bar fades between `hoverOpacity` and `nonHoverOpacity` over `hoverAnimationDuration`. With `light()`'s `nonHoverOpacity` of 0 the bars are invisible until the pointer is over the tree.
 - **Layout.** A bar is built only when its axis needs scrolling. When the horizontal bar is present, a `trackWidth`-high spacer is reserved under the list and the vertical bar stops above it.
 - **Unscaled.** `FlutterFolderViewTheme.scale` does not delegate to `scrollbarTheme`, so the bars receive the theme as given ([chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md)).
-- A Scale Modifier + wheel over a bar is claimed by `ModifierWheelGuard` while blocking is in effect, until the thumb has faded in ([scale-input](scale-input.md)).
+- A Scale Modifier + wheel over a bar is claimed by `ModifierWheelGuard` while blocking is in effect, until the thumb has faded in; after that, see [scale-input](scale-input.md).
 
 ## Code
 - `lib/widgets/folder_view_vertical_scrollbar.dart` — `FolderViewVerticalScrollbar`
@@ -27,13 +27,14 @@ Material's `Scrollbar` and `widgets/scrollbar.dart` thumb placement, read from t
 
 ## Cross-cutting invariants
 - [chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md) — `scrollbarTheme` is the one sub-theme `FlutterFolderViewTheme.scale` skips.
-- [row-extent](../invariant/row-extent.md) — the vertical bar's extent is `contentHeight`, which disagrees with the list's.
+- [row-extent](../invariant/row-extent.md) — the vertical bar's content is `contentHeight` tall, the list's extent.
 
 ## Blast radius
-- [scroll-sync](scroll-sync.md) — a bar's offset is mirrored to the list, clamped to the bar's own extent.
+- [scroll-sync](scroll-sync.md) — a bar's offset is mirrored to the list, clamped to the end its position reports, which is the list's.
 - [row-geometry](row-geometry.md) — `contentHeight` and `contentWidth` size the bars' scroll content.
 - [scale-input](scale-input.md) — the guard inside each bar decides whether a modifier wheel scrolls it.
 - [wheel-motion](wheel-motion.md) — a wheel over a bar is handed to the main controller of that axis.
 
 ## Known holes / open
 - **Not covered: iOS.** There Material's `Scrollbar` builds a `CupertinoScrollbar` from its own constructor arguments. The bars pass thickness, radius and thumb colour only through `ScrollbarThemeData`, so on iOS those three are ignored, and the #122 cap does not apply. Read from the code, not probed. Tracked: #147.
+- **The list can scroll with no vertical bar.** `needsVerticalScroll` compares `contentHeight` with the whole height, and the list's viewport is smaller by the horizontal bar's spacer: at height 324 the list's end is 12 and there is no vertical bar (probed 2026-11-07). Tracked: #177.
