@@ -18,7 +18,7 @@ Read from `SyncedScrollControllers` and `_FolderViewContentState`.
 
 ## Code
 - `lib/widgets/synced_scroll_controllers.dart` — `SyncedScrollControllers`, `_SyncedScrollControllersState._syncScrollControllers`, `_SyncedScrollControllersState._jumpToNoCascade`, `_SyncedScrollControllersState._initControllers`
-- `lib/widgets/folder_view_content.dart` — `_FolderViewContentState._buildItem`, `_FolderViewContentState._onHorizontalScroll`, `_FolderViewContentState.build`
+- `lib/widgets/folder_view_content.dart` — `_FolderViewContentState._buildItem`, `_FolderViewContentState._indexOfRow`, `_FolderViewContentState._onHorizontalScroll`, `_FolderViewContentState.build`
 - `lib/widgets/folder_view.dart` — `_FolderViewState.build` (the `ValueKey(widget.mode)`)
 
 ## Reference behaviour
@@ -26,6 +26,7 @@ Read from `SyncedScrollControllers` and `_FolderViewContentState`.
 
 ## Cross-cutting invariants
 - [row-wider-than-viewport](../invariant/row-wider-than-viewport.md) — the per-row translate is what puts a row's rect off screen.
+- [node-id-identity](../invariant/node-id-identity.md) — each row is keyed by its Node's `id`, with a `findChildIndexCallback`.
 
 ## Blast radius
 - [scroll-anchoring](scroll-anchoring.md) — every programmatic `jumpTo` on a main controller must be followed by a bar re-sync once extents have settled; the mirror alone clamps to a stale extent.

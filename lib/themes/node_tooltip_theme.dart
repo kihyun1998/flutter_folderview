@@ -101,6 +101,12 @@ class NodeTooltipTheme<T> {
   /// A screen reader's tap goes to the row and does not open the tooltip. It
   /// reads [message] with the label, unless a builder supplies the content:
   /// then nothing is read.
+  ///
+  /// On a label tap, `onNodeTap` runs before the toggle. A `show()` on this
+  /// Node's controller made inside `onNodeTap` is therefore undone; deferred
+  /// with `scheduleMicrotask` it opens a closed tooltip, and an open one still
+  /// closes. A tooltip opened by a tap stays open while a dialog or page that
+  /// `onNodeTap` opens is shown, and after it closes.
   final bool? enableTap;
 
   /// Whether hover triggers the tooltip
@@ -112,7 +118,11 @@ class NodeTooltipTheme<T> {
   /// Callback when tooltip is shown
   final VoidCallback? onShow;
 
-  /// Callback when tooltip is hidden
+  /// Callback when tooltip is hidden.
+  ///
+  /// Not called when the label leaves the tree while its tooltip is shown,
+  /// such as when its row is removed or its Parent collapses: the tooltip
+  /// closes at once.
   final VoidCallback? onHide;
 
   /// Whether the tooltip stays visible when hovering over the tooltip itself
