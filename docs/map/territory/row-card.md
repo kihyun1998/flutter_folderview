@@ -33,6 +33,7 @@ Compared, not pinned: the sibling `flutter_table_plus` had already solved `rowTo
 - [row-wider-than-viewport](../invariant/row-wider-than-viewport.md)
 - [innermost-tooltip-wins](../invariant/innermost-tooltip-wins.md)
 - [chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md)
+- [node-id-identity](../invariant/node-id-identity.md) — the card's tooltip is in the keyed row (read from `_buildItem`, not probed).
 
 ## Blast radius
 - [label-tooltip](label-tooltip.md) — the two share every row, and suppression decides which one shows.

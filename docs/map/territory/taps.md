@@ -28,6 +28,7 @@ Read from `CustomInkWell` and the two renderers.
 
 ## Cross-cutting invariants
 - [row-wider-than-viewport](../invariant/row-wider-than-viewport.md) — a tap reaches a row only where hit testing reaches it.
+- [node-id-identity](../invariant/node-id-identity.md) — the double-tap count follows the row's Node (#172): a second tap at the spot of a row the first tap removed is a single tap on the Node now there, and a second tap on a moved row is a double tap on it. Pinned by `test/widgets/node_row_identity_test.dart`.
 
 ## Blast radius
 - [tier-rendering](tier-rendering.md) — the renderers decide what reaches `CustomInkWell`.

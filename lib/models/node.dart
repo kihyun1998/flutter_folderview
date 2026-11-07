@@ -9,6 +9,7 @@ enum LineStyle {
 }
 
 class Node<T> {
+  /// Identifies this Node: no two Nodes in one input tree share an `id`.
   final String id;
   final String label;
   final NodeType type;

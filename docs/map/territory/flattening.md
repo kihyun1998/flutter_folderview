@@ -24,7 +24,7 @@ Read from `Flattener.update` and `FlattenService`.
 **None.**
 
 ## Cross-cutting invariants
-None recorded. The mask is shared with [tree-lines](tree-lines.md) through `FlatNode`, a data dependency both sides can see, so it is a blast edge, not an invariant.
+- [node-id-identity](../invariant/node-id-identity.md) — in-place expand and collapse find the row by `id`.
 
 ## Blast radius
 - [scroll-anchoring](scroll-anchoring.md) — `FlattenChange` is what keeps the viewport still when rows are inserted or removed above it. A change to when `change` is non-null changes which anchoring branch runs.

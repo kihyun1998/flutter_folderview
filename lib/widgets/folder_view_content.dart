@@ -236,6 +236,13 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     }
   }
 
+  /// The index of the row keyed by a Node id.
+  int? _indexOfRow(Key key) {
+    final id = (key as ValueKey<String>).value;
+    final index = widget.flatNodes.indexWhere((flat) => flat.node.id == id);
+    return index < 0 ? null : index;
+  }
+
   @override
   void dispose() {
     widget.horizontalController.removeListener(_onHorizontalScroll);
@@ -366,7 +373,11 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
             padding: theme.spacingTheme.contentPadding,
             itemCount: widget.flatNodes.length,
             itemExtent: itemExtent,
-            itemBuilder: (context, index) => _buildItem(index),
+            itemBuilder: (context, index) => KeyedSubtree(
+              key: ValueKey<String>(widget.flatNodes[index].node.id),
+              child: _buildItem(index),
+            ),
+            findChildIndexCallback: _indexOfRow,
           ),
         ),
         // Only add spacing when horizontal scrollbar is actually needed

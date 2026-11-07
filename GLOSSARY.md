@@ -23,7 +23,7 @@ The leaf tier. Has no children of its own under the tier rules. Rendered as a ro
 _Avoid_: Leaf, item, entry, file.
 
 **Node**:
-A single element in the input tree, regardless of tier. Carries an `id`, a `label`, a tier, optional caller payload, and zero or more child nodes.
+A single element in the input tree, regardless of tier. Carries an `id`, a `label`, a tier, optional caller payload, and zero or more child nodes. Its `id` identifies it: no two **Nodes** in one input tree share an `id`.
 _Avoid_: Item, row, entry, element.
 
 ### Projections
@@ -78,6 +78,7 @@ _Avoid_: Zoom key, ctrl-scroll.
 - When `onScaleChanged` is provided and `blockModifierScroll` is not `false`, the library detects **Scale Modifier** + wheel events and proposes a new **Scale** value; the caller applies it. With `blockModifierScroll: false` the same events scroll, and nothing is proposed. This follows the same caller-controlled-state pattern as the **Expanded Set** and the **Selected Set**.
 - **Scale** is independent of **View Mode**, **Expansion**, and **Selection** — changing **Scale** does not change which **Nodes** are visible or selected.
 - Violations of the tier rules (e.g. a **Child** at the root in `folder` **View Mode**, or a **Folder** nested inside a **Parent**) produce undefined visible behavior — the library does not enforce them at runtime.
+- Two **Nodes** sharing an `id` likewise produce undefined visible behavior, and the library does not check for them.
 
 ## Example dialogue
 

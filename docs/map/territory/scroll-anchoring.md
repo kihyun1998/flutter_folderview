@@ -24,6 +24,7 @@ Read from `ScrollAnchor` and `_FolderViewContentState.didUpdateWidget`.
 
 ## Cross-cutting invariants
 - [row-extent](../invariant/row-extent.md) — the anchor math is in units of `rowHeight + rowSpacing`.
+- [node-id-identity](../invariant/node-id-identity.md) — the bulk anchor finds the top Node by `id`.
 
 ## Blast radius
 - [flattening](flattening.md) — when `FlattenChange` is emitted decides which branch runs.

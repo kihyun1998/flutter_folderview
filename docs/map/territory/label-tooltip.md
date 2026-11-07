@@ -22,6 +22,7 @@ Read from `wrapWithNodeTooltip` and `NodeLabel`.
 - **A screen reader hears `message` on the label** from `just_tooltip 0.5.1`: `wrapWithNodeTooltip` passes neither `semanticsTooltip` nor `excludeFromSemantics`, so upstream puts the message on the label's semantics node. A builder-only tooltip is not heard. `NodeTooltipTheme` exposes neither field.
 - A `child`-anchored tooltip aims at the label rect's visible part. From `just_tooltip 0.4.2`, placement targets the visible part of a clipped child (#47); whether that is near the pointer depends on [row-wider-than-viewport](../invariant/row-wider-than-viewport.md).
 
+- **A row's State follows its Node** (#172). Rows are keyed by `Node.id` with a `findChildIndexCallback` ([node-id-identity](../invariant/node-id-identity.md)). A key on `NodeWidget` alone was rejected: the sliver still matched by index, so a per-Node controller was handed between labels and `assert(_target == null)` fired on a removal, a collapse and an insertion. Pinned by `test/widgets/node_row_identity_test.dart`. A rebuild that replaces every row in one frame still hands a controller over, see Known holes.
 ## Code
 - `lib/widgets/node_render_parts.dart` — `wrapWithNodeTooltip`, `NodeLabel`
 - `lib/themes/node_tooltip_theme.dart` — `NodeTooltipTheme`, `NodeTooltipTheme.anchor`, `NodeTooltipTheme.controllerResolver`, `NodeTooltipTheme.tooltipBuilderResolver`
@@ -34,6 +35,7 @@ Compared against upstream `just_tooltip`, not pinned. #42's hover probes were tr
 - [innermost-tooltip-wins](../invariant/innermost-tooltip-wins.md)
 - [chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md)
 - [measured-equals-rendered](../invariant/measured-equals-rendered.md) — a label is only unellipsized, and its rect only as wide as its glyphs, where measurement holds.
+- [node-id-identity](../invariant/node-id-identity.md) — the tooltip and its controller follow the row's Node.
 
 ## Blast radius
 - [row-card](row-card.md) — narrowing or widening this hover region moves where the card is reachable.
@@ -42,9 +44,10 @@ Compared against upstream `just_tooltip`, not pinned. #42's hover probes were tr
 - [taps](taps.md) — a label tap with `enableTap` reaches the row as well.
 
 ## Known holes / open
-- **What `onNodeTap` does to the view can leave the label tooltip behind.** Since #134 a label tap reaches the caller while its tooltip opens. Each probed 2026-11-06, `enableTap` on, comparing the tree before and after #134:
-  - `onNodeTap` removes the tapped row: the tooltip then shows the next Node's content (`tip c2` for a tap on c1). Rows have no key, so the label's State stays at its index. A tap beside a label that collapses a Parent showed another Node's tooltip before #134 too (`tip z1`).
-  - Its row is torn down: `onHide` does not fire. A tap on a Child then on a collapsing Parent's label counted show/hide 2/0. A resolver that returns `null` once a Child is selected counted 1/0, and the tooltip was never seen.
-  - `onNodeTap` opens a dialog or pushes a page: the tooltip is open during it and after the pop. Whether it draws over the dialog was not measured.
-  - `controller.show()` inside `onNodeTap` is undone on a label tap, because the row's tap comes first and the toggle after: show/hide 1/1, closed. Beside the label it stays open. Tracked: #172.
+- **What `onNodeTap` does to the view can still leave the label tooltip in a state nobody chose** (#172; maintainer's choices, 2026-11-07, each shown the measured table and the options below). Probed 2026-11-07, `enableTap` on, Flutter 3.47.1, just_tooltip 0.5.1:
+  - A row removed or collapsed away while its tooltip is shown: `onHide` does not fire (show/hide 1/0, and 2/0 for a tap on a Child then on a collapsing Parent's label). just_tooltip's `deactivate` closes the overlay at once and `onHide` fires only when the reverse animation is dismissed; Flutter's own tooltip fires nothing on dispose either. Chosen: document it on `NodeTooltipTheme.onHide`. Rejected: having just_tooltip fire `onHide` on teardown, because a synchronous call breaks a `setState` in `onHide` and a microtask reorders it after the next tooltip's `onShow` (a review's probe of a just_tooltip copy, not reproduced here).
+  - `onNodeTap` opens a dialog or pushes a page: the tooltip is open during it and after the pop. Whether it draws over the dialog was not measured. Chosen: document it on `enableTap`, and leave closing to just_tooltip (tracked upstream: just_tooltip#100). Closing it here needs a controller of this package's own, which #134 rejected and which collides with `controllerResolver`.
+  - `controller.show()` inside `onNodeTap` is undone on a label tap, because the row's tap comes first and the toggle after: show/hide 1/1, closed. Deferred with `scheduleMicrotask`, it opens a closed tooltip; an open one still closes (1 to 0), because just_tooltip ignores `show()` during the reverse animation. Chosen: document it on `enableTap`, and report the reverse case upstream (just_tooltip#101).
+  - A `tooltipBuilderResolver` that returns `null` once a Child is selected: the label tap fires `onShow` and nothing is seen (show/hide 1/0). Not covered by the choices above. Tracked: #182.
+- **A rebuild that replaces every row in one frame hands a per-Node controller over.** A View Mode switch (`ValueKey(widget.mode)`) and a flip of `needsHorizontalScroll` (the row gains or loses its `OverflowBox`) build new labels while the old ones are only deactivated. just_tooltip attaches a controller in `initState` and detaches it in `dispose`, so `assert(_target == null)` fires and that controller's `show()` then shows nothing. Probed 2026-11-07 (view 400 to 30 wide, and tree to folder), the same before and after #172's row keys. Tracked upstream: just_tooltip#102.
 - just_tooltip's shared `TooltipRegistry` shows one tooltip app-wide, so two controllers cannot show two tooltips at once. One controller for two Nodes still fails upstream's assertion; the dartdoc says not to.
