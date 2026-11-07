@@ -13,11 +13,20 @@ Read from the bar widgets and `folderViewThumbTheme`.
 - **Shown on hover.** `_FolderViewContentState.build` tracks hover of the whole view in `_isHover`; each bar fades between `hoverOpacity` and `nonHoverOpacity` over `hoverAnimationDuration`. With `light()`'s `nonHoverOpacity` of 0 the bars are invisible until the pointer is over the tree.
 - **Layout.** A bar is built only when its axis needs scrolling. When the horizontal bar is present, a `trackWidth`-high spacer is reserved under the list and the vertical bar stops above it.
 - **Unscaled.** `FlutterFolderViewTheme.scale` does not delegate to `scrollbarTheme`, so the bars receive the theme as given ([chrome-excluded-from-scale](../invariant/chrome-excluded-from-scale.md)).
-- A Scale Modifier + wheel over a bar is claimed by `ModifierWheelGuard` while blocking is in effect, until the thumb has faded in; after that, see [scale-input](scale-input.md).
+- A Scale Modifier + wheel over a bar moves nothing while blocking is in effect ([scale-input](scale-input.md)).
+- **Shift+wheel over the horizontal bar scrolls it sideways, in both states** (#169; maintainer, 2026-11-07, shown the Shift table below and `flutter_table_plus`'s `_handleHorizontalScrollbarSignal`). `RawScrollbar` reads the wheel along its own axis and ignores `pointerAxisModifiers` (flutter/flutter#193282, open), so once the thumb has faded in a vertical notch did nothing. A `Listener` around the horizontal `Scrollbar` (`FolderViewHorizontalScrollbar._handleAxisModifierWheel`) claims a mouse wheel with an axis modifier held and hands its `dy` to the bar's `pointerScroll`, so it joins the wheel motion. It mirrors the checks `RawScrollbar` and `Scrollable` make before taking a wheel: no pointer pressed on the bar (a Shift notch during a thumb drag ended the drag), the `dy` negated on a reversed axis (right to left, a notch moved the bar the other way once the thumb had faded in), and no claim when the bar is at its end, so the notch reaches an enclosing scroll view. Before the fade, the bar's own `Scrollable` flips the axis and registers first, with the same result. Over the rows and the vertical bar, Shift+wheel is left to Flutter. Measured on 9b5d261 (Windows target, 400×160 view), Shift with a vertical notch of 60:
+
+  | Over | Before the fade | Faded in |
+  |---|---|---|
+  | the horizontal bar | sideways 60 | 0, now sideways 60 |
+  | the vertical bar | 0 | down 60 |
+  | the rows | 0 | 0 |
+
+  A trackpad and a wheel without the modifier are not claimed, as `Scrollable` flips axes for a mouse wheel only. Pinned by `test/widgets/folder_view_scrollbar_wheel_test.dart`.
 
 ## Code
 - `lib/widgets/folder_view_vertical_scrollbar.dart` — `FolderViewVerticalScrollbar`
-- `lib/widgets/folder_view_horizontal_scrollbar.dart` — `FolderViewHorizontalScrollbar`
+- `lib/widgets/folder_view_horizontal_scrollbar.dart` — `FolderViewHorizontalScrollbar`, `FolderViewHorizontalScrollbar._handleAxisModifierWheel`
 - `lib/widgets/folder_view_scrollbar_thumb.dart` — `folderViewThumbTheme`
 - `lib/themes/folder_view_scrollbar_theme.dart` — `FolderViewScrollbarTheme`
 - `lib/widgets/folder_view_content.dart` — `_FolderViewContentState.build` (`_isHover`, the bars, the spacer)
@@ -32,7 +41,7 @@ Material's `Scrollbar` and `widgets/scrollbar.dart` thumb placement, read from t
 ## Blast radius
 - [scroll-sync](scroll-sync.md) — a bar's offset is mirrored to the list, clamped to the end its position reports, which is the list's.
 - [row-geometry](row-geometry.md) — `contentHeight` and `contentWidth` size the bars' scroll content.
-- [scale-input](scale-input.md) — the guard inside each bar decides whether a modifier wheel scrolls it.
+- [scale-input](scale-input.md) — a modifier wheel over a bar is refused by the main position's physics.
 - [wheel-motion](wheel-motion.md) — a wheel over a bar is handed to the main controller of that axis.
 
 ## Known holes / open

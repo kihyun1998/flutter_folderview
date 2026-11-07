@@ -34,7 +34,7 @@ Read from `SyncedScrollControllers` and `_FolderViewContentState`.
 - [label-tooltip](label-tooltip.md) and [row-card](row-card.md) — they place overlays against row and label rects, which the translate moves.
 - [taps](taps.md) — a tap reaches a row only where the `OverflowBox` order lets hit testing reach it.
 - [row-geometry](row-geometry.md) — `contentWidth` decides whether horizontal scroll exists at all.
-- [scale-input](scale-input.md) — the `ListView` physics are swapped to block modifier-wheel scrolling.
+- [scale-input](scale-input.md) — the physics of the `ListView` and of the hidden horizontal view are swapped to block modifier-wheel scrolling.
 
 ## Known holes / open
 Probed 2026-11-07, Windows target, Flutter 3.47.1; causes as reported by a review, not traced.

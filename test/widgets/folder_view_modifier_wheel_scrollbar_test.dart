@@ -123,8 +123,14 @@ void main() {
             const Offset(0, 100),
             modifier: false,
           );
+          await wheel(
+            tester,
+            overHorizontalBar(tester),
+            const Offset(60, 0),
+            modifier: false,
+          );
           final before = offsets(tester);
-          expect(before, contains(100));
+          expect(before, [100, 60, 100, 60]);
 
           await pump(
             tester,
@@ -207,6 +213,22 @@ void main() {
       expect(proposed, hasLength(1));
     });
 
+    winTest('over the horizontal scrollbar whose thumb has faded in, a '
+        'sideways modifier notch proposes and does not scroll', (tester) async {
+      final proposed = await pump(tester);
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(pointer.hover(overHorizontalBar(tester)));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendEventToBinding(pointer.scroll(const Offset(120, 0)));
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+
+      expect(offsets(tester), everyElement(0));
+      expect(proposed, hasLength(1));
+    });
+
     winTest('blockModifierScroll: true without a handler blocks the '
         'scrollbar too and proposes nothing', (tester) async {
       final proposed = await pump(
@@ -269,6 +291,29 @@ void main() {
     await mouse.down(top);
     for (var i = 0; i < 5; i++) {
       await mouse.moveBy(const Offset(0, 10));
+      await tester.pump();
+    }
+    await mouse.up();
+    await tester.pumpAndSettle();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+
+    expect(offsets(tester).any((o) => o > 0), isTrue);
+  });
+
+  winTest('dragging the horizontal thumb while holding the modifier still '
+      'scrolls', (tester) async {
+    await pump(tester);
+    final view = tester.getRect(find.byType(FolderView<String>));
+    final start = Offset(view.left + 10, overHorizontalBar(tester).dy);
+
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(mouse.removePointer);
+    await mouse.addPointer(location: start);
+    await tester.pumpAndSettle();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await mouse.down(start);
+    for (var i = 0; i < 5; i++) {
+      await mouse.moveBy(const Offset(10, 0));
       await tester.pump();
     }
     await mouse.up();
