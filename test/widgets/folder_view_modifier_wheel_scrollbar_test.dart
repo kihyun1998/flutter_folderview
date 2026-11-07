@@ -101,6 +101,56 @@ void main() {
     variant: TargetPlatformVariant.only(TargetPlatform.windows),
   );
 
+  group(
+    'changing whether the modifier scroll is blocked keeps the offsets',
+    () {
+      for (final (name, fromHandler, fromBlock, toHandler, toBlock) in [
+        ('a handler added', false, null, true, null),
+        ('the handler removed', true, null, false, null),
+        ('blocking turned off', true, null, true, false),
+        ('blocking turned on', false, null, false, true),
+      ]) {
+        winTest('with $name', (tester) async {
+          await pump(
+            tester,
+            withHandler: fromHandler,
+            blockModifierScroll: fromBlock,
+          );
+          final view = tester.getRect(find.byType(FolderView<String>));
+          await wheel(
+            tester,
+            view.center,
+            const Offset(0, 100),
+            modifier: false,
+          );
+          final before = offsets(tester);
+          expect(before, contains(100));
+
+          await pump(
+            tester,
+            withHandler: toHandler,
+            blockModifierScroll: toBlock,
+          );
+
+          expect(tester.takeException(), isNull);
+          expect(offsets(tester), before);
+        });
+      }
+
+      winTest('and a modifier notch then follows the new setting', (
+        tester,
+      ) async {
+        await pump(tester, withHandler: false);
+        final view = tester.getRect(find.byType(FolderView<String>));
+
+        final handled = await pump(tester);
+        await wheel(tester, view.center, const Offset(0, 100), modifier: true);
+        expect(offsets(tester), everyElement(0));
+        expect(handled, hasLength(1));
+      });
+    },
+  );
+
   group('while the modifier scroll is blocked', () {
     winTest('over the rows a modifier notch proposes and does not scroll', (
       tester,
@@ -123,6 +173,22 @@ void main() {
         const Offset(0, 300),
         modifier: true,
       );
+      expect(offsets(tester), everyElement(0));
+      expect(proposed, hasLength(1));
+    });
+
+    winTest('over the vertical scrollbar whose thumb has faded in, a modifier '
+        'notch proposes and does not scroll', (tester) async {
+      final proposed = await pump(tester);
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(pointer.hover(overVerticalBar(tester)));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendEventToBinding(pointer.scroll(const Offset(0, 120)));
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+
       expect(offsets(tester), everyElement(0));
       expect(proposed, hasLength(1));
     });

@@ -29,9 +29,6 @@ class SizeService {
   }) {
     if (itemCount == 0) return topPadding + bottomPadding;
 
-    final totalRowHeight = itemCount * rowHeight;
-    final totalSpacing = (itemCount - 1) * rowSpacing;
-
-    return totalRowHeight + totalSpacing + topPadding + bottomPadding;
+    return itemCount * (rowHeight + rowSpacing) + topPadding + bottomPadding;
   }
 }

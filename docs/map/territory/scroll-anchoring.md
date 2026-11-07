@@ -11,7 +11,7 @@ Read from `ScrollAnchor` and `_FolderViewContentState.didUpdateWidget`.
 - `ScrollAnchor` only computes offsets and never touches a controller. It returns `null` when nothing needs to move, with a 0.5 px threshold against churn.
 - **Incremental change** (from `FlattenChange`): if the changed row's bottom edge (`topPadding + (index + 1) × itemExtent`) is at or above the current offset, shift by `deltaItems × itemExtent`, clamped to the scroll extent. Otherwise do nothing. Applied at once in `didUpdateWidget`.
 - **Scale change**: map the top fractional item index into the new item extent; the horizontal offset scales by the new/old `contentWidth` ratio. Applied post-frame (a `jumpTo` during build would `setState` during build), then the vertical bar is re-synced even if the offset did not move, because the extent changed.
-- **Bulk change** (a new flat list without a `FlattenChange`, for example expand-all): anchor to the top node, or to its nearest surviving ancestor if the top node was removed. Skipped when either list is empty. Followed by a post-frame bar re-sync, because the bar's extent has not updated yet.
+- **Bulk change** (a new flat list without a `FlattenChange`, for example expand-all): anchor to the top node, or to its nearest surviving ancestor if the top node was removed. Skipped when either list is empty. Followed by a post-frame bar re-sync, because the jump runs before layout, when the end the bar reports is still the old one. Without it, a bulk expand from the end left 77300 / 6100 (body / bar; 2026-11-07, `flutter_smooth_wheel_scroll` 0.1.6). Pinned by `test/widgets/folder_view_scrollbar_wheel_test.dart`.
 - All three read `itemExtent` as `rowHeight + rowSpacing` of the theme they are handed ([row-extent](../invariant/row-extent.md)).
 - A View Mode switch does not anchor; the controllers are recreated at 0, by design ([scroll-sync](scroll-sync.md)).
 
@@ -32,4 +32,5 @@ Read from `ScrollAnchor` and `_FolderViewContentState.didUpdateWidget`.
 - [wheel-motion](wheel-motion.md) — a jump ends a running wheel motion.
 
 ## Known holes / open
-**None** found by this reading.
+- **The Scale re-sync has no case that needs it.** Removing its `barController.jumpTo` in `_applyScaleAdjustment` left the same values at `rowSpacing` 0 and 8, mid-list and at the end (probed 2026-11-07). No test pins it.
+- **An incremental expand at the end is clamped to the old end.** Expanding a Parent above the view at 49300 stays at 49300 with a new end of 50100, so the rows in view move (probed 2026-11-07; the clamp's timing is a review's reading, not traced). Tracked: #176.
