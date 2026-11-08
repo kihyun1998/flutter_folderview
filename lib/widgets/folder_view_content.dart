@@ -412,13 +412,19 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
                 right: 0,
                 bottom: 0,
                 height: 0,
-                child: SingleChildScrollView(
-                  controller: widget.horizontalController,
-                  scrollDirection: Axis.horizontal,
-                  physics: widget.blockModifierScroll
-                      ? const _ModifierKeyAwareScrollPhysics()
-                      : null,
-                  child: SizedBox(width: widget.contentWidth),
+                child: NotificationListener<ScrollMetricsNotification>(
+                  onNotification: (_) {
+                    _onHorizontalScroll();
+                    return false;
+                  },
+                  child: SingleChildScrollView(
+                    controller: widget.horizontalController,
+                    scrollDirection: Axis.horizontal,
+                    physics: widget.blockModifierScroll
+                        ? const _ModifierKeyAwareScrollPhysics()
+                        : null,
+                    child: SizedBox(width: widget.contentWidth),
+                  ),
                 ),
               ),
 
