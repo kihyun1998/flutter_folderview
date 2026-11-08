@@ -495,6 +495,57 @@ void main() {
     });
   });
 
+  for (final motion in <WheelMotion?>[null, _spring]) {
+    _winTest('a notch after a bulk expand past the old end moves the scrollbar '
+        'with the body, ${motion == null ? 'at once' : 'on every frame'}', (
+      tester,
+    ) async {
+      final folders = [
+        for (var f = 0; f < 120; f++)
+          Node<String>(
+            id: 'f$f',
+            label: 'f$f',
+            type: NodeType.parent,
+            children: [
+              for (var c = 0; c < 20; c++)
+                Node<String>(id: 'f$f-$c', label: 'c$c', type: NodeType.child),
+            ],
+          ),
+      ];
+      Widget view(Iterable<int> expanded) => MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 400,
+            height: 300,
+            child: FolderView<String>(
+              data: folders,
+              mode: ViewMode.tree,
+              expandedNodeIds: {for (final f in expanded) 'f$f'},
+              wheelMotion: motion,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpWidget(view([for (var f = 100; f < 120; f++) f]));
+      await tester.pumpAndSettle();
+      final oldEnd = _body(tester).maxScrollExtent;
+      await _wheel(tester, _overBody(tester), const Offset(0, 19000));
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(view([for (var f = 0; f < 120; f++) f]));
+      await tester.pumpAndSettle();
+      final expandedAt = _body(tester).pixels;
+      expect(expandedAt, greaterThan(oldEnd));
+      expect(_bar(tester, Axis.vertical).pixels, expandedAt);
+
+      await _wheel(tester, _overBody(tester), const Offset(0, -120));
+      while (tester.binding.hasScheduledFrame) {
+        await tester.pump(_frame);
+        expect(_bar(tester, Axis.vertical).pixels, _body(tester).pixels);
+      }
+      expect(_body(tester).pixels, expandedAt - 120);
+    });
+  }
+
   _winTest('a bulk expand from the end leaves the scrollbar on the body', (
     tester,
   ) async {
