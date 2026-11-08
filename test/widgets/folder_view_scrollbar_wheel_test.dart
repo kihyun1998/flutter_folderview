@@ -609,6 +609,42 @@ void main() {
     expect(rowsShift(start), 140);
   });
 
+  _winTest('when the horizontal end shrinks below the offset, the rows follow '
+      'the scrollbar to the new end', (tester) async {
+    Widget view(String widest) => MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 400,
+          height: 300,
+          child: FolderView<String>(
+            data: [
+              Node<String>(id: 'wide', label: widest, type: NodeType.parent),
+              Node<String>(id: 'k', label: 'k', type: NodeType.parent),
+            ],
+            mode: ViewMode.tree,
+            expandedNodeIds: const {},
+            wheelMotion: null,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpWidget(view('w' * 300));
+    await tester.pumpAndSettle();
+    final start = tester.getTopLeft(find.text('k')).dx;
+    final bar = _bar(tester, Axis.horizontal);
+    final oldEnd = bar.maxScrollExtent;
+    bar.jumpTo(oldEnd);
+    await tester.pump();
+
+    await tester.pumpWidget(view('y' * 70));
+    await tester.pumpAndSettle();
+
+    final newEnd = _bar(tester, Axis.horizontal).maxScrollExtent;
+    expect(newEnd, lessThan(oldEnd));
+    expect(_bar(tester, Axis.horizontal).pixels, newEnd);
+    expect(start - tester.getTopLeft(find.text('k')).dx, newEnd);
+  });
+
   _winTest('a bulk expand from the end leaves the scrollbar on the body', (
     tester,
   ) async {
