@@ -103,11 +103,11 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
     if (_doNotReissueJump[master] == null ||
         _doNotReissueJump[master]! == false) {
-      _doNotReissueJump[slave] = true;
       final clampedOffset = master.offset.clamp(
         slave.position.minScrollExtent,
         slave.position.maxScrollExtent,
       );
+      if (clampedOffset != slave.offset) _doNotReissueJump[slave] = true;
       slave.jumpTo(clampedOffset);
     } else {
       _doNotReissueJump[master] = false;
