@@ -546,6 +546,69 @@ void main() {
     });
   }
 
+  _winTest('the horizontal scrollbar keeps its offset when the vertical one '
+      'leaves and comes back', (tester) async {
+    final rows = [
+      Node<String>(id: 'wide', label: 'w' * 300, type: NodeType.parent),
+      for (var f = 0; f < 3; f++)
+        Node<String>(
+          id: 'f$f',
+          label: 'f$f',
+          type: NodeType.parent,
+          children: [
+            for (var c = 0; c < 20; c++)
+              Node<String>(id: 'f$f-$c', label: 'c$c', type: NodeType.child),
+          ],
+        ),
+    ];
+    Widget view(Set<String> expanded) => MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 400,
+          height: 300,
+          child: FolderView<String>(
+            data: rows,
+            mode: ViewMode.tree,
+            expandedNodeIds: expanded,
+            wheelMotion: null,
+          ),
+        ),
+      ),
+    );
+    final verticalBar = find.descendant(
+      of: find.byType(Scrollbar),
+      matching: find.byWidgetPredicate(
+        (w) => w is SingleChildScrollView && w.scrollDirection == Axis.vertical,
+      ),
+    );
+    double rowsShift(double start) =>
+        start - tester.getTopLeft(find.text('f0')).dx;
+
+    await tester.pumpWidget(view({'f0', 'f1', 'f2'}));
+    await tester.pumpAndSettle();
+    final start = tester.getTopLeft(find.text('f0')).dx;
+    _bar(tester, Axis.horizontal).jumpTo(200);
+    await tester.pump();
+    expect(rowsShift(start), 200);
+
+    await tester.pumpWidget(view(const {}));
+    await tester.pumpAndSettle();
+    expect(verticalBar, findsNothing);
+    expect(_bar(tester, Axis.horizontal).pixels, 200);
+    expect(rowsShift(start), 200);
+
+    await _wheel(tester, _overHorizontalBar(tester), const Offset(-60, 0));
+    await tester.pumpAndSettle();
+    expect(_bar(tester, Axis.horizontal).pixels, 140);
+    expect(rowsShift(start), 140);
+
+    await tester.pumpWidget(view({'f0', 'f1', 'f2'}));
+    await tester.pumpAndSettle();
+    expect(verticalBar, findsOneWidget);
+    expect(_bar(tester, Axis.horizontal).pixels, 140);
+    expect(rowsShift(start), 140);
+  });
+
   _winTest('a bulk expand from the end leaves the scrollbar on the body', (
     tester,
   ) async {

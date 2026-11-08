@@ -425,6 +425,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
               /// Vertical scrollbar — only rebuilds when hover state changes
               if (widget.needsVerticalScroll)
                 ValueListenableBuilder<bool>(
+                  key: const ValueKey(Axis.vertical),
                   valueListenable: _isHover,
                   builder: (context, isHover, _) => FolderViewVerticalScrollbar(
                     isHover: isHover,
@@ -438,6 +439,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
               /// Horizontal scrollbar — only rebuilds when hover state changes
               if (widget.needsHorizontalScroll)
                 ValueListenableBuilder<bool>(
+                  key: const ValueKey(Axis.horizontal),
                   valueListenable: _isHover,
                   builder: (context, isHover, _) =>
                       FolderViewHorizontalScrollbar(

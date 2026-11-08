@@ -39,5 +39,4 @@ Read from `SyncedScrollControllers` and `_FolderViewContentState`.
 
 ## Known holes / open
 Probed 2026-11-07, Windows target, Flutter 3.47.1; causes as reported by a review, not traced.
-- **A vertical bar appearing or disappearing resets the horizontal bar.** At 200, collapse all: bar 0, rows still shifted 200. Tracked: #175.
 - **The rows can keep a stale horizontal offset when the extent shrinks.** End 800 to 637.5: bar 637.5, rows shifted 800. The clamp sends no notification. Tracked: #179.
