@@ -120,9 +120,11 @@ class NodeTooltipTheme<T> {
 
   /// Callback when tooltip is hidden.
   ///
-  /// Not called when the label leaves the tree while its tooltip is shown,
-  /// such as when its row is removed or its Parent collapses: the tooltip
-  /// closes at once.
+  /// Not called when the tooltip leaves the tree while it is shown: when its
+  /// row is removed, its Parent collapses, or [tooltipBuilderResolver] stops
+  /// returning content for its Node. The tooltip closes at once. With
+  /// [enableTap], a label tap whose `onNodeTap` makes that happen calls
+  /// [onShow] and then neither [onHide] nor anything visible.
   final VoidCallback? onHide;
 
   /// Whether the tooltip stays visible when hovering over the tooltip itself
