@@ -15,7 +15,7 @@ topics:
 # The floor is the max of what the dependencies demand. just_tooltip 0.5.0
 # declares Flutter `>=3.32.0` / Dart `>=3.8.0`
 # (`OverlayPortal.overlayChildLayoutBuilder`, first stable in 3.32.0).
-# flutter_smooth_wheel_scroll 0.1.6 declares Flutter `>=3.32.0` / Dart `^3.8.0`
+# flutter_smooth_wheel_scroll 0.1.7 declares Flutter `>=3.32.0` / Dart `^3.8.0`
 # (`SpringDescription.withDurationAndBounce`, flutter#164411, first stable in
 # 3.32.0). So the floor is `max(3.32, 3.32) = 3.32` / `max(3.8, 3.8) = 3.8`.
 environment:
@@ -26,7 +26,7 @@ dependencies:
   flutter:
     sdk: flutter
   just_tooltip: ^0.5.1
-  flutter_smooth_wheel_scroll: ^0.1.6
+  flutter_smooth_wheel_scroll: ^0.1.7
 
 dev_dependencies:
   flutter_lints: ^6.0.0
