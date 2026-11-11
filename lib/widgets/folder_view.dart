@@ -239,7 +239,12 @@ class _FolderViewState<T> extends State<FolderView<T>> {
         );
 
         final needsHorizontalScroll = contentWidth > availableWidth;
-        final needsVerticalScroll = contentHeight > availableHeight;
+        // The list's viewport is the height left above the horizontal
+        // scrollbar's spacer, which `FolderViewContent` reserves.
+        final listViewportHeight = needsHorizontalScroll
+            ? availableHeight - scaledTheme.scrollbarTheme.trackWidth
+            : availableHeight;
+        final needsVerticalScroll = contentHeight > listViewportHeight;
 
         return SyncedScrollControllers(
           key: ValueKey(widget.mode),
