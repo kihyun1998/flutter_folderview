@@ -3,27 +3,34 @@ import 'flattener.dart';
 
 /// Pure scroll-offset math for preserving viewport position across layout
 /// changes. It computes target offsets; it never touches a ScrollController —
-/// the widget applies the result (post-frame `jumpTo`, scrollbar re-sync).
+/// the widget applies the result (`jumpTo`, scrollbar re-sync).
 ///
-/// Every method returns `null` (or a null field) when no adjustment is needed,
-/// using a > 0.5px threshold to avoid churn.
+/// Every method returns `null` (or a null field) when no adjustment is needed.
+/// The Scale and bulk methods also return `null` for a move of 0.5 px or less.
 class ScrollAnchor {
   ScrollAnchor._();
 
   /// New vertical offset after an incremental single-node change, or null when
   /// the change happened at/below the viewport top (so nothing visible moves).
+  ///
+  /// The offset moves by the change's row delta, clamped to the scroll end of
+  /// the new content: `newContentHeight - viewportHeight`.
   static double? verticalOffsetForFlattenChange({
     required FlattenChange change,
     required double currentOffset,
     required double itemExtent,
     required double topPadding,
-    required double minScrollExtent,
-    required double maxScrollExtent,
+    required double newContentHeight,
+    required double viewportHeight,
   }) {
     final changePixel = topPadding + (change.index + 1) * itemExtent;
     if (changePixel <= currentOffset) {
       final delta = change.deltaItems * itemExtent;
-      return (currentOffset + delta).clamp(minScrollExtent, maxScrollExtent);
+      final newMaxExtent = (newContentHeight - viewportHeight).clamp(
+        0.0,
+        double.infinity,
+      );
+      return (currentOffset + delta).clamp(0.0, newMaxExtent);
     }
     return null;
   }

@@ -7,7 +7,6 @@ import '../models/flat_node.dart';
 import '../models/node.dart';
 import '../services/flattener.dart';
 import '../services/scroll_anchor.dart';
-import '../services/size_service.dart';
 import '../themes/flutter_folder_view_theme.dart';
 import '../themes/row_tooltip_theme.dart';
 import 'folder_view_horizontal_scrollbar.dart';
@@ -177,6 +176,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     final controller = widget.verticalController;
     final itemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
     final topPadding = widget.theme.spacingTheme.contentPadding.top;
+    final newContentHeight = widget.contentHeight;
 
     // Case 1: incremental single-node change.
     final change = widget.change;
@@ -187,10 +187,13 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         currentOffset: controller.offset,
         itemExtent: itemExtent,
         topPadding: topPadding,
-        minScrollExtent: controller.position.minScrollExtent,
-        maxScrollExtent: controller.position.maxScrollExtent,
+        newContentHeight: newContentHeight,
+        viewportHeight: controller.position.viewportDimension,
       );
-      if (newOffset != null) controller.jumpTo(newOffset);
+      if (newOffset != null) {
+        controller.jumpTo(newOffset);
+        _syncVerticalBarAfterLayout();
+      }
       return;
     }
 
@@ -198,15 +201,6 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     if (identical(oldWidget.flatNodes, widget.flatNodes)) return;
     if (oldWidget.flatNodes.isEmpty || widget.flatNodes.isEmpty) return;
     if (!controller.hasClients) return;
-
-    final bottomPadding = widget.theme.spacingTheme.contentPadding.bottom;
-    final newContentHeight = SizeService.calculateContentHeight(
-      itemCount: widget.flatNodes.length,
-      rowHeight: widget.theme.rowHeight,
-      rowSpacing: widget.theme.rowSpacing,
-      topPadding: topPadding,
-      bottomPadding: bottomPadding,
-    );
 
     final newOffset = ScrollAnchor.verticalOffsetForBulkChange<T>(
       oldList: oldWidget.flatNodes,
@@ -220,20 +214,24 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
 
     if (newOffset != null) {
       controller.jumpTo(newOffset);
-
-      // The scrollbar controller's maxScrollExtent hasn't updated yet; re-sync
-      // after layout when both controllers have correct extents.
-      final barController = widget.verticalBarController;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (controller.hasClients && barController.hasClients) {
-          final target = controller.offset.clamp(
-            barController.position.minScrollExtent,
-            barController.position.maxScrollExtent,
-          );
-          barController.jumpTo(target);
-        }
-      });
+      _syncVerticalBarAfterLayout();
     }
+  }
+
+  /// Moves the vertical scrollbar to the body's offset after the next layout,
+  /// when both have the new scroll extent.
+  void _syncVerticalBarAfterLayout() {
+    final controller = widget.verticalController;
+    final barController = widget.verticalBarController;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.hasClients && barController.hasClients) {
+        final target = controller.offset.clamp(
+          barController.position.minScrollExtent,
+          barController.position.maxScrollExtent,
+        );
+        barController.jumpTo(target);
+      }
+    });
   }
 
   /// The index of the row keyed by a Node id.

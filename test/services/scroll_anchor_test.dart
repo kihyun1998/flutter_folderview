@@ -23,8 +23,8 @@ void main() {
         currentOffset: 200,
         itemExtent: 40,
         topPadding: 0,
-        minScrollExtent: 0,
-        maxScrollExtent: 1000,
+        newContentHeight: 1400,
+        viewportHeight: 400,
       );
       expect(offset, 280);
     });
@@ -35,10 +35,65 @@ void main() {
         currentOffset: 40,
         itemExtent: 40,
         topPadding: 0,
-        minScrollExtent: 0,
-        maxScrollExtent: 1000,
+        newContentHeight: 1400,
+        viewportHeight: 400,
       );
       expect(offset, isNull);
+    });
+
+    test('the shift is clamped to the end of the new content, not the old', () {
+      // Old content 1400 in a 400 viewport ends at 1000. Expanding row 0 by 20
+      // rows of 40 makes it 2200, ending at 1800; from 950, the target is 1750.
+      final offset = ScrollAnchor.verticalOffsetForFlattenChange(
+        change: const FlattenChange(index: 0, deltaItems: 20),
+        currentOffset: 950,
+        itemExtent: 40,
+        topPadding: 0,
+        newContentHeight: 2200,
+        viewportHeight: 400,
+      );
+      expect(offset, 1750);
+    });
+
+    test('a collapse at the end lands on the end of the new content', () {
+      // Content 2200 in a 400 viewport, at its end 1800; collapsing row 0 by 20
+      // rows of 40 makes it 1400, ending at 1000.
+      final offset = ScrollAnchor.verticalOffsetForFlattenChange(
+        change: const FlattenChange(index: 0, deltaItems: -20),
+        currentOffset: 1800,
+        itemExtent: 40,
+        topPadding: 0,
+        newContentHeight: 1400,
+        viewportHeight: 400,
+      );
+      expect(offset, 1000);
+    });
+
+    test('a shift below the start is clamped to 0', () {
+      // Row 0 collapses by 20 rows of 40 while the view top is at 100, inside
+      // its Children; 100 - 800 is below the start, and the content still
+      // overflows.
+      final offset = ScrollAnchor.verticalOffsetForFlattenChange(
+        change: const FlattenChange(index: 0, deltaItems: -20),
+        currentOffset: 100,
+        itemExtent: 40,
+        topPadding: 0,
+        newContentHeight: 5000,
+        viewportHeight: 400,
+      );
+      expect(offset, 0);
+    });
+
+    test('content shorter than the viewport lands on 0', () {
+      final offset = ScrollAnchor.verticalOffsetForFlattenChange(
+        change: const FlattenChange(index: 0, deltaItems: -20),
+        currentOffset: 900,
+        itemExtent: 40,
+        topPadding: 0,
+        newContentHeight: 200,
+        viewportHeight: 400,
+      );
+      expect(offset, 0);
     });
   });
 
