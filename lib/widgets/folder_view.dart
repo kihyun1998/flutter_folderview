@@ -51,7 +51,8 @@ class FolderView<T> extends StatefulWidget {
   ///
   /// The library calls this with the proposed new scale value, unclamped,
   /// while blocking is in effect (see [blockModifierScroll]). By default that
-  /// is whenever this callback is non-null.
+  /// is whenever this callback is non-null. A wheel with no vertical
+  /// movement, such as a tilt, proposes nothing.
   ///
   /// The caller should update [scale] in response:
   /// ```dart
@@ -289,7 +290,9 @@ class _FolderViewState<T> extends State<FolderView<T>> {
 
   /// Intercept Ctrl+wheel (or Cmd+wheel on macOS) to change scale.
   void _handlePointerSignalForScale(PointerSignalEvent event) {
-    if (event is PointerScrollEvent && isScaleModifierPressed()) {
+    if (event is PointerScrollEvent &&
+        event.scrollDelta.dy != 0 &&
+        isScaleModifierPressed()) {
       if (widget.onScaleChanged != null) {
         final delta = event.scrollDelta.dy > 0
             ? -widget.scaleStep

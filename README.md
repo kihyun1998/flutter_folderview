@@ -165,7 +165,9 @@ The library also exports `isScaleModifierPressed()` — a platform-aware helper 
 ```dart
 Listener(
   onPointerSignal: (event) {
-    if (event is PointerScrollEvent && isScaleModifierPressed()) {
+    if (event is PointerScrollEvent &&
+        event.scrollDelta.dy != 0 &&
+        isScaleModifierPressed()) {
       final delta = event.scrollDelta.dy > 0 ? -0.1 : 0.1;
       setState(() => _scale = (_scale + delta).clamp(0.5, 3.0));
     }
