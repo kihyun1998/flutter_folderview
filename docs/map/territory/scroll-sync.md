@@ -25,6 +25,7 @@ Read from `SyncedScrollControllers` and `_FolderViewContentState`.
 `flutter_table_plus`'s `SyncedScrollControllers` is the prior art (an example, not binding; route in [`thegraph.md`](../../agents/thegraph.md)).
 
 ## Cross-cutting invariants
+- [pre-layout-extent](../invariant/pre-layout-extent.md) — `_jumpToNoCascade` clamps to the follower's extent, which during a build is the old one.
 - [row-wider-than-viewport](../invariant/row-wider-than-viewport.md) — the per-row translate is what puts a row's rect off screen.
 - [node-id-identity](../invariant/node-id-identity.md) — each row is keyed by its Node's `id`, with a `findChildIndexCallback`.
 
