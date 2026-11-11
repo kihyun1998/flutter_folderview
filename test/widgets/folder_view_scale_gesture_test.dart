@@ -100,6 +100,44 @@ void main() {
     }
   });
 
+  // Each target platform with its Scale Modifier key.
+  for (final (platform, modifier) in <(TargetPlatform, LogicalKeyboardKey)>[
+    (TargetPlatform.windows, LogicalKeyboardKey.controlLeft),
+    (TargetPlatform.macOS, LogicalKeyboardKey.metaLeft),
+  ]) {
+    testWidgets('${platform.name}: modifier+tilt proposes nothing; '
+        'vertical and diagonal still propose ±scaleStep', (tester) async {
+      debugDefaultTargetPlatformOverride = platform;
+      try {
+        final scales = <double>[];
+        await pumpFV(tester, nodes: data(), onScaleChanged: scales.add);
+        final center = tester.getCenter(find.byType(FolderView<String>));
+        final pointer = TestPointer(1, PointerDeviceKind.mouse);
+        await tester.sendEventToBinding(pointer.hover(center));
+
+        await tester.sendKeyDownEvent(modifier);
+        try {
+          await tester.sendEventToBinding(pointer.scroll(const Offset(60, 0)));
+          await tester.sendEventToBinding(pointer.scroll(const Offset(-60, 0)));
+          await tester.pumpAndSettle();
+          expect(scales, isEmpty);
+
+          await tester.sendEventToBinding(pointer.scroll(const Offset(0, 60)));
+          await tester.sendEventToBinding(pointer.scroll(const Offset(0, -60)));
+          // A diagonal follows the sign of dy.
+          await tester.sendEventToBinding(pointer.scroll(const Offset(30, 60)));
+          await tester.pumpAndSettle();
+        } finally {
+          await tester.sendKeyUpEvent(modifier);
+        }
+
+        expect(scales, [0.95, 1.05, 0.95]);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+  }
+
   testWidgets('while blocking, modifier+wheel leaves the scroll offset put', (
     tester,
   ) async {

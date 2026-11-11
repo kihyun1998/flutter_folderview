@@ -8,7 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 ///
 /// While the modifier scroll is blocked, a modifier notch must move no scroll
 /// offset anywhere over the view, the scrollbars included, and still propose
-/// a Scale. The scrollbars are their own scroll views, so before #114 a notch
+/// a Scale when it has vertical movement; a sideways notch proposes nothing
+/// (#174). The scrollbars are their own scroll views, so before #114 a notch
 /// over the vertical bar both scrolled and proposed.
 void main() {
   // 40 Children under one Parent, one with a long label: taller and wider than
@@ -200,7 +201,7 @@ void main() {
     });
 
     winTest('over the horizontal scrollbar a sideways modifier notch '
-        'proposes and does not scroll', (tester) async {
+        'neither proposes nor scrolls', (tester) async {
       final proposed = await pump(tester);
 
       await wheel(
@@ -210,11 +211,25 @@ void main() {
         modifier: true,
       );
       expect(offsets(tester), everyElement(0));
+      expect(proposed, isEmpty);
+    });
+
+    winTest('over the horizontal scrollbar a vertical modifier notch '
+        'proposes and does not scroll', (tester) async {
+      final proposed = await pump(tester);
+
+      await wheel(
+        tester,
+        overHorizontalBar(tester),
+        const Offset(0, 300),
+        modifier: true,
+      );
+      expect(offsets(tester), everyElement(0));
       expect(proposed, hasLength(1));
     });
 
     winTest('over the horizontal scrollbar whose thumb has faded in, a '
-        'sideways modifier notch proposes and does not scroll', (tester) async {
+        'sideways modifier notch neither proposes nor scrolls', (tester) async {
       final proposed = await pump(tester);
       final pointer = TestPointer(1, PointerDeviceKind.mouse);
       await tester.sendEventToBinding(pointer.hover(overHorizontalBar(tester)));
@@ -226,7 +241,7 @@ void main() {
       await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
 
       expect(offsets(tester), everyElement(0));
-      expect(proposed, hasLength(1));
+      expect(proposed, isEmpty);
     });
 
     winTest('blockModifierScroll: true without a handler blocks the '
