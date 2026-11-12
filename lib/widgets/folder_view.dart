@@ -129,8 +129,11 @@ class FolderView<T> extends StatefulWidget {
   /// ```
   ///
   /// Only the wheel is animated: trackpad scrolling, dragging a scrollbar, and
-  /// the jumps that keep a Node in place on expand, collapse or a [scale]
-  /// change move the view at once, and stop a motion in progress. A wheel
+  /// the jump that keeps a Node in place on a [scale] change move the view at
+  /// once, and stop a motion in progress. A change of rows above the view
+  /// during a motion, such as an expand or a collapse, keeps the rows in view
+  /// still and the motion going: it settles where it was heading, moved by the
+  /// rows added or removed, within the list's ends. A wheel
   /// turned over a scrollbar moves the view as it does over the rows, and adds
   /// to the same target.
   ///

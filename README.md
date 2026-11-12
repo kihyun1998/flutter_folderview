@@ -215,7 +215,7 @@ FolderView(
 
 `WheelMotion` comes from [`flutter_smooth_wheel_scroll`](https://pub.dev/packages/flutter_smooth_wheel_scroll) and is re-exported, so no second import is needed. It can change at runtime; the next notch uses it, and the scroll position is kept.
 
-- Only the mouse wheel animates. Trackpad scrolling, dragging a scrollbar, and the jumps that keep a Node in place on expand, collapse or a Scale change move the view at once, and stop a motion in progress.
+- Only the mouse wheel animates. Trackpad scrolling, dragging a scrollbar, and the jump that keeps a Node in place on a Scale change move the view at once, and stop a motion in progress. A change of rows above the view during a motion, such as an expand or a collapse, keeps the rows in view still and the motion going: it settles where it was heading, moved by the rows added or removed, within the list's ends.
 - A wheel turned over a scrollbar moves the view as it does over the rows, and adds to the same target.
 - Ctrl+wheel (Cmd+wheel on macOS) anywhere over the view, the scrollbars included, still proposes a Scale and, while `blockModifierScroll` is in effect, does not scroll.
 - Shift+wheel over the horizontal scrollbar scrolls sideways. Over the rows and the vertical scrollbar, Shift+wheel does what Flutter's scroll views do with it.
