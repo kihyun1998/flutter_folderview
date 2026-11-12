@@ -11,9 +11,11 @@ Three sites match Nodes across two lists by `id`, and none calls the others:
 
 Each takes the first match, so with a duplicate each picks a Node of its own.
 
+Scroll anchoring's correction during a user's scroll (`correctBy`, #195) leans on the keyed rows too: it asks for no layout, and the rows in view changing index under their keys is what lays the list out again in the frame of the change. With the keys removed, a drag case's rows were not laid out at the corrected offset in that frame (probed 2026-11-12).
+
 ## Territories it holds in
 - [flattening](../territory/flattening.md) — the in-place expand and collapse.
-- [scroll-anchoring](../territory/scroll-anchoring.md) — the bulk-change anchor.
+- [scroll-anchoring](../territory/scroll-anchoring.md) — the bulk-change anchor, and the frame in which a correction is laid out.
 - [scroll-sync](../territory/scroll-sync.md) — the rows are built by the `ListView` there.
 - [label-tooltip](../territory/label-tooltip.md) — the label tooltip and its per-Node controller live in the row's State.
 - [row-card](../territory/row-card.md) — the row card's tooltip is built inside the keyed row too (read from `_buildItem`, not probed).

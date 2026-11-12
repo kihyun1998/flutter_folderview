@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:just_tooltip/just_tooltip.dart';
 
 import '../input/scale_modifier.dart';
@@ -183,9 +184,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         newContentHeight: newContentHeight,
         viewportHeight: controller.position.viewportDimension,
       );
-      if (newOffset != null) {
-        controller.jumpTo(newOffset);
-      }
+      if (newOffset != null) _anchorTo(controller.position, newOffset);
       return;
     }
 
@@ -204,8 +203,19 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       viewportHeight: controller.position.viewportDimension,
     );
 
-    if (newOffset != null) {
-      controller.jumpTo(newOffset);
+    if (newOffset != null) _anchorTo(controller.position, newOffset);
+  }
+
+  /// Moves [position] to [offset] for rows added or removed above the view.
+  ///
+  /// While a user's scroll runs on it (a wheel motion, a drag or a fling), the
+  /// position is corrected by the difference, so that scroll goes on from the
+  /// new offset; a wheel motion's target moves with it. Otherwise it jumps.
+  void _anchorTo(ScrollPosition position, double offset) {
+    if (position.userScrollDirection == ScrollDirection.idle) {
+      position.jumpTo(offset);
+    } else {
+      position.correctBy(offset - position.pixels);
     }
   }
 
