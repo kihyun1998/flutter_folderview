@@ -42,7 +42,11 @@ renderers' default colours. Moving `lib/` to `material_ui` would make
 `lib/src/migration_utility.dart`) maps a migrated app's theme **down** to the
 legacy `Theme`: platform, visual density, colour scheme and text theme. It does
 nothing in the other direction, and it is itself `@Deprecated` as a temporary
-utility. Keeping the legacy import leaves an unmigrated app working with no
+utility. It also overrides `Localizations` for its subtree with the global
+Cupertino, Material and Widgets delegates (or the `delegates` it is given), so
+content a consumer builds inside `FolderView`, such as `rowTooltipBuilder`'s
+card, resolves localizations from those delegates. Read from its `build`, not
+measured. Keeping the legacy import leaves an unmigrated app working with no
 change, and costs a migrated app one wrapper.
 
 Read, not measured: `material_ui` 1.11.0 requires Dart `^3.13.0` and Flutter

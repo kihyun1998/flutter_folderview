@@ -121,7 +121,7 @@ FolderViewTheme<String>(
 
 An untyped `FolderViewTheme(data: FlutterFolderViewTheme.dark())` is a `FolderViewTheme<dynamic>`. A `FolderView<String>` does not find it and falls back to `light()`; in debug builds this is reported once.
 
-`FolderView` reads the app's `Theme` from `package:flutter/material.dart` for its default text style, default row colours and scrollbars. An app migrated to `package:material_ui` provides a different `Theme` that `FolderView` does not see, so wrap `FolderView`, or a subtree containing it, in `material_ui`'s `MaterialUiCompatibilityBridge` until this package migrates. The bridge is itself marked `@Deprecated` by `material_ui` as a temporary migration utility, so your own analyzer reports it ([ADR-0006](https://github.com/kihyun1998/flutter_folderview/blob/main/docs/adr/0006-material-import-kept-until-apps-migrate.md)):
+`FolderView` reads the app's `Theme` from `package:flutter/material.dart` for its default text style, default row colours and scrollbars. An app migrated to `package:material_ui` provides a different `Theme` that `FolderView` does not see, so wrap `FolderView`, or a subtree containing it, in `material_ui`'s `MaterialUiCompatibilityBridge` until this package migrates. The bridge is itself marked `@Deprecated` by `material_ui` as a temporary migration utility, so your own analyzer reports it. It also overrides `Localizations` for its subtree with the global Cupertino, Material and Widgets delegates unless you pass `delegates`, which applies to content you build inside `FolderView`, such as a `rowTooltipBuilder` card ([ADR-0006](https://github.com/kihyun1998/flutter_folderview/blob/main/docs/adr/0006-material-import-kept-until-apps-migrate.md)):
 
 ```dart
 MaterialUiCompatibilityBridge(
