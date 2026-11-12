@@ -178,9 +178,11 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     final topPadding = widget.theme.spacingTheme.contentPadding.top;
     final newContentHeight = widget.contentHeight;
 
-    // Case 1: incremental single-node change.
+    // Case 1: incremental single-node change, applied in the update that
+    // brought it.
     final change = widget.change;
     if (change != null && change.deltaItems != 0) {
+      if (identical(oldWidget.change, change)) return;
       if (!controller.hasClients) return;
       final newOffset = ScrollAnchor.verticalOffsetForFlattenChange(
         change: change,

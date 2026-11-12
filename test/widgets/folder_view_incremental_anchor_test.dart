@@ -47,6 +47,33 @@ Widget _view(Set<String> expanded) => MaterialApp(
   ),
 );
 
+/// The view with its [FolderView] built once per Expanded Set, so a change of
+/// [height] alone lays the same [FolderView] out again without rebuilding it.
+Widget _heldView(
+  ValueNotifier<Set<String>> expanded,
+  ValueNotifier<double> height,
+) => MaterialApp(
+  home: Scaffold(
+    body: Center(
+      child: ValueListenableBuilder<Set<String>>(
+        valueListenable: expanded,
+        builder: (context, ids, _) => ValueListenableBuilder<double>(
+          valueListenable: height,
+          builder: (context, h, child) =>
+              SizedBox(width: 400, height: h, child: child),
+          child: FolderView<String>(
+            data: _nodes,
+            mode: ViewMode.tree,
+            expandedNodeIds: ids,
+            wheelMotion: null,
+            theme: _theme,
+          ),
+        ),
+      ),
+    ),
+  ),
+);
+
 ScrollPosition _body(WidgetTester tester) =>
     tester.widget<ListView>(find.byType(ListView)).controller!.position;
 
@@ -139,5 +166,40 @@ void main() {
         expect(_verticalBar(tester).pixels, _body(tester).pixels);
       },
     );
+  }
+
+  for (final expand in [true, false]) {
+    final verb = expand ? 'an expand' : 'a collapse';
+    final after = expand ? 20000 + delta : 20000 - delta;
+    _winTest('a relayout after $verb above the view does not move the rows '
+        'again', (tester) async {
+      final expanded = ValueNotifier(_expanded(p0: !expand));
+      final height = ValueNotifier(300.0);
+      addTearDown(expanded.dispose);
+      addTearDown(height.dispose);
+      await tester.pumpWidget(_heldView(expanded, height));
+      await tester.pumpAndSettle();
+      _body(tester).jumpTo(20000);
+      await tester.pumpAndSettle();
+
+      expanded.value = _expanded(p0: expand);
+      await tester.pumpAndSettle();
+      expect(_body(tester).pixels, after);
+      final (label, top) = _rowAtCentre(tester);
+      final folderView = tester.widget(find.byType(FolderView<String>));
+
+      for (final h in [310.0, 320.0]) {
+        height.value = h;
+        await tester.pumpAndSettle();
+        expect(tester.getSize(find.byType(ListView)).height, h);
+        expect(
+          identical(tester.widget(find.byType(FolderView<String>)), folderView),
+          isTrue,
+        );
+        expect(_body(tester).pixels, after);
+        expect(tester.getTopLeft(find.text(label)).dy, top - (h - 300) / 2);
+        expect(_verticalBar(tester).pixels, _body(tester).pixels);
+      }
+    });
   }
 }

@@ -27,7 +27,7 @@ Read from `Flattener.update` and `FlattenService`.
 - [node-id-identity](../invariant/node-id-identity.md) — in-place expand and collapse find the row by `id`.
 
 ## Blast radius
-- [scroll-anchoring](scroll-anchoring.md) — `FlattenChange` is what keeps the viewport still when rows are inserted or removed above it. A change to when `change` is non-null changes which anchoring branch runs.
+- [scroll-anchoring](scroll-anchoring.md) — `FlattenChange` is what keeps the viewport still when rows are inserted or removed above it. A change to when `change` is non-null changes which anchoring branch runs. The incremental anchor applies a change once by its object identity, so a `FlattenChange` reused across updates, or made canonical, would be skipped.
 - [tree-lines](tree-lines.md) — reads `ancestorIsLastMask` and `isLast`; the bit encoding written here must match the one `TreeLinePlan.forRow` reads.
 - [view-mode-projection](view-mode-projection.md) — the full-rebuild input.
 - [row-geometry](row-geometry.md) — content height is computed from the flat list's length.
