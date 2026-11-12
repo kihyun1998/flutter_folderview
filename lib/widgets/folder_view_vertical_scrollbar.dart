@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 import '../themes/folder_view_scrollbar_theme.dart';

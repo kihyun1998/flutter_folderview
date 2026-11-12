@@ -33,6 +33,7 @@
 // the pure flatten path over the same node counts is ~22 us (1k) / ~275 us
 // (10k), so cold maxWidth remains the dominant per-data-change expense.
 
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_folderview/services/row_metrics.dart';
