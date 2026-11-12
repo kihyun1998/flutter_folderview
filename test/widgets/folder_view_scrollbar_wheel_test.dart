@@ -391,7 +391,7 @@ void main() {
       for (var i = 0; i < count; i++)
         Node<String>(id: 'c$i', label: 'c$i', type: NodeType.parent),
     ];
-    // One list across pumps: a new one would run the bulk anchor's bar re-sync.
+    // One list across pumps: a new one would run the bulk anchor.
     final many = rows(40);
     final few = rows(10);
     double listHeight(int count) {
@@ -546,6 +546,33 @@ void main() {
       expect(_body(tester).pixels, expandedAt - 120);
     });
   }
+
+  testWidgets(
+    'after the body bounces past the top, the scrollbar moves the body',
+    (tester) async {
+      await _pump(tester, null);
+      final at = _overBody(tester);
+      final pan = TestPointer(1, PointerDeviceKind.trackpad);
+      await tester.sendEventToBinding(pan.panZoomStart(at));
+      await tester.pump(_frame);
+      for (var dy = 10.0; dy <= 60; dy += 10) {
+        await tester.sendEventToBinding(
+          pan.panZoomUpdate(at, pan: Offset(0, dy)),
+        );
+        await tester.pump(_frame);
+      }
+      expect(_body(tester).pixels, lessThan(0));
+      expect(_bar(tester, Axis.vertical).pixels, 0);
+      await tester.sendEventToBinding(pan.panZoomEnd());
+      await tester.pumpAndSettle();
+      expect(_body(tester).pixels, 0);
+
+      _bar(tester, Axis.vertical).jumpTo(100);
+      await tester.pump();
+      expect(_body(tester).pixels, 100);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
 
   _winTest('the horizontal scrollbar keeps its offset when the vertical one '
       'leaves and comes back', (tester) async {

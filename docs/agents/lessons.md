@@ -117,6 +117,12 @@ mutation-check 를 PR 본문에 적는다.
   끊었다. 같은 리뷰가 페이드인된 스크롤바 위의 Ctrl+휠도 잡았다: 테스트가 hover 직후라 썸이
   안 그려진 경로만 지나고 있었다. **ticker 와 경쟁하는 입력은 프레임을 흘려서, hover 는
   settle 한 뒤에 잰다.**
+- **#194 (새 메커니즘이 옛 고정 테스트의 창을 지운다)**: 바가 body 의 metrics 를 따라가게 하자
+  #178 의 가드(`_jumpToNoCascade` 의 `clampedOffset != slave.offset`)를 무조건으로 바꿔도 전 스위트가
+  초록이었다. main 에서는 bulk expand 뒤 notch 테스트 둘이 죽는다. layout 뒤 re-follow 가 바를
+  옮기면서 남은 플래그를 지나가며 지웠기 때문이다. 가드는 여전히 필요하다(bouncing physics 의
+  overscroll 에서 바가 clamp 로 0 에 머무를 때). macOS bounce 테스트로 다시 고정했다. **상태를 고치는
+  메커니즘을 더하면, 옛 버그를 고정한 테스트를 그 버그의 가드를 끄고 다시 돌린다.**
 
 ## Step 6/7 — 정합성 스윕 & 게이트
 
