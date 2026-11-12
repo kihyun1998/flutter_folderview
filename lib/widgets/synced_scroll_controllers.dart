@@ -115,6 +115,31 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
     }
   }
 
+  /// Moves the vertical scrollbar to the main vertical offset, clamped to the
+  /// scrollbar's extent, when the two differ.
+  void _verticalBarFollowsBody() {
+    final body = _sc11;
+    final bar = _sc12;
+    if (body == null || bar == null) return;
+    if (!body.hasClients || !bar.hasClients) return;
+    final target = body.offset.clamp(
+      bar.position.minScrollExtent,
+      bar.position.maxScrollExtent,
+    );
+    if (target == bar.offset) return;
+    _doNotReissueJump[bar] = true;
+    bar.jumpTo(target);
+  }
+
+  /// Re-follows the vertical scrollbar on a change of the metrics of a
+  /// vertical scroll view directly below this widget.
+  bool _onScrollMetrics(ScrollMetricsNotification notification) {
+    if (notification.depth == 0 && notification.metrics.axis == Axis.vertical) {
+      _verticalBarFollowsBody();
+    }
+    return false;
+  }
+
   void _disposeOrUnsubscribe() {
     _listenersMap.forEach((controller, listener) {
       controller.removeListener(listener);
@@ -129,5 +154,8 @@ class _SyncedScrollControllersState extends State<SyncedScrollControllers> {
 
   @override
   Widget build(BuildContext context) =>
-      widget.builder(context, _sc11, _sc12, _sc21, _sc22);
+      NotificationListener<ScrollMetricsNotification>(
+        onNotification: _onScrollMetrics,
+        child: widget.builder(context, _sc11, _sc12, _sc21, _sc22),
+      );
 }

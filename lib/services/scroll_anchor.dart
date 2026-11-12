@@ -3,7 +3,7 @@ import 'flattener.dart';
 
 /// Pure scroll-offset math for preserving viewport position across layout
 /// changes. It computes target offsets; it never touches a ScrollController —
-/// the widget applies the result (`jumpTo`, scrollbar re-sync).
+/// the widget applies the result with `jumpTo`.
 ///
 /// Every method returns `null` (or a null field) when no adjustment is needed.
 /// The Scale and bulk methods also return `null` for a move of 0.5 px or less.

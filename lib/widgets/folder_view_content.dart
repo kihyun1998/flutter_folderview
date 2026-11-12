@@ -119,7 +119,6 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     if (!controller.hasClients) return;
 
     final hController = widget.horizontalController;
-    final barController = widget.verticalBarController;
     final oldItemExtent =
         oldWidget.theme.rowHeight + oldWidget.theme.rowSpacing;
     final newItemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
@@ -157,15 +156,6 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       if (result.vertical != null) {
         controller.jumpTo(result.vertical!);
       }
-      // Re-sync the vertical scrollbar even if the offset didn't move — the
-      // scale change altered the scroll extent.
-      if (barController.hasClients) {
-        final target = controller.offset.clamp(
-          barController.position.minScrollExtent,
-          barController.position.maxScrollExtent,
-        );
-        barController.jumpTo(target);
-      }
 
       if (result.horizontal != null && hController.hasClients) {
         hController.jumpTo(result.horizontal!);
@@ -195,7 +185,6 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       );
       if (newOffset != null) {
         controller.jumpTo(newOffset);
-        _syncVerticalBarAfterLayout();
       }
       return;
     }
@@ -217,24 +206,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
 
     if (newOffset != null) {
       controller.jumpTo(newOffset);
-      _syncVerticalBarAfterLayout();
     }
-  }
-
-  /// Moves the vertical scrollbar to the body's offset after the next layout,
-  /// when both have the new scroll extent.
-  void _syncVerticalBarAfterLayout() {
-    final controller = widget.verticalController;
-    final barController = widget.verticalBarController;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (controller.hasClients && barController.hasClients) {
-        final target = controller.offset.clamp(
-          barController.position.minScrollExtent,
-          barController.position.maxScrollExtent,
-        );
-        barController.jumpTo(target);
-      }
-    });
   }
 
   /// The index of the row keyed by a Node id.
