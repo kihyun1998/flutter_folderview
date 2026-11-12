@@ -133,7 +133,8 @@ class FolderView<T> extends StatefulWidget {
   /// once, and stop a motion in progress. A change of rows above the view
   /// during a motion, such as an expand or a collapse, keeps the rows in view
   /// still and the motion going: it settles where it was heading, moved by the
-  /// rows added or removed, within the list's ends. A wheel
+  /// rows added or removed, within the list's ends. One that comes with a
+  /// [scale] change keeps the rows in view still and stops the motion. A wheel
   /// turned over a scrollbar moves the view as it does over the rows, and adds
   /// to the same target.
   ///
