@@ -6,6 +6,7 @@ The public theming surface. `FlutterFolderViewTheme` aggregates eight sub-themes
 ## Governing decisions
 - [ADR-0005](../../adr/0005-tier-theme-boilerplate-not-extracted.md): no shared base for the tier themes. A shared-contract change is applied to all three by hand.
 - [ADR-0003](../../adr/0003-selection-is-tier-bound-to-child.md): only `ChildNodeTheme` carries `selected*` fields.
+- [ADR-0006](../../adr/0006-material-import-kept-until-apps-migrate.md): the ambient theme `FolderView` reads (base text style, default row colours, scrollbars, Scale's `defaultFontSize`) is the legacy `package:flutter/material.dart` `Theme`. A `material_ui` app's theme reaches it through `MaterialUiCompatibilityBridge`, or a legacy `Theme` the app places above it.
 - [ADR-0001](../../adr/0001-scrollbars-excluded-from-scale.md) and [ADR-0004](../../adr/0004-tooltips-excluded-from-scale.md): which sub-themes have no `scale`.
 
 ## Design model

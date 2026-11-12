@@ -1,5 +1,6 @@
 import 'dart:ui' show lerpDouble;
 
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// Defines the visual appearance of scrollbars in a FolderView

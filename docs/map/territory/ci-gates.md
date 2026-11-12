@@ -12,6 +12,7 @@ Read from `.github/workflows/ci.yml`.
 - The `test` job format-checks `lib test benchmark`, analyzes, and runs `flutter test --coverage`. Coverage is uploaded as an artifact; the Codecov step is commented out.
 - The `example` job formats, analyzes and runs `example/test`. For a long time it did not run the tests, and a red `flutter create` smoke test sat there unseen (#57, the workflow's comment).
 - **Outside every gate, on purpose:** `example/integration_test/`, which launches a desktop app and is run locally, one file at a time ([example](example.md)); and `benchmark/`, which the `test` job format-checks but never runs ([benchmarks](benchmarks.md)).
+- **`flutter analyze` fails on infos**, so a deprecation in the SDK turns every PR red the day `stable` moves. Flutter 3.50 did this with `package:flutter/material.dart` (#198); each such import carries `// ignore: deprecated_member_use`, and the diagnostic stays on for everything else ([dependency-floor](dependency-floor.md), [ADR-0006](../../adr/0006-material-import-kept-until-apps-migrate.md)).
 - `flutter analyze` regenerates `example/*/flutter/generated_plugin_registrant.*` with line-ending changes only. A `M` there after a gate run is not a content change: check with `git diff --ignore-all-space --stat`, then `git restore`.
 
 ## Code
