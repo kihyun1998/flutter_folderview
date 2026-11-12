@@ -91,6 +91,11 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   /// Current horizontal scroll offset, driven by horizontalController.
   final ValueNotifier<double> _horizontalOffset = ValueNotifier<double>(0.0);
 
+  /// Whether a drag runs on the vertical scrollbar: set by a scroll start or
+  /// update that carries drag details, cleared by one that does not (a fling,
+  /// a track tap's animation, a jump) and by a scroll end.
+  bool _barDragging = false;
+
   @override
   void initState() {
     super.initState();
@@ -115,7 +120,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     if (scaleChanged) {
       _applyScaleAdjustment(oldWidget, rowsOffset);
     } else if (rowsOffset != null) {
-      _anchorTo(widget.verticalController.position, rowsOffset);
+      _anchorTo(rowsOffset);
     }
   }
 
@@ -219,17 +224,38 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     );
   }
 
-  /// Moves [position] to [offset] for rows added or removed above the view.
+  /// Moves the view to [offset] for rows added or removed above it.
   ///
-  /// While a user's scroll runs on it (a wheel motion, a drag or a fling), the
-  /// position is corrected by the difference, so that scroll goes on from the
-  /// new offset; a wheel motion's target moves with it. Otherwise it jumps.
-  void _anchorTo(ScrollPosition position, double offset) {
-    if (position.userScrollDirection == ScrollDirection.idle) {
-      position.jumpTo(offset);
+  /// While the vertical scrollbar is dragged, the body and the scrollbar are
+  /// both corrected by their difference to [offset], and the drag goes on.
+  /// While a user's scroll runs on the body (a wheel motion, a drag or a
+  /// fling), the body is corrected by the difference, so that scroll goes on
+  /// from the new offset; a wheel motion's target moves with it. Otherwise the
+  /// body jumps, and the scrollbar follows it.
+  void _anchorTo(double offset) {
+    final body = widget.verticalController.position;
+    final bar = widget.verticalBarController;
+    if (_barDragging && bar.hasClients) {
+      for (final position in [body, bar.position]) {
+        position.correctBy(offset - position.pixels);
+      }
+    } else if (body.userScrollDirection != ScrollDirection.idle) {
+      body.correctBy(offset - body.pixels);
     } else {
-      position.correctBy(offset - position.pixels);
+      body.jumpTo(offset);
     }
+  }
+
+  /// Follows whether a drag runs on the vertical scrollbar, from the scroll
+  /// notifications of its scroll view.
+  bool _onVerticalBarScroll(ScrollNotification notification) {
+    _barDragging = switch (notification) {
+      ScrollStartNotification(:final dragDetails) => dragDetails != null,
+      ScrollUpdateNotification(:final dragDetails) => dragDetails != null,
+      ScrollEndNotification() => false,
+      _ => _barDragging,
+    };
+    return false;
   }
 
   /// The index of the row keyed by a Node id.
@@ -426,15 +452,20 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
 
               /// Vertical scrollbar — only rebuilds when hover state changes
               if (widget.needsVerticalScroll)
-                ValueListenableBuilder<bool>(
+                NotificationListener<ScrollNotification>(
                   key: const ValueKey(Axis.vertical),
-                  valueListenable: _isHover,
-                  builder: (context, isHover, _) => FolderViewVerticalScrollbar(
-                    isHover: isHover,
-                    verticalScrollbarController: widget.verticalBarController,
-                    contentHeight: widget.contentHeight,
-                    needsHorizontalScroll: widget.needsHorizontalScroll,
-                    scrollbarTheme: widget.theme.scrollbarTheme,
+                  onNotification: _onVerticalBarScroll,
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: _isHover,
+                    builder: (context, isHover, _) =>
+                        FolderViewVerticalScrollbar(
+                          isHover: isHover,
+                          verticalScrollbarController:
+                              widget.verticalBarController,
+                          contentHeight: widget.contentHeight,
+                          needsHorizontalScroll: widget.needsHorizontalScroll,
+                          scrollbarTheme: widget.theme.scrollbarTheme,
+                        ),
                   ),
                 ),
 
