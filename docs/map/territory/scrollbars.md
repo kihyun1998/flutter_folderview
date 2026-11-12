@@ -44,6 +44,7 @@ Material's `Scrollbar` and `widgets/scrollbar.dart` thumb placement, read from t
 - [row-geometry](row-geometry.md) — `contentHeight` and `contentWidth` size the bars' scroll content.
 - [scale-input](scale-input.md) — a modifier wheel over a bar is refused by the main position's physics.
 - [wheel-motion](wheel-motion.md) — a wheel over a bar is handed to the main controller of that axis.
+- [scroll-anchoring](scroll-anchoring.md) — the vertical bar's scroll notifications tell the anchor whether the bar is dragged, so an anchor during a drag on the bar corrects the bar instead of ending the drag (#203).
 
 ## Known holes / open
 - **Not covered: iOS.** There Material's `Scrollbar` builds a `CupertinoScrollbar` from its own constructor arguments. The bars pass thickness, radius and thumb colour only through `ScrollbarThemeData`, so on iOS those three are ignored, and the #122 cap does not apply. Read from the code, not probed. Tracked: #147.

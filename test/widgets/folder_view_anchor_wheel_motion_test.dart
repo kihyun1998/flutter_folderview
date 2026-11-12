@@ -1,4 +1,5 @@
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_folderview/flutter_folderview.dart';
@@ -7,7 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 // An expand or collapse above the view during a wheel motion is added to that
 // motion: the rows in view stay still, and the motion settles at its target
 // plus the rows added or removed above, with the vertical scrollbar on the
-// body.
+// body. A drag, a fling and a thumb drag on the vertical scrollbar go on
+// through one too.
 
 const int _parents = 60;
 const int _children = 20;
@@ -57,18 +59,15 @@ Widget _view(Set<String> expanded) => MaterialApp(
 ScrollPosition _body(WidgetTester tester) =>
     tester.widget<ListView>(find.byType(ListView)).controller!.position;
 
-ScrollPosition _verticalBar(WidgetTester tester) => tester
-    .widget<SingleChildScrollView>(
-      find.descendant(
-        of: find.byType(Scrollbar),
-        matching: find.byWidgetPredicate(
-          (w) =>
-              w is SingleChildScrollView && w.scrollDirection == Axis.vertical,
-        ),
-      ),
-    )
-    .controller!
-    .position;
+final Finder _verticalBarView = find.descendant(
+  of: find.byType(Scrollbar),
+  matching: find.byWidgetPredicate(
+    (w) => w is SingleChildScrollView && w.scrollDirection == Axis.vertical,
+  ),
+);
+
+ScrollPosition _verticalBar(WidgetTester tester) =>
+    tester.widget<SingleChildScrollView>(_verticalBarView).controller!.position;
 
 /// Sends one mouse-wheel notch of [dy] over the view, without pumping.
 Future<void> _wheel(WidgetTester tester, double dy) async {
@@ -125,6 +124,72 @@ Future<void> _changeKeepsRowsStill(
   final (label, top) = _rowAtCentre(tester);
   await tester.pumpWidget(_view(expanded));
   expect(tester.getTopLeft(find.text(label)).dy, top);
+}
+
+/// A mouse drag on the vertical scrollbar's thumb, pressed near the top of the
+/// view, moved down in steps of 10 with a frame after each.
+class _ThumbDrag {
+  _ThumbDrag._(this._tester, this._at);
+
+  final WidgetTester _tester;
+  final Offset _at;
+  final TestPointer _pointer = TestPointer(1, PointerDeviceKind.mouse);
+  double _dy = 0;
+
+  /// Presses [below] the top of the view plus 5.
+  static Future<_ThumbDrag> start(
+    WidgetTester tester, {
+    double below = 0,
+  }) async {
+    final rect = tester.getRect(find.byType(FolderView<String>));
+    final drag = _ThumbDrag._(
+      tester,
+      Offset(rect.right - 3, rect.top + 5 + below),
+    );
+    await tester.sendEventToBinding(drag._pointer.hover(drag._at));
+    await tester.pumpAndSettle();
+    await tester.sendEventToBinding(drag._pointer.down(drag._at));
+    await tester.pump();
+    return drag;
+  }
+
+  Future<void> down(int steps) async {
+    for (var i = 0; i < steps; i++) {
+      _dy += 10;
+      await _tester.sendEventToBinding(_pointer.move(_at + Offset(0, _dy)));
+      await _tester.pump();
+    }
+  }
+
+  Future<void> release() async {
+    await _tester.sendEventToBinding(_pointer.up());
+    await _tester.pumpAndSettle();
+  }
+}
+
+/// Where a thumb drag of [steps] moves the view from the top, with every
+/// Parent expanded but those in [collapsed] and no change during the drag.
+Future<double> _thumbDragAlone(
+  WidgetTester tester,
+  Set<String> collapsed,
+  int steps,
+) async {
+  await tester.pumpWidget(_view(_expandedBut(collapsed)));
+  await tester.pumpAndSettle();
+  final drag = await _ThumbDrag.start(tester);
+  await drag.down(steps);
+  final pixels = _body(tester).pixels;
+  await drag.release();
+  _body(tester).jumpTo(0);
+  await tester.pumpAndSettle();
+  return pixels;
+}
+
+/// Checks that the vertical scrollbar's thumb drag is still running, with the
+/// body on the scrollbar.
+void _thumbDragRuns(WidgetTester tester) {
+  expect(_verticalBar(tester).activity, isA<DragScrollActivity>());
+  expect(_body(tester).pixels, _verticalBar(tester).pixels);
 }
 
 void _winTest(String description, WidgetTesterCallback body) => testWidgets(
@@ -351,4 +416,214 @@ void main() {
     expect(_body(tester).pixels, pixels + delta);
     expect(_verticalBar(tester).pixels, _body(tester).pixels);
   });
+
+  // A thumb drag sets the offset from where the pointer is on the track,
+  // mapped onto the content as it is now, so after a change the drag goes on
+  // to the place the pointer stands for in the new content. When that place
+  // is behind the view, each move is added to the offset instead.
+
+  _winTest('expanding a Parent above the view during a thumb drag lets the '
+      'drag go on', (tester) async {
+    final expected = await _thumbDragAlone(tester, {}, 6);
+
+    await tester.pumpWidget(_view(_expandedBut({'p0'})));
+    await tester.pumpAndSettle();
+    final drag = await _ThumbDrag.start(tester);
+    await drag.down(3);
+    final pixels = _body(tester).pixels;
+    expect(pixels, greaterThan(0));
+    _thumbDragRuns(tester);
+    await _changeKeepsRowsStill(tester, _expandedBut({}));
+    expect(_body(tester).pixels, pixels + delta);
+    _thumbDragRuns(tester);
+
+    await drag.down(3);
+    _thumbDragRuns(tester);
+    expect(_body(tester).pixels, expected);
+    await drag.release();
+
+    expect(_body(tester).pixels, expected);
+    expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  });
+
+  _winTest('collapsing a Parent above the view during a thumb drag lets the '
+      'drag go on', (tester) async {
+    final expected = await _thumbDragAlone(tester, {'p0'}, 6);
+
+    await tester.pumpWidget(_view(_expandedBut({})));
+    await tester.pumpAndSettle();
+    final drag = await _ThumbDrag.start(tester);
+    await drag.down(3);
+    final pixels = _body(tester).pixels;
+    expect(pixels, greaterThan(delta));
+    _thumbDragRuns(tester);
+    await _changeKeepsRowsStill(tester, _expandedBut({'p0'}));
+    expect(_body(tester).pixels, pixels - delta);
+    _thumbDragRuns(tester);
+
+    await drag.down(3);
+    _thumbDragRuns(tester);
+    expect(_body(tester).pixels, expected);
+    await drag.release();
+
+    expect(_body(tester).pixels, expected);
+    expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  });
+
+  _winTest('expanding ten Parents above the view at once during a thumb drag '
+      'adds each further move to the offset', (tester) async {
+    final step = await _thumbDragAlone(tester, {}, 3);
+    final collapsed = {for (var p = 0; p < 10; p++) 'p$p'};
+
+    await tester.pumpWidget(_view(_expandedBut(collapsed)));
+    await tester.pumpAndSettle();
+    final drag = await _ThumbDrag.start(tester);
+    await drag.down(3);
+    final pixels = _body(tester).pixels;
+    expect(pixels, greaterThan(0));
+    _thumbDragRuns(tester);
+    await _changeKeepsRowsStill(tester, _expandedBut({}));
+    expect(_body(tester).pixels, pixels + 10 * delta);
+    _thumbDragRuns(tester);
+
+    await drag.down(3);
+    _thumbDragRuns(tester);
+    expect(_body(tester).pixels, closeTo(pixels + 10 * delta + step, 0.001));
+    await drag.release();
+
+    expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  });
+
+  _winTest('expanding a Parent above the view while the thumb is pressed and '
+      'not yet moved lets the drag go on', (tester) async {
+    final expected = await _thumbDragAlone(tester, {}, 6);
+
+    await tester.pumpWidget(_view(_expandedBut({'p0'})));
+    await tester.pumpAndSettle();
+    final first = await _ThumbDrag.start(tester);
+    await first.down(3);
+    await first.release();
+    final pixels = _body(tester).pixels;
+    expect(pixels, greaterThan(0));
+
+    // Pressed again where the first drag left the thumb.
+    final drag = await _ThumbDrag.start(tester, below: 30);
+    expect(_body(tester).pixels, pixels);
+    _thumbDragRuns(tester);
+    expect(_verticalBar(tester).userScrollDirection, ScrollDirection.idle);
+    await _changeKeepsRowsStill(tester, _expandedBut({}));
+    expect(_body(tester).pixels, pixels + delta);
+    _thumbDragRuns(tester);
+
+    await drag.down(3);
+    _thumbDragRuns(tester);
+    expect(_body(tester).pixels, expected);
+    await drag.release();
+
+    expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  });
+
+  _winTest('expanding a Parent above the view during a track tap ends the '
+      "tap's animation where the rows stay", (tester) async {
+    await tester.pumpWidget(_view(_expandedBut({'p0'})));
+    await tester.pumpAndSettle();
+    _body(tester).jumpTo(20000);
+    await tester.pumpAndSettle();
+
+    final rect = tester.getRect(find.byType(FolderView<String>));
+    final at = Offset(rect.right - 3, rect.bottom - 40);
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(at));
+    await tester.pumpAndSettle();
+    await tester.sendEventToBinding(pointer.down(at));
+    await tester.pump();
+    await tester.sendEventToBinding(pointer.up());
+    await _midMotion(tester, 20000, 20300);
+    final pixels = _body(tester).pixels;
+    await _changeKeepsRowsStill(tester, _expandedBut({}));
+    await tester.pumpAndSettle();
+
+    expect(_body(tester).pixels, pixels + delta);
+    expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  });
+
+  _winTest('expanding a Parent above the view as a track tap starts ends the '
+      "tap's animation where the rows stay", (tester) async {
+    await tester.pumpWidget(_view(_expandedBut({'p0'})));
+    await tester.pumpAndSettle();
+    _body(tester).jumpTo(20000);
+    await tester.pumpAndSettle();
+
+    final rect = tester.getRect(find.byType(FolderView<String>));
+    final at = Offset(rect.right - 3, rect.bottom - 40);
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(at));
+    await tester.pumpAndSettle();
+    await tester.sendEventToBinding(pointer.down(at));
+    await tester.pump();
+    await tester.sendEventToBinding(pointer.up());
+    expect(_verticalBar(tester).isScrollingNotifier.value, isTrue);
+    final pixels = _body(tester).pixels;
+    await _changeKeepsRowsStill(tester, _expandedBut({}));
+    await tester.pumpAndSettle();
+
+    expect(_body(tester).pixels, pixels + delta);
+    expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  });
+
+  _winTest('expanding a Parent above the view after a thumb drag has ended '
+      'moves the view by its rows at once', (tester) async {
+    await tester.pumpWidget(_view(_expandedBut({'p0'})));
+    await tester.pumpAndSettle();
+    final drag = await _ThumbDrag.start(tester);
+    await drag.down(3);
+    await drag.release();
+    final pixels = _body(tester).pixels;
+    expect(pixels, greaterThan(0));
+    expect(_verticalBar(tester).isScrollingNotifier.value, isFalse);
+
+    var heard = 0;
+    void hear() => heard++;
+    final body = _body(tester)..addListener(hear);
+    await _changeKeepsRowsStill(tester, _expandedBut({}));
+    body.removeListener(hear);
+
+    expect(heard, greaterThan(0), reason: 'a jump notifies the listeners');
+    expect(_body(tester).pixels, pixels + delta);
+    await tester.pumpAndSettle();
+    expect(_body(tester).pixels, pixels + delta);
+    expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  });
+
+  testWidgets('expanding a Parent above the view and collapsing one below it '
+      'during a fling on the vertical scrollbar ends the fling where the rows '
+      'stay', (tester) async {
+    await tester.pumpWidget(_view(_expandedBut({'p0'})));
+    await tester.pumpAndSettle();
+    _body(tester).jumpTo(20000);
+    await tester.pumpAndSettle();
+
+    final rect = tester.getRect(find.byType(FolderView<String>));
+    await tester.flingFrom(
+      Offset(rect.right - 3, rect.center.dy),
+      const Offset(0, -150),
+      2000,
+    );
+    for (var i = 0; i < 3; i++) {
+      await tester.pump(_frame);
+    }
+    final pixels = _body(tester).pixels;
+    expect(_verticalBar(tester).isScrollingNotifier.value, isTrue);
+    expect(pixels, greaterThan(20150));
+
+    // The same number of rows: the content height does not change.
+    await _changeKeepsRowsStill(tester, _expandedBut({'p59'}));
+    expect(_body(tester).pixels, pixels + delta);
+    await tester.pump(_frame);
+    expect(_body(tester).pixels, pixels + delta);
+    await tester.pumpAndSettle();
+
+    expect(_body(tester).pixels, pixels + delta);
+    expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.android));
 }
