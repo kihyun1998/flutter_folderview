@@ -4,12 +4,12 @@
 Every rendered row is exactly `rowHeight + rowSpacing` tall, with its content centred in that height. `rowSpacing` is extra height on every row, not an empty gap between rows (maintainer, at triage, #118). So the list's total extent is `n × (rowHeight + rowSpacing)` plus vertical content padding, and every site that converts between pixels and rows must use the same unit.
 
 ## Why it is cross-cutting
-The unit is recomputed at each site from the theme, `theme.rowHeight + theme.rowSpacing`, with no shared helper. `_FolderViewContentState.build` hands it to the `ListView` as `itemExtent`; `_applyScrollAdjustment` and `_applyScaleAdjustment` compute it again for `ScrollAnchor`; `SizeService.calculateContentHeight` computes its own total, `n × (rowHeight + rowSpacing)` plus padding, for the scrollbars and for `needsVerticalScroll`. None calls the others. `NodeWidget` asks for `rowHeight` and is overridden by the `itemExtent`, and `TreeLinesPainter` follows by reading the size it paints. A site that drifts produces rows, anchors and bars that disagree, with no error.
+The unit is recomputed at each site from the theme, `theme.rowHeight + theme.rowSpacing`, with no shared helper. `_FolderViewContentState.build` hands it to the `ListView` as `itemExtent`; `_rowsAnchorOffset` and `_applyScaleAdjustment` compute it again for `ScrollAnchor`; `SizeService.calculateContentHeight` computes its own total, `n × (rowHeight + rowSpacing)` plus padding, for the scrollbars and for `needsVerticalScroll`. None calls the others. `NodeWidget` asks for `rowHeight` and is overridden by the `itemExtent`, and `TreeLinesPainter` follows by reading the size it paints. A site that drifts produces rows, anchors and bars that disagree, with no error.
 
 ## Territories it holds in
 - [tier-rendering](../territory/tier-rendering.md) — `NodeWidget`'s `SizedBox(height: rowHeight)` is overridden by the `itemExtent`.
 - [tree-lines](../territory/tree-lines.md) — `TreeLinesPainter` uses half its own size, so it follows the extent (#118).
-- [scroll-anchoring](../territory/scroll-anchoring.md) — `_applyScrollAdjustment` and `_applyScaleAdjustment` convert offsets in units of the extent.
+- [scroll-anchoring](../territory/scroll-anchoring.md) — `_rowsAnchorOffset` and `_applyScaleAdjustment` convert offsets in units of the extent.
 - [row-geometry](../territory/row-geometry.md) — `SizeService.calculateContentHeight` totals the same unit.
 - [scrollbars](../territory/scrollbars.md) — the vertical bar's scroll content is `contentHeight` tall.
 

@@ -105,17 +105,29 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       widget.horizontalController.addListener(_onHorizontalScroll);
     }
 
-    // Adjust scroll position when scale changes (preserve visible node)
-    _applyScaleAdjustment(oldWidget);
-
-    // Adjust vertical scroll offset when items were inserted/removed above
-    // the current viewport due to expand/collapse.
-    _applyScrollAdjustment(oldWidget);
+    // Rows added or removed above the view move it in the Scale it was laid
+    // out in; a Scale change then maps that offset into the new one and clamps
+    // it to the end.
+    final scaleChanged = oldWidget.scale != widget.scale;
+    final rowsOffset = scaleChanged
+        ? _rowsAnchorOffset(oldWidget, oldWidget.theme, double.infinity)
+        : _rowsAnchorOffset(oldWidget, widget.theme, widget.contentHeight);
+    if (scaleChanged) {
+      _applyScaleAdjustment(oldWidget, rowsOffset);
+    } else if (rowsOffset != null) {
+      _anchorTo(widget.verticalController.position, rowsOffset);
+    }
   }
 
-  void _applyScaleAdjustment(FolderViewContent<T> oldWidget) {
-    if (oldWidget.scale == widget.scale) return;
-
+  /// Moves the view after a Scale change, keeping the row at its top.
+  ///
+  /// The vertical mapping starts from [rowsOffset], the offset the rows added
+  /// or removed in the same update put the view at in the old Scale, or from
+  /// the current offset when there is none.
+  void _applyScaleAdjustment(
+    FolderViewContent<T> oldWidget,
+    double? rowsOffset,
+  ) {
     final controller = widget.verticalController;
     if (!controller.hasClients) return;
 
@@ -125,7 +137,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     final newItemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
     final oldTopPadding = oldWidget.theme.spacingTheme.contentPadding.top;
     final newTopPadding = widget.theme.spacingTheme.contentPadding.top;
-    final currentV = controller.offset;
+    final currentV = rowsOffset ?? controller.offset;
     final currentH = hController.hasClients ? hController.offset : null;
     final oldContentWidth = oldWidget.contentWidth;
     final newContentWidth = widget.contentWidth;
@@ -154,9 +166,8 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
             : 0.0,
       );
 
-      if (result.vertical != null) {
-        controller.jumpTo(result.vertical!);
-      }
+      final vertical = result.vertical ?? rowsOffset;
+      if (vertical != null) controller.jumpTo(vertical);
 
       if (result.horizontal != null && hController.hasClients) {
         hController.jumpTo(result.horizontal!);
@@ -164,19 +175,25 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     });
   }
 
-  void _applyScrollAdjustment(FolderViewContent<T> oldWidget) {
+  /// The offset that keeps the rows in view still across rows added or removed
+  /// above the view in this update, in the Scale of [theme] and clamped to the
+  /// end of [newContentHeight], or null when nothing above the view changed.
+  double? _rowsAnchorOffset(
+    FolderViewContent<T> oldWidget,
+    FlutterFolderViewTheme<T> theme,
+    double newContentHeight,
+  ) {
     final controller = widget.verticalController;
-    final itemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
-    final topPadding = widget.theme.spacingTheme.contentPadding.top;
-    final newContentHeight = widget.contentHeight;
+    final itemExtent = theme.rowHeight + theme.rowSpacing;
+    final topPadding = theme.spacingTheme.contentPadding.top;
 
     // Case 1: incremental single-node change, applied in the update that
     // brought it.
     final change = widget.change;
     if (change != null && change.deltaItems != 0) {
-      if (identical(oldWidget.change, change)) return;
-      if (!controller.hasClients) return;
-      final newOffset = ScrollAnchor.verticalOffsetForFlattenChange(
+      if (identical(oldWidget.change, change)) return null;
+      if (!controller.hasClients) return null;
+      return ScrollAnchor.verticalOffsetForFlattenChange(
         change: change,
         currentOffset: controller.offset,
         itemExtent: itemExtent,
@@ -184,16 +201,14 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         newContentHeight: newContentHeight,
         viewportHeight: controller.position.viewportDimension,
       );
-      if (newOffset != null) _anchorTo(controller.position, newOffset);
-      return;
     }
 
     // Case 2: bulk change (e.g., expandAll / collapseAll).
-    if (identical(oldWidget.flatNodes, widget.flatNodes)) return;
-    if (oldWidget.flatNodes.isEmpty || widget.flatNodes.isEmpty) return;
-    if (!controller.hasClients) return;
+    if (identical(oldWidget.flatNodes, widget.flatNodes)) return null;
+    if (oldWidget.flatNodes.isEmpty || widget.flatNodes.isEmpty) return null;
+    if (!controller.hasClients) return null;
 
-    final newOffset = ScrollAnchor.verticalOffsetForBulkChange<T>(
+    return ScrollAnchor.verticalOffsetForBulkChange<T>(
       oldList: oldWidget.flatNodes,
       newList: widget.flatNodes,
       currentOffset: controller.offset,
@@ -202,8 +217,6 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       newContentHeight: newContentHeight,
       viewportHeight: controller.position.viewportDimension,
     );
-
-    if (newOffset != null) _anchorTo(controller.position, newOffset);
   }
 
   /// Moves [position] to [offset] for rows added or removed above the view.
