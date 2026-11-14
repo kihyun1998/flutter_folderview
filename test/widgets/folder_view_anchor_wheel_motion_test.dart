@@ -18,12 +18,13 @@ const Duration _frame = Duration(milliseconds: 16);
 final FlutterFolderViewTheme<String> _theme = FlutterFolderViewTheme.light();
 final double _itemExtent = _theme.rowHeight + _theme.rowSpacing;
 
-/// 60 Parents of 20 Children each, every label unique.
-final List<Node<String>> _nodes = [
+/// 60 Parents of 20 Children each, every label unique. The first Parent's
+/// label is [firstLabel] when given, to widen the content.
+List<Node<String>> _nodesWith({String? firstLabel}) => [
   for (var p = 0; p < _parents; p++)
     Node<String>(
       id: 'p$p',
-      label: 'p$p',
+      label: p == 0 && firstLabel != null ? firstLabel : 'p$p',
       type: NodeType.parent,
       children: [
         for (var c = 0; c < _children; c++)
@@ -32,21 +33,31 @@ final List<Node<String>> _nodes = [
     ),
 ];
 
+final List<Node<String>> _nodes = _nodesWith();
+
+/// Wide enough that the view has a horizontal scrollbar.
+final List<Node<String>> _wide = _nodesWith(firstLabel: 'L' * 120);
+
 /// Every Parent expanded but those in [collapsed].
 Set<String> _expandedBut(Set<String> collapsed) => {
   for (var p = 0; p < _parents; p++)
     if (!collapsed.contains('p$p')) 'p$p',
 };
 
-/// The view under the default `wheelMotion`, `WheelMotion.spring()`.
-Widget _view(Set<String> expanded) => MaterialApp(
+/// The view of [data] under the default `wheelMotion`,
+/// `WheelMotion.spring()`, [height] tall.
+Widget _view(
+  Set<String> expanded, {
+  double height = 300,
+  List<Node<String>>? data,
+}) => MaterialApp(
   home: Scaffold(
     body: Center(
       child: SizedBox(
         width: 400,
-        height: 300,
+        height: height,
         child: FolderView<String>(
-          data: _nodes,
+          data: data ?? _nodes,
           mode: ViewMode.tree,
           expandedNodeIds: expanded,
           theme: _theme,
@@ -119,10 +130,11 @@ Future<void> _midMotion(WidgetTester tester, double from, double target) async {
 /// still in that frame.
 Future<void> _changeKeepsRowsStill(
   WidgetTester tester,
-  Set<String> expanded,
-) async {
+  Set<String> expanded, {
+  double height = 300,
+}) async {
   final (label, top) = _rowAtCentre(tester);
-  await tester.pumpWidget(_view(expanded));
+  await tester.pumpWidget(_view(expanded, height: height));
   expect(tester.getTopLeft(find.text(label)).dy, top);
 }
 
@@ -264,6 +276,29 @@ void main() {
     expect(_verticalBar(tester).pixels, _body(tester).pixels);
   });
 
+  _winTest('expanding a Parent above the view and a taller view in one update '
+      'during a notch to the end put the view at the new end', (tester) async {
+    await tester.pumpWidget(_view(_expandedBut({'p0'})));
+    await tester.pumpAndSettle();
+    final oldEnd = _body(tester).maxScrollExtent;
+    _body(tester).jumpTo(oldEnd - 60);
+    await tester.pumpAndSettle();
+
+    await _wheel(tester, 600);
+    await _midMotion(tester, oldEnd - 60, oldEnd);
+    final pixels = _body(tester).pixels;
+    await tester.pumpWidget(_view(_expandedBut({}), height: 500));
+    final newEnd = oldEnd + delta - 200;
+    expect(pixels + delta, greaterThan(newEnd));
+    expect(_body(tester).maxScrollExtent, newEnd);
+    expect(_body(tester).pixels, newEnd);
+    expect(_verticalBar(tester).pixels, newEnd);
+    await tester.pumpAndSettle();
+
+    expect(_body(tester).pixels, newEnd);
+    expect(_verticalBar(tester).pixels, newEnd);
+  });
+
   _winTest('expanding two Parents above the view at once during a notch adds '
       'their rows to the notch', (tester) async {
     await tester.pumpWidget(_view(_expandedBut({'p0', 'p1'})));
@@ -308,6 +343,43 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(_body(tester).pixels, pixels + delta + 100);
+    expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  });
+
+  _winTest('expanding a Parent above the view and a taller view in one frame '
+      'during a drag at the end put the view at the new end and let the drag '
+      'go on', (tester) async {
+    await tester.pumpWidget(_view(_expandedBut({'p0'})));
+    await tester.pumpAndSettle();
+    final oldEnd = _body(tester).maxScrollExtent;
+    _body(tester).jumpTo(oldEnd);
+    await tester.pumpAndSettle();
+
+    final drag = await tester.startGesture(
+      tester.getCenter(find.byType(ListView)),
+      kind: PointerDeviceKind.touch,
+    );
+    await drag.moveBy(const Offset(0, 30));
+    await tester.pump(const Duration(milliseconds: 100));
+    await drag.moveBy(const Offset(0, 30));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(_body(tester).pixels, oldEnd - 30);
+
+    await tester.pumpWidget(_view(_expandedBut({}), height: 500));
+    final newEnd = oldEnd + delta - 200;
+    expect(_body(tester).maxScrollExtent, newEnd);
+    expect(_body(tester).pixels, newEnd);
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(_body(tester).pixels, newEnd);
+    expect(_verticalBar(tester).pixels, newEnd);
+
+    await drag.moveBy(const Offset(0, 10));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(_body(tester).pixels, newEnd - 10);
+    await drag.up();
+    await tester.pumpAndSettle();
+
+    expect(_body(tester).pixels, newEnd - 10);
     expect(_verticalBar(tester).pixels, _body(tester).pixels);
   });
 
@@ -492,6 +564,98 @@ void main() {
     await drag.release();
 
     expect(_verticalBar(tester).pixels, _body(tester).pixels);
+  });
+
+  // The view's new height in the same update as the change sets the new end.
+
+  for (final (verb, kind, from, to) in [
+    ('expanding', 'a Parent', {'p0'}, <String>{}),
+    ('expanding', 'two Parents', {'p0', 'p1'}, <String>{}),
+    ('collapsing', 'a Parent', <String>{}, {'p0'}),
+    ('collapsing', 'two Parents', <String>{}, {'p0', 'p1'}),
+  ]) {
+    for (final height in [250.0, 350.0]) {
+      _winTest('$verb $kind above the view and a view height of $height '
+          'in one update during a thumb drag at the end keep the rows still '
+          'up to the new end and let the drag go on', (tester) async {
+        await tester.pumpWidget(_view(_expandedBut(from)));
+        await tester.pumpAndSettle();
+        final drag = await _ThumbDrag.start(tester);
+        await drag.down(30);
+        final oldEnd = _body(tester).maxScrollExtent;
+        expect(_body(tester).pixels, oldEnd);
+        _thumbDragRuns(tester);
+
+        await tester.pumpWidget(_view(_expandedBut(to), height: height));
+        final rowsStill = oldEnd + (from.length - to.length) * delta;
+        final newEnd = rowsStill + 300 - height;
+        expect(_body(tester).maxScrollExtent, newEnd);
+        expect(_body(tester).pixels, rowsStill < newEnd ? rowsStill : newEnd);
+        _thumbDragRuns(tester);
+
+        await tester.pump();
+        _thumbDragRuns(tester);
+        await drag.down(3);
+        _thumbDragRuns(tester);
+        expect(_body(tester).pixels, newEnd);
+        await drag.release();
+
+        expect(_body(tester).pixels, newEnd);
+        expect(_verticalBar(tester).pixels, newEnd);
+      });
+    }
+  }
+
+  _winTest('expanding a Parent above the view in the update that takes the '
+      'horizontal scrollbar away, during a thumb drag at the end, puts the '
+      'view at the new end and lets the drag go on', (tester) async {
+    await tester.pumpWidget(_view(_expandedBut({'p0'}), data: _wide));
+    await tester.pumpAndSettle();
+    final drag = await _ThumbDrag.start(tester);
+    await drag.down(30);
+    final oldEnd = _body(tester).maxScrollExtent;
+    expect(_body(tester).viewportDimension, lessThan(300));
+    expect(_body(tester).pixels, oldEnd);
+    _thumbDragRuns(tester);
+
+    // New data, so a bulk change.
+    await tester.pumpWidget(_view(_expandedBut({}), data: _nodesWith()));
+    final newEnd = (_parents * (_children + 1)) * _itemExtent - 300;
+    expect(oldEnd + delta, greaterThan(newEnd));
+    expect(_body(tester).viewportDimension, 300);
+    expect(_body(tester).maxScrollExtent, newEnd);
+    expect(_body(tester).pixels, newEnd);
+    _thumbDragRuns(tester);
+
+    await tester.pump();
+    _thumbDragRuns(tester);
+    await drag.down(3);
+    _thumbDragRuns(tester);
+    expect(_body(tester).pixels, newEnd);
+    await drag.release();
+
+    expect(_body(tester).pixels, newEnd);
+    expect(_verticalBar(tester).pixels, newEnd);
+  });
+
+  _winTest('expanding a Parent above the view and collapsing one below it '
+      'with no motion running and a shorter view in one update put the view '
+      'at the new end', (tester) async {
+    await tester.pumpWidget(_view(_expandedBut({'p0'})));
+    await tester.pumpAndSettle();
+    final oldEnd = _body(tester).maxScrollExtent;
+    _body(tester).jumpTo(oldEnd);
+    await tester.pumpAndSettle();
+
+    // The same number of rows: only the view's height moves the end.
+    await tester.pumpWidget(_view(_expandedBut({'p59'}), height: 250));
+    final newEnd = oldEnd + 50;
+    expect(_body(tester).maxScrollExtent, newEnd);
+    expect(_body(tester).pixels, newEnd);
+    await tester.pumpAndSettle();
+
+    expect(_body(tester).pixels, newEnd);
+    expect(_verticalBar(tester).pixels, newEnd);
   });
 
   _winTest('expanding a Parent above the view while the thumb is pressed and '
