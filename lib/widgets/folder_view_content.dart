@@ -250,7 +250,8 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
 
   /// The offset that keeps the rows in view still across rows added or removed
   /// above the view in this update, in the Scale of [theme] and clamped to the
-  /// end of [newContentHeight], or null when nothing above the view changed.
+  /// end of [newContentHeight] in [FolderViewContent.viewportHeight], or null
+  /// when nothing above the view changed.
   double? _rowsAnchorOffset(
     FolderViewContent<T> oldWidget,
     FlutterFolderViewTheme<T> theme,
@@ -272,7 +273,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
         itemExtent: itemExtent,
         topPadding: topPadding,
         newContentHeight: newContentHeight,
-        viewportHeight: controller.position.viewportDimension,
+        viewportHeight: widget.viewportHeight,
       );
     }
 
@@ -288,7 +289,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       itemExtent: itemExtent,
       topPadding: topPadding,
       newContentHeight: newContentHeight,
-      viewportHeight: controller.position.viewportDimension,
+      viewportHeight: widget.viewportHeight,
     );
   }
 
