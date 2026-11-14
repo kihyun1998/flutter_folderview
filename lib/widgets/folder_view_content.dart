@@ -29,6 +29,12 @@ class FolderViewContent<T> extends StatefulWidget {
   final double contentWidth;
   final double contentHeight;
 
+  /// The width and height of the list's viewport in the layout this widget is
+  /// built for: the view's width, and its height above the horizontal
+  /// scrollbar's track when there is one.
+  final double viewportWidth;
+  final double viewportHeight;
+
   final List<FlatNode<T>> flatNodes;
   final ViewMode mode;
   final Function(Node<T>)? onNodeTap;
@@ -65,6 +71,8 @@ class FolderViewContent<T> extends StatefulWidget {
     required this.needsHorizontalScroll,
     required this.contentWidth,
     required this.contentHeight,
+    required this.viewportWidth,
+    required this.viewportHeight,
     required this.flatNodes,
     required this.mode,
     required this.onNodeTap,
@@ -91,10 +99,11 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   /// Current horizontal scroll offset, driven by horizontalController.
   final ValueNotifier<double> _horizontalOffset = ValueNotifier<double>(0.0);
 
-  /// Whether a drag runs on the vertical scrollbar: set by a scroll start or
-  /// update that carries drag details, cleared by one that does not (a fling,
-  /// a track tap's animation, a jump) and by a scroll end.
-  bool _barDragging = false;
+  /// The scrollbars a drag runs on: an axis is added by a scroll start or
+  /// update of its scrollbar that carries drag details, and removed by one
+  /// that does not (a fling, a track tap's animation, a jump) and by a scroll
+  /// end.
+  final Set<Axis> _barsDragged = {};
 
   @override
   void initState() {
@@ -129,6 +138,12 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   /// The vertical mapping starts from [rowsOffset], the offset the rows added
   /// or removed in the same update put the view at in the old Scale, or from
   /// the current offset when there is none.
+  ///
+  /// On an axis whose scrollbar is dragged, the body and the scrollbar are
+  /// both corrected to the mapped offset now, clamped to the end of the new
+  /// content in [FolderViewContent.viewportWidth] and
+  /// [FolderViewContent.viewportHeight], and the drag goes on. On the other
+  /// axes the body jumps after the frame, and the scrollbar follows it.
   void _applyScaleAdjustment(
     FolderViewContent<T> oldWidget,
     double? rowsOffset,
@@ -148,36 +163,89 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     final newContentWidth = widget.contentWidth;
     final contentHeight = widget.contentHeight;
 
+    ({double? vertical, double? horizontal}) offsets({
+      required double viewportHeight,
+      required double hMaxScrollExtent,
+    }) => ScrollAnchor.offsetsForScaleChange(
+      currentVerticalOffset: currentV,
+      oldItemExtent: oldItemExtent,
+      newItemExtent: newItemExtent,
+      oldTopPadding: oldTopPadding,
+      newTopPadding: newTopPadding,
+      newContentHeight: contentHeight,
+      viewportHeight: viewportHeight,
+      currentHorizontalOffset: currentH,
+      oldContentWidth: oldContentWidth,
+      newContentWidth: newContentWidth,
+      hMinScrollExtent: 0.0,
+      hMaxScrollExtent: hMaxScrollExtent,
+    );
+
+    final verticalDragged = _barDragged(Axis.vertical);
+    final horizontalDragged = _barDragged(Axis.horizontal);
+    if (verticalDragged || horizontalDragged) {
+      final result = offsets(
+        viewportHeight: widget.viewportHeight,
+        hMaxScrollExtent: (newContentWidth - widget.viewportWidth).clamp(
+          0.0,
+          double.infinity,
+        ),
+      );
+      final vertical = result.vertical ?? rowsOffset;
+      if (verticalDragged && vertical != null) {
+        _correctWithBar(controller, widget.verticalBarController, vertical);
+      }
+      final horizontal = result.horizontal;
+      if (horizontalDragged && horizontal != null) {
+        _correctWithBar(
+          hController,
+          widget.horizontalBarController,
+          horizontal,
+        );
+      }
+    }
+
     // Defer jumpTo to after the build phase to avoid setState-during-build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!controller.hasClients) return;
 
-      final result = ScrollAnchor.offsetsForScaleChange(
-        currentVerticalOffset: currentV,
-        oldItemExtent: oldItemExtent,
-        newItemExtent: newItemExtent,
-        oldTopPadding: oldTopPadding,
-        newTopPadding: newTopPadding,
-        newContentHeight: contentHeight,
+      final result = offsets(
         viewportHeight: controller.position.viewportDimension,
-        currentHorizontalOffset: currentH,
-        oldContentWidth: oldContentWidth,
-        newContentWidth: newContentWidth,
-        hMinScrollExtent: hController.hasClients
-            ? hController.position.minScrollExtent
-            : 0.0,
         hMaxScrollExtent: hController.hasClients
             ? hController.position.maxScrollExtent
             : 0.0,
       );
 
       final vertical = result.vertical ?? rowsOffset;
-      if (vertical != null) controller.jumpTo(vertical);
+      if (!verticalDragged && vertical != null) controller.jumpTo(vertical);
 
-      if (result.horizontal != null && hController.hasClients) {
+      if (!horizontalDragged &&
+          result.horizontal != null &&
+          hController.hasClients) {
         hController.jumpTo(result.horizontal!);
       }
     });
+  }
+
+  /// Whether a drag runs on the scrollbar of [axis], and the scrollbar is
+  /// attached.
+  bool _barDragged(Axis axis) {
+    final bar = axis == Axis.vertical
+        ? widget.verticalBarController
+        : widget.horizontalBarController;
+    return _barsDragged.contains(axis) && bar.hasClients;
+  }
+
+  /// Corrects the body of [body] and the scrollbar of [bar] to [offset], each
+  /// by its difference to it.
+  void _correctWithBar(
+    ScrollController body,
+    ScrollController bar,
+    double offset,
+  ) {
+    for (final position in [body.position, bar.position]) {
+      position.correctBy(offset - position.pixels);
+    }
   }
 
   /// The offset that keeps the rows in view still across rows added or removed
@@ -234,11 +302,12 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   /// body jumps, and the scrollbar follows it.
   void _anchorTo(double offset) {
     final body = widget.verticalController.position;
-    final bar = widget.verticalBarController;
-    if (_barDragging && bar.hasClients) {
-      for (final position in [body, bar.position]) {
-        position.correctBy(offset - position.pixels);
-      }
+    if (_barDragged(Axis.vertical)) {
+      _correctWithBar(
+        widget.verticalController,
+        widget.verticalBarController,
+        offset,
+      );
     } else if (body.userScrollDirection != ScrollDirection.idle) {
       body.correctBy(offset - body.pixels);
     } else {
@@ -246,15 +315,20 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     }
   }
 
-  /// Follows whether a drag runs on the vertical scrollbar, from the scroll
+  /// Follows whether a drag runs on the scrollbar of [axis], from the scroll
   /// notifications of its scroll view.
-  bool _onVerticalBarScroll(ScrollNotification notification) {
-    _barDragging = switch (notification) {
+  bool _onBarScroll(Axis axis, ScrollNotification notification) {
+    final dragging = switch (notification) {
       ScrollStartNotification(:final dragDetails) => dragDetails != null,
       ScrollUpdateNotification(:final dragDetails) => dragDetails != null,
       ScrollEndNotification() => false,
-      _ => _barDragging,
+      _ => _barsDragged.contains(axis),
     };
+    if (dragging) {
+      _barsDragged.add(axis);
+    } else {
+      _barsDragged.remove(axis);
+    }
     return false;
   }
 
@@ -454,7 +528,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
               if (widget.needsVerticalScroll)
                 NotificationListener<ScrollNotification>(
                   key: const ValueKey(Axis.vertical),
-                  onNotification: _onVerticalBarScroll,
+                  onNotification: (n) => _onBarScroll(Axis.vertical, n),
                   child: ValueListenableBuilder<bool>(
                     valueListenable: _isHover,
                     builder: (context, isHover, _) =>
@@ -471,17 +545,20 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
 
               /// Horizontal scrollbar — only rebuilds when hover state changes
               if (widget.needsHorizontalScroll)
-                ValueListenableBuilder<bool>(
+                NotificationListener<ScrollNotification>(
                   key: const ValueKey(Axis.horizontal),
-                  valueListenable: _isHover,
-                  builder: (context, isHover, _) =>
-                      FolderViewHorizontalScrollbar(
-                        isHover: isHover,
-                        horizontalScrollbarController:
-                            widget.horizontalBarController,
-                        contentWidth: widget.contentWidth,
-                        scrollbarTheme: widget.theme.scrollbarTheme,
-                      ),
+                  onNotification: (n) => _onBarScroll(Axis.horizontal, n),
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: _isHover,
+                    builder: (context, isHover, _) =>
+                        FolderViewHorizontalScrollbar(
+                          isHover: isHover,
+                          horizontalScrollbarController:
+                              widget.horizontalBarController,
+                          contentWidth: widget.contentWidth,
+                          scrollbarTheme: widget.theme.scrollbarTheme,
+                        ),
+                  ),
                 ),
             ],
           ),

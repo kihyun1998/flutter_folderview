@@ -274,6 +274,8 @@ class _FolderViewState<T> extends State<FolderView<T>> {
                   rowTooltipTheme: widget.rowTooltipTheme,
                   contentWidth: contentWidth,
                   contentHeight: contentHeight,
+                  viewportWidth: availableWidth,
+                  viewportHeight: listViewportHeight,
                   needsHorizontalScroll: needsHorizontalScroll,
                   needsVerticalScroll: needsVerticalScroll,
                   horizontalController: horizontalController!,
