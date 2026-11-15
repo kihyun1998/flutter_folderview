@@ -118,6 +118,61 @@ void main() {
       // horizontal ratio = 200/100 = 2; 50 * 2 = 100
       expect(r.horizontal, 100);
     });
+
+    ({double? vertical, double? horizontal}) inPadding(
+      double offset, {
+      required double oldTopPadding,
+      required double newTopPadding,
+      required double newItemExtent,
+    }) => ScrollAnchor.offsetsForScaleChange(
+      currentVerticalOffset: offset,
+      oldItemExtent: 40,
+      newItemExtent: newItemExtent,
+      oldTopPadding: oldTopPadding,
+      newTopPadding: newTopPadding,
+      newContentHeight: 100000,
+      viewportHeight: 400,
+      currentHorizontalOffset: null,
+      oldContentWidth: 100,
+      newContentWidth: 100,
+      hMinScrollExtent: 0,
+      hMaxScrollExtent: 0,
+    );
+
+    test('an offset inside an unchanged top padding stays where it is', () {
+      for (final offset in [0.0, 10.0, 29.0]) {
+        for (final extent in [20.0, 60.0]) {
+          final r = inPadding(
+            offset,
+            oldTopPadding: 30,
+            newTopPadding: 30,
+            newItemExtent: extent,
+          );
+          expect(r.vertical, isNull, reason: 'offset $offset, extent $extent');
+        }
+      }
+    });
+
+    test('an offset inside the top padding keeps its share of the padding', () {
+      // 10 of 30 is a third; a third of 45 is 15.
+      final r = inPadding(
+        10,
+        oldTopPadding: 30,
+        newTopPadding: 45,
+        newItemExtent: 40,
+      );
+      expect(r.vertical, 15);
+    });
+
+    test('an offset above the top with no top padding maps to the top', () {
+      final r = inPadding(
+        -5,
+        oldTopPadding: 0,
+        newTopPadding: 0,
+        newItemExtent: 60,
+      );
+      expect(r.vertical, 0);
+    });
   });
 
   group('ScrollAnchor.verticalOffsetForBulkChange', () {
