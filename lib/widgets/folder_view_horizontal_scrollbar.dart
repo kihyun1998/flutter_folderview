@@ -78,25 +78,20 @@ class _FolderViewHorizontalScrollbarState
             color: scrollbarTheme.trackColor,
             borderRadius: BorderRadius.circular(scrollbarTheme.trackRadius),
           ),
-          child: Theme(
-            data: Theme.of(context).copyWith(
-              scrollbarTheme: folderViewThumbTheme(context, scrollbarTheme),
-            ),
-            child: Listener(
-              onPointerDown: (event) => _pressed.add(event.pointer),
-              onPointerUp: (event) => _pressed.remove(event.pointer),
-              onPointerCancel: (event) => _pressed.remove(event.pointer),
-              onPointerSignal: _handleAxisModifierWheel,
-              child: Scrollbar(
+          child: Listener(
+            onPointerDown: (event) => _pressed.add(event.pointer),
+            onPointerUp: (event) => _pressed.remove(event.pointer),
+            onPointerCancel: (event) => _pressed.remove(event.pointer),
+            onPointerSignal: _handleAxisModifierWheel,
+            child: FolderViewScrollbarThumb(
+              controller: horizontalScrollbarController,
+              theme: scrollbarTheme,
+              child: SingleChildScrollView(
                 controller: horizontalScrollbarController,
-                thumbVisibility: scrollbarTheme.thumbVisibility,
-                child: SingleChildScrollView(
-                  controller: horizontalScrollbarController,
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: widget.contentWidth,
-                    height: scrollbarTheme.trackWidth,
-                  ),
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: widget.contentWidth,
+                  height: scrollbarTheme.trackWidth,
                 ),
               ),
             ),
