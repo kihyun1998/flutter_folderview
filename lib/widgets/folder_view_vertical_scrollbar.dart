@@ -38,20 +38,15 @@ class FolderViewVerticalScrollbar extends StatelessWidget {
             color: scrollbarTheme.trackColor,
             borderRadius: BorderRadius.circular(scrollbarTheme.trackRadius),
           ),
-          child: Theme(
-            data: Theme.of(context).copyWith(
-              scrollbarTheme: folderViewThumbTheme(context, scrollbarTheme),
-            ),
-            child: Scrollbar(
+          child: FolderViewScrollbarThumb(
+            controller: verticalScrollbarController,
+            theme: scrollbarTheme,
+            child: SingleChildScrollView(
               controller: verticalScrollbarController,
-              thumbVisibility: scrollbarTheme.thumbVisibility,
-              child: SingleChildScrollView(
-                controller: verticalScrollbarController,
-                scrollDirection: Axis.vertical,
-                child: SizedBox(
-                  width: scrollbarTheme.trackWidth,
-                  height: contentHeight,
-                ),
+              scrollDirection: Axis.vertical,
+              child: SizedBox(
+                width: scrollbarTheme.trackWidth,
+                height: contentHeight,
               ),
             ),
           ),
