@@ -41,6 +41,7 @@ Read from `FlutterFolderViewTheme` and `FolderViewTheme`.
 - [row-geometry](row-geometry.md) — the effective theme's identity invalidates measurement, whether it comes from `theme:` or from an ancestor.
 - [tier-rendering](tier-rendering.md) — the renderers read the tier themes, via `ExpandableNodeThemeView` for Folder and Parent.
 - [label-tooltip](label-tooltip.md) — `tooltipTheme` is a field on each tier theme.
+- [scroll-anchoring](scroll-anchoring.md) — a change of `rowHeight`, `rowSpacing` or `spacingTheme.contentPadding.top` in the effective theme moves the vertical offset to keep the rows in view still (#205), whatever the theme's source.
 - [example](example.md) — a new public field turns the coverage guard red until the example exposes it.
 
 ## Known holes / open

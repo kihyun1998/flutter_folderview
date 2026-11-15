@@ -119,46 +119,65 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
       widget.horizontalController.addListener(_onHorizontalScroll);
     }
 
-    // Rows added or removed above the view move it in the Scale it was laid
-    // out in; a Scale change then maps that offset into the new one and clamps
-    // it to the end.
+    // Rows added or removed above the view move it in the row geometry it was
+    // laid out in; a change of the row extent or the top padding, from a
+    // Scale or a theme, then maps that offset into the new geometry and
+    // clamps it to the end.
     final scaleChanged = oldWidget.scale != widget.scale;
-    final rowsOffset = scaleChanged
+    final geometryChanged =
+        _rowExtent(oldWidget.theme) != _rowExtent(widget.theme) ||
+        _topPadding(oldWidget.theme) != _topPadding(widget.theme);
+    final remap = scaleChanged || geometryChanged;
+    final rowsOffset = remap
         ? _rowsAnchorOffset(oldWidget, oldWidget.theme, double.infinity)
         : _rowsAnchorOffset(oldWidget, widget.theme, widget.contentHeight);
-    if (scaleChanged) {
-      _applyScaleAdjustment(oldWidget, rowsOffset);
+    if (remap) {
+      _applyRowGeometryAdjustment(
+        oldWidget,
+        rowsOffset,
+        mapHorizontal: scaleChanged,
+      );
     } else if (rowsOffset != null) {
       _anchorTo(rowsOffset);
     }
   }
 
-  /// Moves the view after a Scale change, keeping the row at its top.
+  static double _rowExtent(FlutterFolderViewTheme<dynamic> theme) =>
+      theme.rowHeight + theme.rowSpacing;
+
+  static double _topPadding(FlutterFolderViewTheme<dynamic> theme) =>
+      theme.spacingTheme.contentPadding.top;
+
+  /// Moves the view after a change of the row extent or the top padding,
+  /// keeping the row at its top, and after a Scale change maps the horizontal
+  /// offset by the content-width ratio when [mapHorizontal] is true.
   ///
   /// The vertical mapping starts from [rowsOffset], the offset the rows added
-  /// or removed in the same update put the view at in the old Scale, or from
-  /// the current offset when there is none.
+  /// or removed in the same update put the view at in the old row geometry,
+  /// or from the current offset when there is none.
   ///
   /// On an axis whose scrollbar is dragged, the body and the scrollbar are
   /// both corrected to the mapped offset now, clamped to the end of the new
   /// content in [FolderViewContent.viewportWidth] and
   /// [FolderViewContent.viewportHeight], and the drag goes on. On the other
   /// axes the body jumps after the frame, and the scrollbar follows it.
-  void _applyScaleAdjustment(
+  void _applyRowGeometryAdjustment(
     FolderViewContent<T> oldWidget,
-    double? rowsOffset,
-  ) {
+    double? rowsOffset, {
+    required bool mapHorizontal,
+  }) {
     final controller = widget.verticalController;
     if (!controller.hasClients) return;
 
     final hController = widget.horizontalController;
-    final oldItemExtent =
-        oldWidget.theme.rowHeight + oldWidget.theme.rowSpacing;
-    final newItemExtent = widget.theme.rowHeight + widget.theme.rowSpacing;
-    final oldTopPadding = oldWidget.theme.spacingTheme.contentPadding.top;
-    final newTopPadding = widget.theme.spacingTheme.contentPadding.top;
+    final oldItemExtent = _rowExtent(oldWidget.theme);
+    final newItemExtent = _rowExtent(widget.theme);
+    final oldTopPadding = _topPadding(oldWidget.theme);
+    final newTopPadding = _topPadding(widget.theme);
     final currentV = rowsOffset ?? controller.offset;
-    final currentH = hController.hasClients ? hController.offset : null;
+    final currentH = mapHorizontal && hController.hasClients
+        ? hController.offset
+        : null;
     final oldContentWidth = oldWidget.contentWidth;
     final newContentWidth = widget.contentWidth;
     final contentHeight = widget.contentHeight;
@@ -249,7 +268,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
   }
 
   /// The offset that keeps the rows in view still across rows added or removed
-  /// above the view in this update, in the Scale of [theme] and clamped to the
+  /// above the view in this update, in the row geometry of [theme] and clamped to the
   /// end of [newContentHeight] in [FolderViewContent.viewportHeight], or null
   /// when nothing above the view changed.
   double? _rowsAnchorOffset(
@@ -258,8 +277,8 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     double newContentHeight,
   ) {
     final controller = widget.verticalController;
-    final itemExtent = theme.rowHeight + theme.rowSpacing;
-    final topPadding = theme.spacingTheme.contentPadding.top;
+    final itemExtent = _rowExtent(theme);
+    final topPadding = _topPadding(theme);
 
     // Case 1: incremental single-node change, applied in the update that
     // brought it.
@@ -456,7 +475,7 @@ class _FolderViewContentState<T> extends State<FolderViewContent<T>> {
     // Fixed item extent enables O(1) scroll offset calculation.
     // Without it, jumping to the middle of 20k items forces Flutter
     // to lay out all preceding items to determine their cumulative height.
-    final double itemExtent = theme.rowHeight + theme.rowSpacing;
+    final double itemExtent = _rowExtent(theme);
 
     final Widget listView = Column(
       children: [

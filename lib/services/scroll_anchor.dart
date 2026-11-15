@@ -35,8 +35,12 @@ class ScrollAnchor {
     return null;
   }
 
-  /// New vertical/horizontal offsets after a Scale change, preserving the node
-  /// at the top of the viewport. A field is null when that axis needs no move.
+  /// New vertical/horizontal offsets after a change of the row extent or the
+  /// top padding, such as a Scale change, preserving the node at the top of
+  /// the viewport. An offset inside the old top padding keeps its share of the
+  /// padding. The horizontal offset scales by the content-width ratio when
+  /// [currentHorizontalOffset] is given. A field is null when that axis needs
+  /// no move.
   static ({double? vertical, double? horizontal}) offsetsForScaleChange({
     required double currentVerticalOffset,
     required double oldItemExtent,
@@ -51,11 +55,18 @@ class ScrollAnchor {
     required double hMinScrollExtent,
     required double hMaxScrollExtent,
   }) {
-    // Vertical: map the top fractional item position into the new item extent.
-    final topFractionalIndex = oldItemExtent > 0
-        ? (currentVerticalOffset - oldTopPadding) / oldItemExtent
-        : 0.0;
-    final newOffset = newTopPadding + topFractionalIndex * newItemExtent;
+    // Vertical: an offset inside the top padding keeps its share of the
+    // padding; below it, the top fractional item position maps into the new
+    // item extent.
+    final double newOffset;
+    if (oldTopPadding > 0 && currentVerticalOffset < oldTopPadding) {
+      newOffset = currentVerticalOffset / oldTopPadding * newTopPadding;
+    } else {
+      final topFractionalIndex = oldItemExtent > 0
+          ? (currentVerticalOffset - oldTopPadding) / oldItemExtent
+          : 0.0;
+      newOffset = newTopPadding + topFractionalIndex * newItemExtent;
+    }
     final newMaxExtent = (newContentHeight - viewportHeight).clamp(
       0.0,
       double.infinity,
