@@ -7,7 +7,8 @@ import 'package:flutter_folderview/widgets/folder_view_vertical_scrollbar.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Each bar's thumb is painted with the theme's thickness, radius and colour on
-/// every platform, iOS included (#147).
+/// every platform, iOS included (#147), whatever scrollbar theme the app sets
+/// around FolderView (#216).
 void main() {
   // Enough rows to scroll vertically, and a label wide enough to scroll
   // horizontally, so both bars are drawn.
@@ -31,25 +32,33 @@ void main() {
     WidgetTester tester, {
     required double thickness,
     required double trackWidth,
+    ScrollbarThemeData? appScrollbarTheme,
+    ScrollbarThemeData? ancestorScrollbarTheme,
   }) async {
     final light = FlutterFolderViewTheme<String>.light();
+    Widget wrap(Widget child) => ancestorScrollbarTheme == null
+        ? child
+        : ScrollbarTheme(data: ancestorScrollbarTheme, child: child);
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(scrollbarTheme: appScrollbarTheme),
         home: Scaffold(
-          body: SizedBox(
-            width: 300,
-            height: 300,
-            child: FolderView<String>(
-              data: data(),
-              mode: ViewMode.folder,
-              expandedNodeIds: const {'f'},
-              theme: light.copyWith(
-                scrollbarTheme: light.scrollbarTheme.copyWith(
-                  thickness: thickness,
-                  trackWidth: trackWidth,
-                  radius: 1,
-                  thumbColor: const Color(0xFFFF0000),
-                  thumbVisibility: true,
+          body: wrap(
+            SizedBox(
+              width: 300,
+              height: 300,
+              child: FolderView<String>(
+                data: data(),
+                mode: ViewMode.folder,
+                expandedNodeIds: const {'f'},
+                theme: light.copyWith(
+                  scrollbarTheme: light.scrollbarTheme.copyWith(
+                    thickness: thickness,
+                    trackWidth: trackWidth,
+                    radius: 1,
+                    thumbColor: const Color(0xFFFF0000),
+                    thumbVisibility: true,
+                  ),
                 ),
               ),
             ),
@@ -82,6 +91,30 @@ void main() {
     TargetPlatform.android,
   });
 
+  // A scrollbar theme an app sets around FolderView, with every value the
+  // thumb paints with different from the FolderView theme's.
+  final appThumbTheme = ScrollbarThemeData(
+    thickness: WidgetStateProperty.all(1),
+    radius: const Radius.circular(9),
+    thumbColor: WidgetStateProperty.all(const Color(0xFF00FF00)),
+    crossAxisMargin: 5,
+    mainAxisMargin: 7,
+    minThumbLength: 10,
+  );
+
+  /// Expects [bar]'s thumb painted from the FolderView theme alone: thickness
+  /// 6, radius 1, red, the platform margin and Material's minimum length.
+  void expectFolderViewThumb(WidgetTester tester, Type bar) {
+    final android = defaultTargetPlatform == TargetPlatform.android;
+    final painter = thumbPainter(tester, bar);
+    expect(painter.thickness, 6);
+    expect(painter.radius, const Radius.circular(1));
+    expect(painter.color, const Color(0xFFFF0000));
+    expect(painter.crossAxisMargin, android ? 0.0 : 2.0);
+    expect(painter.mainAxisMargin, 0);
+    expect(painter.minLength, 48);
+  }
+
   for (final bar in [
     FolderViewVerticalScrollbar,
     FolderViewHorizontalScrollbar,
@@ -109,6 +142,28 @@ void main() {
       final painter = thumbPainter(tester, bar);
       expect(painter.crossAxisMargin, margin);
       expect(painter.thickness, 8 - margin);
+    }, variant: platforms);
+
+    testWidgets('$bar ignores an ancestor ScrollbarTheme widget', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        thickness: 6,
+        trackWidth: 16,
+        ancestorScrollbarTheme: appThumbTheme,
+      );
+      expectFolderViewThumb(tester, bar);
+    }, variant: platforms);
+
+    testWidgets("$bar ignores the app's Theme.scrollbarTheme", (tester) async {
+      await pump(
+        tester,
+        thickness: 6,
+        trackWidth: 16,
+        appScrollbarTheme: appThumbTheme,
+      );
+      expectFolderViewThumb(tester, bar);
     }, variant: platforms);
   }
 }

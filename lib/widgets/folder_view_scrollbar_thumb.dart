@@ -46,8 +46,9 @@ const double _rawMinOverscrollLength = 18;
 
 /// The thumb of a FolderView bar over [child], painted from [theme].
 ///
-/// A Material `Scrollbar` on every platform but iOS. On iOS, a `RawScrollbar`
-/// with the values Material's `Scrollbar` paints with on desktop.
+/// A Material `Scrollbar` under a `ScrollbarTheme` of [folderViewThumbTheme] on
+/// every platform but iOS. On iOS, a `RawScrollbar` with the values Material's
+/// `Scrollbar` paints with on desktop.
 class FolderViewScrollbarThumb extends StatelessWidget {
   const FolderViewScrollbarThumb({
     super.key,
@@ -76,10 +77,8 @@ class FolderViewScrollbarThumb extends StatelessWidget {
         child: child,
       );
     }
-    return Theme(
-      data: Theme.of(
-        context,
-      ).copyWith(scrollbarTheme: folderViewThumbTheme(context, theme)),
+    return ScrollbarTheme(
+      data: folderViewThumbTheme(context, theme),
       child: Scrollbar(
         controller: controller,
         thumbVisibility: theme.thumbVisibility,
