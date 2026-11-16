@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../themes/folder_view_scrollbar_theme.dart';
+import 'folder_view_bar_scroll_physics.dart';
 import 'folder_view_scrollbar_thumb.dart';
 
 class FolderViewHorizontalScrollbar extends StatefulWidget {
@@ -89,6 +90,7 @@ class _FolderViewHorizontalScrollbarState
               child: SingleChildScrollView(
                 controller: horizontalScrollbarController,
                 scrollDirection: Axis.horizontal,
+                physics: const FolderViewBarScrollPhysics(),
                 child: SizedBox(
                   width: widget.contentWidth,
                   height: scrollbarTheme.trackWidth,

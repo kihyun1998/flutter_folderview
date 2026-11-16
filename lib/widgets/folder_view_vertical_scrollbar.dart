@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../themes/folder_view_scrollbar_theme.dart';
+import 'folder_view_bar_scroll_physics.dart';
 import 'folder_view_scrollbar_thumb.dart';
 
 class FolderViewVerticalScrollbar extends StatelessWidget {
@@ -44,6 +45,7 @@ class FolderViewVerticalScrollbar extends StatelessWidget {
             child: SingleChildScrollView(
               controller: verticalScrollbarController,
               scrollDirection: Axis.vertical,
+              physics: const FolderViewBarScrollPhysics(),
               child: SizedBox(
                 width: scrollbarTheme.trackWidth,
                 height: contentHeight,
