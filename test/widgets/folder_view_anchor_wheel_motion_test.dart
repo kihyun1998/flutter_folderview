@@ -71,7 +71,7 @@ ScrollPosition _body(WidgetTester tester) =>
     tester.widget<ListView>(find.byType(ListView)).controller!.position;
 
 final Finder _verticalBarView = find.descendant(
-  of: find.byType(Scrollbar),
+  of: find.bySubtype<RawScrollbar>(),
   matching: find.byWidgetPredicate(
     (w) => w is SingleChildScrollView && w.scrollDirection == Axis.vertical,
   ),
@@ -209,6 +209,19 @@ void _winTest(String description, WidgetTesterCallback body) => testWidgets(
   body,
   variant: TargetPlatformVariant.only(TargetPlatform.windows),
 );
+
+/// A test run on Windows, on iOS and on Android, where a scrollbar thumb drag
+/// could pass the end if the scrollbar's physics allowed it.
+void _thumbPlatformsTest(String description, WidgetTesterCallback body) =>
+    testWidgets(
+      description,
+      body,
+      variant: TargetPlatformVariant({
+        TargetPlatform.windows,
+        TargetPlatform.iOS,
+        TargetPlatform.android,
+      }),
+    );
 
 void main() {
   final delta = _children * _itemExtent;
@@ -575,68 +588,74 @@ void main() {
     ('collapsing', 'two Parents', <String>{}, {'p0', 'p1'}),
   ]) {
     for (final height in [250.0, 350.0]) {
-      _winTest('$verb $kind above the view and a view height of $height '
-          'in one update during a thumb drag at the end keep the rows still '
-          'up to the new end and let the drag go on', (tester) async {
-        await tester.pumpWidget(_view(_expandedBut(from)));
-        await tester.pumpAndSettle();
-        final drag = await _ThumbDrag.start(tester);
-        await drag.down(30);
-        final oldEnd = _body(tester).maxScrollExtent;
-        expect(_body(tester).pixels, oldEnd);
-        _thumbDragRuns(tester);
+      _thumbPlatformsTest(
+        '$verb $kind above the view and a view height of $height '
+        'in one update during a thumb drag at the end keep the rows still '
+        'up to the new end and let the drag go on',
+        (tester) async {
+          await tester.pumpWidget(_view(_expandedBut(from)));
+          await tester.pumpAndSettle();
+          final drag = await _ThumbDrag.start(tester);
+          await drag.down(30);
+          final oldEnd = _body(tester).maxScrollExtent;
+          expect(_body(tester).pixels, oldEnd);
+          _thumbDragRuns(tester);
 
-        await tester.pumpWidget(_view(_expandedBut(to), height: height));
-        final rowsStill = oldEnd + (from.length - to.length) * delta;
-        final newEnd = rowsStill + 300 - height;
-        expect(_body(tester).maxScrollExtent, newEnd);
-        expect(_body(tester).pixels, rowsStill < newEnd ? rowsStill : newEnd);
-        _thumbDragRuns(tester);
+          await tester.pumpWidget(_view(_expandedBut(to), height: height));
+          final rowsStill = oldEnd + (from.length - to.length) * delta;
+          final newEnd = rowsStill + 300 - height;
+          expect(_body(tester).maxScrollExtent, newEnd);
+          expect(_body(tester).pixels, rowsStill < newEnd ? rowsStill : newEnd);
+          _thumbDragRuns(tester);
 
-        await tester.pump();
-        _thumbDragRuns(tester);
-        await drag.down(3);
-        _thumbDragRuns(tester);
-        expect(_body(tester).pixels, newEnd);
-        await drag.release();
+          await tester.pump();
+          _thumbDragRuns(tester);
+          await drag.down(3);
+          _thumbDragRuns(tester);
+          expect(_body(tester).pixels, newEnd);
+          await drag.release();
 
-        expect(_body(tester).pixels, newEnd);
-        expect(_verticalBar(tester).pixels, newEnd);
-      });
+          expect(_body(tester).pixels, newEnd);
+          expect(_verticalBar(tester).pixels, newEnd);
+        },
+      );
     }
   }
 
-  _winTest('expanding a Parent above the view in the update that takes the '
-      'horizontal scrollbar away, during a thumb drag at the end, puts the '
-      'view at the new end and lets the drag go on', (tester) async {
-    await tester.pumpWidget(_view(_expandedBut({'p0'}), data: _wide));
-    await tester.pumpAndSettle();
-    final drag = await _ThumbDrag.start(tester);
-    await drag.down(30);
-    final oldEnd = _body(tester).maxScrollExtent;
-    expect(_body(tester).viewportDimension, lessThan(300));
-    expect(_body(tester).pixels, oldEnd);
-    _thumbDragRuns(tester);
+  _thumbPlatformsTest(
+    'expanding a Parent above the view in the update that takes the '
+    'horizontal scrollbar away, during a thumb drag at the end, puts the '
+    'view at the new end and lets the drag go on',
+    (tester) async {
+      await tester.pumpWidget(_view(_expandedBut({'p0'}), data: _wide));
+      await tester.pumpAndSettle();
+      final drag = await _ThumbDrag.start(tester);
+      await drag.down(30);
+      final oldEnd = _body(tester).maxScrollExtent;
+      expect(_body(tester).viewportDimension, lessThan(300));
+      expect(_body(tester).pixels, oldEnd);
+      _thumbDragRuns(tester);
 
-    // New data, so a bulk change.
-    await tester.pumpWidget(_view(_expandedBut({}), data: _nodesWith()));
-    final newEnd = (_parents * (_children + 1)) * _itemExtent - 300;
-    expect(oldEnd + delta, greaterThan(newEnd));
-    expect(_body(tester).viewportDimension, 300);
-    expect(_body(tester).maxScrollExtent, newEnd);
-    expect(_body(tester).pixels, newEnd);
-    _thumbDragRuns(tester);
+      // New data, so a bulk change.
+      await tester.pumpWidget(_view(_expandedBut({}), data: _nodesWith()));
+      final newEnd = (_parents * (_children + 1)) * _itemExtent - 300;
+      expect(oldEnd + delta, greaterThan(newEnd));
+      expect(_body(tester).viewportDimension, 300);
+      expect(_body(tester).maxScrollExtent, newEnd);
+      expect(_body(tester).pixels, newEnd);
+      _thumbDragRuns(tester);
 
-    await tester.pump();
-    _thumbDragRuns(tester);
-    await drag.down(3);
-    _thumbDragRuns(tester);
-    expect(_body(tester).pixels, newEnd);
-    await drag.release();
+      await tester.pump();
+      _thumbDragRuns(tester);
+      await drag.down(3);
+      _thumbDragRuns(tester);
+      expect(_body(tester).pixels, newEnd);
+      await drag.release();
 
-    expect(_body(tester).pixels, newEnd);
-    expect(_verticalBar(tester).pixels, newEnd);
-  });
+      expect(_body(tester).pixels, newEnd);
+      expect(_verticalBar(tester).pixels, newEnd);
+    },
+  );
 
   _winTest('expanding a Parent above the view and collapsing one below it '
       'with no motion running and a shorter view in one update put the view '

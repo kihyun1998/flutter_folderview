@@ -67,6 +67,12 @@
   `example/README.md` 를 렌더 = `flutter create` 템플릿"* 이라는 전제-파괴 사실이 나왔다.
 - **#44 (seam 은 테스트 전에 합의)**: `FolderView` 공개 vs `FolderViewContent` 내부 —
   전자를 골라 "행이 뷰포트보다 넓다" 를 손으로 흉내 안 내고 진짜 재현했다.
+- **#217 (결정에 붙은 메커니즘은 결정보다 많이 바꾼다)**: triage 는 "바는 overscroll 하지 않는다,
+  `ClampingScrollPhysics` 로" 를 정했다. 근거는 "보이는 변화는 iOS 바의 overscroll 뿐" 이었다.
+  `ClampingScrollPhysics` 는 경계만이 아니라 fling 곡선도 바꿔서, iOS 에서 thumb 를 놓은 fling 이
+  20843.2 → 20490.2 로 짧아졌다. 리뷰어와 lens 가 따로 잡았고, 질문 끝에 경계만 clamp 하는 physics 로
+  바뀌었다. **결정 문구에 메커니즘 이름이 있으면, 그 메커니즘이 결정의 근거 밖에서 무엇을 바꾸는지
+  재고 나서 쓴다.**
 
 ## Step 4 — RED→GREEN
 

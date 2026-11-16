@@ -70,7 +70,7 @@ ScrollPosition _verticalBody(WidgetTester tester) =>
 ScrollPosition _bar(WidgetTester tester, Axis axis) => tester
     .widget<SingleChildScrollView>(
       find.descendant(
-        of: find.byType(Scrollbar),
+        of: find.bySubtype<RawScrollbar>(),
         matching: find.byWidgetPredicate(
           (w) => w is SingleChildScrollView && w.scrollDirection == axis,
         ),
@@ -205,6 +205,19 @@ void _winTest(String description, WidgetTesterCallback body) => testWidgets(
   variant: TargetPlatformVariant.only(TargetPlatform.windows),
 );
 
+/// A test run on Windows, on iOS and on Android, where a scrollbar thumb drag
+/// could pass the end if the scrollbar's physics allowed it.
+void _thumbPlatformsTest(String description, WidgetTesterCallback body) =>
+    testWidgets(
+      description,
+      body,
+      variant: TargetPlatformVariant({
+        TargetPlatform.windows,
+        TargetPlatform.iOS,
+        TargetPlatform.android,
+      }),
+    );
+
 void main() {
   test('the theme has no top padding and a 40 px row', () {
     final theme = FlutterFolderViewTheme<String>.light();
@@ -338,109 +351,119 @@ void main() {
     });
   }
 
-  _winTest('a Scale change 1.5 → 1.0 during a horizontal thumb drag at the end '
-      'puts the view at the new end and lets the drag go on', (tester) async {
-    await tester.pumpWidget(_view(1.5, data: _wide));
-    await tester.pumpAndSettle();
-    final drag = await _ThumbDrag.start(tester, Axis.horizontal);
-    await drag.along(40);
-    final oldEnd = _horizontalBody(tester).maxScrollExtent;
-    expect(_horizontalBody(tester).pixels, oldEnd);
-    _thumbDragRuns(tester, Axis.horizontal);
-
-    await tester.pumpWidget(_view(1.0, data: _wide));
-    await tester.pump();
-    final body = _horizontalBody(tester);
-    expect(body.maxScrollExtent, lessThan(oldEnd));
-    expect(body.pixels, body.maxScrollExtent);
-    _thumbDragRuns(tester, Axis.horizontal);
-
-    await drag.along(3);
-    _thumbDragRuns(tester, Axis.horizontal);
-    expect(_horizontalBody(tester).pixels, body.maxScrollExtent);
-    await drag.release();
-  });
-
-  _winTest('a Scale change 1.0 → 1.5 during a horizontal thumb drag at the end '
-      'maps the offset past the old end and lets the drag go on', (
-    tester,
-  ) async {
-    await tester.pumpWidget(_view(1.0, data: _wide));
-    await tester.pumpAndSettle();
-    final drag = await _ThumbDrag.start(tester, Axis.horizontal);
-    await drag.along(40);
-    final old = _horizontalBody(tester);
-    final oldEnd = old.maxScrollExtent;
-    final oldWidth = oldEnd + old.viewportDimension;
-    expect(old.pixels, oldEnd);
-    _thumbDragRuns(tester, Axis.horizontal);
-
-    await tester.pumpWidget(_view(1.5, data: _wide));
-    await tester.pump();
-    final body = _horizontalBody(tester);
-    final newWidth = body.maxScrollExtent + body.viewportDimension;
-    final mapped = oldEnd / oldWidth * newWidth;
-    expect(mapped, greaterThan(oldEnd));
-    expect(mapped, lessThan(body.maxScrollExtent));
-    expect(body.pixels, moreOrLessEquals(mapped));
-    _thumbDragRuns(tester, Axis.horizontal);
-    await drag.release();
-  });
-
-  for (final height in [250.0, 350.0]) {
-    _winTest('a Scale change 1.5 → 1.0 and a view height of $height in one '
-        'update during a vertical thumb drag at the end put the view at the '
-        'new end and let the drag go on', (tester) async {
-      await tester.pumpWidget(_view(1.5));
-      await tester.pumpAndSettle();
-      final drag = await _ThumbDrag.start(tester, Axis.vertical);
-      await drag.along(30);
-      expect(
-        _verticalBody(tester).pixels,
-        _verticalBody(tester).maxScrollExtent,
-      );
-      _thumbDragRuns(tester, Axis.vertical);
-
-      await tester.pumpWidget(_view(1.0, height: height));
-      await tester.pump();
-      _thumbDragRuns(tester, Axis.vertical);
-      final body = _verticalBody(tester);
-      expect(body.pixels, body.maxScrollExtent);
-
-      await tester.pump(const Duration(milliseconds: 500));
-      await drag.along(3);
-      _thumbDragRuns(tester, Axis.vertical);
-      expect(body.pixels, body.maxScrollExtent);
-      await drag.release();
-    });
-  }
-
-  for (final width in [380.0, 420.0]) {
-    _winTest('a Scale change 1.5 → 1.0 and a view width of $width in one '
-        'update during a horizontal thumb drag at the end put the view at the '
-        'new end and let the drag go on', (tester) async {
+  _thumbPlatformsTest(
+    'a Scale change 1.5 → 1.0 during a horizontal thumb drag at the end '
+    'puts the view at the new end and lets the drag go on',
+    (tester) async {
       await tester.pumpWidget(_view(1.5, data: _wide));
       await tester.pumpAndSettle();
       final drag = await _ThumbDrag.start(tester, Axis.horizontal);
       await drag.along(40);
-      expect(
-        _horizontalBody(tester).pixels,
-        _horizontalBody(tester).maxScrollExtent,
-      );
+      final oldEnd = _horizontalBody(tester).maxScrollExtent;
+      expect(_horizontalBody(tester).pixels, oldEnd);
       _thumbDragRuns(tester, Axis.horizontal);
 
-      await tester.pumpWidget(_view(1.0, data: _wide, width: width));
+      await tester.pumpWidget(_view(1.0, data: _wide));
       await tester.pump();
-      _thumbDragRuns(tester, Axis.horizontal);
       final body = _horizontalBody(tester);
+      expect(body.maxScrollExtent, lessThan(oldEnd));
       expect(body.pixels, body.maxScrollExtent);
+      _thumbDragRuns(tester, Axis.horizontal);
 
-      await tester.pump(const Duration(milliseconds: 500));
       await drag.along(3);
       _thumbDragRuns(tester, Axis.horizontal);
-      expect(body.pixels, body.maxScrollExtent);
+      expect(_horizontalBody(tester).pixels, body.maxScrollExtent);
       await drag.release();
-    });
+    },
+  );
+
+  _thumbPlatformsTest(
+    'a Scale change 1.0 → 1.5 during a horizontal thumb drag at the end '
+    'maps the offset past the old end and lets the drag go on',
+    (tester) async {
+      await tester.pumpWidget(_view(1.0, data: _wide));
+      await tester.pumpAndSettle();
+      final drag = await _ThumbDrag.start(tester, Axis.horizontal);
+      await drag.along(40);
+      final old = _horizontalBody(tester);
+      final oldEnd = old.maxScrollExtent;
+      final oldWidth = oldEnd + old.viewportDimension;
+      expect(old.pixels, oldEnd);
+      _thumbDragRuns(tester, Axis.horizontal);
+
+      await tester.pumpWidget(_view(1.5, data: _wide));
+      await tester.pump();
+      final body = _horizontalBody(tester);
+      final newWidth = body.maxScrollExtent + body.viewportDimension;
+      final mapped = oldEnd / oldWidth * newWidth;
+      expect(mapped, greaterThan(oldEnd));
+      expect(mapped, lessThan(body.maxScrollExtent));
+      expect(body.pixels, moreOrLessEquals(mapped));
+      _thumbDragRuns(tester, Axis.horizontal);
+      await drag.release();
+    },
+  );
+
+  for (final height in [250.0, 350.0]) {
+    _thumbPlatformsTest(
+      'a Scale change 1.5 → 1.0 and a view height of $height in one '
+      'update during a vertical thumb drag at the end put the view at the '
+      'new end and let the drag go on',
+      (tester) async {
+        await tester.pumpWidget(_view(1.5));
+        await tester.pumpAndSettle();
+        final drag = await _ThumbDrag.start(tester, Axis.vertical);
+        await drag.along(30);
+        expect(
+          _verticalBody(tester).pixels,
+          _verticalBody(tester).maxScrollExtent,
+        );
+        _thumbDragRuns(tester, Axis.vertical);
+
+        await tester.pumpWidget(_view(1.0, height: height));
+        await tester.pump();
+        _thumbDragRuns(tester, Axis.vertical);
+        final body = _verticalBody(tester);
+        expect(body.pixels, body.maxScrollExtent);
+
+        await tester.pump(const Duration(milliseconds: 500));
+        await drag.along(3);
+        _thumbDragRuns(tester, Axis.vertical);
+        expect(body.pixels, body.maxScrollExtent);
+        await drag.release();
+      },
+    );
+  }
+
+  for (final width in [380.0, 420.0]) {
+    _thumbPlatformsTest(
+      'a Scale change 1.5 → 1.0 and a view width of $width in one '
+      'update during a horizontal thumb drag at the end put the view at the '
+      'new end and let the drag go on',
+      (tester) async {
+        await tester.pumpWidget(_view(1.5, data: _wide));
+        await tester.pumpAndSettle();
+        final drag = await _ThumbDrag.start(tester, Axis.horizontal);
+        await drag.along(40);
+        expect(
+          _horizontalBody(tester).pixels,
+          _horizontalBody(tester).maxScrollExtent,
+        );
+        _thumbDragRuns(tester, Axis.horizontal);
+
+        await tester.pumpWidget(_view(1.0, data: _wide, width: width));
+        await tester.pump();
+        _thumbDragRuns(tester, Axis.horizontal);
+        final body = _horizontalBody(tester);
+        expect(body.pixels, body.maxScrollExtent);
+
+        await tester.pump(const Duration(milliseconds: 500));
+        await drag.along(3);
+        _thumbDragRuns(tester, Axis.horizontal);
+        expect(body.pixels, body.maxScrollExtent);
+        await drag.release();
+      },
+    );
   }
 
   _winTest('a Scale change while the vertical thumb is pressed and not moved '
