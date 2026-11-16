@@ -205,15 +205,16 @@ void _winTest(String description, WidgetTesterCallback body) => testWidgets(
   variant: TargetPlatformVariant.only(TargetPlatform.windows),
 );
 
-/// A test run on Windows and on iOS, where a scrollbar thumb drag could pass
-/// the end if the scrollbar's physics allowed it.
-void _winAndIosTest(String description, WidgetTesterCallback body) =>
+/// A test run on Windows, on iOS and on Android, where a scrollbar thumb drag
+/// could pass the end if the scrollbar's physics allowed it.
+void _thumbPlatformsTest(String description, WidgetTesterCallback body) =>
     testWidgets(
       description,
       body,
       variant: TargetPlatformVariant({
         TargetPlatform.windows,
         TargetPlatform.iOS,
+        TargetPlatform.android,
       }),
     );
 
@@ -350,7 +351,7 @@ void main() {
     });
   }
 
-  _winAndIosTest(
+  _thumbPlatformsTest(
     'a Scale change 1.5 → 1.0 during a horizontal thumb drag at the end '
     'puts the view at the new end and lets the drag go on',
     (tester) async {
@@ -376,7 +377,7 @@ void main() {
     },
   );
 
-  _winAndIosTest(
+  _thumbPlatformsTest(
     'a Scale change 1.0 → 1.5 during a horizontal thumb drag at the end '
     'maps the offset past the old end and lets the drag go on',
     (tester) async {
@@ -404,7 +405,7 @@ void main() {
   );
 
   for (final height in [250.0, 350.0]) {
-    _winAndIosTest(
+    _thumbPlatformsTest(
       'a Scale change 1.5 → 1.0 and a view height of $height in one '
       'update during a vertical thumb drag at the end put the view at the '
       'new end and let the drag go on',
@@ -435,31 +436,34 @@ void main() {
   }
 
   for (final width in [380.0, 420.0]) {
-    _winAndIosTest('a Scale change 1.5 → 1.0 and a view width of $width in one '
-        'update during a horizontal thumb drag at the end put the view at the '
-        'new end and let the drag go on', (tester) async {
-      await tester.pumpWidget(_view(1.5, data: _wide));
-      await tester.pumpAndSettle();
-      final drag = await _ThumbDrag.start(tester, Axis.horizontal);
-      await drag.along(40);
-      expect(
-        _horizontalBody(tester).pixels,
-        _horizontalBody(tester).maxScrollExtent,
-      );
-      _thumbDragRuns(tester, Axis.horizontal);
+    _thumbPlatformsTest(
+      'a Scale change 1.5 → 1.0 and a view width of $width in one '
+      'update during a horizontal thumb drag at the end put the view at the '
+      'new end and let the drag go on',
+      (tester) async {
+        await tester.pumpWidget(_view(1.5, data: _wide));
+        await tester.pumpAndSettle();
+        final drag = await _ThumbDrag.start(tester, Axis.horizontal);
+        await drag.along(40);
+        expect(
+          _horizontalBody(tester).pixels,
+          _horizontalBody(tester).maxScrollExtent,
+        );
+        _thumbDragRuns(tester, Axis.horizontal);
 
-      await tester.pumpWidget(_view(1.0, data: _wide, width: width));
-      await tester.pump();
-      _thumbDragRuns(tester, Axis.horizontal);
-      final body = _horizontalBody(tester);
-      expect(body.pixels, body.maxScrollExtent);
+        await tester.pumpWidget(_view(1.0, data: _wide, width: width));
+        await tester.pump();
+        _thumbDragRuns(tester, Axis.horizontal);
+        final body = _horizontalBody(tester);
+        expect(body.pixels, body.maxScrollExtent);
 
-      await tester.pump(const Duration(milliseconds: 500));
-      await drag.along(3);
-      _thumbDragRuns(tester, Axis.horizontal);
-      expect(body.pixels, body.maxScrollExtent);
-      await drag.release();
-    });
+        await tester.pump(const Duration(milliseconds: 500));
+        await drag.along(3);
+        _thumbDragRuns(tester, Axis.horizontal);
+        expect(body.pixels, body.maxScrollExtent);
+        await drag.release();
+      },
+    );
   }
 
   _winTest('a Scale change while the vertical thumb is pressed and not moved '

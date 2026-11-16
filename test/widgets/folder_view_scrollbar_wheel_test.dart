@@ -363,12 +363,19 @@ void main() {
       expect(_bar(tester, Axis.vertical).pixels, end);
     });
 
-    _winTest('a track tap moves the body with the scrollbar', (tester) async {
-      final pointer = await pastTheEnd(tester);
-      await trackTapNearTheTop(tester, pointer);
-      expect(_body(tester).pixels, lessThan(_body(tester).maxScrollExtent));
-      expect(_bar(tester, Axis.vertical).pixels, _body(tester).pixels);
-    });
+    testWidgets(
+      'a track tap moves the body with the scrollbar',
+      (tester) async {
+        final pointer = await pastTheEnd(tester);
+        await trackTapNearTheTop(tester, pointer);
+        expect(_body(tester).pixels, lessThan(_body(tester).maxScrollExtent));
+        expect(_bar(tester, Axis.vertical).pixels, _body(tester).pixels);
+      },
+      variant: TargetPlatformVariant({
+        TargetPlatform.windows,
+        TargetPlatform.android,
+      }),
+    );
 
     _winTest('a notch after that track tap moves both by the notch', (
       tester,

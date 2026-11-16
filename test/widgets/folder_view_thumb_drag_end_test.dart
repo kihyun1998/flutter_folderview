@@ -5,8 +5,8 @@ import 'package:flutter_folderview/flutter_folderview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // A scrollbar thumb dragged past the end stops at the end and the drag goes
-// on, with the body on the scrollbar, on desktop and on iOS alike. A fling on
-// a scrollbar goes as far as the platform's own physics takes it.
+// on, with the body on the scrollbar, on desktop, iOS and Android alike. A
+// fling on a scrollbar goes as far as the platform's own physics takes it.
 
 const int _parents = 60;
 const int _children = 20;
@@ -151,6 +151,7 @@ void main() {
       variant: TargetPlatformVariant({
         TargetPlatform.windows,
         TargetPlatform.iOS,
+        TargetPlatform.android,
       }),
     );
   }

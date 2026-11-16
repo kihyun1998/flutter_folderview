@@ -48,7 +48,8 @@ const double _rawMinOverscrollLength = 18;
 ///
 /// A Material `Scrollbar` under a `ScrollbarTheme` of [folderViewThumbTheme] on
 /// every platform but iOS. On iOS, a `RawScrollbar` with the values Material's
-/// `Scrollbar` paints with on desktop.
+/// `Scrollbar` paints with on desktop. On every platform the thumb takes drags
+/// and the track takes taps.
 class FolderViewScrollbarThumb extends StatelessWidget {
   const FolderViewScrollbarThumb({
     super.key,
@@ -82,6 +83,7 @@ class FolderViewScrollbarThumb extends StatelessWidget {
       child: Scrollbar(
         controller: controller,
         thumbVisibility: theme.thumbVisibility,
+        interactive: true,
         child: child,
       ),
     );
