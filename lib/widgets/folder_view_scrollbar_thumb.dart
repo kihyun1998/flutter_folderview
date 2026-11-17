@@ -49,7 +49,8 @@ const double _rawMinOverscrollLength = 18;
 /// A Material `Scrollbar` under a `ScrollbarTheme` of [folderViewThumbTheme] on
 /// every platform but iOS. On iOS, a `RawScrollbar` with the values Material's
 /// `Scrollbar` paints with on desktop. On every platform the thumb takes drags
-/// and the track takes taps.
+/// and the track takes taps. The thumb is placed from the bar's own box: no
+/// ambient `MediaQuery` padding reaches it.
 class FolderViewScrollbarThumb extends StatelessWidget {
   const FolderViewScrollbarThumb({
     super.key,
@@ -64,6 +65,17 @@ class FolderViewScrollbarThumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return MediaQuery.removePadding(
+      context: context,
+      removeLeft: true,
+      removeTop: true,
+      removeRight: true,
+      removeBottom: true,
+      child: _thumb(context),
+    );
+  }
+
+  Widget _thumb(BuildContext context) {
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       final metrics = _thumbMetrics(context, theme);
       return RawScrollbar(
