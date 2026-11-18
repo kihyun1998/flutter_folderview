@@ -12,7 +12,7 @@ topics:
   - treeview
   - explorer
 
-# The floor is the max of what the dependencies demand. just_tooltip 0.5.0
+# The floor is the max of what the dependencies demand. just_tooltip 0.6.0, as 0.5.0,
 # declares Flutter `>=3.32.0` / Dart `>=3.8.0`
 # (`OverlayPortal.overlayChildLayoutBuilder`, first stable in 3.32.0).
 # flutter_smooth_wheel_scroll 0.1.7 declares Flutter `>=3.32.0` / Dart `^3.8.0`
@@ -25,7 +25,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  just_tooltip: ^0.5.1
+  just_tooltip: ^0.6.0
   flutter_smooth_wheel_scroll: ^0.1.7
 
 dev_dependencies:

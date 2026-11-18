@@ -104,9 +104,10 @@ class NodeTooltipTheme<T> {
   ///
   /// On a label tap, `onNodeTap` runs before the toggle. A `show()` on this
   /// Node's controller made inside `onNodeTap` is therefore undone; deferred
-  /// with `scheduleMicrotask` it opens a closed tooltip, and an open one still
-  /// closes. A tooltip opened by a tap stays open while a dialog or page that
-  /// `onNodeTap` opens is shown, and after it closes.
+  /// with `scheduleMicrotask` it opens a closed tooltip and keeps an open one
+  /// open. A dialog or page that `onNodeTap` opens covers the tooltip: the tap
+  /// does not open it, and it stays closed after the route is popped until a
+  /// pointer over the label or another trigger shows it.
   final bool? enableTap;
 
   /// Whether hover triggers the tooltip
@@ -124,7 +125,8 @@ class NodeTooltipTheme<T> {
   /// row is removed, its Parent collapses, or [tooltipBuilderResolver] stops
   /// returning content for its Node. The tooltip closes at once. With
   /// [enableTap], a label tap whose `onNodeTap` makes that happen calls
-  /// [onShow] and then neither [onHide] nor anything visible.
+  /// neither [onShow] nor [onHide], since [onShow] comes after the first frame
+  /// the tooltip is drawn in.
   final VoidCallback? onHide;
 
   /// Whether the tooltip stays visible when hovering over the tooltip itself
