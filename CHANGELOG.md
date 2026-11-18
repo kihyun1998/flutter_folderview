@@ -1,4 +1,4 @@
-## Unreleased
+## 0.13.0
 
 - **deps**: `just_tooltip` `^0.6.0`, up from `^0.5.1` ([#185](https://github.com/kihyun1998/flutter_folderview/issues/185)). No API was removed upstream and the Flutter `3.32.0` / Dart `3.8.0` floor does not move. `^0.5.1` does not admit `0.6.0`, so an app that also depends on `just_tooltip` raises its own constraint to `^0.6.0`.
   - **What a consumer sees differently.** These come from just_tooltip. Measured on a Child label tooltip, against 0.5.1:
